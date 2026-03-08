@@ -1,0 +1,26 @@
+<?php
+return [
+    'title' => '¿Qué es el préstamo para inversión?',
+    'intro_text' => 'El préstamo para inversión es una estrategia que permite pedir dinero prestado para realizar inversiones con un potencial de rendimiento superior al costo del préstamo (efecto de apalancamiento).',
+    'btn_request' => 'Hacer una solicitud',
+    'btn_contact' => 'Contáctenos',
+    'why_title' => '¿Por qué solicitar un préstamo para inversión?',
+    'why_text' => 'La idea es aprovechar el efecto de apalancamiento financiero para aumentar la capacidad de inversión y potencialmente aumentar las ganancias.',
+    'who_title' => '¿Quién utiliza este tipo de préstamo?',
+    'user_1_title' => 'Los inversores inmobiliarios',
+    'user_1_desc' => 'Para comprar bienes raíces mientras esperan una plusvalía.',
+    'user_2_title' => 'Los inversores en bolsa',
+    'user_2_desc' => 'Para comprar acciones con el objetivo de obtener ganancias importantes.',
+    'disclaimer' => 'El préstamo para inversión conlleva riesgos. Una gestión prudente y la comprensión de los costos son esenciales.',
+    'advantages_title' => 'Las principales ventajas del préstamo para inversión',
+    'adv_list' => [
+        'Aprovechar las subidas de los mercados',
+        'Maximizar sus inversiones manteniendo su liquidez',
+        'Diversificar su cartera',
+        'Aprovechar la deducibilidad de los gastos por intereses',
+        'Acceso a las ventajas de los fondos segregados',
+        'Aumentar el valor de la cartera (se requiere tolerancia al riesgo)',
+    ],
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];

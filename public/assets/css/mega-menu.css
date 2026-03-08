@@ -1,0 +1,475 @@
+/* =========================================================
+   VIP — HEADER + MEGA MENU ONLY
+   ========================================================= */
+
+/* =========================
+   1) TOP BAR
+   ========================= */
+.vip-topbar {
+    background: #0b0d26;
+    color: rgba(255, 255, 255, .92);
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+    font-size: .95rem;
+}
+
+.vip-topbar a {
+    color: rgba(255, 255, 255, .92);
+    text-decoration: none;
+}
+
+.vip-topbar a:hover {
+    opacity: .92;
+}
+
+.vip-topbar .vip-lang a {
+    font-weight: 800;
+}
+
+.vip-topbar .vip-lang a.is-active {
+    color: #c9a050;
+}
+
+.vip-topbar .vip-lang .sep {
+    color: rgba(255, 255, 255, .55);
+}
+
+/* =========================
+   2) NAVBAR (base)
+   ========================= */
+.vip-navbar {
+    background-color: #0e1030;
+    position: relative;
+    z-index: 3000;
+}
+
+.vip-navbar .vip-logo {
+    height: 62px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .3));
+}
+
+.vip-navbar .nav-link {
+    font-weight: 700;
+    color: rgba(255, 255, 255, .92) !important;
+    padding: 12px 14px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    font-size: .86rem;
+}
+
+.vip-navbar .nav-link:hover,
+.vip-navbar .nav-link.active,
+.vip-navbar .active-gold {
+    color: #c9a050 !important;
+}
+
+.vip-navbar .nav-link.dropdown-toggle {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    position: relative;
+}
+
+.vip-navbar .dropdown-toggle::after {
+    display: none !important;
+}
+
+.vip-navbar .nav-link.dropdown-toggle:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.vip-navbar .nav-link.dropdown-toggle:focus-visible {
+    outline: 3px solid rgba(201, 160, 80, .85) !important;
+    outline-offset: 6px;
+    border-radius: 12px;
+}
+
+/* =========================
+   3) BOUTON GOLD
+   ========================= */
+.vip-navbar .vip-btn-gold {
+    background: linear-gradient(45deg, #b88b4a, #e6c67c) !important;
+    color: #0d0e12 !important;
+    border: none !important;
+    font-weight: 900;
+    border-radius: 999px !important;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .22);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1 !important;
+    padding: 10px 18px !important;
+    min-height: 42px !important;
+}
+
+.vip-navbar .vip-btn-gold:hover {
+    filter: brightness(1.05);
+}
+
+/* =========================
+   4) MEGA MENU WRAPPER
+   ========================= */
+.vip-navbar .dropdown-menu.vip-mega-menu {
+    position: absolute;
+    top: calc(100% - 2px);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    width: min(920px, calc(100vw - 56px));
+    max-width: calc(100vw - 56px);
+    margin-top: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 18px;
+    background: transparent;
+    box-shadow: 0 18px 55px rgba(0, 0, 0, .22);
+    z-index: 4000;
+    overflow: visible;
+
+    /* état fermé */
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition: opacity 160ms ease, transform 160ms ease, visibility 160ms ease;
+    will-change: opacity, transform;
+}
+
+.vip-navbar .dropdown-menu.vip-mega-menu.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Shell + watermark */
+.vip-mega-menu .vip-mega-shell {
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 18px;
+    padding: 16px;
+}
+
+.vip-mega-menu .vip-mega-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("/assets/img/menu/background_nos_services.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.04;
+    /* ✅ watermark très léger */
+    pointer-events: none;
+}
+
+.vip-mega-menu .vip-mega-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, .92);
+    pointer-events: none;
+}
+
+.vip-mega-menu .vip-mega-shell>* {
+    position: relative;
+    z-index: 1;
+}
+
+/* =========================
+   5) PILLS (colonne gauche)
+   ========================= */
+.vip-navbar .vip-mega-pills .nav-link {
+    text-align: left;
+    border-radius: 14px;
+    padding: 12px 12px;
+    color: #14151a !important;
+    background: transparent !important;
+    font-weight: 900;
+    letter-spacing: .02em;
+    text-transform: none;
+    font-size: .98rem;
+}
+
+.vip-navbar .vip-mega-pills .nav-link:hover {
+    background: rgba(0, 0, 0, .04) !important;
+}
+
+.vip-navbar .vip-mega-pills .nav-link.active {
+    background: linear-gradient(45deg, #b88b4a, #e6c67c) !important;
+    color: #14151a !important;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, .12);
+}
+
+/* =========================
+   6) PANELS (CTA + Cards)
+   => même design “Besoin d’un conseil ?”
+   ========================= */
+.vip-navbar .vip-mega-panel {
+    border-radius: 16px;
+    background: linear-gradient(180deg, rgba(201, 160, 80, .12), rgba(201, 160, 80, .06));
+    border: 1px solid rgba(201, 160, 80, .25);
+    padding: 14px;
+    backdrop-filter: blur(6px);
+}
+
+/* CTA texte */
+.vip-navbar .vip-mega-cta-title {
+    font-weight: 900;
+}
+
+.vip-navbar .vip-mega-cta-sub {
+    color: rgba(0, 0, 0, .65);
+}
+
+/* CTA bouton : wrap ok */
+.vip-navbar .vip-mega-cta .vip-btn-gold {
+    width: 100%;
+    display: block !important;
+    text-align: center !important;
+    padding: 10px 12px !important;
+    min-height: 44px !important;
+    font-size: .90rem !important;
+    line-height: 1.15 !important;
+    white-space: normal !important;
+}
+
+/* =========================
+   7) COLONNE DROITE
+   ========================= */
+.vip-navbar .vip-mega-content {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* 2 cartes égales */
+.vip-navbar .vip-mega-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    align-items: stretch;
+    /* ✅ mêmes hauteurs */
+}
+
+.vip-navbar .vip-mega-card {
+    min-height: 220px;
+    /* ajuste si tu veux +/− */
+}
+
+/* liens services */
+.vip-navbar .vip-mega-link {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    color: #101217;
+    font-weight: 800;
+    padding: 10px 12px;
+    border-radius: 12px;
+    white-space: normal;
+    line-height: 1.25;
+    transition: background 120ms ease, transform 120ms ease;
+}
+
+.vip-navbar .vip-mega-link:hover {
+    background: rgba(201, 160, 80, .22);
+    transform: translateY(-1px);
+}
+
+.vip-navbar .vip-mega-link:focus-visible {
+    outline: 3px solid rgba(201, 160, 80, .95);
+    outline-offset: 2px;
+}
+
+/* =========================
+   8) BRIDGE (hover stable)
+   ========================= */
+@media (min-width:1200px) {
+    .vip-navbar .nav-link.dropdown-toggle::after {
+        content: "";
+        position: absolute;
+        left: -18px;
+        right: -18px;
+        bottom: -34px;
+        height: 70px;
+        background: transparent;
+    }
+}
+
+/* =========================
+   9) RESPONSIVE
+   ========================= */
+@media (max-width:1400px) {
+    .vip-navbar .dropdown-menu.vip-mega-menu {
+        width: min(860px, calc(100vw - 40px));
+        max-width: calc(100vw - 40px);
+    }
+}
+
+@media (max-width:1300px) {
+    .vip-navbar .dropdown-menu.vip-mega-menu {
+        max-height: calc(100vh - 140px);
+        overflow: auto;
+    }
+}
+
+/* =========================
+   10) MOBILE (<1200px)
+   ========================= */
+@media (max-width:1199.98px) {
+    .vip-navbar .navbar-collapse {
+        max-height: 80vh;
+        overflow-y: auto;
+        background-color: #0e1030;
+    }
+
+    .vip-navbar .dropdown-menu.vip-mega-menu {
+        position: static !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        pointer-events: auto !important;
+        background: rgba(255, 255, 255, .05);
+        padding: 12px 10px !important;
+        box-shadow: none !important;
+    }
+
+    .vip-mega-menu .vip-mega-shell {
+        background: transparent;
+        padding: 0 !important;
+    }
+
+    .vip-navbar .vip-mega-content {
+        max-height: none;
+        overflow: visible;
+        padding-right: 0;
+    }
+
+    .vip-navbar .vip-mega-grid {
+        grid-template-columns: 1fr;
+        /* en colonne sur mobile */
+    }
+}
+
+/* FIX: empêche les gros trous entre les liens du menu */
+.vip-navbar .navbar-collapse {
+    justify-content: flex-end;
+    /* garde le menu à droite */
+}
+
+.vip-navbar .navbar-nav {
+    width: auto !important;
+    /* empêche l'étirement */
+    justify-content: flex-end !important;
+    /* au lieu de space-between */
+    gap: 0.5rem !important;
+    /* espace régulier (ajuste si tu veux) */
+}
+
+.vip-navbar .navbar-nav .nav-item {
+    flex: 0 0 auto !important;
+    /* évite qu’un item prenne tout l’espace */
+}
+
+/* 1) Le conteneur de la navbar : laisse de la place au logo */
+.vip-navbar .navbar-brand {
+    margin-right: 24px;
+    /* espace entre logo et menu */
+}
+
+/* 2) Le bloc menu à droite + espace minimum */
+.vip-navbar .navbar-collapse {
+    justify-content: flex-end;
+}
+
+/* 3) Empêche le menu de coller au logo */
+.vip-navbar .navbar-nav {
+    margin-left: 16px;
+    /* espace de sécurité côté logo */
+    gap: 0.6rem;
+    /* espacement entre items */
+    flex-wrap: nowrap;
+    /* évite les retours ligne bizarres */
+}
+
+/* 4) Si jamais ton logo est trop large sur certains écrans */
+@media (min-width: 1200px) {
+    .vip-navbar .vip-logo {
+        max-width: 180px;
+        /* ajuste: 160-200 selon ton logo */
+    }
+}
+
+/* =========================================================
+   FIX CHEVAUCHEMENT LOGO < 1400px
+   ========================================================= */
+@media (max-width: 1399.98px) {
+
+    /* 1) Réduit le logo juste dans cette zone */
+    .vip-navbar .vip-logo {
+        height: 52px;
+        /* avant: 62px */
+    }
+
+    /* 2) Réduit un peu l'espace interne des liens */
+    .vip-navbar .nav-link {
+        padding: 10px 10px;
+        /* avant: 12px 14px */
+        font-size: .82rem;
+        /* avant: .86rem */
+        letter-spacing: .04em;
+        /* avant: .06em */
+    }
+
+    /* 3) Réduit un peu l’espace entre les items */
+    .vip-navbar .navbar-nav {
+        gap: .35rem !important;
+        /* au lieu de .5/.6 */
+    }
+
+    /* 4) Réduit légèrement le bouton CTA */
+    .vip-navbar .vip-btn-gold {
+        padding: 9px 14px !important;
+        min-height: 40px !important;
+        font-size: .92rem;
+    }
+}
+
+@media (max-width: 1399.98px) {
+    .vip-navbar .navbar-brand {
+        margin-right: 28px;
+    }
+
+    .vip-navbar .navbar-nav {
+        margin-left: 18px;
+    }
+}
+
+@media (max-width: 1399.98px) {
+    .vip-navbar .vip-logo {
+        height: 48px;
+    }
+
+    /* réduit logo */
+    .vip-navbar .nav-link {
+        padding: 8px 8px;
+        font-size: .78rem;
+    }
+
+    /* réduit liens */
+    .vip-navbar .navbar-nav {
+        gap: .2rem !important;
+    }
+
+    /* réduit gap */
+    .vip-navbar .vip-btn-gold {
+        padding: 8px 12px !important;
+    }
+
+    /* réduit CTA */
+}

@@ -1,0 +1,82 @@
+<?php
+
+return [
+    'badge' => 'Epay & Retrèt',
+    'title' => 'Plan Anrejistre pou Epay-Envalidite (REEI)',
+    'subtitle' => 'Yon zouti espesyal ou pap jwenn lòt kote pou bati yon sekirite finansye solid.',
+    'cta_btn' => 'Louvri yon REEI',
+
+    'what_is_title' => 'Kisa REEI a ye?',
+    'what_is_text' => 'REEI a se yon plan epay gouvènman Kanada anrejistre ki fèt pou ede asire avni yon moun k ap viv ak yon andikap, yon fason pou tèt li pa chofe nan zafè lajan pou demen.',
+    'tax_shelter_title' => 'Lajan an grandi san Taks',
+    'tax_shelter_text' => 'Enterè lajan an fè a (enterè, dividann) p ap gen okenn taks sou li toutotan l rete anndan plan an.',
+    'non_deductible_title' => 'Lajan ou mete a',
+    'non_deductible_text' => 'Se pa menm jan ak REER, kòb ou mete nan REEI pa diminye sou kantite taks ou dwe peye gouvènman an ditou.',
+
+    'eligibility_title' => 'Ki kondisyon pou w kalifye?',
+    'eligibility_intro' => 'Pou yon moun benefisye l, fòk li respekte 4 kondisyon sa yo :',
+    'condition_ciph' => 'Li dwe gen dwa pou l pran Kredi Taks pou Moun Andikape a (CIPH).',
+    'condition_residence' => 'Fòk l ap viv kòm moun peyi Kanada.',
+    'condition_age' => 'Li dwe gen mwens pase 60 an (ou ka mete lajan ladan l jis lè l gen 59 an).',
+    'condition_sin' => 'Li dwe gen yon Nimewo Asirans Sosyal (NAS) ki valab.',
+    'ciph_info_title' => 'Kisa CIPH la ye menm?',
+    'ciph_info_text' => 'Se yon ti avantaj gouvènman an ofri sou taks moun ki gen yon andikap grav anpil ki la lontan pap bezwen ranbouse. Li la pou kouvri lòt ti depans moun nan oblije fè a koz maladi l la.',
+
+    'specs_title' => 'Karakteristik plan an',
+    'spec_limit_lifetime' => 'Maksimòm pou lavi w',
+    'spec_limit_lifetime_val' => '$200 000',
+    'spec_limit_annual' => 'Limit pou ane a',
+    'spec_limit_annual_val' => 'Li pa gen okenn limit',
+    'spec_deadline' => 'Dat limit la',
+    'spec_deadline_val' => 'Nan fen ane moun nan ap fete 59 an l lan',
+    'spec_contributor' => 'Kiyès ki ka mete kòb la?',
+    'spec_contributor_val' => 'Nenpòt moun (si l gen yon pèmisyon ekri pou sa).',
+
+    'grants_title' => 'Sibvansyon Gouvènman an',
+    'grants_subtitle' => 'Ou ka jwenn jiska $90 000 nan èd sa a pou tout lavi w.',
+
+    'scei_name' => 'Sibvansyon Gouvènman Kanada (SCEI)',
+    'scei_max' => 'Max. $70 000 pou lavi w',
+    'scei_desc' => 'Gouvènman an ka ajoute jiska 300 % anplis sou kòb ou mete a (sa baze sou kantite lajan fanmi an fè).',
+    'scei_annual' => 'Jiska $3 500 chak ane',
+
+    'bcei_name' => 'Bon Gouvènman Kanada a (BCEI)',
+    'bcei_max' => 'Max. $20 000 pou lavi w',
+    'bcei_desc' => 'Sa se pou fanmi ki pa fè gwo lajan yo. Ou pa menm oblije mete yon santim pou w jwenn li.',
+    'bcei_annual' => 'Jiska $1 000 chak ane',
+
+    'benefits_title' => 'Poukisa pou w chwazi REEI a?',
+    'benefit_security' => 'Sekirite Finansye',
+    'benefit_security_desc' => 'Lapè lespri pou moun ki andikape a pou demen l ka asire.',
+    'benefit_social' => 'Li pap deranje èd sosyal ou',
+    'benefit_social_desc' => 'Li pap afekte kòb gouvènman Kanada ba ou deja yo (SRG, Pansyon granmoun, Byennèt Sosyal, elt.).',
+    'benefit_flexibility' => 'Ou sèvi avè l jan w vle',
+    'benefit_flexibility_desc' => 'Ou ka pran l pou w peye moun k ap pran swen w yo, lwaye kay ou ak anpil lòt bezwen ou.',
+
+    'investments_title' => 'Kalite envestisman ou ka fè avè l',
+    'inv_funds' => 'Fon Komen ak Fon Distenk',
+    'inv_cpg' => 'Sètifika pou plasman garanti (CPG)',
+    'inv_stocks' => 'Aksyon ki vann nan Labous',
+    'inv_etf' => 'Fon k ap vann nan labous yo (FNB)',
+    'inv_bonds' => 'Obligasyon yo',
+
+    'faq_title' => 'Kesyon yo Poze Souvan (FAQ)',
+    'q1' => 'Kiyès ki ka gen kont REEI sa a sou non l?',
+    'a1' => 'Moun k ap benefisye lajan an (si l majè e si lespri l anplas), yon paran l, yon titè. Jiskaske rive 2026, madanm oswa mari moun nan, frè l ak sè l ka ouvri kont lan pou li si l se yon granmoun men lespri l pa twò anfòm.',
+    'q2' => 'Kisa Règ 10 an an ye (Penalite a)?',
+    'a2' => 'Se règ kote gouvènman an ap reprann kòb li. Si w rale lajan nan kont lan, w ap oblije remèt gouvènman an kantite kòb sibvansyon li te ba w nan 10 ane anvan ou te rale kòb la.',
+    'q3' => 'Jiska ki laj y ap ba m sibvansyon sa yo?',
+    'a3' => 'Y ap ba ou SCEI ak BCEI an jiska fen ane moun nan ap gen 49 an an. Li trè bon si w rive mete yon maksimòm lajan ladan l anvan dat sa a rive.',
+    'q4' => 'Kijan y ap pran taks sou lajan mwen rale yo?',
+    'a4' => 'Lajan pa w ou te depoze dedan l lan pap gen okenn taks sou li. Se sèlman kòb gouvènman an ba ou ak enterè yo te fè yo k ap gen taks nan ane ou rale lajan an.',
+    'q5' => 'Kisa k ap pase si yo ta retire dwa mwen te gen nan CIPH la?',
+    'a5' => 'Si w pèdi CIPH ou anvan w gen 60 an epitou yo fèmen kont lan, w ap oblije remèt tout lajan gouvènman an te ba ou pandan 10 dènye lane yo.',
+
+    'q6' => 'Ki kalite plasman ki ka fèt anndan yon REEI?',
+    'a6' => 'REEI a ka pran anpil kalite plasman : Fon Komen, fon distenk, CPG, aksyon ki vann nan labous, FNB, ak obligasyon yo.',
+    'q7' => 'Kisa CIPH la ye menm?',
+    'a7' => 'Kredi Taks pou Moun Andikape a (CIPH) se yon avantaj gouvènman an bay pou pèmèt moun ki andikape pèmanan pa peye kèk taks. Se yon obligasyon pou w genyen l anvan ou ka louvri yon REEI.',
+
+    'final_cta_title' => 'Ou pare pou w garanti avni w?',
+    'final_cta_text' => 'Ekspè nou yo ap ede w byen konprann tout prensip ak lwa ki genyen nan REEI a pou w ka rale tout avantaj posib ladan l.',
+];

@@ -1,0 +1,33 @@
+<?php
+return [
+    'title' => '¿Qué es un FERR?',
+    'intro_text' => 'El Fondo Registrado de Ingresos de Jubilación (FERR) es un tipo de cuenta de jubilación que permite diferir los impuestos sobre los fondos invertidos hasta su retiro. A menudo se utiliza para convertir los fondos de un REER a la edad de jubilación.',
+    'btn_convert' => 'Hacer una conversión',
+    'btn_contact' => 'Contáctenos',
+    'btn_calc' => 'Calculadora FERR',
+    'rules_list' => [
+        'r1' => '- Las condiciones de conversión del REER en FERR varían según las reglas de la CRA (Agencia de Ingresos de Canadá).',
+        'r2' => '- Una vez en un FERR, los retiros mínimos anuales son obligatorios para mantener la integridad fiscal.',
+    ],
+    'key_points_title' => 'Los puntos clave que debe saber sobre el FERR',
+    'points' => [
+        'p1_title' => 'Conversión del REER',
+        'p1_desc' => 'El REER debe transformarse en FERR a más tardar a los 71 años.',
+        'p2_title' => 'Retiros e Ingresos',
+        'p2_desc' => 'Los retiros de un FERR están sujetos a impuestos como ingresos.',
+        'p3_title' => 'Límites de Retiro',
+        'p3_desc' => 'Se aplican límites mínimos anualmente.',
+        'p4_title' => 'Inversiones',
+        'p4_desc' => 'El FERR puede contener diversos activos (acciones, bonos, etc.).',
+        'p5_title' => 'Transferibilidad',
+        'p5_desc' => 'Transferible entre instituciones sin impacto fiscal.',
+        'p6_title' => 'Cónyuge Sobreviviente',
+        'p6_desc' => 'El cónyuge puede continuar recibiendo los pagos en caso de fallecimiento.',
+        'p7_title' => 'Vida útil limitada',
+        'p7_desc' => 'Algunos FERR requieren liquidación después de cierta edad.',
+    ],
+    'disclaimer' => 'Se recomienda consultar a un asesor para comprender las reglas específicas de su provincia.',
+    'cta_contact' => 'Contáctenos',
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];

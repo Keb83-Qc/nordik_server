@@ -1,0 +1,32 @@
+<?php
+return [
+    'title' => 'Kisa yon FRV ye?',
+    'intro_text' => 'Yon Fon Revni Retrèt (FRV) se yon kont epay pou retrèt ki fèt pou ba w yon ti kòb regilye ak lajan ki soti nan yon plan retrèt ki te bloke (CRI oswa RVER).',
+    'btn_convert' => 'Fè yon konvèsyon',
+    'btn_contact' => 'Kontakte nou',
+    'btn_calc' => 'Kalkilatris pou FRV',
+    'challenges_title' => 'Pwen enpòtan sou FRV a',
+    'challenges' => [
+        'c1_title' => 'Konvèsyon',
+        'c1_desc' => 'Lè w rive 71 an, ou oblije chanje CRI/RVER ou a pou w fè l tounen FRV oswa yon rant.',
+        'c2_title' => 'Taks sou kòb ou rale yo',
+        'c2_desc' => 'Lajan ou rale yo ap ajoute sou revni w pou yo kalkile taks ou.',
+        'c3_title' => 'Limit sou kòb ou ka Rale',
+        'c3_desc' => 'Gen gwo limit sou kantite lajan minimòm ak maksimòm ou ka rale chak ane.',
+        'c4_title' => 'Envestisman',
+        'c4_desc' => 'Ou ka mete divès kalite plasman ladan l ki adapte a moun ki gen kont lan.',
+    ],
+    'features' => [
+        'f1_title' => 'Transfè ki limite anpil',
+        'f1_desc' => 'Anjeneral, ou pa ka transfere fon sa yo ankò yon fwa ou fin konvèti yo.',
+        'f2_title' => 'Moun ou Marye avè l la',
+        'f2_desc' => 'Moun ou chwazi a kapab resevwa pèman yo nan plas ou lè w mouri.',
+        'f3_title' => 'Li gen yon limit tan',
+        'f3_desc' => 'Trè souvan, ou oblije vide l nèt epi fè l tounen yon rant pou lavi.',
+    ],
+    'disclaimer' => 'Règ FRV yo chanje selon pwovens lan. Pale ak yon ekspè pou l gade sitiyasyon w lan.',
+    'cta_contact' => 'Kontakte nou',
+    'info_text' => 'Règ ki fèt espesyalman pou CRI ak FRV yo ka chanje de yon pwovens a yon lòt nan Kanada.',
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

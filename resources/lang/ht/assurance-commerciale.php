@@ -1,0 +1,26 @@
+<?php
+return [
+    'title' => 'Kisa asirans komèsyal la ye?',
+    'intro_text' => 'Asirans Komèsyal la jwe yon gwo wòl nan pwoteje biznis ou. Li sèvi kòm yon boukliye finansye, ki ba ou lapè lespri lè gen yon bagay ou pa t atann ki rive, tankou dega materyèl, vòl, dife oswa responsablite sivil.',
+    'btn_quote' => 'Fè yon soumisyon',
+    'btn_contact' => 'Kontakte nou',
+    'pillars' => [
+        'p1_title' => 'Yon avni ki asire',
+        'p1_desc' => 'Asire avni biznis ou ak yon asirans komèsyal ki serye epi fleksib.',
+        'p2_title' => 'Yon patenarya solid',
+        'p2_desc' => 'An patenarya ak Trushield Assurance, nou ofri solisyon ki byen adapte.',
+        'p3_title' => 'Pwoteksyon konplè',
+        'p3_desc' => 'Asirans nou an pwoteje w kont risk finansye, dega materyèl ak responsablite sivil.',
+        'p4_title' => 'Ekspètiz ak Lapè lespri',
+        'p4_desc' => 'Gen yon ekip ekspè k ap akonpaye w. Chwazi lapè lespri.',
+    ],
+    'cost_title' => 'Bagay ki fè pri a chanje',
+    'cost_text' => 'An mwayèn, pri yon asirans komèsyal varye ant 1 000 rive nan plizyè 10 000 dola pa ane, selon gwosè biznis la, kalite biznis la, ak kote li ye a.',
+    'types_title' => 'Gen de kalite asirans komèsyal',
+    'type_1_title' => 'Asirans tout risk',
+    'type_1_desc' => 'Li pi konplè epi li kouvri anpil anpil sitiyasyon, sof kèk ti esepsyon espesifik.',
+    'type_2_title' => 'Asirans pou risk yo chwazi sèlman',
+    'type_2_desc' => 'Li pi bon mache, li bay mwens pwoteksyon, epi li kouvri sèlman pèt ki gen rapò ak kèk sitiyasyon ki byen presize.',
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

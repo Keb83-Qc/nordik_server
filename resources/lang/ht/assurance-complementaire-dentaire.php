@@ -1,0 +1,67 @@
+<?php
+
+return [
+    'title' => 'Asirans Sante Konplemantè ak Dantè',
+    'subtitle' => 'Pwoteje tèt ou plis pase sa RAMQ bay',
+    'intro_p1' => 'Nan Kanada, ak sitou nan Kebèk, plan asirans sante piblik ou (tankou RAMQ) ofri yon pwoteksyon ki esansyèl, men gen anpil gwo twou ki rete, sitou nan zafè swen li pa kouvri.',
+    'intro_p2' => 'Se poutèt sa asirans konplemantè a vrèman nesesè. Èske w ap chèche kouvri depans ou pa t atann pou medikaman preskripsyon, pou sèvis pwofesyonèl sante tankou masoterapi, kiwopratik oswa osteyopati, oubyen pou gwo kòb swen dantis mande?',
+    'intro_p3' => 'Nou ka ba ou bon enfòmasyon sou pi bon solisyon asirans pou medikaman ak dantis ki fèt espesyalman pou moun ki abite nan Kebèk, yon fason pou tèt ou ka trankil nan zafè lajan.',
+    'btn_quote' => 'Jwenn yon soumisyon',
+    'btn_contact' => 'Kontakte nou',
+
+    'essential_title' => 'Poukisa li tèlman enpòtan nan Kebèk?',
+    'meds_title' => 'Asirans Medikaman',
+    'meds_text' => 'Lalwa nan Kebèk rann asirans medikaman obligatwa. Si w pa nan yon asirans prive nan travay ou, ou oblije enskri nan plan piblik RAMQ la. Men, plan piblik sa a ka mande w peye anpil franchiz ak kò-asirans (co-assurance). Yon asirans prive ap fè w peye mwens lajan nan pòch ou epi l ap elaji lis medikaman ou ka jwenn yo.',
+    'dental_title' => 'Asirans Dantè',
+    'dental_text' => 'Swen dantis yo (tcheke dan, netwayaj, plonbaj, kouwòn) se youn nan pi gwo depans sistèm piblik la pa kouvri. Yon bon asirans dantè ap pèmèt ou jwenn swen prevansyon ak gwo tretman san l pa kraze bidjè w.',
+
+    'coverage_title' => 'Sa Asirans Swen Konplemantè a kouvri',
+    'coverage_intro' => 'Gwo objektif yon asirans konplemantè se ranpli vid asirans pwovens la kite.',
+    'cov_1_title' => 'Medikaman sou preskripsyon',
+    'cov_1_desc' => 'Li kouvri medikaman ki nan lis la, pou konplete oswa ranplase RAMQ.',
+    'cov_2_title' => 'Swen dantè',
+    'cov_2_desc' => 'Ranbouse frè pou tcheke dan, netwayaj, plonbaj, kouwòn ak pwotèz.',
+    'cov_3_title' => 'Swen paramedikal',
+    'cov_3_desc' => 'Espesyalis yo pa kouvri yo : fizyoterapi, kiwopratik, osteyopati, masoterapi, sikològ.',
+    'cov_4_title' => 'Swen pou je',
+    'cov_4_desc' => 'Egzamen zye, linèt ak vè de kontak.',
+    'cov_5_title' => 'Frè ijans aletranje',
+    'cov_5_desc' => 'Swen medikal ijans lè w ap vwayaje deyò pwovens la oswa deyò Kanada.',
+    'cov_6_title' => 'Lòt kalite sèvis',
+    'cov_6_desc' => 'Anbilans, swen enfimyè nan kay apre operasyon.',
+
+    'stats_title' => 'Kèk chif sou mache a',
+    'stat_1' => 'Prèske 70 % Kanadyen gen yon asirans konplemantè.',
+    'stat_2' => 'Nan lane 2023, yo te peye 48,2 milya dola nan dedomajman pou sante.',
+    'stat_3' => '1 Kanadyen sou 4 pa al kay dantis paske sa koute twò chè.',
+    'stat_4' => 'Pèman pou swen sante mantal te ogmante 45 % nan espas yon ane.',
+
+    'dental_focus_title' => 'Asirans Dantè: Yon nesesite',
+    'dental_focus_intro' => 'Kontrèman ak swen medikal yo, sistèm piblik yo pa fin kouvri sèvis dantè yo, sa ki fè yon asirans prive vrèman enpòtan.',
+    'dental_cost_title' => 'Pri ak Fason sa fèt',
+    'dental_cost_text' => 'Fanmi nan Kebèk yo se moun ki depanse plis lajan kach pou swen dantè. Yon prim prive ap koute w ant $40 ak plis pase $300 pa mwa, selon nivo kouvèti a.',
+    'dental_payment_title' => 'Kijan pèman yo fèt',
+    'dental_payment_1' => 'Franchiz : Lajan ou dwe peye anvan asirans lan kòmanse ranbouse w (egz: $25-50/pa ane).',
+    'dental_payment_2' => 'Kò-asirans (Swen debaz) : Asirans lan souvan kouvri 80 %, epi ou peye 20 % an.',
+    'dental_payment_3' => 'Kò-asirans (Gwo swen) : Yo souvan separe l mwatye mwatye (50 % / 50 %) pou kouwòn ak pon (pont).',
+    'dental_prevention_title' => 'Enpòtans prevansyon an',
+    'dental_prevention_text' => 'Anviwon 27 % granmoun nan Kebèk pa ka jwenn swen ki esansyèl yo poutèt pri a. Maladi nan dan lakòz elèv rate lekòl 2,26 milyon fwa chak ane.',
+
+    'faq_title' => 'Kesyon yo poze souvan (FAQ)',
+    'faq_q1' => 'Kisa asirans dantè konplemantè a ye?',
+    'faq_a1' => 'Se yon asirans prive ki peye pou frè (netwayaj, egzamen, tretman) RAMQ pa ranbouse yo. Anpil fwa, li vin ansanm ak asirans sante konplemantè a.',
+
+    'faq_q2' => 'Èske asirans dantè a obligatwa?',
+    'faq_a2' => 'Non, eksepte pou kèk ti swen pou timoun RAMQ kouvri. Men, nou rekòmande w anpil pou w genyen l paske swen prive yo koute trè chè.',
+
+    'faq_q3' => 'Kijan m ka fè tretman m yo koute mwens chè?',
+    'faq_a3' => '1. Pran yon asirans prive (y ap ranbouse yon pati).<br>2. Gade si w kalifye pou nouvo Plan Kanadyen pou Swen Dantè a (RCSD/CDCP).<br>3. Toujou fè prevansyon (al tcheke dan w souvan) pou evite gwo pwoblèm ki pral koute chè.',
+
+    'cta_title' => 'Sante w merite pi bon pwoteksyon an',
+    'cta_text' => 'Pa kite frè dantis oswa medikal kraze bidjè w. Konpare plan yo kounye a.',
+    'cta_btn' => 'Pale ak yon konseye',
+    'blog_title' => 'Zòn konsèy',
+    'blog_subtitle' => 'Atik nou yo sou sante ak asirans.',
+    'blog_no_article' => 'Pa gen atik ki disponib pou kounye a.',
+    'read_more' => 'Konnen plis',
+];

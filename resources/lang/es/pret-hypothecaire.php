@@ -1,0 +1,28 @@
+<?php
+return [
+    'title' => '¿Qué es un préstamo hipotecario?',
+    'intro_text' => 'El préstamo hipotecario es otorgado por una institución financiera para la compra de un bien inmueble. Está garantizado por una hipoteca sobre la propiedad comprada.',
+    'btn_rate' => 'Obtener una tasa',
+    'btn_contact' => 'Contáctenos',
+    'aspects_title' => 'Los aspectos importantes del préstamo hipotecario',
+    'aspects' => [
+        'a1_title' => 'Garantía por la hipoteca',
+        'a1_desc' => 'La propiedad sirve como garantía en caso de falta de pago.',
+        'a2_title' => 'Tasa y Reembolso',
+        'a2_desc' => 'Tasas fijas o variables, reembolso progresivo del capital e intereses.',
+        'a3_title' => 'Pago inicial',
+        'a3_desc' => 'Porcentaje del precio de compra pagado por el prestatario (enganche).',
+        'a4_title' => 'Duración del Préstamo',
+        'a4_desc' => 'Período de amortización, a menudo 25 años.',
+        'a5_title' => 'Gastos y Cargos',
+        'a5_desc' => 'Gastos de cierre, evaluación, seguro hipotecario, etc.',
+        'a6_title' => 'Amortización',
+        'a6_desc' => 'Acumulación progresiva del capital (valor neto) en la casa.',
+    ],
+    'info_text_1' => 'Un préstamo hipotecario es una herramienta poderosa para comprar bienes raíces, pero es crucial comprender las obligaciones financieras asociadas.',
+    'info_text_2' => 'Se recomienda consultar a un experto para tomar decisiones informadas.',
+    'disclaimer' => '*El servicio de corretaje hipotecario es ofrecido por socios independientes.',
+    'cta_btn' => 'Obtener una tasa hipotecaria',
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];

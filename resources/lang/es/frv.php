@@ -1,0 +1,32 @@
+<?php
+return [
+    'title' => '¿Qué es un FRV?',
+    'intro_text' => 'Un Fondo de Ingresos de Jubilación (FRV) es una cuenta de ahorro para la jubilación diseñada para proporcionar ingresos regulares a partir de sumas provenientes de un plan de pensiones bloqueado (CRI o RVER).',
+    'btn_convert' => 'Hacer una conversión',
+    'btn_contact' => 'Contáctenos',
+    'btn_calc' => 'Calculadora de FRV',
+    'challenges_title' => 'Puntos clave y desafíos del FRV',
+    'challenges' => [
+        'c1_title' => 'Conversión',
+        'c1_desc' => 'A los 71 años, conversión obligatoria del CRI/RVER en FRV o renta.',
+        'c2_title' => 'Retiros sujetos a impuestos',
+        'c2_desc' => 'Los retiros se suman a sus ingresos imponibles.',
+        'c3_title' => 'Límites de Retiro',
+        'c3_desc' => 'Límites mínimos y máximos anuales estrictos.',
+        'c4_title' => 'Inversiones',
+        'c4_desc' => 'Contiene diversas inversiones adaptadas al titular.',
+    ],
+    'features' => [
+        'f1_title' => 'Transferibilidad limitada',
+        'f1_desc' => 'Fondos generalmente no transferibles después de la conversión.',
+        'f2_title' => 'Cónyuge Sobreviviente',
+        'f2_desc' => 'El cónyuge designado puede recibir los pagos al fallecer el titular.',
+        'f3_title' => 'Vida útil limitada',
+        'f3_desc' => 'A menudo requiere una liquidación en forma de renta vitalicia.',
+    ],
+    'disclaimer' => 'Las reglas del FRV varían por provincia. Consulte a un experto para su situación.',
+    'cta_contact' => 'Contáctenos',
+    'info_text' => 'Las reglas específicas del CRI y del FRV pueden variar de una provincia a otra en Canadá.',
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];

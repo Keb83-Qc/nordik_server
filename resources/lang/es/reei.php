@@ -1,0 +1,82 @@
+<?php
+
+return [
+    'badge' => 'Ahorro y Jubilación',
+    'title' => 'Plan Registrado de Ahorro para la Discapacidad (REEI)',
+    'subtitle' => 'Una herramienta única para construir una seguridad financiera sostenible.',
+    'cta_btn' => 'Abrir un REEI',
+
+    'what_is_title' => '¿Qué es el REEI?',
+    'what_is_text' => 'El REEI es un plan de ahorro registrado creado por el gobierno de Canadá. Está diseñado específicamente para asegurar la seguridad financiera a largo plazo de una persona que vive con una discapacidad.',
+    'tax_shelter_title' => 'Crecimiento libre de impuestos',
+    'tax_shelter_text' => 'Los ingresos de las inversiones (intereses, dividendos, ganancias de capital) se acumulan libres de impuestos mientras permanezcan en el plan.',
+    'non_deductible_title' => 'Contribuciones',
+    'non_deductible_text' => 'A diferencia del REER, las contribuciones no son deducibles de los ingresos sujetos a impuestos.',
+
+    'eligibility_title' => 'Criterios de Elegibilidad',
+    'eligibility_intro' => 'Para ser designado beneficiario, se deben cumplir estos 4 criterios:',
+    'condition_ciph' => 'Tener derecho al Crédito Fiscal por Discapacidad (CIPH).',
+    'condition_residence' => 'Ser residente de Canadá.',
+    'condition_age' => 'Tener menos de 60 años (contribuciones posibles hasta los 59 años).',
+    'condition_sin' => 'Poseer un Número de Seguro Social (SIN) válido.',
+    'ciph_info_title' => '¿Qué es el CIPH?',
+    'ciph_info_text' => 'Es un crédito fiscal no reembolsable para personas con una deficiencia grave y prolongada. Su objetivo es compensar los costos adicionales asociados a la discapacidad.',
+
+    'specs_title' => 'Características del Plan',
+    'spec_limit_lifetime' => 'Límite de por vida',
+    'spec_limit_lifetime_val' => '$200,000',
+    'spec_limit_annual' => 'Límite anual',
+    'spec_limit_annual_val' => 'Sin límite',
+    'spec_deadline' => 'Fecha límite',
+    'spec_deadline_val' => 'Fin del año de su 59º cumpleaños',
+    'spec_contributor' => '¿Quién aporta?',
+    'spec_contributor_val' => 'Cualquier persona (con autorización por escrito).',
+
+    'grants_title' => 'Subvenciones Gubernamentales',
+    'grants_subtitle' => 'Acceda a hasta $90,000 en ayuda de por vida.',
+
+    'scei_name' => 'Subvención Canadiense (SCEI)',
+    'scei_max' => 'Máx. $70,000 de por vida',
+    'scei_desc' => 'El gobierno añade hasta un 300% de sus contribuciones (según los ingresos familiares).',
+    'scei_annual' => 'Hasta $3,500 / año',
+
+    'bcei_name' => 'Bono Canadiense (BCEI)',
+    'bcei_max' => 'Máx. $20,000 de por vida',
+    'bcei_desc' => 'Para familias de bajos ingresos. No se requieren contribuciones personales.',
+    'bcei_annual' => 'Hasta $1,000 / año',
+
+    'benefits_title' => '¿Por qué elegir el REEI?',
+    'benefit_security' => 'Seguridad Financiera',
+    'benefit_security_desc' => 'Tranquilidad para el futuro del beneficiario.',
+    'benefit_social' => 'Sin impacto social',
+    'benefit_social_desc' => 'No afecta a las prestaciones federales (SRG, Seguridad de la Vejez, Asistencia social, etc.).',
+    'benefit_flexibility' => 'Uso flexible',
+    'benefit_flexibility_desc' => 'El dinero se puede usar para cuidados, ayuda a domicilio u otras necesidades.',
+
+    'investments_title' => 'Tipos de inversiones elegibles',
+    'inv_funds' => 'Fondos mutuos y fondos segregados',
+    'inv_cpg' => 'Certificados de inversión garantizada (CPG)',
+    'inv_stocks' => 'Acciones cotizadas en Bolsa',
+    'inv_etf' => 'Fondos cotizados en bolsa (ETF)',
+    'inv_bonds' => 'Bonos',
+
+    'faq_title' => 'Preguntas Frecuentes (FAQ)',
+    'q1' => '¿Quién puede ser titular del plan?',
+    'a1' => 'El beneficiario (si es mayor de edad y capaz), un padre legal, un tutor o un curador. Hasta 2026, un cónyuge, hermano o hermana también puede abrirlo para un adulto cuya capacidad sea incierta.',
+    'q2' => '¿Qué es la regla de los 10 años (Penalización)?',
+    'a2' => 'Es la regla de reembolso proporcional. Si retira fondos, las subvenciones y bonos recibidos en los 10 años anteriores deben reembolsarse al gobierno.',
+    'q3' => '¿Hasta qué edad se reciben las subvenciones?',
+    'a3' => 'La SCEI y el BCEI se pagan hasta el final del año del 49º cumpleaños. Se recomienda maximizar las contribuciones antes de esta edad.',
+    'q4' => '¿Cómo se gravan los retiros?',
+    'a4' => 'Las contribuciones iniciales no están sujetas a impuestos. Solo las subvenciones, los bonos y los ingresos de inversión (crecimiento) se gravan en el año del retiro.',
+    'q5' => '¿Qué sucede si se pierde el CIPH?',
+    'a5' => 'Si se pierde el CIPH antes de los 60 años y el plan se cierra, las subvenciones de los últimos 10 años deben reembolsarse.',
+
+    'q6' => '¿Qué tipos de inversiones se pueden mantener en un REEI?',
+    'a6' => 'El REEI puede mantener una variedad de inversiones: Fondos mutuos, fondos segregados, CPG (Certificados de inversión garantizada), acciones en Bolsa, ETF (Fondos cotizados en bolsa) y bonos.',
+    'q7' => '¿Qué es el CIPH?',
+    'a7' => 'El Crédito Fiscal por Discapacidad (CIPH) es un crédito fiscal no reembolsable para personas con una deficiencia física o mental grave y prolongada. Es obligatorio para abrir un REEI.',
+
+    'final_cta_title' => '¿Listo para asegurar el futuro?',
+    'final_cta_text' => 'Nuestros expertos le guían a través de las complejas reglas del REEI para maximizar sus derechos.',
+];

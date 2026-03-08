@@ -1,0 +1,20 @@
+<?php
+return [
+    'title' => '¿Qué es el CELI?',
+    'intro_text' => 'El CELI, o Cuenta de Ahorro Libre de Impuestos (TFSA por sus siglas en inglés), es un tipo de cuenta de ahorro que se ofrece en Canadá y que permite invertir dinero libre de impuestos.',
+    'btn_open' => 'Abrir su CELI',
+    'btn_contact' => 'Contáctenos',
+    'btn_calc' => 'Calculadora CELI',
+    'contrib_title' => 'Derechos de contribución',
+    'contrib_text' => 'El límite de contribución es de $7,000 en 2025. Desde 2009 hasta hoy, los derechos de contribución máxima son de $102,000.',
+    'criteria_title' => 'Criterios de elegibilidad',
+    'crit_1' => 'Tener 18 años de edad',
+    'crit_2' => 'Ser residente fiscal en Canadá',
+    'crit_3' => 'Tener un número de seguro social',
+    'modalities_title' => 'Modalidades del CELI',
+    'mod_1' => 'Regla de retiro',
+    'mod_2' => 'Regla de transferencia',
+    'mod_3' => 'Tipos de inversión',
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];

@@ -1,0 +1,20 @@
+<?php
+return [
+    'title' => 'Kisa yon CELI ye?',
+    'intro_text' => 'CELI a (oswa Kont Epay San Taks / TFSA nan lang anglè) se yon kalite kont epay yo ofri nan Kanada ki pèmèt ou sere ak envesti kòb san w pa peye taks sou li ditou.',
+    'btn_open' => 'Louvri CELI ou a',
+    'btn_contact' => 'Kontakte nou',
+    'btn_calc' => 'Kalkilatris pou CELI',
+    'contrib_title' => 'Dwa pou mete kòb',
+    'contrib_text' => 'Maksimum ou ka mete a se $7 000 pou ane 2025 lan. Soti nan lane 2009 pou rive jodi a, pi gwo montan ou gen dwa mete an jeneral se $102 000.',
+    'criteria_title' => 'Kondisyon pou w kalifye',
+    'crit_1' => 'Ou dwe genyen 18 an oswa plis',
+    'crit_2' => 'Ou dwe yon moun k ap viv epi k ap peye taks nan Kanada',
+    'crit_3' => 'Ou dwe gen yon nimewo asirans sosyal (NAS)',
+    'modalities_title' => 'Kijan CELI a fonksyone',
+    'mod_1' => 'Règ pou lè w ap rale kòb',
+    'mod_2' => 'Règ pou lè w ap transfere l',
+    'mod_3' => 'Kalite envestisman ou ka fè yo',
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

@@ -1,0 +1,28 @@
+<?php
+return [
+    'title' => 'Kisa yon prè ipotekè ye?',
+    'intro_text' => 'Yon enstitisyon finansye bay yon prè ipotekè pou pèmèt ou achte yon kay oswa yon tè. Yo sèvi ak pwopriyete w ap achte a kòm garanti (ipotèk) pou prè a.',
+    'btn_rate' => 'Jwenn yon to',
+    'btn_contact' => 'Kontakte nou',
+    'aspects_title' => 'Bagay enpòtan sou prè ipotekè a',
+    'aspects' => [
+        'a1_title' => 'Garanti ak Ipotèk la',
+        'a1_desc' => 'Yo sèvi ak kay la kòm garanti si w pa ka peye.',
+        'a2_title' => 'To ak Ranbousman',
+        'a2_desc' => 'To ki fiks oswa ki ka chanje, peman tikras pa tikras sou kapital la ak enterè yo.',
+        'a3_title' => 'Premye Pèman (Mise de fonds)',
+        'a3_desc' => 'Yon pousantaj nan pri kay la se moun k ap achte a ki dwe bay li.',
+        'a4_title' => 'Dire Prè a',
+        'a4_desc' => 'Tan y ap ba w pou w fin peye a, trè souvan se 25 an.',
+        'a5_title' => 'Frè ak Lòt Depans',
+        'a5_desc' => 'Frè pou siyen papye, evalyasyon kay la, asirans ipotèk, elatriye.',
+        'a6_title' => 'Amòtisman',
+        'a6_desc' => 'Pati nan kay la ki vin pou ou toutbonvre (valè nèt) k ap ogmante chak mwa.',
+    ],
+    'info_text_1' => 'Yon prè ipotekè se yon gwo zouti pou w achte kay oswa tè, men li trèzenpòtan pou w konprann tout obligasyon finansye ki vin avè l yo.',
+    'info_text_2' => 'Nou rekòmande w pale ak yon ekspè pou w ka pran pi bon desizyon yo.',
+    'disclaimer' => '*Sèvis koutye pou ipotèk la fèt ak patnè endepandan nou yo.',
+    'cta_btn' => 'Jwenn yon to pou ipotèk',
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

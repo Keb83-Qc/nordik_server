@@ -1,0 +1,67 @@
+<?php
+
+return [
+    'title' => 'Seguro de Salud Complementario y Dental',
+    'subtitle' => 'Protéjase más allá de la RAMQ',
+    'intro_p1' => 'En Canadá, y más particularmente en Quebec, su régimen público de seguro de salud (como la RAMQ) ofrece una protección esencial, pero persisten lagunas importantes, especialmente en materia de cuidados no cubiertos.',
+    'intro_p2' => 'Es por eso que el seguro complementario es indispensable. ¿Busca cubrir los gastos inesperados de medicamentos recetados, los servicios de profesionales de la salud como masajistas, quiroprácticos u osteópatas, o los costosos cuidados dentales?',
+    'intro_p3' => 'Podemos orientarle sobre las mejores soluciones de seguros de medicamentos y dentales diseñadas específicamente para los residentes de Quebec, asegurándole tranquilidad financiera.',
+    'btn_quote' => 'Obtener una cotización',
+    'btn_contact' => 'Contáctenos',
+
+    'essential_title' => '¿Por qué es esencial en Quebec?',
+    'meds_title' => 'Seguro de Medicamentos',
+    'meds_text' => 'La ley de Quebec hace que el seguro de medicamentos sea obligatorio. Si no está cubierto por un plan colectivo privado, debe afiliarse al régimen público de la RAMQ. Sin embargo, este último puede implicar deducibles y coaseguros significativos. Un seguro privado reduce su parte a pagar y amplía la lista de medicamentos cubiertos.',
+    'dental_title' => 'Seguro Dental',
+    'dental_text' => 'Los cuidados dentales (exámenes, limpiezas, empastes, coronas) son uno de los mayores gastos no cubiertos por el régimen público. Un buen seguro dental le da acceso a cuidados preventivos y tratamientos mayores sin comprometer sus finanzas.',
+
+    'coverage_title' => 'Lo que cubre el Seguro de Cuidados Complementarios',
+    'coverage_intro' => 'El objetivo principal de un plan de seguro complementario es cubrir las deficiencias de la cobertura provincial.',
+    'cov_1_title' => 'Medicamentos recetados',
+    'cov_1_desc' => 'Cubre los medicamentos incluidos en el formulario, complementando o reemplazando a la RAMQ.',
+    'cov_2_title' => 'Cuidados dentales',
+    'cov_2_desc' => 'Reembolso de gastos de exámenes, limpiezas, empastes, coronas y prótesis.',
+    'cov_3_title' => 'Cuidados paramédicos',
+    'cov_3_desc' => 'Especialistas no cubiertos: fisioterapeutas, quiroprácticos, osteópatas, masajistas, psicólogos.',
+    'cov_4_title' => 'Cuidado de la vista',
+    'cov_4_desc' => 'Exámenes de la vista, anteojos y lentes de contacto.',
+    'cov_5_title' => 'Gastos de emergencia en el extranjero',
+    'cov_5_desc' => 'Atención médica de emergencia al viajar fuera de la provincia o de Canadá.',
+    'cov_6_title' => 'Servicios diversos',
+    'cov_6_desc' => 'Ambulancia, atención de enfermería a domicilio después de una cirugía.',
+
+    'stats_title' => 'El mercado en cifras',
+    'stat_1' => 'Casi el 70 % de los canadienses se benefician de una protección complementaria.',
+    'stat_2' => 'En 2023, se pagaron 48,200 millones de dólares en prestaciones de salud.',
+    'stat_3' => '1 de cada 4 canadienses evita ir al dentista debido al costo.',
+    'stat_4' => 'Los pagos por salud mental han aumentado un 45 % en un año.',
+
+    'dental_focus_title' => 'El Seguro Dental: Una necesidad',
+    'dental_focus_intro' => 'A diferencia de los cuidados médicos, los servicios dentales están muy poco cubiertos por los regímenes públicos, lo que hace que el seguro privado sea crucial.',
+    'dental_cost_title' => 'Costos y Estructuras',
+    'dental_cost_text' => 'Los hogares de Quebec son los que más gastan en cuidados dentales directos. Una prima privada varía de $40 a más de $300 por mes según la cobertura.',
+    'dental_payment_title' => 'Funcionamiento de los pagos',
+    'dental_payment_1' => 'Deducible: Cantidad a pagar antes del reembolso (ej: $25-50/año).',
+    'dental_payment_2' => 'Coaseguro (Cuidados básicos): El asegurador a menudo cubre el 80 %, usted paga el 20 %.',
+    'dental_payment_3' => 'Coaseguro (Cuidados mayores): A menudo compartido 50 % / 50 % para coronas y puentes.',
+    'dental_prevention_title' => 'La importancia de la prevención',
+    'dental_prevention_text' => 'Aproximadamente el 27 % de los adultos de Quebec renuncian a los cuidados esenciales debido al costo. Las enfermedades dentales causan 2.26 millones de días de ausentismo escolar al año.',
+
+    'faq_title' => 'Preguntas Frecuentes (FAQ)',
+    'faq_q1' => '¿Qué es el seguro dental complementario?',
+    'faq_a1' => 'Es un seguro privado que cubre los gastos (limpieza, exámenes, tratamientos) no reembolsados por la RAMQ. A menudo está incluido en el seguro de salud complementario.',
+
+    'faq_q2' => '¿Es obligatorio el seguro dental?',
+    'faq_a2' => 'No, excepto para ciertos cuidados infantiles cubiertos por la RAMQ. Sin embargo, es altamente recomendable dados los altos costos de los cuidados privados.',
+
+    'faq_q3' => '¿Cómo reducir el costo de mis tratamientos?',
+    'faq_a3' => '1. Contratar un seguro privado (reembolso parcial).<br>2. Verificar la elegibilidad al nuevo Plan Canadiense de Atención Dental (RCSD).<br>3. Priorizar la prevención (exámenes regulares) para evitar complicaciones costosas.',
+
+    'cta_title' => 'Su salud merece la mejor protección',
+    'cta_text' => 'No deje que los gastos dentales o médicos afecten su presupuesto. Compare los planes ahora mismo.',
+    'cta_btn' => 'Hablar con un asesor',
+    'blog_title' => 'Zona de consejos',
+    'blog_subtitle' => 'Nuestros artículos sobre salud y seguros.',
+    'blog_no_article' => 'No hay artículos disponibles por el momento.',
+    'read_more' => 'Saber más',
+];

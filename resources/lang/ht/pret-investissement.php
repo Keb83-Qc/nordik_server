@@ -1,0 +1,26 @@
+<?php
+return [
+    'title' => 'Kisa yon prè pou envestisman ye?',
+    'intro_text' => 'Prè pou envestisman se yon fason w prete lajan pou w ka fè envèstisman ki gen chans rapòte w plis kòb pase sa prè a koute w la (yo rele sa efè levye / effet de levier).',
+    'btn_request' => 'Fè yon aplikasyon',
+    'btn_contact' => 'Kontakte nou',
+    'why_title' => 'Poukisa pou w pran yon prè envestisman?',
+    'why_text' => 'Lide a se sèvi ak efè levye finansye a pou w jwenn plis kòb nan men w pou w envesti epi pou w gen chans fè plis pwofi.',
+    'who_title' => 'Ki moun ki sèvi ak prè sa a?',
+    'user_1_title' => 'Moun k ap envesti nan kay (Immobilier)',
+    'user_1_desc' => 'Pou yo achte kay epi tann yo pran plis valè pou yo fè kòb.',
+    'user_2_title' => 'Moun k ap envesti nan labous (Bourse)',
+    'user_2_desc' => 'Pou yo achte aksyon avèk lespwa y ap fè anpil gwo pwofi.',
+    'disclaimer' => 'Prè pou envestisman mache ak risk tou. Li trèzenpòtan pou w jere l ak anpil pridans epi pou w byen konprann ki frè l ap pote.',
+    'advantages_title' => 'Pi gwo avantaj prè pou envestisman an genyen',
+    'adv_list' => [
+        'Pwofite de moman mache a ap monte yo',
+        'Mete maksimòm lajan nan plasman w yo toutpandan w kenbe kòb ou gen nan men w lan',
+        'Fè plizyè kalite envestisman diferan (Diversifier portefeuille)',
+        'Pwofite avantaj kote yo retire frè enterè yo sou taks ou',
+        'Jwenn aksè ak avantaj fon distenk yo bay',
+        'Fè tout envestisman w yo (portefeuille) pran valè pi vit (ou dwe yon moun ki ka tolere risk)',
+    ],
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

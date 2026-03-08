@@ -1,0 +1,33 @@
+<?php
+return [
+    'title' => 'Kisa yon FERR ye?',
+    'intro_text' => 'Fon Anrejistre pou Revni Retrèt (FERR) la se yon kalite kont pou retrèt ki pèmèt ou pa peye taks sou lajan ou envesti a jouk lè w ap rale l la. Yo souvan sèvi avè l pou konvèti lajan ki te nan yon REER lè moun nan rive nan laj pou l pran retrèt li.',
+    'btn_convert' => 'Fè yon konvèsyon',
+    'btn_contact' => 'Kontakte nou',
+    'btn_calc' => 'Kalkilatris pou FERR',
+    'rules_list' => [
+        'r1' => '- Kondisyon pou w chanje REER fè l tounen FERR yo chanje selon règ Ajans Reveni Kanada a (ARC).',
+        'r2' => '- Yon fwa lajan an nan yon FERR, lalwa oblije w rale yon minimòm ladan l chak ane pou w respekte règ taks yo.',
+    ],
+    'key_points_title' => 'Bagay enpòtan ou dwe konnen sou FERR la',
+    'points' => [
+        'p1_title' => 'Konvèti REER',
+        'p1_desc' => 'Ou oblije chanje REER ou a pou w fè l tounen yon FERR lè w gen 71 an pi ta.',
+        'p2_title' => 'Lè w ap Rale Kòb ak Revni w',
+        'p2_desc' => 'Lajan ou rale nan FERR la ap gen taks sou li tankou tout lòt revni.',
+        'p3_title' => 'Limit pou Rale Kòb',
+        'p3_desc' => 'Gen yon kantite lajan minimòm ou oblije rale chak ane.',
+        'p4_title' => 'Envestisman',
+        'p4_desc' => 'FERR la ka gen tout kalite byen ladan l (aksyon, obligasyon, elatriye).',
+        'p5_title' => 'Pase l nan yon Lòt Enstitisyon',
+        'p5_desc' => 'Ou ka transfere l sot nan yon enstitisyon pou ale nan yon lòt san sa pa deranje taks ou.',
+        'p6_title' => 'Moun ou Marye avè l la (Si l vivan toujou)',
+        'p6_desc' => 'Lè w mouri, mari w oswa madanm ou ka kontinye ap resevwa lajan yo nan plas ou.',
+        'p7_title' => 'Gen yon Limit Tan sou li',
+        'p7_desc' => 'Gen kèk FERR ki mande pou yo vide yo nèt apre w fin rive nan yon laj.',
+    ],
+    'disclaimer' => 'Nou rekòmande w pale ak yon konseye pou w ka byen konprann règ ki genyen nan pwovens pa w la.',
+    'cta_contact' => 'Kontakte nou',
+    'blog_title' => 'Zòn konsèy',
+    'read_more' => 'Konnen plis',
+];

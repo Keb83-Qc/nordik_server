@@ -1,0 +1,47 @@
+<?php
+return [
+    'title' => '¿Qué es un seguro de vida?',
+    'intro_text' => 'El seguro de vida es un contrato entre un asegurado y un asegurador derivado de un proceso de evaluación. En el marco de este contrato, el asegurador se compromete a pagar al beneficiario designado una cierta cantidad de dinero a cambio del pago regular de primas.<br><br>Esta cantidad de dinero, llamada beneficio por fallecimiento o capital por fallecimiento, generalmente está libre de impuestos para el beneficiario. Existen dos tipos principales de seguros: <strong>temporal</strong> y <strong>permanente</strong>.',
+
+    'temp_title' => '1. Seguro de vida Temporal',
+    'temp_subtitle' => 'Una solución flexible para necesidades de duración determinada.',
+    'card_1_title' => 'Duración Limitada',
+    'card_1_desc' => 'El seguro de vida temporal ofrece una cobertura por un período definido, que va de 10 a 40 años.',
+    'card_2_title' => 'Renovable',
+    'card_2_desc' => 'Al final del período de cobertura, el contrato puede renovarse, a menudo con primas más altas.',
+    'card_3_title' => 'Convertible',
+    'card_3_desc' => 'El seguro temporal puede convertirse en una póliza de seguro de vida permanente sin necesidad de un examen médico.',
+
+    'perm_title' => '2. Seguro de vida Permanente',
+    'perm_subtitle' => 'Una protección de por vida con beneficios financieros.',
+    'perm_card_1_title' => 'Duración Indefinida',
+    'perm_card_1_desc' => 'El seguro de vida permanente proporciona cobertura durante toda la vida del asegurado.',
+    'perm_card_2_title' => 'Valor de Rescate',
+    'perm_card_2_desc' => 'Puede pedir prestado contra el valor acumulado en la póliza o retirarlo.',
+    'perm_card_3_title' => 'Inversión',
+    'perm_card_3_desc' => 'Algunas pólizas incluyen componentes de inversión y dividendos.',
+
+    'why_title' => '¿Por qué contratar un seguro de vida?',
+    'reason_1' => 'Seguridad financiera para la familia',
+    'reason_1_desc' => 'Reemplazo de ingresos para las necesidades familiares. Pago de deudas para evitar el endeudamiento.',
+    'reason_2' => 'Planificación Sucesoral',
+    'reason_2_desc' => 'Cobertura de los impuestos sucesorales. Facilitación de la transferencia de empresas.',
+    'reason_3' => 'Uso como inversión',
+    'reason_3_desc' => 'Ahorro con ventajas fiscales gracias a los componentes de inversión.',
+    'reason_4' => 'Educación de los hijos',
+    'reason_4_desc' => 'Asegurar fondos para la educación de los hijos.',
+
+    'options_title' => 'Opciones de Suscripción',
+    'options_subtitle' => 'Comprender la diferencia entre el seguro con y sin examen médico.',
+    'opt_1_title' => 'Con Tarificación',
+    'opt_1_subtitle' => '(Con examen médico)',
+    'opt_1_text' => 'Proceso completo donde el asegurador evalúa su salud. Esto a menudo permite obtener <strong>las mejores primas</strong>.',
+    'opt_2_title' => 'Sin Tarificación',
+    'opt_2_subtitle' => '(Sin examen médico)',
+    'opt_2_text' => 'También llamado "Aceptación Garantizada". No requiere examen médico, ideal para personas con salud frágil.',
+
+    'btn_quote' => 'Obtener una cotización',
+    'read_more' => 'Saber más',
+    'blog_title' => 'Zona de consejos',
+    'disclaimer' => 'Es esencial comprender bien los términos, condiciones y beneficios de cualquier póliza de seguro de vida antes de firmar un contrato.',
+];

@@ -1,0 +1,47 @@
+<?php
+return [
+    'title' => 'Kisa yon asirans lavi ye?',
+    'intro_text' => 'Asirans lavi se yon kontra ant yon moun ki asire ak yon konpayi asirans ki fèt apre yo fin evalye pri a. Nan kontra sa a, asirans lan pwomèt pou l peye moun ou chwazi a (benefisyè a) yon montan lajan alòske ou menm ou peye prim ou yo regilyèman.<br><br>Montan lajan sa a, yo rele l dedomajman pou lanmò oswa kapital-lanmò, an jeneral li pa gen okenn taks sou li pou benefisyè a. Gen de gwo kalite asirans lavi: <strong>tanporè</strong> ak <strong>pèmanan</strong>.',
+
+    'temp_title' => '1. Asirans lavi Tanporè',
+    'temp_subtitle' => 'Yon solisyon fleksib pou bezwen ki gen yon tan fikse.',
+    'card_1_title' => 'Dire ki Limite',
+    'card_1_desc' => 'Asirans lavi tanporè a ba w pwoteksyon pou yon peryòd byen defini, ki ka soti nan 10 pou rive 40 an.',
+    'card_2_title' => 'Ou ka renouvle l',
+    'card_2_desc' => 'Lè peryòd pwoteksyon an fini, ou ka renouvle kontra a, men souvan asirans lan ap vin pi chè.',
+    'card_3_title' => 'Ou ka chanje l (Konvètib)',
+    'card_3_desc' => 'Ou ka chanje asirans tanporè a pou fè l tounen yon asirans lavi pèmanan san w pa bezwen pase nan okenn egzamen medikal.',
+
+    'perm_title' => '2. Asirans lavi Pèmanan',
+    'perm_subtitle' => 'Yon pwoteksyon pou tout lavi ak plizyè avantaj finansye.',
+    'perm_card_1_title' => 'Dire ki pa Limite',
+    'perm_card_1_desc' => 'Asirans lavi pèmanan an pwoteje w pou tout lavi w nèt.',
+    'perm_card_2_title' => 'Valè Racha (Valeur de rachat)',
+    'perm_card_2_desc' => 'Ou ka fè prete kòb sou valè lajan ki akimile nan kontra a oswa ou ka rale l.',
+    'perm_card_3_title' => 'Envestisman',
+    'perm_card_3_desc' => 'Gen kèk kontra ki gen yon pati ladan l ki la pou envestisman epi ki bay dividann.',
+
+    'why_title' => 'Poukisa pou w pran yon asirans lavi?',
+    'reason_1' => 'Sekirite finansye pou fanmi an',
+    'reason_1_desc' => 'Li ranplase revni w pou fanmi an ka viv. Li peye dèt ou yo pou fanmi an pa rete nan pwoblèm.',
+    'reason_2' => 'Planifikasyon pou Eritaj',
+    'reason_2_desc' => 'Li peye taks ki vini lè y ap transfere byen w yo. Li fasilite pasasyon biznis ou a.',
+    'reason_3' => 'Pou sèvi kòm envestisman',
+    'reason_3_desc' => 'Fè ekonomi ak avantaj sou taks gras a opsyon envestisman ki gen ladan l yo.',
+    'reason_4' => 'Edikasyon pitit ou yo',
+    'reason_4_desc' => 'Asire gen lajan disponib pou peye lekòl ak inivèsite pitit ou yo.',
+
+    'options_title' => 'Opsyon pou w Enskri',
+    'options_subtitle' => 'Konprann diferans ant asirans ki mande egzamen medikal ak sa ki pa mande l yo.',
+    'opt_1_title' => 'Avèk Evalyasyon',
+    'opt_1_subtitle' => '(Avèk egzamen medikal)',
+    'opt_1_text' => 'Se yon pwosesis konplè kote asirans lan verifye eta sante w. Souvan sa pèmèt ou jwenn <strong>pi bon pri yo</strong>.',
+    'opt_2_title' => 'San Evalyasyon',
+    'opt_2_subtitle' => '(San egzamen medikal)',
+    'opt_2_text' => 'Yo rele sa tou "Aseptasyon Garanti". Yo pa mande okenn egzamen medikal, sa trè bon pou moun ki gen pwoblèm sante.',
+
+    'btn_quote' => 'Jwenn yon pri',
+    'read_more' => 'Konnen plis',
+    'blog_title' => 'Zòn konsèy',
+    'disclaimer' => 'Li esansyèl pou w byen konprann tèm, kondisyon, ak tout avantaj yon kontra asirans lavi genyen anvan w siyen l.',
+];

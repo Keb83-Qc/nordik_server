@@ -1,0 +1,26 @@
+<?php
+return [
+    'title' => '¿Qué es el seguro comercial?',
+    'intro_text' => 'El Seguro Comercial juega un papel crucial en la protección de su empresa. Actúa como un escudo financiero, ofreciéndole tranquilidad en caso de eventos imprevistos como daños materiales, robos, incendios o responsabilidades civiles.',
+    'btn_quote' => 'Hacer una cotización',
+    'btn_contact' => 'Contáctenos',
+    'pillars' => [
+        'p1_title' => 'Futuro asegurado',
+        'p1_desc' => 'Asegure el futuro de su empresa con un seguro comercial confiable y flexible.',
+        'p2_title' => 'Asociación Sólida',
+        'p2_desc' => 'En asociación con Trushield Assurance, ofrecemos soluciones adaptadas.',
+        'p3_title' => 'Protección Completa',
+        'p3_desc' => 'Nuestro seguro protege contra los riesgos financieros, los siniestros materiales y la responsabilidad civil.',
+        'p4_title' => 'Experiencia y Serenidad',
+        'p4_desc' => 'Un equipo de expertos lo acompaña. Elija la tranquilidad.',
+    ],
+    'cost_title' => 'Los factores que influyen en el costo',
+    'cost_text' => 'El costo promedio de un seguro comercial varía entre $1,000 y más de $10,000 al año, dependiendo del tamaño, el tipo de empresa y su ubicación.',
+    'types_title' => 'Existen dos tipos de seguros comerciales',
+    'type_1_title' => 'El seguro a todo riesgo',
+    'type_1_desc' => 'Es más completo y cubre una amplia gama de situaciones, salvo excepciones específicas.',
+    'type_2_title' => 'El seguro de riesgos designados',
+    'type_2_desc' => 'Más económico, ofrece menos protección y protege de pérdidas resultantes de situaciones específicas.',
+    'blog_title' => 'Zona de consejos',
+    'read_more' => 'Saber más',
+];
