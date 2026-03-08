@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class AuthController extends Controller
 {
     /**
-     * 
+     *
      * Affiche la page de connexion
      */
     public function showLogin()
@@ -25,60 +25,60 @@ class AuthController extends Controller
      * Gère la connexion
      */
     public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-    \Log::info('LOGIN attempt', [
-        'email' => $request->email,
-        'session_id_before' => $request->session()->getId(),
-    ]);
+        \Log::info('LOGIN attempt', [
+            'email' => $request->email,
+            'session_id_before' => $request->session()->getId(),
+        ]);
 
-    if (!Auth::attempt($credentials)) {
-        return back()
-            ->withErrors(['email' => 'Identifiants invalides.'])
-            ->onlyInput('email');
+        if (!Auth::attempt($credentials)) {
+            return back()
+                ->withErrors(['email' => 'Identifiants invalides.'])
+                ->onlyInput('email');
+        }
+
+        $request->session()->regenerate();
+
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+
+        if ((int) ($user->role_id ?? 0) === 6) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()
+                ->route('login', ['locale' => app()->getLocale()])
+                ->withErrors(['email' => 'Votre compte est en attente de validation.']);
+        }
+
+        $isAdmin = method_exists($user, 'hasAnyRole')
+            ? $user->hasAnyRole(['admin', 'super_admin'])
+            : in_array((int) ($user->role_id ?? 0), [1, 2], true);
+
+        $isAbf = method_exists($user, 'hasRole')
+            ? $user->hasRole('abf')
+            : false;
+
+        $locale = app()->getLocale();
+
+        $target = $isAdmin
+            ? "/{$locale}/admin"
+            : ($isAbf ? "/{$locale}/abf" : "/{$locale}/conseiller");
+
+        \Log::info('LOGIN result', [
+            'ok' => Auth::check(),
+            'user_id' => Auth::id(),
+            'intended' => session('url.intended'),
+        ]);
+
+        return redirect()->intended($target);
     }
-
-    $request->session()->regenerate();
-
-    /** @var \App\Models\User $user */
-    $user = Auth::user();
-
-    if ((int) ($user->role_id ?? 0) === 6) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()
-            ->route('login', ['locale' => app()->getLocale()])
-            ->withErrors(['email' => 'Votre compte est en attente de validation.']);
-    }
-
-    $isAdmin = method_exists($user, 'hasAnyRole')
-        ? $user->hasAnyRole(['admin', 'super_admin'])
-        : in_array((int) ($user->role_id ?? 0), [1, 2], true);
-
-    $isAbf = method_exists($user, 'hasRole')
-        ? $user->hasRole('abf')
-        : false;
-
-    $locale = app()->getLocale();
-
-    $target = $isAdmin
-        ? "/{$locale}/admin"
-        : ($isAbf ? "/{$locale}/abf" : "/{$locale}/conseiller");
-
-    \Log::info('LOGIN result', [
-        'ok' => Auth::check(),
-        'user_id' => Auth::id(),
-        'intended' => session('url.intended'),
-    ]);
-
-    return redirect()->intended($target);
-}
 
     /**
      * Gère l'inscription AJAX et envoie le message interne
