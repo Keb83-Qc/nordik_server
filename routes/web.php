@@ -184,7 +184,7 @@ Route::prefix('{locale}')
         // Auth
         Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
         Route::post('/login', [AuthController::class, 'login'])
-            ->middleware(['throttle:20,1'])
+            ->middleware(['throttle:5,1'])
             ->name('login.post');
         Route::post('/register-ajax', [AuthController::class, 'registerAjax'])
             ->middleware(['throttle:10,1'])

@@ -31,11 +31,6 @@ class AuthController extends Controller
         'password' => ['required'],
     ]);
 
-    \Log::info('LOGIN attempt', [
-        'email' => $request->email,
-        'session_id_before' => $request->session()->getId(),
-    ]);
-
     if (!Auth::attempt($credentials)) {
         return back()
             ->withErrors(['email' => 'Identifiants invalides.'])
@@ -71,12 +66,6 @@ class AuthController extends Controller
         ? "/{$locale}/admin"
         : ($isAbf ? "/{$locale}/abf" : "/{$locale}/conseiller");
 
-    \Log::info('LOGIN result', [
-        'ok' => Auth::check(),
-        'user_id' => Auth::id(),
-        'intended' => session('url.intended'),
-    ]);
-
     return redirect()->intended($target);
 }
 
@@ -98,10 +87,10 @@ class AuthController extends Controller
 
         // 1. Validation
         $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'phone' => 'required|string',
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+            'email'      => 'required|email:rfc,dns|max:255|unique:users,email',
+            'phone'      => ['required', 'string', 'max:20', 'regex:/^[0-9\s\-\+\(\)]+$/'],
         ]);
 
         try {

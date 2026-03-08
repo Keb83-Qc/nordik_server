@@ -100,7 +100,7 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
             {{-- COLONNE 4 : IMAGE AIGLE --}}
             <div
                 class="col-lg-3 col-md-6 text-center text-lg-end d-flex align-items-end justify-content-center justify-content-lg-end">
-                <img src="{{ asset('assets/img/footer/imageVIP-2.webp') }}" class="img-fluid footer-eagle" alt="VIP">
+                <img src="{{ asset('assets/img/footer/imageVIP-2.webp') }}" class="img-fluid footer-eagle" alt="VIP" loading="lazy" width="180" height="220">
             </div>
 
         </div>
@@ -166,9 +166,11 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
     </style>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="{{ asset('assets/js/script.js') }}"></script>
-<script src="{{ asset('assets/js/mega-menu.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer crossorigin="anonymous"></script>
+@php $jsVer = @filemtime(public_path('assets/js/script.js')) ?: '1'; @endphp
+<script src="{{ asset('assets/js/script.js') }}?v={{ $jsVer }}" defer></script>
+@php $menuJsVer = @filemtime(public_path('assets/js/mega-menu.js')) ?: '1'; @endphp
+<script src="{{ asset('assets/js/mega-menu.js') }}?v={{ $menuJsVer }}" defer></script>
 
 
 </body>

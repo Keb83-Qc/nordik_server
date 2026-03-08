@@ -44,7 +44,10 @@ class AppServiceProvider extends ServiceProvider
                 config(['mail.submission_broker_to' => $recipient]);
             }
         } catch (\Throwable $e) {
-            // Fallback .env si DB/settings pas prêts
+            // Fallback .env si DB/settings pas prêts — on logue l'erreur en dev
+            \Illuminate\Support\Facades\Log::warning('MailSettings non disponibles, fallback .env utilisé.', [
+                'reason' => $e->getMessage(),
+            ]);
             $fallback = config('mail.from.address');
             if (! empty($fallback)) {
                 config(['mail.submission_broker_to' => $fallback]);
@@ -52,13 +55,15 @@ class AppServiceProvider extends ServiceProvider
         }
 
         // =========================
-        // SETTINGS (déjà existant)
+        // SETTINGS (mis en cache 30 min)
         // =========================
         try {
             if (Schema::hasTable('settings')) {
-                $settingsData = DB::table('settings')
-                    ->pluck('setting_value', 'setting_key')
-                    ->toArray();
+                $settingsData = Cache::remember('app_settings', 1800, function () {
+                    return DB::table('settings')
+                        ->pluck('setting_value', 'setting_key')
+                        ->toArray();
+                });
 
                 View::share('settings', $settingsData);
             } else {
@@ -73,7 +78,7 @@ class AppServiceProvider extends ServiceProvider
             View::composer('partials.menu', function ($view) {
                 $locale = app()->getLocale();
 
-                $menuServices = Cache::remember("menu_services_$locale", 300, function () use ($locale) {
+                $menuServices = Cache::remember("menu_services_$locale", 1800, function () use ($locale) {
                     return PublicServiceCategory::query()
                         ->where('is_active', 1)
                         ->orderBy('sort_order')

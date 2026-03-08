@@ -8,18 +8,20 @@
 
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/header/favicon.ico') }}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- <link
-        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap"
-        rel="stylesheet"> -->
+    {{-- Préconnexions CDN pour réduire la latence --}}
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+
+    {{-- CSS local en premier (évite le FOUC) --}}
     <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}?v={{ time() }}">
-    <link rel="stylesheet" href="{{ asset('assets/css/mega-menu.css') }}?v={{ time() }}"> -->
-    <link rel="stylesheet" href="{{ asset('assets/css/vip.css') }}?v={{ time() }}">
+    {{-- Bootstrap + Font Awesome depuis CDN --}}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
+
+    {{-- CSS principal — version basée sur la date de modification du fichier (évite le rechargement inutile) --}}
+    @php $vipCssVer = @filemtime(public_path('assets/css/vip.css')) ?: '1'; @endphp
+    <link rel="stylesheet" href="{{ asset('assets/css/vip.css') }}?v={{ $vipCssVer }}">
 
 
 
