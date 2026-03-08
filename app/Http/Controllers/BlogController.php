@@ -71,33 +71,25 @@ class BlogController extends Controller
         $lang = app()->getLocale();
         $fallback = Language::defaultCode() ?? config('app.fallback_locale', 'fr');
 
-        $recentPosts = BlogPost::query()
+        // Récupère les 7 posts voisins en une seule requête puis extrait prev/next/recents
+        $neighbors = BlogPost::query()
             ->where('id', '!=', $post->id)
             ->where(function ($q) use ($lang, $fallback) {
                 $q->whereNotNull("title->{$lang}")
                     ->orWhereNotNull("title->{$fallback}");
             })
+            ->where(function ($q) use ($post) {
+                $q->where('created_at', '<', $post->created_at)
+                    ->orWhere('created_at', '>', $post->created_at);
+            })
             ->orderByDesc('created_at')
-            ->take(5)
+            ->take(7)
             ->get();
 
-        $prevPost = BlogPost::query()
-            ->where('created_at', '<', $post->created_at)
-            ->where(function ($q) use ($lang, $fallback) {
-                $q->whereNotNull("slug->{$lang}")
-                    ->orWhereNotNull("slug->{$fallback}");
-            })
-            ->orderByDesc('created_at')
-            ->first();
+        $recentPosts = $neighbors->take(5);
 
-        $nextPost = BlogPost::query()
-            ->where('created_at', '>', $post->created_at)
-            ->where(function ($q) use ($lang, $fallback) {
-                $q->whereNotNull("slug->{$lang}")
-                    ->orWhereNotNull("slug->{$fallback}");
-            })
-            ->orderBy('created_at')
-            ->first();
+        $prevPost = $neighbors->first(fn($p) => $p->created_at < $post->created_at);
+        $nextPost  = $neighbors->sortBy('created_at')->first(fn($p) => $p->created_at > $post->created_at);
 
         $header_bg = $post->image_url ?: asset('assets/img/blog/Entete-page-blog1.jpg');
 
