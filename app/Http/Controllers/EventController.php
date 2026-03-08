@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -9,12 +10,16 @@ class EventController extends Controller
 {
     public function index()
     {
-        $events = DB::table('events')
-            ->where('is_internal', 0)
-            ->whereDate('event_date', '>=', Carbon::now())
-            ->orderBy('event_date', 'asc')
-            ->orderBy('start_time', 'asc')
-            ->get();
+        // Cache 15 min — les événements changent peu, mais la date "now" doit rester fraîche
+        $today = Carbon::today()->toDateString();
+        $events = Cache::remember("events_upcoming_{$today}", 900, function () {
+            return DB::table('events')
+                ->where('is_internal', 0)
+                ->whereDate('event_date', '>=', Carbon::now())
+                ->orderBy('event_date', 'asc')
+                ->orderBy('start_time', 'asc')
+                ->get();
+        });
 
         return view('pages.evenements', [
             'events' => $events,

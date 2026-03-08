@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use App\Models\BlogPost;
 use App\Models\Partner;
 use App\Models\CareerPage;
@@ -11,15 +12,19 @@ class PageController extends Controller
 {
     private function getConseils(array $keywords)
     {
-        // ... (votre code actuel pour getConseils reste identique)
-        return BlogPost::where(function ($query) use ($keywords) {
-            foreach ($keywords as $word) {
-                $query->orWhere('category->fr', 'LIKE', "%{$word}%");
-            }
-        })
-            ->latest()
-            ->take(3)
-            ->get();
+        // Cache par combinaison de mots-clés (30 min) — évite une requête DB sur chaque page de service
+        $cacheKey = 'conseils_' . md5(implode('|', $keywords));
+
+        return Cache::remember($cacheKey, 1800, function () use ($keywords) {
+            return BlogPost::where(function ($query) use ($keywords) {
+                foreach ($keywords as $word) {
+                    $query->orWhere('category->fr', 'LIKE', "%{$word}%");
+                }
+            })
+                ->latest()
+                ->take(3)
+                ->get();
+        });
     }
 
     // --- PAGES GÉNÉRALES ---
@@ -51,7 +56,9 @@ class PageController extends Controller
     {
         $title = __('PageController.partenaires.header_title');
         $desc = __('PageController.partenaires.header_subtitle');
-        $partners = Partner::where('is_visible', true)->orderBy('sort_order', 'asc')->get();
+        $partners = Cache::remember('partners_visible', 3600, fn() =>
+            Partner::where('is_visible', true)->orderBy('sort_order', 'asc')->get()
+        );
 
         return view('pages.partenaires', [
             'header_title' => $title,
@@ -517,7 +524,7 @@ class PageController extends Controller
 
     public function carrieres()
     {
-        $careerSettings = \App\Models\CareerPage::first();
+        $careerSettings = Cache::remember('career_page_settings', 3600, fn() => CareerPage::first());
 
         return view('pages.carrieres', [
             // Titre et Image
