@@ -23,6 +23,27 @@
     @php $vipCssVer = @filemtime(public_path('assets/css/vip.css')) ?: '1'; @endphp
     <link rel="stylesheet" href="{{ asset('assets/css/vip.css') }}?v={{ $vipCssVer }}">
 
+    {{-- Preload de l'image hero (LCP) sur la page d'accueil uniquement --}}
+    @if(request()->routeIs('home') && isset($slides) && $slides->isNotEmpty())
+    @php
+        $firstSlide = $slides->first();
+        $heroImg = (string)($firstSlide->image ?? '');
+        if (\Illuminate\Support\Str::startsWith($heroImg, ['http://', 'https://'])) {
+            $heroPreload = $heroImg;
+        } elseif (\Illuminate\Support\Str::startsWith($heroImg, ['assets/', '/assets/'])) {
+            $heroPreload = asset(ltrim($heroImg, '/'));
+        } else {
+            $heroPreload = asset('storage/' . ltrim($heroImg, '/'));
+        }
+    @endphp
+    <link rel="preload" as="image" href="{{ $heroPreload }}" fetchpriority="high">
+    @endif
+
+    {{-- Preload de l'image de fond sur les pages internes --}}
+    @if(!request()->routeIs('home') && !request()->routeIs('landing') && isset($header_bg))
+    <link rel="preload" as="image" href="{{ $header_bg }}" fetchpriority="high">
+    @endif
+
 
 
     {{-- Schema.org Spécifique --}}

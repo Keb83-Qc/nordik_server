@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Language;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class WelcomeController extends Controller
 {
@@ -14,15 +15,15 @@ class WelcomeController extends Controller
             return redirect()->route('home', ['locale' => session('locale')]);
         }
 
-        $langs = Language::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->get();
+        // Utilise le cache Language (1h) — évite une requête DB brute à chaque visite
+        $activeCodes = Language::activeCodes();
 
-        $activeCodes = $langs->pluck('code')
-            ->map(fn($c) => strtolower($c))
-            ->values()
-            ->all();
+        $langs = Cache::remember('languages.all_active', 3600, function () {
+            return Language::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get();
+        });
 
         $detected = $this->detectBestLocale($request->getLanguages(), $activeCodes)
             ?? Language::defaultCode();
@@ -31,7 +32,7 @@ class WelcomeController extends Controller
         app()->setLocale($detected);
 
         return view('landing', [
-            'langs' => $langs,
+            'langs'          => $langs,
             'detectedLocale' => $detected,
         ]);
     }
