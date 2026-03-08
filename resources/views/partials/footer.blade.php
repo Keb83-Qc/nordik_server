@@ -172,6 +172,55 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
 @php $menuJsVer = @filemtime(public_path('assets/js/mega-menu.js')) ?: '1'; @endphp
 <script src="{{ asset('assets/js/mega-menu.js') }}?v={{ $menuJsVer }}" defer></script>
 
+{{-- Prefetching: précharge les pages internes au survol pour navigation quasi-instantanée --}}
+<script>
+(function () {
+    // Utilise Speculation Rules API si disponible (Chrome 109+) — le plus rapide
+    if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+        const s = document.createElement('script');
+        s.type = 'speculationrules';
+        s.textContent = JSON.stringify({
+            prefetch: [{
+                source: 'document',
+                eagerness: 'moderate',
+                where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/admin/*' } }, { not: { href_matches: '/abf/*' } }, { not: { href_matches: '/conseiller/*' } }] }
+            }]
+        });
+        document.head.appendChild(s);
+        return;
+    }
+
+    // Fallback: prefetch manuel au survol (65ms de délai pour éviter les prefetchs inutiles)
+    const prefetched = new Set();
+    let timer;
+
+    function prefetch(url) {
+        if (prefetched.has(url)) return;
+        prefetched.add(url);
+        const link = document.createElement('link');
+        link.rel = 'prefetch';
+        link.href = url;
+        link.as = 'document';
+        document.head.appendChild(link);
+    }
+
+    document.addEventListener('mouseover', function (e) {
+        const a = e.target.closest('a[href]');
+        if (!a) return;
+        const href = a.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+        if (/\/(admin|abf|conseiller|logout)/.test(href)) return;
+
+        clearTimeout(timer);
+        timer = setTimeout(() => prefetch(a.href), 65);
+    }, { passive: true });
+
+    document.addEventListener('mouseout', function () {
+        clearTimeout(timer);
+    }, { passive: true });
+})();
+</script>
+
 
 </body>
 

@@ -34,8 +34,12 @@ class SetLocale
 
         // 5) Application
         App::setLocale($locale);
-        Session::put('locale', $locale);
         URL::defaults(['locale' => $locale]);
+
+        // Écrire en session seulement si la valeur a changé (évite une écriture inutile à chaque requête)
+        if (Session::get('locale') !== $locale) {
+            Session::put('locale', $locale);
+        }
 
         return $next($request);
     }

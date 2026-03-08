@@ -13,11 +13,8 @@
             $base = '/' . $currentLocale;
             $loc = $currentLocale;
 
-            // langues actives depuis la DB
-            $langs = \App\Models\Language::query()
-            ->where('is_active', 1)
-            ->orderBy('sort_order')
-            ->get(['code']);
+            // Langues actives depuis le cache (1h) — évite une requête DB brute sur chaque page
+            $langs = collect(\App\Models\Language::activeCodes())->map(fn($c) => (object)['code' => $c]);
             // chemin courant sans préfixe /{locale}
             $path = request()->path(); // ex: fr/services/assurance/...
             $path = preg_replace('#^[a-zA-Z]{2,5}/#', '', $path);
@@ -57,7 +54,7 @@
 <nav class="navbar navbar-expand-xxl vip-navbar sticky-top shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="/">
-            <img src="https://vipgpi.ca/assets/img/menu/VIP_Logo_Gold_Gradient10.png" alt="VIP GPI" class="vip-logo" width="200">
+            <img src="{{ asset('assets/img/menu/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI" class="vip-logo" width="200" height="62">
         </a>
 
         <button class="navbar-toggler border-0 p-2" type="button"
