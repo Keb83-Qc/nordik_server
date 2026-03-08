@@ -85,13 +85,10 @@
         Header set Cache-Control "public, max-age=31536000, immutable"
     </FilesMatch>
 
-    # HTML & PHP — toujours revalidé
-    <FilesMatch "\.(html|php)$">
+    # HTML & PHP — toujours revalidé (PHP servi via index.php, pas directement)
+    <FilesMatch "\.html$">
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
-
-    # Keep-Alive: évite de réouvrir une connexion TCP à chaque ressource
-    Header set Connection keep-alive
 </IfModule>
 
 # ──────────────────────────────────────────────────
