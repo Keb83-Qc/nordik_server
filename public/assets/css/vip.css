@@ -723,3 +723,122 @@ section {
         grid-template-columns: 1fr;
     }
 }
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer-premium {
+    background-color: var(--primary);
+    color: var(--text-muted);
+    padding-top: 80px;
+    border-top: 5px solid var(--secondary);
+}
+
+.footer-title {
+    color: var(--white);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    position: relative;
+    display: inline-block;
+}
+
+.footer-title::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 3px;
+    background-color: var(--secondary);
+    margin-top: 10px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a i {
+    margin-right: 10px;
+    color: var(--secondary);
+    transition: transform 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--white);
+    padding-left: 5px;
+}
+
+.footer-links a:hover i {
+    transform: translateX(5px);
+}
+
+.footer-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 20px;
+}
+
+.footer-contact-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(201, 160, 80, 0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary);
+    flex-shrink: 0;
+}
+
+.footer-contact-text h6 {
+    color: var(--white);
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.footer-contact-text a,
+.footer-contact-text p {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.footer-contact-text a:hover {
+    color: var(--secondary);
+}
+
+.footer-bottom {
+    background: var(--primary-dark);
+    padding: 20px 0;
+    margin-top: 60px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.hover-white {
+    transition: color 0.3s;
+}
+
+.hover-white:hover {
+    color: var(--white) !important;
+}
