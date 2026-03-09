@@ -142,7 +142,11 @@
       "Bash(xargs grep -l \"extends.*Component\\\\|implements.*Component\")",
       "Bash(grep -n \"years_old\" /d/vipgpi__net/.claude/worktrees/fervent-newton/resources/lang/*/chat.php)",
       "Bash(git -C /d/vipgpi__net/.claude/worktrees/fervent-newton log --oneline -20)",
-      "Bash(git -C /d/vipgpi__net/.claude/worktrees/fervent-newton log --all --oneline --grep=\"performance\\\\|perf\\\\|cache\\\\|gzip\\\\|compress\" -i)"
+      "Bash(git -C /d/vipgpi__net/.claude/worktrees/fervent-newton log --all --oneline --grep=\"performance\\\\|perf\\\\|cache\\\\|gzip\\\\|compress\" -i)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(where npm)",
+      "Bash(where npx)",
+      "Bash(npm install)"
     ]
   }
 }
