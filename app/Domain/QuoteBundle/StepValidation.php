@@ -19,6 +19,7 @@ final class StepValidation
             'auto_renewal_date' => ['renewal_date' => 'required|date'],
             'auto_license_number' => ['license_number' => 'nullable|string|max:60'],
 
+            'hab_renewal_date' => ['hab_renewal_date' => 'required|date'],
             'hab_address' => ['address' => 'required|string|min:5|max:200'],
             'hab_move_in_date' => ['move_in_date' => 'required|date'],
             'hab_units_in_building' => ['units_in_building' => 'required|integer|min:1|max:999'],

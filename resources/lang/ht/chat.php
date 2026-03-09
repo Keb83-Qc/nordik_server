@@ -56,6 +56,17 @@ return [
     'products_both' => "Asirans ak Envestisman",
     'products_none' => "Okenn",
 
+    // Pi bon moman pou kontakte
+    'q_best_contact_time' => "Ki pi bon moman pou kontakte w?",
+    'btn_contact_matin' => "Maten (8è - 12è)",
+    'btn_contact_apres_midi' => "Apremidi (12è - 5è)",
+    'btn_contact_soir' => "Aswè (5è - 8è)",
+    'btn_contact_nimporte_quand' => "Nenpòt kilè",
+    'contact_time_matin' => "Maten (8è - 12è)",
+    'contact_time_apres_midi' => "Apremidi (12è - 5è)",
+    'contact_time_soir' => "Aswè (5è - 8è)",
+    'contact_time_nimporte_quand' => "Nenpòt kilè",
+
     // Thank You / Success Page
     'success_title' => 'Mèsi!',
     'success_subtitle' => 'Nou resevwa demann sitasyon ou a.',
