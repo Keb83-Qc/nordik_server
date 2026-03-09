@@ -138,7 +138,11 @@
       "Bash(curl -s -o /dev/null -w \"COLD /fr/pret: TTFB=%{time_starttransfer}s HTTP=%{http_code}\\\\n\" https://vipgpi.net/fr/pret)",
       "Bash(curl -s -D - -o /dev/null -w \"\\\\nTTFB=%{time_starttransfer}s\\\\n\" https://vipgpi.net/fr/pret)",
       "Bash(python3:*)",
-      "Bash(xargs grep -l \"QuoteAuto\\\\|QuoteHome\\\\|QuoteBundle\")"
+      "Bash(xargs grep -l \"QuoteAuto\\\\|QuoteHome\\\\|QuoteBundle\")",
+      "Bash(xargs grep -l \"extends.*Component\\\\|implements.*Component\")",
+      "Bash(grep -n \"years_old\" /d/vipgpi__net/.claude/worktrees/fervent-newton/resources/lang/*/chat.php)",
+      "Bash(git -C /d/vipgpi__net/.claude/worktrees/fervent-newton log --oneline -20)",
+      "Bash(git -C /d/vipgpi__net/.claude/worktrees/fervent-newton log --all --oneline --grep=\"performance\\\\|perf\\\\|cache\\\\|gzip\\\\|compress\" -i)"
     ]
   }
 }
