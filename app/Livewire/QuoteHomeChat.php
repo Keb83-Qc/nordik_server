@@ -55,9 +55,13 @@ class QuoteHomeChat extends Component
     public $marketing_email;    // yes|no
     public $consent_credit;     // yes|no
 
+    public $best_contact_time;
+    public $hab_renewal_date;
+
     protected $stepOrder = [
         'occupancy'          => 'occupancy',
         'property_type'      => 'property_type',
+        'hab_renewal_date'   => 'hab_renewal_date',
         'identity'           => ['first_name', 'last_name', 'gender'],
         'address'            => 'address',
         'living_there'       => 'living_there',
@@ -73,6 +77,7 @@ class QuoteHomeChat extends Component
         'email'              => 'email',
         'phone'              => 'phone',
         'phone_is_cell'      => 'phone_is_cell',
+        'best_contact_time'  => 'best_contact_time',
         'marital_status'     => 'marital_status',
         'employment_status'  => 'employment_status',
         'education_level'    => 'education_level',
@@ -297,6 +302,18 @@ class QuoteHomeChat extends Component
     {
         $this->validate(['phone' => 'required|string|min:10|max:30']);
         $this->persist('phone', $this->phone);
+    }
+
+    public function setBestContactTime($val)
+    {
+        if (!in_array($val, ['matin', 'apres_midi', 'soir', 'nimporte_quand'], true)) return;
+        $this->persist('best_contact_time', $val);
+    }
+
+    public function submitHabRenewalDate()
+    {
+        $this->validate(['hab_renewal_date' => 'required|date']);
+        $this->persist('hab_renewal_date', $this->hab_renewal_date);
     }
 
     public function submitIndustry()

@@ -257,6 +257,17 @@
     };
     };
 
+    $contactTimeLabel = function($val) {
+    $v = is_string($val) ? strtolower(trim($val)) : $val;
+    return match ($v ?? '') {
+    'matin' => 'Matin (8h-12h)',
+    'apres_midi' => 'Après-midi (12h-17h)',
+    'soir' => 'Soir (17h-20h)',
+    'nimporte_quand' => "N'importe quand",
+    default => ($val === null || $val === '') ? '-' : (string)$val,
+    };
+    };
+
     // ------------------------------------------------------------------
     // Header info
     // ------------------------------------------------------------------
@@ -300,6 +311,7 @@
                     <div class="grid">
                         <div class="info-row"><span class="label">Occupation : </span><span class="value">{{ $occLabel($v('occupancy')) }}</span></div>
                         <div class="info-row"><span class="label">Type de propriété : </span><span class="value">{{ $propLabel($v('property_type')) }}</span></div>
+                        <div class="info-row"><span class="label">Renouvellement habitation : </span><span class="value">{{ $v('hab_renewal_date') }}</span></div>
 
                         <div class="info-row"><span class="label">Adresse : </span><span class="value">{{ $v('address') }}</span></div>
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($v('living_there')) }}</span></div>
@@ -391,6 +403,7 @@
                         <div class="info-row"><span class="label">Âge : </span><span class="value">{{ isset($d['age']) && $d['age'] !== '' ? ($d['age'].' ans') : '-' }}</span></div>
                         <div class="info-row"><span class="label">Courriel : </span><span class="value">{{ $v('email') }}</span></div>
                         <div class="info-row"><span class="label">Téléphone : </span><span class="value">{{ $v('phone') }}</span></div>
+                        <div class="info-row"><span class="label">Meilleur moment : </span><span class="value">{{ $contactTimeLabel($d['best_contact_time'] ?? null) }}</span></div>
                     </div>
                 </div>
             </div>
@@ -408,6 +421,7 @@
                         <div class="info-row"><span class="label">Âge : </span><span class="value">{{ isset($c['age']) && $c['age'] !== '' ? ($c['age'].' ans') : '-' }}</span></div>
                         <div class="info-row"><span class="label">Courriel : </span><span class="value">{{ $val($c,'email') }}</span></div>
                         <div class="info-row"><span class="label">Téléphone : </span><span class="value">{{ $val($c,'phone') }}</span></div>
+                        <div class="info-row"><span class="label">Meilleur moment : </span><span class="value">{{ $contactTimeLabel($c['best_contact_time'] ?? null) }}</span></div>
                     </div>
                 </div>
             </div>
@@ -434,6 +448,7 @@
                     <div class="grid">
                         <div class="info-row"><span class="label">Occupation : </span><span class="value">{{ $occLabel($h['occupancy'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Type de propriété : </span><span class="value">{{ $propLabel($h['property_type'] ?? null) }}</span></div>
+                        <div class="info-row"><span class="label">Renouvellement habitation : </span><span class="value">{{ $val($h,'renewal_date') }}</span></div>
 
                         <div class="info-row"><span class="label">Adresse : </span><span class="value">{{ $val($h,'address') }}</span></div>
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($h['living_there'] ?? null) }}</span></div>
@@ -530,6 +545,9 @@
                             @endif
                         </span>
                     </div>
+                    @if($type === 'habitation')
+                    <div class="info-row"><span class="label">Meilleur moment :&nbsp;</span><span class="value">{{ $contactTimeLabel($d['best_contact_time'] ?? null) }}</span></div>
+                    @endif
                 </div>
             </div>
             @endif

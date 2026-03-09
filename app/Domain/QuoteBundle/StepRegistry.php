@@ -10,7 +10,8 @@ final class StepRegistry
             'common_identity' => ['bucket' => 'common', 'required' => ['first_name','last_name','gender']],
             'common_age'      => ['bucket' => 'common', 'required' => 'age'],
             'common_email'    => ['bucket' => 'common', 'required' => 'email'],
-            'common_phone'    => ['bucket' => 'common', 'required' => 'phone'],
+            'common_phone'              => ['bucket' => 'common', 'required' => 'phone'],
+            'common_best_contact_time'  => ['bucket' => 'common', 'required' => 'best_contact_time'],
         ];
     }
 
@@ -44,6 +45,7 @@ final class StepRegistry
         return [
             'hab_occupancy'          => ['bucket' => 'habitation', 'required' => 'occupancy'],
             'hab_property_type'      => ['bucket' => 'habitation', 'required' => 'property_type'],
+            'hab_renewal_date'       => ['bucket' => 'habitation', 'required' => 'renewal_date'],
             'hab_address'            => ['bucket' => 'habitation', 'required' => 'address'],
             'hab_living_there'       => ['bucket' => 'habitation', 'required' => 'living_there'],
             'hab_move_in_date'       => ['bucket' => 'habitation', 'required' => 'move_in_date'],

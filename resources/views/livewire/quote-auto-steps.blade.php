@@ -299,9 +299,36 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 
 
 {{-- ============================================================
-|  NUMÉRO DE PERMIS (après téléphone)
+|  MEILLEUR MOMENT DE CONTACT (après téléphone)
 ============================================================ --}}
-@if(isset($data['phone']) && ($step === 'license_number' || isset($data['license_number'])))
+@if(isset($data['phone']) && ($step === 'best_contact_time' || isset($data['best_contact_time'])))
+<div class="messages__item" wire:key="msg-contact-time">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_best_contact_time') }}</div>
+    </div>
+</div>
+
+@if(isset($data['best_contact_time']))
+<div class="messages__item" wire:key="resp-contact-time">
+    <div class="user-message" wire:click="goToStep('best_contact_time')">
+        @php
+        $contactTimeKey = 'chat.contact_time_' . $data['best_contact_time'];
+        $contactTimeLabel = __($contactTimeKey);
+        if ($contactTimeLabel === $contactTimeKey) $contactTimeLabel = $data['best_contact_time'];
+        @endphp
+        <span>{{ $contactTimeLabel }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  NUMÉRO DE PERMIS (après meilleur moment de contact)
+============================================================ --}}
+@if(isset($data['best_contact_time']) && ($step === 'license_number' || isset($data['license_number'])))
 <div class="messages__item" wire:key="msg-license">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>

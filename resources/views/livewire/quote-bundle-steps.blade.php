@@ -168,6 +168,24 @@ $identityAnswer = $hasIdentity
 ])
 @endif
 
+@if($show('common_best_contact_time', isset($common['phone'])))
+@php
+$answer = null;
+if (isset($common['best_contact_time'])) {
+    $ctKey = 'bundlechat.contact_time_' . $common['best_contact_time'];
+    $ctLabel = __($ctKey);
+    $answer = ($ctLabel === $ctKey) ? $common['best_contact_time'] : $ctLabel;
+}
+@endphp
+@include('livewire.partials.qa', [
+'baseKey' => 'common_best_contact_time',
+'questionKey' => 'bundlechat.q_best_contact_time',
+'answerText' => $answer,
+'goTo' => 'common_best_contact_time',
+'agentImage' => $agentImage,
+])
+@endif
+
 {{-- =========================
    PROFILE (dans habitation, avant auto)
 ========================= --}}
@@ -258,6 +276,7 @@ $profileSteps = [
 $habCoreKeys = [
 'occupancy',
 'property_type',
+'renewal_date',
 'address',
 'living_there',
 'move_in_date',
@@ -302,6 +321,7 @@ str_starts_with($step, 'hab_')
 $habFieldsTop = [
 ['occupancy', 'hab_occupancy', 'bundlechat.q_occupancy', fn($v) => $labelOccupancy($v)],
 ['property_type', 'hab_property_type', 'bundlechat.q_property_type', fn($v) => $labelPropertyType($v)],
+['renewal_date', 'hab_renewal_date', 'bundlechat.q_hab_renewal_date', fn($v) => (string)$v],
 ['address', 'hab_address', 'bundlechat.q_address_home', fn($v) => (string)$v],
 ['living_there', 'hab_living_there', 'bundlechat.q_living_there', fn($v) => $labelYesNo($v)],
 ];

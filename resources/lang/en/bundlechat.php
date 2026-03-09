@@ -103,4 +103,18 @@ return [
 
     'final_success_msg' => "Thanks! Your request has been saved.",
     'btn_finalize' => "Submit",
+
+    // Best contact time
+    'q_best_contact_time' => "What is the best time to reach you?",
+    'btn_contact_matin' => "Morning (8am - 12pm)",
+    'btn_contact_apres_midi' => "Afternoon (12pm - 5pm)",
+    'btn_contact_soir' => "Evening (5pm - 8pm)",
+    'btn_contact_nimporte_quand' => "Anytime",
+    'contact_time_matin' => "Morning (8am - 12pm)",
+    'contact_time_apres_midi' => "Afternoon (12pm - 5pm)",
+    'contact_time_soir' => "Evening (5pm - 8pm)",
+    'contact_time_nimporte_quand' => "Anytime",
+
+    // Home insurance renewal date
+    'q_hab_renewal_date' => "What is your home insurance renewal date?",
 ];

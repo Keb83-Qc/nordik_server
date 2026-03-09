@@ -159,6 +159,22 @@
                 </button>
             </div>
 
+            @elseif($step == 'best_contact_time')
+            <div class="d-grid gap-2" wire:key="area-contact-time">
+                <button wire:click="setBestContactTime('matin')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_contact_matin') }}
+                </button>
+                <button wire:click="setBestContactTime('apres_midi')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_contact_apres_midi') }}
+                </button>
+                <button wire:click="setBestContactTime('soir')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_contact_soir') }}
+                </button>
+                <button wire:click="setBestContactTime('nimporte_quand')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_contact_nimporte_quand') }}
+                </button>
+            </div>
+
             @elseif($step == 'license_number')
             <div wire:key="area-license">
                 <div class="input-group mb-2">

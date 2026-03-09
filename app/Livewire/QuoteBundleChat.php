@@ -44,6 +44,7 @@ class QuoteBundleChat extends Component
     public $age;
     public $email;
     public $phone;
+    public $best_contact_time;
 
     // AUTO
     public $vehicle_year;
@@ -58,6 +59,7 @@ class QuoteBundleChat extends Component
     // HABITATION
     public $occupancy;
     public $property_type;
+    public $hab_renewal_date;
     public $address;
     public $living_there;
     public $move_in_date;
@@ -293,6 +295,12 @@ class QuoteBundleChat extends Component
         $this->persistField('common', 'phone', $this->phone);
     }
 
+    public function setCommonBestContactTime(string $val): void
+    {
+        if (!in_array($val, ['matin', 'apres_midi', 'soir', 'nimporte_quand'], true)) return;
+        $this->persistField('common', 'best_contact_time', $val);
+    }
+
     // AUTO
     public function updatedVehicleYear($val): void
     {
@@ -374,6 +382,12 @@ class QuoteBundleChat extends Component
     public function saveHab(string $field, string $value): void
     {
         $this->persistField('habitation', $field, $value);
+    }
+
+    public function submitHabRenewalDate(): void
+    {
+        $this->validate(StepValidation::rules('hab_renewal_date'));
+        $this->persistField('habitation', 'renewal_date', $this->hab_renewal_date);
     }
 
     public function submitHabAddress(): void

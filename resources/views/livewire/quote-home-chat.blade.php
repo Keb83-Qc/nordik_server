@@ -44,6 +44,14 @@
                 </button>
             </div>
 
+            @elseif($step === 'hab_renewal_date')
+            <div class="input-group" wire:key="hab-renewal">
+                <input type="date" wire:model="hab_renewal_date" class="form-control form-control-lg shadow-sm">
+                <button wire:click="submitHabRenewalDate" class="btn btn-primary px-4">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
             @elseif($step === 'identity')
             <div wire:key="identity">
                 <div class="input-group mb-2">
@@ -215,6 +223,22 @@
                 </button>
                 <button wire:click="save('phone_is_cell','no')" class="btn btn-outline-primary flex-grow-1 py-3">
                     {{ __('homechat.btn_no') }}
+                </button>
+            </div>
+
+            @elseif($step === 'best_contact_time')
+            <div class="d-grid gap-2" wire:key="contact-time">
+                <button wire:click="setBestContactTime('matin')" class="btn btn-outline-primary btn-lg">
+                    {{ __('homechat.btn_contact_matin') }}
+                </button>
+                <button wire:click="setBestContactTime('apres_midi')" class="btn btn-outline-primary btn-lg">
+                    {{ __('homechat.btn_contact_apres_midi') }}
+                </button>
+                <button wire:click="setBestContactTime('soir')" class="btn btn-outline-primary btn-lg">
+                    {{ __('homechat.btn_contact_soir') }}
+                </button>
+                <button wire:click="setBestContactTime('nimporte_quand')" class="btn btn-outline-primary btn-lg">
+                    {{ __('homechat.btn_contact_nimporte_quand') }}
                 </button>
             </div>
 

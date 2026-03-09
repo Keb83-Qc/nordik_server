@@ -84,6 +84,22 @@
                 </button>
             </div>
 
+            @elseif($step === 'common_best_contact_time')
+            <div class="d-grid gap-2" wire:key="common-contact-time">
+                <button wire:click="setCommonBestContactTime('matin')" class="btn btn-outline-primary btn-lg">
+                    {{ __('bundlechat.btn_contact_matin') }}
+                </button>
+                <button wire:click="setCommonBestContactTime('apres_midi')" class="btn btn-outline-primary btn-lg">
+                    {{ __('bundlechat.btn_contact_apres_midi') }}
+                </button>
+                <button wire:click="setCommonBestContactTime('soir')" class="btn btn-outline-primary btn-lg">
+                    {{ __('bundlechat.btn_contact_soir') }}
+                </button>
+                <button wire:click="setCommonBestContactTime('nimporte_quand')" class="btn btn-outline-primary btn-lg">
+                    {{ __('bundlechat.btn_contact_nimporte_quand') }}
+                </button>
+            </div>
+
             {{-- =========================
                  PROFILE (avant auto, stocké dans habitation)
             ========================== --}}
@@ -238,6 +254,14 @@
                 </button>
                 <button wire:click="saveHab('property_type','appartement')" class="btn btn-outline-primary btn-lg">
                     {{ __('bundlechat.btn_apartment') }}
+                </button>
+            </div>
+
+            @elseif($step === 'hab_renewal_date')
+            <div class="input-group" wire:key="hab-renewal">
+                <input type="date" wire:model="hab_renewal_date" class="form-control form-control-lg shadow-sm">
+                <button wire:click="submitHabRenewalDate" class="btn btn-primary px-4">
+                    <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
 
