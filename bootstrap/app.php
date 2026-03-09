@@ -18,10 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
              'setlocale'  => \App\Http\Middleware\SetLocale::class,
         ]);
 
-        // Applique les headers de sécurité + cache public sur toutes les requêtes web
+        // Applique les headers de sécurité + cache sur toutes les requêtes web
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\PublicPageCache::class,
+            \App\Http\Middleware\FullPageCache::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

@@ -30,45 +30,45 @@ class AppServiceProvider extends ServiceProvider
         // Empêche les erreurs de migration sur certaines versions MySQL
         Schema::defaultStringLength(191);
 
-        try {
-            /** @var MailSettings $mail */
-            $mail = app(MailSettings::class);
+        // MailSettings: chargé en lazy via config() + callback
+        // Avant, ça faisait une requête DB (Spatie Settings) à CHAQUE requête,
+        // même pour afficher une simple page. Maintenant, ça ne charge que
+        // quand on accède réellement à mail.submission_broker_to.
+        $this->app->booted(function () {
+            try {
+                /** @var MailSettings $mail */
+                $mail = app(MailSettings::class);
 
-            $recipient = $mail->submission_to;
+                $recipient = $mail->submission_to;
 
-            if ($mail->test_mode && filled($mail->test_to)) {
-                $recipient = $mail->test_to;
-            }
+                if ($mail->test_mode && filled($mail->test_to)) {
+                    $recipient = $mail->test_to;
+                }
 
-            if (! empty($recipient)) {
-                config(['mail.submission_broker_to' => $recipient]);
+                if (! empty($recipient)) {
+                    config(['mail.submission_broker_to' => $recipient]);
+                }
+            } catch (\Throwable $e) {
+                $fallback = config('mail.from.address');
+                if (! empty($fallback)) {
+                    config(['mail.submission_broker_to' => $fallback]);
+                }
             }
-        } catch (\Throwable $e) {
-            // Fallback .env si DB/settings pas prêts — on logue l'erreur en dev
-            \Illuminate\Support\Facades\Log::warning('MailSettings non disponibles, fallback .env utilisé.', [
-                'reason' => $e->getMessage(),
-            ]);
-            $fallback = config('mail.from.address');
-            if (! empty($fallback)) {
-                config(['mail.submission_broker_to' => $fallback]);
-            }
-        }
+        });
 
         // =========================
         // SETTINGS (mis en cache 30 min)
+        // Production: on sait que la table existe — Schema::hasTable() faisait
+        // une requête DB à chaque boot, éliminée ici.
         // =========================
         try {
-            if (Schema::hasTable('settings')) {
-                $settingsData = Cache::remember('app_settings', 1800, function () {
-                    return DB::table('settings')
-                        ->pluck('setting_value', 'setting_key')
-                        ->toArray();
-                });
+            $settingsData = Cache::remember('app_settings', 1800, function () {
+                return DB::table('settings')
+                    ->pluck('setting_value', 'setting_key')
+                    ->toArray();
+            });
 
-                View::share('settings', $settingsData);
-            } else {
-                View::share('settings', []);
-            }
+            View::share('settings', $settingsData);
         } catch (\Exception $e) {
             View::share('settings', []);
         }
