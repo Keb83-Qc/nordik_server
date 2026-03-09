@@ -124,4 +124,18 @@ return [
 
     'consent_marketing_accept' => "Mwen aksepte",
     'consent_marketing_refuse' => "Mwen refize",
+
+    // Dat renouvèlman asirans kay
+    'q_hab_renewal_date' => "Ki dat renouvèlman asirans kay ou a?",
+
+    // Pi bon moman pou kontakte
+    'q_best_contact_time' => "Ki pi bon moman pou kontakte w?",
+    'btn_contact_matin' => "Maten (8è - 12è)",
+    'btn_contact_apres_midi' => "Apremidi (12è - 5è)",
+    'btn_contact_soir' => "Aswè (5è - 8è)",
+    'btn_contact_nimporte_quand' => "Nenpòt kilè",
+    'contact_time_matin' => "Maten (8è - 12è)",
+    'contact_time_apres_midi' => "Apremidi (12è - 5è)",
+    'contact_time_soir' => "Aswè (5è - 8è)",
+    'contact_time_nimporte_quand' => "Nenpòt kilè",
 ];

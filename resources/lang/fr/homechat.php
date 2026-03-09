@@ -124,4 +124,18 @@ return [
 
     'consent_marketing_accept' => "J'accepte",
     'consent_marketing_refuse' => "Je refuse",
+
+    // Date de renouvellement habitation
+    'q_hab_renewal_date' => "Quelle est votre date de renouvellement d'assurance habitation ?",
+
+    // Meilleur moment de contact
+    'q_best_contact_time' => "Quel est le meilleur moment pour vous contacter ?",
+    'btn_contact_matin' => "Matin (8h - 12h)",
+    'btn_contact_apres_midi' => "Après-midi (12h - 17h)",
+    'btn_contact_soir' => "Soir (17h - 20h)",
+    'btn_contact_nimporte_quand' => "N'importe quand",
+    'contact_time_matin' => "Matin (8h - 12h)",
+    'contact_time_apres_midi' => "Après-midi (12h - 17h)",
+    'contact_time_soir' => "Soir (17h - 20h)",
+    'contact_time_nimporte_quand' => "N'importe quand",
 ];

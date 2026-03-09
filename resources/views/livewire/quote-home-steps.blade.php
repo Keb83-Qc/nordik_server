@@ -59,8 +59,26 @@ default => '',
 @endif
 @endif
 
+{{-- DATE DE RENOUVELLEMENT HABITATION --}}
+@if(isset($data['property_type']) && ($step === 'hab_renewal_date' || isset($data['hab_renewal_date'])))
+<div class="messages__item" wire:key="h-msg-hab-renewal">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('homechat.q_hab_renewal_date') }}</div>
+    </div>
+</div>
+@if(isset($data['hab_renewal_date']))
+<div class="messages__item" wire:key="h-resp-hab-renewal">
+    <div class="user-message" wire:click="goToStep('hab_renewal_date')">
+        <span>{{ $data['hab_renewal_date'] }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
 {{-- IDENTITÉ --}}
-@if(isset($data['property_type']) && ($step === 'identity' || isset($data['first_name']) || isset($data['gender'])))
+@if(isset($data['hab_renewal_date']) && ($step === 'identity' || isset($data['first_name']) || isset($data['gender'])))
 <div class="messages__item" wire:key="h-msg-id">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
@@ -327,6 +345,29 @@ default => '',
 <div class="messages__item" wire:key="h-resp-cell">
     <div class="user-message" wire:click="goToStep('phone_is_cell')">
         <span>{{ $data['phone_is_cell'] }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+{{-- MEILLEUR MOMENT DE CONTACT --}}
+@if(isset($data['phone_is_cell']) && ($step === 'best_contact_time' || isset($data['best_contact_time'])))
+<div class="messages__item" wire:key="h-msg-contact-time">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('homechat.q_best_contact_time') }}</div>
+    </div>
+</div>
+@if(isset($data['best_contact_time']))
+<div class="messages__item" wire:key="h-resp-contact-time">
+    <div class="user-message" wire:click="goToStep('best_contact_time')">
+        @php
+        $contactTimeKey = 'homechat.contact_time_' . $data['best_contact_time'];
+        $contactTimeLabel = __($contactTimeKey);
+        if ($contactTimeLabel === $contactTimeKey) $contactTimeLabel = $data['best_contact_time'];
+        @endphp
+        <span>{{ $contactTimeLabel }}</span>
         <span class="edit-badge"><i class="fas fa-pen"></i></span>
     </div>
 </div>

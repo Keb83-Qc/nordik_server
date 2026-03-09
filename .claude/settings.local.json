@@ -136,7 +136,9 @@
       "Bash(curl -s -o /dev/null -w \"COLD /fr/assurance: TTFB=%{time_starttransfer}s HTTP=%{http_code}\\\\n\" https://vipgpi.net/fr/assurance)",
       "Bash(curl -s -D - -o /dev/null -w \"\\\\nTTFB=%{time_starttransfer}s\\\\n\" https://vipgpi.net/fr/assurance)",
       "Bash(curl -s -o /dev/null -w \"COLD /fr/pret: TTFB=%{time_starttransfer}s HTTP=%{http_code}\\\\n\" https://vipgpi.net/fr/pret)",
-      "Bash(curl -s -D - -o /dev/null -w \"\\\\nTTFB=%{time_starttransfer}s\\\\n\" https://vipgpi.net/fr/pret)"
+      "Bash(curl -s -D - -o /dev/null -w \"\\\\nTTFB=%{time_starttransfer}s\\\\n\" https://vipgpi.net/fr/pret)",
+      "Bash(python3:*)",
+      "Bash(xargs grep -l \"QuoteAuto\\\\|QuoteHome\\\\|QuoteBundle\")"
     ]
   }
 }

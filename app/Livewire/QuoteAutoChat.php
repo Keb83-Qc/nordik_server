@@ -42,6 +42,7 @@ class QuoteAutoChat extends Component
     public $license_number;
     public $profession;
     public $existing_products;
+    public $best_contact_time;
 
     protected $stepOrder = [
         'year'             => 'year',
@@ -57,6 +58,7 @@ class QuoteAutoChat extends Component
         'existing_products' => 'existing_products',
         'email'            => 'email',
         'phone'            => 'phone',
+        'best_contact_time' => 'best_contact_time',
         'license_number'   => 'license_number',
     ];
 
@@ -265,6 +267,12 @@ class QuoteAutoChat extends Component
     {
         $this->validate(['phone' => 'required|string|min:10|max:30']);
         $this->persist('phone', $this->phone);
+    }
+
+    public function setBestContactTime($val)
+    {
+        if (!in_array($val, ['matin', 'apres_midi', 'soir', 'nimporte_quand'], true)) return;
+        $this->persist('best_contact_time', $val);
     }
 
     public function submitLicense()

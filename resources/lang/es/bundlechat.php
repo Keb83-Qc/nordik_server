@@ -103,4 +103,18 @@ return [
 
     'final_success_msg' => "¡Gracias! Su solicitud fue guardada.",
     'btn_finalize' => "Enviar",
+
+    // Mejor momento de contacto
+    'q_best_contact_time' => "¿Cuál es el mejor momento para contactarlo?",
+    'btn_contact_matin' => "Mañana (8h - 12h)",
+    'btn_contact_apres_midi' => "Tarde (12h - 17h)",
+    'btn_contact_soir' => "Noche (17h - 20h)",
+    'btn_contact_nimporte_quand' => "Cualquier momento",
+    'contact_time_matin' => "Mañana (8h - 12h)",
+    'contact_time_apres_midi' => "Tarde (12h - 17h)",
+    'contact_time_soir' => "Noche (17h - 20h)",
+    'contact_time_nimporte_quand' => "Cualquier momento",
+
+    // Fecha de renovación del seguro de hogar
+    'q_hab_renewal_date' => "¿Cuál es la fecha de renovación de su seguro de hogar?",
 ];
