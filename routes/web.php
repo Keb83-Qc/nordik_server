@@ -85,6 +85,8 @@ Route::get('/switch-language/{locale}', function (Request $request, string $loca
     if (is_string($next) && $next !== '') {
         $next = '/' . ltrim($next, '/');
         $next = preg_replace('#^/[a-zA-Z]{2,5}(/|$)#', '/', $next);
+        // Si next est juste "/", rediriger vers /home au lieu de la landing
+        if ($next === '/') $next = '/home';
         return redirect("/{$locale}{$next}");
     }
 
@@ -208,20 +210,22 @@ Route::prefix('{locale}')
             'consent.accept',
         );
 
-        Route::get('/quote/auto', function () {
-            abort_unless(session('has_consented') === true, 403);
-            return view('quote-auto-page');
-        })->name('quote.auto');
+        Route::middleware(['throttle:60,1'])->group(function () {
+            Route::get('/quote/auto', function () {
+                abort_unless(session('has_consented') === true, 403);
+                return view('quote-auto-page');
+            })->name('quote.auto');
 
-        Route::get('/quote/habitation', function () {
-            abort_unless(session('has_consented') === true, 403);
-            return view('quote-home-page');
-        })->name('quote.habitation');
+            Route::get('/quote/habitation', function () {
+                abort_unless(session('has_consented') === true, 403);
+                return view('quote-home-page');
+            })->name('quote.habitation');
 
-        Route::get('/quote/bundle', function () {
-            abort_unless(session('has_consented') === true, 403);
-            return view('quote-bundle-page');
-        })->name('quote.bundle');
+            Route::get('/quote/bundle', function () {
+                abort_unless(session('has_consented') === true, 403);
+                return view('quote-bundle-page');
+            })->name('quote.bundle');
+        });
 
         Route::get('/quote/success', function () {
             return view('quote.success');

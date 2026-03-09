@@ -56,6 +56,8 @@ return [
     'products_both' => "Asirans ak Envestisman",
     'products_none' => "Okenn",
 
+    'years_old' => 'an',
+
     // Pi bon moman pou kontakte
     'q_best_contact_time' => "Ki pi bon moman pou kontakte w?",
     'btn_contact_matin' => "Maten (8è - 12è)",

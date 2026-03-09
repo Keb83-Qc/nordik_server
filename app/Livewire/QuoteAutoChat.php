@@ -2,26 +2,16 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\User;
-use App\Models\Submission;
+use App\Livewire\Concerns\HasChatSteps;
 use App\Models\VehicleBrand;
 use App\Models\VehicleModel;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use App\Mail\NewSubmissionAdmin;
 use App\Services\LeadDispatcher;
+use Illuminate\Support\Facades\Cache;
+use Livewire\Component;
 
 class QuoteAutoChat extends Component
 {
-    public $step = 'year';
-    public $data = [];
-    public Submission $submission;
-
-    // Agent
-    public $advisorCode;
-    public $agentName = 'Julie';
-    public $agentImage;
+    use HasChatSteps;
 
     // Lists
     public $brands;
@@ -44,157 +34,105 @@ class QuoteAutoChat extends Component
     public $existing_products;
     public $best_contact_time;
 
-    protected $stepOrder = [
-        'year'             => 'year',
-        'brand'            => 'brand',
-        'model'            => 'model',
-        'renewal_date'     => 'renewal_date',
-        'usage'            => 'usage',
-        'km_annuel'        => 'km_annuel',
-        'address'          => 'address',
-        'identity'         => ['first_name', 'last_name'],
-        'age'              => 'age',
-        'profession'       => 'profession',
-        'existing_products' => 'existing_products',
-        'email'            => 'email',
-        'phone'            => 'phone',
-        'best_contact_time' => 'best_contact_time',
-        'license_number'   => 'license_number',
-    ];
+    // ── Trait contract ──────────────────────────
 
-    public function mount(LeadDispatcher $dispatcher)
+    protected function chatType(): string { return 'auto'; }
+    protected function sessionKey(): string { return 'current_submission_id'; }
+    protected function defaultAgentImage(): string { return asset('assets/img/VIP_Logo_Gold_Gradient10.png'); }
+
+    protected function validSteps(): array
     {
-        if (!session('has_consented')) {
-            return redirect()->route('consent.show', [
-                'locale' => app()->getLocale(),
-                'code'   => session('current_advisor_code'),
-            ]);
-        }
-
-        // conseiller (organique)
-        if (!session()->has('current_advisor_code')) {
-            $assignedAdvisor = $dispatcher->assignAdvisor();
-            if ($assignedAdvisor) {
-                session(['current_advisor_code' => $assignedAdvisor->advisor_code]);
-            }
-        }
-
-        $this->advisorCode = session('current_advisor_code');
-        $advisor = User::where('advisor_code', $this->advisorCode)->first();
-
-        if ($advisor) {
-            $this->agentName  = $advisor->first_name;
-            $this->agentImage = $advisor->image_url;
-        } else {
-            $this->agentImage = asset('assets/img/VIP_Logo_Gold_Gradient10.png');
-        }
-
-        $this->brands = VehicleBrand::orderBy('name')->get();
-
-        // ✅ session unifiée
-        if (session()->has('current_submission_id')) {
-            $submission = Submission::find(session('current_submission_id'));
-            if ($submission) {
-                $this->submission = $submission;
-                $this->data = $submission->data ?? [];
-                $this->fillPropertiesFromData();
-                $this->calculateStep();
-                return;
-            }
-        }
+        return array_keys($this->stepOrder());
     }
 
-    public function calculateStep()
+    protected function stepOrder(): array
     {
-        $this->step = 'final';
+        return [
+            'year'              => 'year',
+            'brand'             => 'brand',
+            'model'             => 'model',
+            'renewal_date'      => 'renewal_date',
+            'usage'             => 'usage',
+            'km_annuel'         => 'km_annuel',
+            'address'           => 'address',
+            'identity'          => ['first_name', 'last_name'],
+            'age'               => 'age',
+            'profession'        => 'profession',
+            'existing_products' => 'existing_products',
+            'email'             => 'email',
+            'phone'             => 'phone',
+            'best_contact_time' => 'best_contact_time',
+            'license_number'    => 'license_number',
+        ];
+    }
 
-        foreach ($this->stepOrder as $stepName => $requiredFields) {
-            $missing = false;
+    protected function afterPersist(): void
+    {
+        $this->calculateStep();
 
-            if (is_array($requiredFields)) {
-                foreach ($requiredFields as $field) {
-                    if (!isset($this->data[$field]) || $this->data[$field] === '') {
-                        $missing = true;
-                        break;
-                    }
-                }
-            } else {
-                if (!isset($this->data[$requiredFields]) || $this->data[$requiredFields] === '') {
-                    $missing = true;
-                }
-            }
-
-            if ($missing) {
-                $this->step = $stepName;
-                break;
-            }
-        }
-
-        // reload models if needed
         if ($this->step === 'model' && !empty($this->data['brand_id'])) {
             $this->models = VehicleModel::where('vehicle_brand_id', $this->data['brand_id'])
-                ->orderBy('name')
-                ->get();
+                ->orderBy('name')->get();
         }
     }
 
-    public function persist($key, $value)
+    protected function afterHydrate(): void
     {
-        $this->data[$key] = $value;
+        // Mapping champs UI
+        if (isset($this->data['year']))     $this->vehicle_year  = $this->data['year'];
+        if (isset($this->data['brand_id'])) $this->vehicle_brand = $this->data['brand_id'];
+        if (isset($this->data['model_id'])) $this->vehicle_model = $this->data['model_id'];
 
-        if (!isset($this->submission)) {
-            $this->submission = Submission::create([
-                'type' => 'auto',
-                'advisor_code' => $this->advisorCode,
-                'data' => $this->data
-            ]);
-
-            // ✅ session unifiée
-            session(['current_submission_id' => $this->submission->id]);
-        } else {
-            $this->submission->update(['data' => $this->data]);
+        if (!empty($this->vehicle_brand)) {
+            $this->models = VehicleModel::where('vehicle_brand_id', $this->vehicle_brand)
+                ->orderBy('name')->get();
         }
 
         $this->calculateStep();
-        $this->dispatch('scroll-down');
     }
 
-    // Année
+    // ── Mount ───────────────────────────────────
+
+    public function mount(LeadDispatcher $dispatcher)
+    {
+        $this->brands = Cache::remember('vehicle_brands', 3600, function () {
+            return VehicleBrand::orderBy('name')->get();
+        });
+
+        $this->mountChat($dispatcher);
+    }
+
+    // ── Step handlers ───────────────────────────
+
     public function updatedVehicleYear($val)
     {
         if (!empty($val)) $this->persist('year', $val);
     }
 
-    // Marque
     public function updatedVehicleBrand($val)
     {
         $brand = VehicleBrand::find($val);
         if (!$brand) return;
 
-        // ✅ persister les IDs + noms
         $this->data['brand_id'] = $brand->id;
-        $this->vehicle_brand = $brand->id;
+        $this->vehicle_brand    = $brand->id;
 
-        // reset modèle
         unset($this->data['model'], $this->data['model_id']);
         $this->vehicle_model = null;
 
         $this->models = VehicleModel::where('vehicle_brand_id', $brand->id)
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name')->get();
 
         $this->persist('brand', $brand->name);
     }
 
-    // Modèle
     public function updatedVehicleModel($val)
     {
         $model = VehicleModel::find($val);
         if (!$model) return;
 
-        // ✅ persister model_id + nom
         $this->data['model_id'] = $model->id;
-        $this->vehicle_model = $model->id;
+        $this->vehicle_model    = $model->id;
 
         $this->persist('model', $model->name);
     }
@@ -207,18 +145,15 @@ class QuoteAutoChat extends Component
 
     public function save($field, $value)
     {
-        // normalisation usage
         if ($field === 'usage') {
             $value = strtolower((string)$value);
             $value = ($value === 'commercial') ? 'commercial' : 'personnel';
         }
-
         $this->persist($field, $value);
     }
 
     public function setKm($val)
     {
-        // valeurs stables (comme tu as déjà)
         $this->persist('km_annuel', $val);
     }
 
@@ -232,7 +167,7 @@ class QuoteAutoChat extends Component
     {
         $this->validate([
             'first_name' => 'required|string|min:2|max:60',
-            'last_name' => 'required|string|min:2|max:60',
+            'last_name'  => 'required|string|min:2|max:60',
         ]);
 
         $this->data['first_name'] = $this->first_name;
@@ -286,72 +221,18 @@ class QuoteAutoChat extends Component
         $this->persist('license_number', 'not_provided');
     }
 
-    public function goToStep($name)
+    public function goToStep(string $name): void
     {
+        if (!in_array($name, $this->validSteps(), true)) return;
+
         $this->step = $name;
 
-        // hydratation modèles si retour modèle
         if ($name === 'model' && !empty($this->data['brand_id'])) {
             $this->models = VehicleModel::where('vehicle_brand_id', $this->data['brand_id'])
-                ->orderBy('name')
-                ->get();
+                ->orderBy('name')->get();
         }
 
         $this->dispatch('scroll-down');
-    }
-
-    private function fillPropertiesFromData()
-    {
-        foreach ($this->data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->$key = $value;
-            }
-        }
-
-        // mapping champs UI
-        if (isset($this->data['year'])) $this->vehicle_year = $this->data['year'];
-        if (isset($this->data['brand_id'])) $this->vehicle_brand = $this->data['brand_id'];
-        if (isset($this->data['model_id'])) $this->vehicle_model = $this->data['model_id'];
-
-        // précharger modèles si brand_id existe
-        if (!empty($this->vehicle_brand)) {
-            $this->models = VehicleModel::where('vehicle_brand_id', $this->vehicle_brand)
-                ->orderBy('name')
-                ->get();
-        }
-    }
-
-    public function finalize()
-    {
-        if (!isset($this->submission)) return;
-
-        $recipients = array_filter([
-            config('mail.submission_broker_to') ?: config('mail.from.address'),
-            User::where('advisor_code', $this->advisorCode)->value('email'),
-        ]);
-        $recipients = array_values(array_unique($recipients));
-
-        if (!empty($recipients)) {
-            try {
-                Mail::to($recipients)->send(new NewSubmissionAdmin($this->submission));
-                Log::info("Soumission Auto {$this->submission->id} envoyée à : " . implode(', ', $recipients));
-            } catch (\Exception $e) {
-                Log::error("Erreur Mail Soumission Auto {$this->submission->id}: " . $e->getMessage());
-            }
-        } else {
-            Log::warning("Aucun destinataire pour Soumission Auto {$this->submission->id}");
-        }
-
-        session(['last_advisor_code' => $this->advisorCode]);
-
-        // ✅ nettoyage complet (inclut legacy)
-        session()->forget([
-            'current_submission_id',
-            'current_submission_id_auto',
-            'current_advisor_code',
-        ]);
-
-        return redirect()->route('quote.success', ['locale' => app()->getLocale()]);
     }
 
     public function render()

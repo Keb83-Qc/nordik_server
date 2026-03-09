@@ -19,6 +19,7 @@
             $path = request()->path(); // ex: fr/services/assurance/...
             $path = preg_replace('#^[a-zA-Z]{2,5}/#', '', $path);
             $path = $path === $currentLocale ? '' : $path; // au cas où
+            if ($path === '' || $path === '/') $path = 'home'; // landing → home
             @endphp
 
             <div class="vip-lang">
@@ -53,7 +54,7 @@
 <!-- NAVBAR -->
 <nav class="navbar navbar-expand-xxl vip-navbar sticky-top shadow-sm">
     <div class="container">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="/{{ app()->getLocale() }}/home">
             <img src="{{ asset('assets/img/menu/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI" class="vip-logo" width="200" height="62">
         </a>
 
