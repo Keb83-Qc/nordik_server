@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Message; // <--- INDISPENSABLE pour la messagerie
 use Illuminate\Support\Facades\Hash;
@@ -94,54 +95,50 @@ class AuthController extends Controller
         ]);
 
         try {
-            // --- GESTION DE LA POSITION (OPTIONNEL) ---
-            $lastPosition = User::max('position');
-            $newPosition = $lastPosition ? $lastPosition + 1 : 1;
-            // ------------------------------------------
+            DB::transaction(function () use ($request) {
+                // --- GESTION DE LA POSITION (OPTIONNEL) ---
+                $lastPosition = User::max('position');
+                // ------------------------------------------
 
-            // 2. CRÉATION DU CANDIDAT
-            $password = Str::random(12);
+                // 2. CRÉATION DU CANDIDAT
+                $password = Str::random(12);
 
-            $newUser = User::create([
-                'first_name' => $request->first_name,
-                'last_name' => $request->last_name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => Hash::make($password),
-                'role_id' => 6,
-                'position' => 0,
-            ]);
-
-            // 3. ENVOI DU MESSAGE AUX SUPER ADMINS ET ADMINS
-
-            // Liste des IDs de rôles qui doivent recevoir la notif
-            // 1 = Super Admin, 3 = Admin (Adaptez selon vos vrais IDs dans la table 'roles')
-            $targetRoleIds = [1, 2];
-
-            $recipient = User::whereIn('role_id', $targetRoleIds)
-                ->orderBy('role_id') // super admin en premier si 1 < 2
-                ->orderBy('id')
-                ->first();
-
-            if ($recipient) {
-                Message::create([
-                    'sender_id' => $newUser->id,
-                    'receiver_id' => $recipient->id,
-                    'subject' => 'Nouvelle inscription : ' . $newUser->first_name . ' ' . $newUser->last_name,
-                    'body' => "Une nouvelle demande d'inscription a été reçue.<br><br>" .
-                        "<strong>Nom :</strong> {$newUser->last_name}<br>" .
-                        "<strong>Prénom :</strong> {$newUser->first_name}<br>" .
-                        "<strong>Email :</strong> {$newUser->email}<br>" .
-                        "<strong>Téléphone :</strong> {$newUser->phone}<br><br>" .
-                        "Merci de valider ou refuser ce compte ci-dessous.",
-                    'is_read' => false,
-                    'created_at' => now(),
-                    'data' => [
-                        'action_type' => 'registration_request',
-                        'applicant_id' => $newUser->id,
-                    ],
+                $newUser = User::create([
+                    'first_name' => $request->first_name,
+                    'last_name'  => $request->last_name,
+                    'email'      => $request->email,
+                    'phone'      => $request->phone,
+                    'password'   => Hash::make($password),
+                    'role_id'    => 6,
+                    'position'   => 0,
                 ]);
-            }
+
+                // 3. ENVOI DU MESSAGE AUX SUPER ADMINS ET ADMINS
+                $recipient = User::whereIn('role_id', [1, 2])
+                    ->orderBy('role_id')
+                    ->orderBy('id')
+                    ->first();
+
+                if ($recipient) {
+                    Message::create([
+                        'sender_id'   => $newUser->id,
+                        'receiver_id' => $recipient->id,
+                        'subject'     => 'Nouvelle inscription : ' . $newUser->first_name . ' ' . $newUser->last_name,
+                        'body'        => "Une nouvelle demande d'inscription a été reçue.<br><br>" .
+                            "<strong>Nom :</strong> {$newUser->last_name}<br>" .
+                            "<strong>Prénom :</strong> {$newUser->first_name}<br>" .
+                            "<strong>Email :</strong> {$newUser->email}<br>" .
+                            "<strong>Téléphone :</strong> {$newUser->phone}<br><br>" .
+                            "Merci de valider ou refuser ce compte ci-dessous.",
+                        'is_read'    => false,
+                        'created_at' => now(),
+                        'data'       => [
+                            'action_type'  => 'registration_request',
+                            'applicant_id' => $newUser->id,
+                        ],
+                    ]);
+                }
+            });
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {

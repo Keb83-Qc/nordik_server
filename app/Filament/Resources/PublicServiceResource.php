@@ -22,11 +22,18 @@ class PublicServiceResource extends Resource
 
     public static function getActiveLocales(): array
     {
-        return DB::table('languages')
-            ->where('is_active', 1)
-            ->orderBy('sort_order')
-            ->pluck('code')
-            ->toArray();
+        return \Illuminate\Support\Facades\Cache::remember('filament_active_locales', 3600, function () {
+            return DB::table('languages')
+                ->where('is_active', 1)
+                ->orderBy('sort_order')
+                ->pluck('code')
+                ->toArray();
+        });
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()->with('translations');
     }
 
     public static function form(Form $form): Form

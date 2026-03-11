@@ -32,6 +32,19 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'first_name';
 
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return method_exists($user, 'hasAnyRole')
+            ? $user->hasAnyRole(['super_admin', 'admin'])
+            : in_array((int) ($user->role_id ?? 0), [1, 2], true);
+    }
+
+    public static function canCreate(): bool  { return static::canViewAny(); }
+    public static function canEdit($record): bool   { return static::canViewAny(); }
+    public static function canDelete($record): bool { return static::canViewAny(); }
+
     public static function getNavigationGroup(): ?string
     {
         return 'Gestion Conseillers';
@@ -224,6 +237,7 @@ class UserResource extends Resource
                                         ->label('Titre du poste')
                                         ->options(function () {
                                             return TeamTitle::query()
+                                                ->select(['id', 'name'])
                                                 ->orderBy('id')
                                                 ->get()
                                                 ->mapWithKeys(function ($title) {
@@ -252,6 +266,7 @@ class UserResource extends Resource
                                         ->label('Compte Zoho People')
                                         ->options(
                                             fn() => Employee::query()
+                                                ->select(['zoho_id', 'name', 'email', 'employee_number'])
                                                 ->orderBy('name')
                                                 ->get()
                                                 ->mapWithKeys(fn($e) => [

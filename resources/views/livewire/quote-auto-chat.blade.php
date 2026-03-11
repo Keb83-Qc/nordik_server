@@ -114,7 +114,7 @@
 
             @elseif($step == 'age')
             <div class="input-group" wire:key="area-age">
-                <input type="number" wire:model.live="age" class="form-control form-control-lg shadow-sm"
+                <input type="number" wire:model="age" class="form-control form-control-lg shadow-sm"
                     placeholder="{{ __('chat.placeholder_age') }}" min="16" max="99">
                 <button wire:click="submitAge" class="btn btn-primary px-4">
                     <i class="fas fa-paper-plane"></i>
@@ -123,7 +123,7 @@
 
             @elseif($step == 'profession')
             <div class="input-group" wire:key="area-profession">
-                <input type="text" wire:model.live="profession" class="form-control form-control-lg shadow-sm"
+                <input type="text" wire:model="profession" class="form-control form-control-lg shadow-sm"
                     placeholder="{{ __('chat.placeholder_profession') }}">
                 <button wire:click="submitProfession" class="btn btn-primary px-4">
                     <i class="fas fa-paper-plane"></i>
@@ -148,7 +148,7 @@
 
             @elseif($step == 'email')
             <div class="input-group" wire:key="area-email">
-                <input type="email" wire:model.live="email" class="form-control form-control-lg shadow-sm"
+                <input type="email" wire:model="email" class="form-control form-control-lg shadow-sm"
                     placeholder="{{ __('chat.placeholder_email') }}">
                 <button wire:click="submitEmail" class="btn btn-primary px-4">
                     <i class="fas fa-paper-plane"></i>
@@ -157,7 +157,7 @@
 
             @elseif($step == 'phone')
             <div class="input-group" wire:key="area-phone">
-                <input type="tel" wire:model.live="phone" class="form-control form-control-lg"
+                <input type="tel" wire:model="phone" class="form-control form-control-lg"
                     placeholder="{{ __('chat.placeholder_phone') }}">
                 <button wire:click="submitPhone" class="btn btn-primary px-4">
                     <i class="fas fa-paper-plane"></i>
@@ -183,7 +183,7 @@
             @elseif($step == 'license_number')
             <div wire:key="area-license">
                 <div class="input-group mb-2">
-                    <input type="text" wire:model.live="license_number" class="form-control form-control-lg"
+                    <input type="text" wire:model="license_number" class="form-control form-control-lg"
                         placeholder="{{ __('chat.placeholder_license') }}">
                     <button wire:click="submitLicense" class="btn btn-primary px-4">
                         <i class="fas fa-paper-plane"></i>

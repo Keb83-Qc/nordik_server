@@ -55,10 +55,14 @@ class SystemRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Message::query()
-            ->system()
-            ->where('status', 'pending')
-            ->count();
+        $count = \Illuminate\Support\Facades\Cache::remember(
+            'badge_sysreq_pending',
+            300,
+            fn() => Message::query()
+                ->system()
+                ->where('status', 'pending')
+                ->count()
+        );
 
         return $count ? (string) $count : null;
     }
@@ -72,6 +76,7 @@ class SystemRequestResource extends Resource
     {
         return parent::getEloquentQuery()
             ->system()
+            ->with('handledBy')
             ->latest();
     }
 
@@ -146,7 +151,11 @@ class SystemRequestResource extends Resource
                             'body'    => $record->body,
                         ]);
                     })
-                    ->modalFooterActions(function (Message $record, $action): array {
+                    ->modalFooterActions(function (?Message $record, $action): array {
+                        if (! $record) {
+                            return [];
+                        }
+
                         return [
                             /**
                              * =========================
@@ -222,15 +231,17 @@ class SystemRequestResource extends Resource
                                     $action->cancel();
                                 }),
 
-                            Tables\Actions\DeleteAction::make()
+                            Tables\Actions\Action::make('delete')
                                 ->label('Supprimer')
                                 ->icon('heroicon-o-trash')
                                 ->color('danger')
                                 ->requiresConfirmation()
-                                ->visible(fn() => auth()->user()?->hasAnyRole(['super_admin'])) // ou admin aussi si tu veux
-                                ->successNotification(
-                                    Notification::make()->success()->title('Demande supprimée.')
-                                ),
+                                ->visible(fn() => auth()->user()?->hasAnyRole(['super_admin']))
+                                ->action(function () use ($record) {
+                                    $record->delete();
+                                    Notification::make()->success()->title('Demande supprimée.')->send();
+                                    redirect(static::getUrl()); // redirige vers la liste, ferme tous les modals
+                                }),
 
                             Tables\Actions\Action::make('reject_registration')
                                 ->label('Refuser')

@@ -39,23 +39,25 @@ class Message extends Model
                 : 'Système VIP';
 
             if ($receiver && $receiver->email) {
-                try {
-                    Mail::raw(
-                        "Bonjour {$receiver->first_name},\n\n" .
-                            "Vous avez reçu un nouveau message interne de : {$senderName}.\n\n" .
-                            "Sujet : {$message->subject}\n\n" .
-                            "Connectez-vous à votre portail VIP GPI pour lire le contenu.\n\n" .
-                            "Cordialement,\nL'équipe VIP Services Financiers",
-                        function ($mail) use ($receiver, $senderName, $message) {
-                            $mail->from('no-reply@vipgpi.ca', 'VIP GPI')
-                                ->to($receiver->email)
-                                ->replyTo(optional($message->sender)->email, $senderName)
-                                ->subject("Nouveau message interne de $senderName");
-                        }
-                    );
-                } catch (\Exception $e) {
-                    // Ne pas bloquer l'app si le mail échoue
-                }
+                dispatch(function () use ($receiver, $senderName, $message) {
+                    try {
+                        Mail::raw(
+                            "Bonjour {$receiver->first_name},\n\n" .
+                                "Vous avez reçu un nouveau message interne de : {$senderName}.\n\n" .
+                                "Sujet : {$message->subject}\n\n" .
+                                "Connectez-vous à votre portail VIP GPI pour lire le contenu.\n\n" .
+                                "Cordialement,\nL'équipe VIP Services Financiers",
+                            function ($mail) use ($receiver, $senderName, $message) {
+                                $mail->from('no-reply@vipgpi.ca', 'VIP GPI')
+                                    ->to($receiver->email)
+                                    ->replyTo(optional($message->sender)->email, $senderName)
+                                    ->subject("Nouveau message interne de $senderName");
+                            }
+                        );
+                    } catch (\Exception $e) {
+                        // Ne pas bloquer l'app si le mail échoue
+                    }
+                })->afterResponse();
             }
         });
     }

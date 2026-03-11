@@ -146,7 +146,14 @@
       "mcp__Claude_Preview__preview_start",
       "Bash(where npm)",
       "Bash(where npx)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(xargs grep:*)",
+      "Bash(grep -rn submission_broker_to /d/vipgpi__net/ --include=*.php --exclude-dir=vendor)",
+      "Bash(grep -n \"super_admin\\\\|$action->cancel\\\\|delete_.*action\\\\|Action::make\\(''''delete''''\\)\" /d/vipgpi__net/app/Filament/Resources/SystemRequestResource.php)",
+      "Bash(git push:*)",
+      "Bash(gh pr:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }

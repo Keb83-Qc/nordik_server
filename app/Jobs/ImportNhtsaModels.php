@@ -12,6 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ImportNhtsaModels implements ShouldQueue
@@ -70,6 +71,9 @@ class ImportNhtsaModels implements ShouldQueue
                     // Pause légère pour l'API
                     usleep(100000);
                 } catch (\Exception $e) {
+                    Log::warning('ImportNhtsaModels: échec pour ' . $brand->name . '/' . $year, [
+                        'error' => $e->getMessage(),
+                    ]);
                     continue;
                 }
             }
