@@ -133,6 +133,7 @@ class SubmissionResource extends Resource
                     );
                 }),
 
+            // ── Informations Client ──────────────────────────────────────────────
             Forms\Components\Section::make('Informations Client')
                 ->compact()
                 ->schema([
@@ -170,14 +171,116 @@ class SubmissionResource extends Resource
                             return match ($v) {
                                 'assurance' => 'Assurances',
                                 'placement' => 'Placements',
-                                'both' => 'Assurances et Placements',
-                                'none' => 'Aucun',
+                                'both'      => 'Assurances et Placements',
+                                'none'      => 'Aucun',
+                                default     => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('best_contact_time')
+                        ->label('Meilleur moment de contact')
+                        ->content(function ($record) {
+                            $v = self::d($record, 'best_contact_time');
+                            return match ($v) {
+                                'matin'          => 'Matin (8h - 12h)',
+                                'apres_midi'     => 'Après-midi (12h - 17h)',
+                                'soir'           => 'Soir (17h - 20h)',
+                                'nimporte_quand' => "N'importe quand",
+                                default          => $v ?: '-',
+                            };
+                        }),
+
+                    // ── Champs spécifiques au profil habitation ──
+                    Forms\Components\Placeholder::make('gender')
+                        ->label('Genre')
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'gender');
+                            return match ($v) {
+                                'homme'      => 'Homme',
+                                'femme'      => 'Femme',
+                                'autre'      => 'Autre',
+                                'prefer_not' => 'Préfère ne pas préciser',
+                                default      => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('phone_is_cell')
+                        ->label('Téléphone cellulaire ?')
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'phone_is_cell');
+                            return match ($v) {
+                                'yes'   => 'Oui',
+                                'no'    => 'Non',
+                                default => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('marital_status')
+                        ->label('État civil')
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'marital_status');
+                            return match ($v) {
+                                'celibataire' => 'Célibataire',
+                                'conjoint'    => 'Conjoint(e) de fait',
+                                'marie'       => 'Marié(e)',
+                                'autre'       => 'Autre',
+                                default       => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('employment_status')
+                        ->label('Statut professionnel')
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'employment_status');
+                            return match ($v) {
+                                'employe'                   => 'Employé(e)',
+                                'travailleur_autonome',
+                                'self'                      => 'Travailleur autonome',
+                                'etudiant', 'student'       => 'Étudiant(e)',
+                                'retraite', 'retired'       => 'Retraité(e)',
+                                'sans_emploi', 'unemployed' => 'Sans emploi',
+                                default                     => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('education_level')
+                        ->label("Niveau d'éducation")
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'education_level');
+                            return match ($v) {
+                                'secondaire', 'highschool' => 'Secondaire',
+                                'college'                  => 'Collège/Cégep',
+                                'universite', 'university' => 'Université',
+                                'autre', 'other'           => 'Autre',
+                                default                    => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('industry')
+                        ->label("Secteur d'activité")
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(fn($record) => self::d($record, 'industry') ?? '-'),
+
+                    Forms\Components\Placeholder::make('has_ia_products')
+                        ->label('Produits IA/VIP existants ?')
+                        ->visible(fn($record) => in_array($record?->type, ['habitation', 'bundle'], true))
+                        ->content(function ($record) {
+                            $v = self::d($record, 'has_ia_products');
+                            return match ($v) {
+                                'yes'   => 'Oui',
+                                'no'    => 'Non',
                                 default => $v ?: '-',
                             };
                         }),
                 ])
                 ->columns(2),
 
+            // ── Informations Véhicule ────────────────────────────────────────────
             Forms\Components\Section::make('Informations Véhicule')
                 ->compact()
                 ->visible(
@@ -213,8 +316,22 @@ class SubmissionResource extends Resource
                             ->label('Renouvellement')
                             ->content(fn($record) => self::d($record, 'renewal_date') ?? '-'),
                     ]),
+
+                    Forms\Components\Grid::make(2)->schema([
+                        Forms\Components\Placeholder::make('address_auto')
+                            ->label('Adresse')
+                            ->content(fn($record) => self::d($record, 'address') ?? '-'),
+
+                        Forms\Components\Placeholder::make('license_number')
+                            ->label('No. de permis')
+                            ->content(function ($record) {
+                                $v = self::d($record, 'license_number');
+                                return ($v && $v !== 'not_provided') ? $v : 'Non fourni';
+                            }),
+                    ]),
                 ]),
 
+            // ── Informations Habitation ──────────────────────────────────────────
             Forms\Components\Section::make('Informations Habitation')
                 ->compact()
                 ->visible(
@@ -222,25 +339,148 @@ class SubmissionResource extends Resource
                     in_array($record?->type, ['habitation', 'bundle'], true)
                 )
                 ->schema([
-                    Forms\Components\Grid::make(2)->schema([
-                        Forms\Components\Placeholder::make('occupancy')
-                            ->label('Occupation')
-                            ->content(fn($record) => self::d($record, 'occupancy') ?? '-'),
+                    Forms\Components\Placeholder::make('occupancy')
+                        ->label('Occupation')
+                        ->content(fn($record) => self::d($record, 'occupancy') ?? '-'),
 
-                        Forms\Components\Placeholder::make('property_type')
-                            ->label('Type de propriété')
-                            ->content(fn($record) => self::d($record, 'property_type') ?? '-'),
+                    Forms\Components\Placeholder::make('property_type')
+                        ->label('Type de propriété')
+                        ->content(fn($record) => self::d($record, 'property_type') ?? '-'),
 
-                        Forms\Components\Placeholder::make('address_home')
-                            ->label('Adresse')
-                            ->content(fn($record) => self::d($record, 'address') ?? '-'),
+                    Forms\Components\Placeholder::make('address_home')
+                        ->label('Adresse du bien')
+                        ->columnSpanFull()
+                        ->content(fn($record) => self::d($record, 'address') ?? '-'),
 
-                        Forms\Components\Placeholder::make('living_there')
-                            ->label('Vivez-vous à cette adresse ?')
-                            ->content(fn($record) => self::d($record, 'living_there') ?? '-'),
-                    ]),
-                ]),
+                    Forms\Components\Placeholder::make('hab_renewal_date')
+                        ->label('Renouvellement habitation')
+                        ->content(fn($record) => self::d($record, 'hab_renewal_date') ?? '-'),
 
+                    Forms\Components\Placeholder::make('living_there')
+                        ->label('Réside à cette adresse ?')
+                        ->content(function ($record) {
+                            $v = self::d($record, 'living_there');
+                            return match ($v) {
+                                'yes'   => 'Oui',
+                                'no'    => 'Non',
+                                default => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('years_at_address')
+                        ->label("Années à l'adresse")
+                        ->content(function ($record) {
+                            $v = self::d($record, 'years_at_address');
+                            return $v !== null && $v !== '' ? ($v . ' an(s)') : '-';
+                        }),
+
+                    Forms\Components\Placeholder::make('units_in_building')
+                        ->label("Unités dans l'immeuble")
+                        ->content(fn($record) => self::d($record, 'units_in_building') ?? '-'),
+
+                    Forms\Components\Placeholder::make('contents_amount')
+                        ->label('Valeur des biens assurés')
+                        ->content(function ($record) {
+                            $v = self::d($record, 'contents_amount');
+                            return $v !== null && $v !== '' ? number_format((float)$v, 0, ',', ' ') . ' $' : '-';
+                        }),
+
+                    Forms\Components\Placeholder::make('electric_baseboard')
+                        ->label('Plinthes élect. (chauffage principal) ?')
+                        ->content(function ($record) {
+                            $v = self::d($record, 'electric_baseboard');
+                            return match ($v) {
+                                'yes'   => 'Oui',
+                                'no'    => 'Non',
+                                default => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('supp_heating')
+                        ->label("Chauffage d'appoint ?")
+                        ->content(function ($record) {
+                            $v = self::d($record, 'supp_heating');
+                            return match ($v) {
+                                'yes'   => 'Oui',
+                                'no'    => 'Non',
+                                default => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('years_insured')
+                        ->label("Années d'assurance habitation")
+                        ->content(function ($record) {
+                            $v = self::d($record, 'years_insured');
+                            return match ($v) {
+                                '0'       => '0 an',
+                                '1_2'     => '1-2 ans',
+                                '3_5'     => '3-5 ans',
+                                '6_10'    => '6-10 ans',
+                                '11_plus' => '11 ans et plus',
+                                default   => $v ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('years_with_insurer')
+                        ->label("Années avec l'assureur actuel")
+                        ->content(function ($record) {
+                            $v = self::d($record, 'years_with_insurer');
+                            return $v !== null && $v !== '' ? ($v . ' an(s)') : '-';
+                        }),
+
+                    Forms\Components\Placeholder::make('current_insurer')
+                        ->label('Assureur actuel')
+                        ->content(fn($record) => self::d($record, 'current_insurer') ?? '-'),
+                ])
+                ->columns(2),
+
+            // ── Consentements ────────────────────────────────────────────────────
+            Forms\Components\Section::make('Consentements')
+                ->compact()
+                ->schema([
+                    Forms\Components\Placeholder::make('consent_profile')
+                        ->label('Profilage')
+                        ->content(function ($record) {
+                            return match (self::d($record, 'consent_profile')) {
+                                'accept' => '✅ Accepté',
+                                'refuse' => '❌ Refusé',
+                                default  => self::d($record, 'consent_profile') ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('consent_marketing')
+                        ->label('Communications marketing')
+                        ->content(function ($record) {
+                            return match (self::d($record, 'consent_marketing')) {
+                                'accept' => '✅ Accepté',
+                                'refuse' => '❌ Refusé',
+                                default  => self::d($record, 'consent_marketing') ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('marketing_email')
+                        ->label('Marketing par courriel')
+                        ->content(function ($record) {
+                            return match (self::d($record, 'marketing_email')) {
+                                'yes'   => '✅ Oui',
+                                'no'    => '❌ Non',
+                                default => self::d($record, 'marketing_email') ?: '-',
+                            };
+                        }),
+
+                    Forms\Components\Placeholder::make('consent_credit')
+                        ->label('Vérification de crédit')
+                        ->content(function ($record) {
+                            return match (self::d($record, 'consent_credit')) {
+                                'yes'   => '✅ Autorisé',
+                                'no'    => '❌ Refusé',
+                                default => self::d($record, 'consent_credit') ?: '-',
+                            };
+                        }),
+                ])
+                ->columns(2),
+
+            // ── Suivi ────────────────────────────────────────────────────────────
             Forms\Components\Section::make('Suivi')
                 ->compact()
                 ->schema([
@@ -355,6 +595,7 @@ class SubmissionResource extends Resource
                     ->label('Voir')
                     ->icon('heroicon-o-eye')
                     ->modalHeading('Détails de la soumission')
+                    ->modalWidth('4xl')
                     ->modalSubmitAction(false),
 
                 Tables\Actions\Action::make('resend_email')

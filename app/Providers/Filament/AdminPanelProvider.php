@@ -267,7 +267,12 @@ html, body { font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif !im
 /* =============================================================================
    SIDEBAR
    ============================================================================= */
-.fi-sidebar{ z-index: 1000 !important; }
+.fi-sidebar{ z-index: 30 !important; }
+
+/* ── Fix: modal overlay + panel doivent être au-dessus de la sidebar ── */
+.fi-modal-close-overlay { z-index: 1040 !important; }
+.fi-dialog            { z-index: 1041 !important; }
+.fi-dialog-panel      { margin-left: auto !important; margin-right: auto !important; }
 
 .fi-sidebar-header{
     background: linear-gradient(180deg, rgba(14,16,48,1) 0%, rgba(14,16,48,.92) 100%) !important;
