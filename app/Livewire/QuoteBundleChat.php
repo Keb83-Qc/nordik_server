@@ -289,7 +289,6 @@ class QuoteBundleChat extends Component
 
     // ── AUTO handlers ───────────────────────────
 
-
     public function updatedVehicleYear($val): void
     {
         if (!empty($val)) $this->persistField('auto', 'year', $val);

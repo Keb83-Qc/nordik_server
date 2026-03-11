@@ -58,7 +58,6 @@ return [
 
     'years_old' => 'años',
 
-
     // Mejor momento de contacto
     'q_best_contact_time' => "¿Cuál es el mejor momento para contactarlo?",
     'btn_contact_matin' => "Mañana (8h - 12h)",
