@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Soumission Auto - VIP GPI' }}</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -200,6 +201,49 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
+
+    {{-- ▸ Capture globale des erreurs JavaScript → SystemLog --}}
+    <script>
+    (function () {
+        var endpoint = '{{ route("log-js-error") }}';
+        var token    = document.querySelector('meta[name="csrf-token"]')?.content;
+        var count    = 0; // max 3 envois par chargement de page
+
+        function send(type, message, detail) {
+            if (!token || count >= 3) return;
+            count++;
+            var body = Object.assign({ type: type, message: String(message).substring(0, 300), url: window.location.href }, detail);
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(body)
+            }).catch(function () {}); // échec silencieux
+        }
+
+        // Erreurs JS non rattrapées
+        window.addEventListener('error', function (e) {
+            // Ignorer les erreurs de ressources (images, scripts externes)
+            if (e.target && e.target !== window) return;
+            send('js_error', e.message || 'Unknown error', {
+                source: (e.filename || '').substring(0, 200),
+                line:   e.lineno   || '',
+                column: e.colno    || '',
+                stack:  (e.error && e.error.stack ? e.error.stack.substring(0, 500) : '')
+            });
+        }, true);
+
+        // Promesses rejetées non rattrapées
+        window.addEventListener('unhandledrejection', function (e) {
+            var msg   = (e.reason && e.reason.message) ? e.reason.message : String(e.reason || 'Unhandled promise rejection');
+            var stack = (e.reason && e.reason.stack)   ? e.reason.stack.substring(0, 500) : '';
+            send('promise_rejection', msg, { stack: stack });
+        });
+    })();
+    </script>
 </body>
 
 </html>

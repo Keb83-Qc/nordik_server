@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use App\Models\SystemLog;
 
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\HomeController;
@@ -19,6 +21,25 @@ use App\Models\Language;
 use App\Http\Controllers\AccessRequestController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+/**
+ * Récepteur d'erreurs JavaScript — toutes les pages l'utilisent.
+ * Protégé par CSRF + rate-limit (10 req/min/IP).
+ */
+Route::post('/log-js-error', function (Request $request) {
+    $type    = Str::limit($request->input('type', 'js_error'), 50);
+    $message = Str::limit($request->input('message', 'Unknown JS error'), 300);
+
+    SystemLog::record('warning', "[JS] {$type}: {$message}", [
+        'source'   => Str::limit($request->input('source', ''), 300),
+        'line'     => $request->input('line', ''),
+        'column'   => $request->input('column', ''),
+        'stack'    => Str::limit($request->input('stack', ''), 600),
+        'page_url' => Str::limit($request->input('url', ''), 300),
+    ]);
+
+    return response()->json(['ok' => true]);
+})->middleware('throttle:10,1')->name('log-js-error');
 
 /**
  * 1) Redirige / vers /{locale} (locale déterminée par middleware/service)

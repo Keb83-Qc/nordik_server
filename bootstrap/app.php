@@ -4,7 +4,9 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\SetLocale;
-use App\Models\SystemLog; // Assurez-vous que l'import est là
+use App\Models\SystemLog;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -35,13 +37,30 @@ return Application::configure(basePath: dirname(__DIR__))
                 }
 
                 SystemLog::record('danger', 'Crash Automatique: ' . $e->getMessage(), [
-                    'file' => $e->getFile(),
-                    'line' => $e->getLine(),
-                    'trace' => mb_substr($e->getTraceAsString(), 0, 500), // On limite la trace pour la DB
-                    'url' => request()->fullUrl(),
+                    'file'  => $e->getFile(),
+                    'line'  => $e->getLine(),
+                    'trace' => mb_substr($e->getTraceAsString(), 0, 500),
+                    'url'   => request()->fullUrl(),
                 ]);
+
+                // ── Notification email (max 1 par heure pour éviter le spam) ──
+                $cacheKey = 'error_alert_sent_' . md5(get_class($e));
+                if (!Cache::has($cacheKey)) {
+                    Cache::put($cacheKey, true, 3600);
+                    $to = config('mail.submission_broker_to') ?: config('mail.from.address');
+                    if ($to) {
+                        Mail::raw(
+                            "[VIP GPI] Erreur PHP détectée\n\n"
+                            . "Message : " . $e->getMessage() . "\n"
+                            . "Fichier  : " . $e->getFile() . ':' . $e->getLine() . "\n"
+                            . "URL      : " . request()->fullUrl() . "\n\n"
+                            . mb_substr($e->getTraceAsString(), 0, 800),
+                            fn($m) => $m->to($to)->subject('[VIP GPI] 🚨 Erreur critique')
+                        );
+                    }
+                }
             } catch (Throwable $dbError) {
-                // Si la DB est en panne, on ne fait rien pour éviter le crash en boucle
+                // Si la DB ou le mail est en panne, on évite le crash en boucle
             }
         });
     })

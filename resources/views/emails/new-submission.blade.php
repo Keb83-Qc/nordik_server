@@ -327,20 +327,20 @@
                         <div class="info-row"><span class="label">Adresse : </span><span class="value">{{ $v('address') }}</span></div>
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($v('living_there')) }}</span></div>
 
-                        @php $living = strtolower(trim((string)($d[‘living_there’] ?? ‘’))); @endphp
-                        @if($living === ‘yes’ || $living === ‘oui’)
-                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $v(‘years_at_address’) !== ‘-’ ? ($v(‘years_at_address’).’ an(s)’) : ‘-’ }}</span></div>
+                        @php $living = strtolower(trim((string)($d['living_there'] ?? ''))); @endphp
+                        @if($living === 'yes' || $living === 'oui')
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $v('years_at_address') !== '-' ? ($v('years_at_address').' an(s)') : '-' }}</span></div>
                         @else
                         <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">N/A</span></div>
                         @endif
 
-                        <div class="info-row"><span class="label">Nb d’unités immeuble : </span><span class="value">{{ $v('units_in_building') }}</span></div>
+                        <div class="info-row"><span class="label">Nb d'unités immeuble : </span><span class="value">{{ $v('units_in_building') }}</span></div>
                         <div class="info-row"><span class="label">Montant des biens : </span><span class="value">{{ $fmtMoney($d['contents_amount'] ?? null) }}</span></div>
 
                         <div class="info-row"><span class="label">Plinthes électriques : </span><span class="value">{{ $yesNoLabel($v('electric_baseboard')) }}</span></div>
-                        <div class="info-row"><span class="label">Chauffage d’appoint : </span><span class="value">{{ $yesNoLabel($v('supp_heating')) }}</span></div>
+                        <div class="info-row"><span class="label">Chauffage d'appoint : </span><span class="value">{{ $yesNoLabel($v('supp_heating')) }}</span></div>
 
-                        <div class="info-row"><span class="label">Années d’assurance habitation : </span><span class="value">{{ $yearsInsuredLabel($d['years_insured'] ?? null) }}</span></div>
+                        <div class="info-row"><span class="label">Années d'assurance habitation : </span><span class="value">{{ $yearsInsuredLabel($d['years_insured'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Années chez assureur actuel : </span><span class="value">{{ $v('years_with_insurer') }}</span></div>
 
                         <div class="info-row"><span class="label">Assureur actuel : </span><span class="value">{{ $v('current_insurer') }}</span></div>
@@ -361,7 +361,7 @@
                         <div class="info-row"><span class="label">Statut professionnel : </span><span class="value">{{ $jobLabel($d['employment_status'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Dernier diplôme : </span><span class="value">{{ $eduLabel($d['education_level'] ?? null) }}</span></div>
 
-                        <div class="info-row"><span class="label">Secteur d’activité : </span><span class="value">{{ $v('industry') }}</span></div>
+                        <div class="info-row"><span class="label">Secteur d'activité : </span><span class="value">{{ $v('industry') }}</span></div>
                         <div class="info-row"><span class="label">Produits iA sous le même toit : </span><span class="value">{{ $yesNoLabel($v('has_ia_products')) }}</span></div>
                     </div>
                 </div>
@@ -475,15 +475,15 @@
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($h['living_there'] ?? null) }}</span></div>
 
                         @php $livingH = strtolower(trim((string)($h['living_there'] ?? ''))); @endphp
-                        @if($livingH === ‘oui’ || $livingH === ‘yes’ || $livingH === ‘1’ || $livingH === ‘true’)
-                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $val($h,’years_at_address’) !== ‘-’ ? ($val($h,’years_at_address’).’ an(s)’) : ‘-’ }}</span></div>
+                        @if($livingH === 'oui' || $livingH === 'yes' || $livingH === '1' || $livingH === 'true')
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $val($h,'years_at_address') !== '-' ? ($val($h,'years_at_address').' an(s)') : '-' }}</span></div>
                         @else
                         <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">N/A</span></div>
                         @endif
 
                         @php $prop = strtolower(trim((string)($h['property_type'] ?? ''))); @endphp
                         @if($prop !== 'maison')
-                        <div class="info-row"><span class="label">Nb d’unités immeuble : </span><span class="value">{{ $val($h,'units_in_building') }}</span></div>
+                        <div class="info-row"><span class="label">Nb d'unités immeuble : </span><span class="value">{{ $val($h,'units_in_building') }}</span></div>
                         @else
                         <div class="info-row"><span class="label">Nb d’unités immeuble : </span><span class="value">N/A</span></div>
                         @endif
@@ -491,9 +491,9 @@
                         <div class="info-row"><span class="label">Montant des biens : </span><span class="value">{{ $fmtMoney($h['contents_amount'] ?? null) }}</span></div>
 
                         <div class="info-row"><span class="label">Plinthes électriques : </span><span class="value">{{ $yesNoLabel($h['electric_baseboard'] ?? null) }}</span></div>
-                        <div class="info-row"><span class="label">Chauffage d’appoint : </span><span class="value">{{ $yesNoLabel($h['supp_heating'] ?? null) }}</span></div>
+                        <div class="info-row"><span class="label">Chauffage d'appoint : </span><span class="value">{{ $yesNoLabel($h['supp_heating'] ?? null) }}</span></div>
 
-                        <div class="info-row"><span class="label">Années d’assurance habitation : </span><span class="value">{{ $yearsInsuredLabel($h['years_insured'] ?? null) }}</span></div>
+                        <div class="info-row"><span class="label">Années d'assurance habitation : </span><span class="value">{{ $yearsInsuredLabel($h['years_insured'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Années chez assureur actuel : </span><span class="value">{{ $val($h,'years_with_insurer') }}</span></div>
 
                         <div class="info-row"><span class="label">Assureur actuel : </span><span class="value">{{ $val($h,'current_insurer') }}</span></div>
@@ -508,7 +508,7 @@
                         <div class="info-row"><span class="label">État civil : </span><span class="value">{{ $maritalLabel($h['marital_status'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Statut professionnel : </span><span class="value">{{ $jobLabel($h['employment_status'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">Dernier diplôme : </span><span class="value">{{ $eduLabel($h['education_level'] ?? null) }}</span></div>
-                        <div class="info-row"><span class="label">Secteur d’activité : </span><span class="value">{{ $val($h,'industry') }}</span></div>
+                        <div class="info-row"><span class="label">Secteur d'activité : </span><span class="value">{{ $val($h,'industry') }}</span></div>
                         <div class="info-row"><span class="label">Produits iA sous le même toit : </span><span class="value">{{ $yesNoLabel($h['has_ia_products'] ?? null) }}</span></div>
                     </div>
                 </div>
