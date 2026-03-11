@@ -269,9 +269,7 @@ html, body { font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif !im
    ============================================================================= */
 .fi-sidebar{ z-index: 30 !important; }
 
-/* ── Fix: modal overlay + panel doivent être au-dessus de la sidebar ── */
-.fi-modal-close-overlay { z-index: 1040 !important; }
-.fi-dialog            { z-index: 1041 !important; }
+/* ── Modal centré (les z-index laissés aux défaults Filament z-50 > sidebar z-30) ── */
 .fi-dialog-panel      { margin-left: auto !important; margin-right: auto !important; }
 
 .fi-sidebar-header{
