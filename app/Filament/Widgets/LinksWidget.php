@@ -32,7 +32,7 @@ class LinksWidget extends BaseWidget
                 $query->whereRaw('1=0');
             } else {
                 // ✅ filtre DB par visible_to_roles si la colonne existe
-                if (Schema::hasColumn('tools', 'visible_to_roles')) {
+                if (\Illuminate\Support\Facades\Cache::remember('schema_tools_visible_to_roles', 86400, fn() => Schema::hasColumn('tools', 'visible_to_roles'))) {
                     $roleName = $user->role?->name ?? ($user->getRoleNames()->first() ?? null);
 
                     $query->where(function (Builder $q) use ($roleName) {

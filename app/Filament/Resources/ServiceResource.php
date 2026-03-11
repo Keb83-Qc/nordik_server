@@ -28,13 +28,15 @@ class ServiceResource extends Resource
     protected static function activeLocales(): array
     {
         try {
-            return Language::query()
-                ->where('is_active', 1)
-                ->orderByDesc('is_default')
-                ->orderBy('sort_order')
-                ->pluck('code')
-                ->values()
-                ->all();
+            return \Illuminate\Support\Facades\Cache::remember('filament_active_locales', 3600, fn() =>
+                Language::query()
+                    ->where('is_active', 1)
+                    ->orderByDesc('is_default')
+                    ->orderBy('sort_order')
+                    ->pluck('code')
+                    ->values()
+                    ->all()
+            );
         } catch (\Throwable $e) {
             return ['fr', 'en'];
         }

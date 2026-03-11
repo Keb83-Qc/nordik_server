@@ -224,6 +224,7 @@ class UserResource extends Resource
                                         ->label('Titre du poste')
                                         ->options(function () {
                                             return TeamTitle::query()
+                                                ->select(['id', 'name'])
                                                 ->orderBy('id')
                                                 ->get()
                                                 ->mapWithKeys(function ($title) {
@@ -252,6 +253,7 @@ class UserResource extends Resource
                                         ->label('Compte Zoho People')
                                         ->options(
                                             fn() => Employee::query()
+                                                ->select(['zoho_id', 'name', 'email', 'employee_number'])
                                                 ->orderBy('name')
                                                 ->get()
                                                 ->mapWithKeys(fn($e) => [

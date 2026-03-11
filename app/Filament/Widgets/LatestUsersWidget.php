@@ -24,7 +24,7 @@ class LatestUsersWidget extends BaseWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(User::query()->latest()->limit(5)) // Les 5 derniers
+            ->query(User::query()->with('role')->latest()->limit(5)) // Les 5 derniers
             ->columns([
                 Tables\Columns\ImageColumn::make('avatar_url')
                     ->circular()
