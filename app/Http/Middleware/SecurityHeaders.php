@@ -30,8 +30,9 @@ class SecurityHeaders
         // Isole le contexte de navigation (protège contre Spectre / fenêtres cross-origin)
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
 
-        // Renforce l'isolation cross-origin côté embedder
-        $response->headers->set('Cross-Origin-Embedder-Policy', 'require-corp');
+        // NOTE: Cross-Origin-Embedder-Policy intentionnellement absent —
+        // require-corp bloquerait les ressources CDN (Bootstrap, Font Awesome, Google Fonts)
+        // qui ne servent pas de header Cross-Origin-Resource-Policy.
 
         // Bloque Flash et PDF cross-domain (legacy, mais sécurité défense en profondeur)
         $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
