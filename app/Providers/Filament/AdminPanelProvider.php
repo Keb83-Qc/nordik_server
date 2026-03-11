@@ -703,13 +703,14 @@ html:not(.dark) .fi-page-header header.fi-header{
 
 /* =============================================================================
    WIDGETS DASHBOARD — Légère ombre au hover
+   NOTE: pas de transform ici — transform crée un stacking context qui
+   interfère avec les overlays/modals de Filament (dialogs z-index).
    ============================================================================= */
 .fi-wi-widget{
-    transition: box-shadow .18s ease, transform .18s ease;
+    transition: box-shadow .18s ease;
 }
 .fi-wi-widget:hover{
-    box-shadow: 0 14px 32px rgba(0,0,0,.18) !important;
-    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(0,0,0,.22) !important;
 }
 
 /* =============================================================================
