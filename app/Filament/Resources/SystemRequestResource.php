@@ -146,7 +146,11 @@ class SystemRequestResource extends Resource
                             'body'    => $record->body,
                         ]);
                     })
-                    ->modalFooterActions(function (Message $record, $action): array {
+                    ->modalFooterActions(function (?Message $record, $action): array {
+                        if (! $record) {
+                            return [];
+                        }
+
                         return [
                             /**
                              * =========================

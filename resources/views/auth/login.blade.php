@@ -131,25 +131,14 @@
                 <p class="text-muted small mb-4">Connectez-vous pour accéder à votre portail.</p>
 
                 @if ($errors->any())
-                <div
-                    class="alert alert-danger text-start py-2 fs-6 border-0 bg-danger bg-opacity-10 text-danger rounded-3 mb-3">
-                    <i class="fas fa-exclamation-circle me-1"></i> {{ $errors->first() }}
-                </div>
+                    <div class="alert alert-danger text-start py-2 fs-6 border-0 bg-danger bg-opacity-10 text-danger rounded-3 mb-3">
+                        <i class="fas fa-exclamation-circle me-1"></i> {{ $errors->first() }}
+                    </div>
                 @endif
 
-                @if ($errors->any())
-  <div class="alert alert-danger text-start">
-    <ul class="mb-0">
-      @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-@endif
-
-@if (session('status'))
-  <div class="alert alert-info">{{ session('status') }}</div>
-@endif
+                @if (session('status'))
+                    <div class="alert alert-info mb-3">{{ session('status') }}</div>
+                @endif
 
                 <form action="{{ route('login.post', ['locale' => app()->getLocale()]) }}" method="post">
                     @csrf
