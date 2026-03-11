@@ -119,12 +119,16 @@ trait HasChatSteps
         $this->data[$key] = $value;
 
         if (!isset($this->submission)) {
-            $this->submission = Submission::create([
-                'type'         => $this->chatType(),
-                'advisor_code' => $this->advisorCode,
-                'data'         => $this->data,
-            ]);
-            session([$this->sessionKey() => $this->submission->id]);
+            // Lazy creation: only write to DB once we have an email
+            if (!empty($this->data['email'])) {
+                $this->submission = Submission::create([
+                    'type'         => $this->chatType(),
+                    'advisor_code' => $this->advisorCode,
+                    'data'         => $this->data,
+                ]);
+                session([$this->sessionKey() => $this->submission->id]);
+            }
+            // else: keep data in Livewire snapshot only until email is provided
         } else {
             $this->submission->update(['data' => $this->data]);
         }

@@ -48,6 +48,11 @@ class QuoteAutoChat extends Component
     protected function stepOrder(): array
     {
         return [
+            'identity'          => ['first_name', 'last_name'],
+            'age'               => 'age',
+            'email'             => 'email',
+            'phone'             => 'phone',
+            'best_contact_time' => 'best_contact_time',
             'year'              => 'year',
             'brand'             => 'brand',
             'model'             => 'model',
@@ -55,13 +60,8 @@ class QuoteAutoChat extends Component
             'usage'             => 'usage',
             'km_annuel'         => 'km_annuel',
             'address'           => 'address',
-            'identity'          => ['first_name', 'last_name'],
-            'age'               => 'age',
-            'profession'        => 'profession',
             'existing_products' => 'existing_products',
-            'email'             => 'email',
-            'phone'             => 'phone',
-            'best_contact_time' => 'best_contact_time',
+            'profession'        => 'profession',
             'license_number'    => 'license_number',
         ];
     }
