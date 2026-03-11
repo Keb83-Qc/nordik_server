@@ -247,28 +247,29 @@
                 &copy; {{ date('Y') }} VIP Services Financiers
             </div>
         </div>
+    </div>{{-- /.login-card --}}
 
-        {{-- MODAL SUCCESS --}}
-        <div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 p-4 text-center rounded-4 shadow-lg">
-                    <div class="mb-3">
-                        <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center"
-                            style="width: 80px; height: 80px;">
-                            <i class="fas fa-check fa-3x text-success"></i>
-                        </div>
+    {{-- MODAL SUCCESS — hors du .login-card (backdrop-filter crée un stacking context qui bloque les clics) --}}
+    <div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 p-4 text-center rounded-4 shadow-lg">
+                <div class="mb-3">
+                    <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center"
+                        style="width: 80px; height: 80px;">
+                        <i class="fas fa-check fa-3x text-success"></i>
                     </div>
-                    <h3 class="fw-bold text-dark mb-2">Demande envoyée !</h3>
-                    <p class="text-muted mb-4">Nous avons bien reçu votre demande.<br>Un administrateur validera votre
-                        compte sous peu.</p>
-                    <button type="button" class="btn btn-dark px-5 py-2 fw-bold rounded-pill"
-                        onclick="window.location.reload();">Terminer</button>
                 </div>
+                <h3 class="fw-bold text-dark mb-2">Demande envoyée !</h3>
+                <p class="text-muted mb-4">Nous avons bien reçu votre demande.<br>Un administrateur validera votre
+                    compte sous peu.</p>
+                <button type="button" class="btn btn-dark px-5 py-2 fw-bold rounded-pill"
+                    onclick="window.location.reload();">Terminer</button>
             </div>
         </div>
+    </div>
 
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        <script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
             function toggleForms(view) {
                 const loginBox = document.getElementById('login-section');
                 const regBox = document.getElementById('register-section');
@@ -283,10 +284,10 @@
                     loginBox.style.display = 'block';
                 }
             }
-            // Ouvrir automatiquement "Demandez votre accès" si ?register=1
+            // Ouvrir automatiquement si ?register (avec ou sans valeur)
             document.addEventListener('DOMContentLoaded', () => {
                 const params = new URLSearchParams(window.location.search);
-                if (params.get('register') === '1') {
+                if (params.has('register')) {
                     toggleForms('register');
                 }
             });
@@ -332,7 +333,7 @@
                         btn.innerHTML = originalBtnText;
                     });
             });
-        </script>
+    </script>
 </body>
 
 </html>
