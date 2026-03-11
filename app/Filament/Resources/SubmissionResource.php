@@ -572,12 +572,15 @@ class SubmissionResource extends Resource
                 Tables\Filters\SelectFilter::make('advisor_code')
                     ->label('Conseiller')
                     ->options(
-                        fn() => User::query()
-                            ->whereNotNull('advisor_code')
-                            ->orderBy('first_name')
-                            ->get()
-                            ->mapWithKeys(fn($u) => [$u->advisor_code => "{$u->first_name} {$u->last_name} ({$u->advisor_code})"])
-                            ->toArray()
+                        fn() => \Illuminate\Support\Facades\Cache::remember('filter_advisor_codes', 300, fn() =>
+                            User::query()
+                                ->whereNotNull('advisor_code')
+                                ->orderBy('first_name')
+                                ->select(['first_name', 'last_name', 'advisor_code'])
+                                ->get()
+                                ->mapWithKeys(fn($u) => [$u->advisor_code => "{$u->first_name} {$u->last_name} ({$u->advisor_code})"])
+                                ->toArray()
+                        )
                     )
                     ->searchable()
                     ->preload(),

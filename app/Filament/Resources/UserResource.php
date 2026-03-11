@@ -32,6 +32,19 @@ class UserResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'first_name';
 
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if (! $user) return false;
+        return method_exists($user, 'hasAnyRole')
+            ? $user->hasAnyRole(['super_admin', 'admin'])
+            : in_array((int) ($user->role_id ?? 0), [1, 2], true);
+    }
+
+    public static function canCreate(): bool  { return static::canViewAny(); }
+    public static function canEdit($record): bool   { return static::canViewAny(); }
+    public static function canDelete($record): bool { return static::canViewAny(); }
+
     public static function getNavigationGroup(): ?string
     {
         return 'Gestion Conseillers';
