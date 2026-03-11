@@ -55,10 +55,14 @@ class SystemRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = Message::query()
-            ->system()
-            ->where('status', 'pending')
-            ->count();
+        $count = \Illuminate\Support\Facades\Cache::remember(
+            'badge_sysreq_pending',
+            300,
+            fn() => Message::query()
+                ->system()
+                ->where('status', 'pending')
+                ->count()
+        );
 
         return $count ? (string) $count : null;
     }
@@ -72,6 +76,7 @@ class SystemRequestResource extends Resource
     {
         return parent::getEloquentQuery()
             ->system()
+            ->with('handledBy')
             ->latest();
     }
 

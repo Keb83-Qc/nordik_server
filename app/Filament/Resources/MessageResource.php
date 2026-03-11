@@ -38,11 +38,15 @@ class MessageResource extends Resource
         $id = Filament::auth()->id();
         if (! $id) return null;
 
-        $count = Message::query()
-            ->where('receiver_id', $id)
-            ->internal()
-            ->where('is_read', false)
-            ->count();
+        $count = \Illuminate\Support\Facades\Cache::remember(
+            "badge_msg_unread_{$id}",
+            300,
+            fn() => Message::query()
+                ->where('receiver_id', $id)
+                ->internal()
+                ->where('is_read', false)
+                ->count()
+        );
 
         return $count ? (string) $count : null;
     }
@@ -59,6 +63,7 @@ class MessageResource extends Resource
         return parent::getEloquentQuery()
             ->when($id, fn(Builder $q) => $q->where('receiver_id', $id))
             ->internal()
+            ->with('sender')
             ->latest();
     }
 
@@ -72,6 +77,7 @@ class MessageResource extends Resource
                 ->label('Destinataire')
                 ->options(
                     fn() => User::query()
+                        ->select(['id', 'first_name', 'last_name'])
                         ->where('id', '!=', Filament::auth()->id())
                         ->orderBy('first_name')
                         ->get()
