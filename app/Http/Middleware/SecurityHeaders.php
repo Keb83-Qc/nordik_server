@@ -25,7 +25,16 @@ class SecurityHeaders
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
         // Désactive les fonctionnalités sensibles du navigateur
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), serial=(), bluetooth=()');
+
+        // Isole le contexte de navigation (protège contre Spectre / fenêtres cross-origin)
+        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+
+        // Renforce l'isolation cross-origin côté embedder
+        $response->headers->set('Cross-Origin-Embedder-Policy', 'require-corp');
+
+        // Bloque Flash et PDF cross-domain (legacy, mais sécurité défense en profondeur)
+        $response->headers->set('X-Permitted-Cross-Domain-Policies', 'none');
 
         // HSTS: force HTTPS pendant 1 an (activer seulement en production avec HTTPS)
         if (config('app.env') === 'production') {

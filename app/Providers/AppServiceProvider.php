@@ -8,7 +8,14 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use App\Models\BlogPost;
+use App\Models\Employee;
+use App\Models\HomepageStat;
+use App\Models\Partner;
 use App\Models\PublicServiceCategory;
+use App\Models\Service;
+use App\Models\Slide;
+use App\Observers\ClearPageCacheObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Settings\MailSettings;
 
@@ -24,6 +31,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super_admin') ? true : null;
         });
+
+        // Invalide le cache HTML de page quand du contenu public change
+        BlogPost::observe(ClearPageCacheObserver::class);
+        Slide::observe(ClearPageCacheObserver::class);
+        HomepageStat::observe(ClearPageCacheObserver::class);
+        Service::observe(ClearPageCacheObserver::class);
+        Partner::observe(ClearPageCacheObserver::class);
+        Employee::observe(ClearPageCacheObserver::class);
 
         Paginator::useBootstrapFive();
 

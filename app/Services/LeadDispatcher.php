@@ -21,17 +21,25 @@ class LeadDispatcher
 
             // 2. Filtrer ceux qui n'ont pas encore rempli leur quota pour ce cycle
             // Ex: Si le poids est 2 et qu'il a reçu 1, il est éligible.
-            $eligible = $candidates->filter(function ($user) {
-                return $user->leads_received_cycle < $user->lead_weight;
-            });
+            // Boucle (max 2 itérations) au lieu d'une récursion pour éviter tout stack overflow
+            // si lead_weight = 0 pour tous les conseillers actifs.
+            $eligible = collect();
+            for ($attempt = 0; $attempt < 2; $attempt++) {
+                $eligible = $candidates->filter(fn($user) => $user->leads_received_cycle < $user->lead_weight);
 
-            // 3. FIN DU CYCLE : Si tout le monde a atteint son quota
-            if ($eligible->isEmpty()) {
-                // On remet tout le monde à 0
+                if ($eligible->isNotEmpty()) {
+                    break;
+                }
+
+                // 3. FIN DU CYCLE : tout le monde a atteint son quota — on remet à 0 et on re-fetch
                 User::where('accepts_leads', true)->update(['leads_received_cycle' => 0]);
+                $candidates = User::where('accepts_leads', true)->get();
+            }
 
-                // On ré-exécute la logique (récursion) pour choisir le premier du nouveau cycle
-                return $this->assignAdvisor();
+            // Sécurité : si toujours vide (ex: lead_weight = 0 pour tous), on abandonne proprement
+            if ($eligible->isEmpty()) {
+                Log::warning('LeadDispatcher: aucun conseiller éligible même après reset du cycle (lead_weight=0?).');
+                return User::where('email', 'admin@vipgpi.ca')->first();
             }
 
             // 4. CHOIX DU GAGNANT

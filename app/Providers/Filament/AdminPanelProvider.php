@@ -620,6 +620,112 @@ html:not(.dark) .fi-page-header header.fi-header{
         justify-content: flex-start;
     }
 }
+
+/* =============================================================================
+   SECTIONS — Bordure gauche dorée sur les headers de section
+   ============================================================================= */
+.fi-section-header{
+    border-left: 3px solid var(--vip-accent) !important;
+    padding-left: .85rem !important;
+    border-radius: 0 !important;
+}
+.fi-section-header-heading{
+    font-weight: 700 !important;
+    letter-spacing: -.015em !important;
+    font-size: .92rem !important;
+}
+
+/* =============================================================================
+   TABLES — Alternance douce des lignes (zebra)
+   ============================================================================= */
+.fi-ta-row:nth-child(even){
+    background: rgba(148,163,184,.045) !important;
+}
+.dark .fi-ta-row:nth-child(even){
+    background: rgba(255,255,255,.024) !important;
+}
+
+/* =============================================================================
+   BADGES — Plus arrondis, padding harmonisé, fond plus doux
+   ============================================================================= */
+.fi-badge{
+    border-radius: 999px !important;
+    padding: .2rem .65rem !important;
+    font-weight: 600 !important;
+    font-size: .72rem !important;
+    letter-spacing: .01em !important;
+}
+
+/* =============================================================================
+   FORMULAIRES — Meilleur style des labels
+   ============================================================================= */
+.fi-fo-field-wrp > label,
+.fi-fo-field-wrp .fi-fo-field-wrp-label{
+    font-weight: 600 !important;
+    font-size: .82rem !important;
+    letter-spacing: .005em !important;
+    opacity: .92;
+}
+
+/* =============================================================================
+   MODAL — Header avec dégradé doré
+   ============================================================================= */
+.fi-modal-header,
+.fi-dialog-header{
+    background: linear-gradient(135deg, rgba(201,160,80,.12) 0%, rgba(201,160,80,.04) 100%) !important;
+    border-bottom: 1px solid rgba(201,160,80,.25) !important;
+    padding: 1rem 1.25rem !important;
+}
+.fi-modal-header-heading,
+.fi-dialog-header-heading{
+    font-weight: 700 !important;
+    font-size: 1.05rem !important;
+    color: var(--vip-accent) !important;
+}
+
+/* =============================================================================
+   SCROLLBAR — Fine et dorée (webkit)
+   ============================================================================= */
+::-webkit-scrollbar{
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track{
+    background: transparent;
+}
+::-webkit-scrollbar-thumb{
+    background: rgba(201,160,80,.45);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover{
+    background: rgba(201,160,80,.70);
+}
+
+/* =============================================================================
+   WIDGETS DASHBOARD — Légère ombre au hover
+   ============================================================================= */
+.fi-wi-widget{
+    transition: box-shadow .18s ease, transform .18s ease;
+}
+.fi-wi-widget:hover{
+    box-shadow: 0 14px 32px rgba(0,0,0,.18) !important;
+    transform: translateY(-2px);
+}
+
+/* =============================================================================
+   DARK MODE — Harmonisation couleurs
+   ============================================================================= */
+.dark .fi-section-header{
+    border-left-color: rgba(201,160,80,.7) !important;
+}
+.dark .fi-fo-field-wrp > label,
+.dark .fi-fo-field-wrp .fi-fo-field-wrp-label{
+    color: rgba(255,255,255,.80) !important;
+}
+.dark .fi-modal-header,
+.dark .fi-dialog-header{
+    background: linear-gradient(135deg, rgba(201,160,80,.09) 0%, rgba(201,160,80,.03) 100%) !important;
+}
 </style>
 HTML;
     }
