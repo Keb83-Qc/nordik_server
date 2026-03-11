@@ -232,10 +232,10 @@ class SystemRequestResource extends Resource
                                 ->color('danger')
                                 ->requiresConfirmation()
                                 ->visible(fn() => auth()->user()?->hasAnyRole(['super_admin']))
-                                ->action(function () use ($record, $action) {
+                                ->action(function () use ($record) {
                                     $record->delete();
                                     Notification::make()->success()->title('Demande supprimée.')->send();
-                                    $action->cancel(); // ferme le modal parent
+                                    redirect(static::getUrl()); // redirige vers la liste, ferme tous les modals
                                 }),
 
                             Tables\Actions\Action::make('reject_registration')
