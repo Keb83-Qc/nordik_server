@@ -105,6 +105,9 @@ trait HasChatSteps
                 return;
             }
         }
+
+        // Nouvel utilisateur — calcule la première étape
+        $this->calculateStep();
     }
 
     // ──────────────────────────────────────────────
