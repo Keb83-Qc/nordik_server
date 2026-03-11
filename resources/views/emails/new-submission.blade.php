@@ -257,6 +257,17 @@
     };
     };
 
+    $existingProductsLabel = function($val) {
+    $v = is_string($val) ? strtolower(trim($val)) : $val;
+    return match ($v ?? '') {
+    'assurance' => 'Assurances',
+    'placement' => 'Placements',
+    'both' => 'Assurances et Placements',
+    'none' => 'Aucun',
+    default => ($val === null || $val === '') ? '-' : (string)$val,
+    };
+    };
+
     $contactTimeLabel = function($val) {
     $v = is_string($val) ? strtolower(trim($val)) : $val;
     return match ($v ?? '') {
@@ -316,11 +327,11 @@
                         <div class="info-row"><span class="label">Adresse : </span><span class="value">{{ $v('address') }}</span></div>
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($v('living_there')) }}</span></div>
 
-                        @php $living = strtolower(trim((string)($d['living_there'] ?? ''))); @endphp
-                        @if($living === 'oui')
-                        <div class="info-row"><span class="label">Date d’emménagement : </span><span class="value">{{ $v('move_in_date') }}</span></div>
+                        @php $living = strtolower(trim((string)($d[‘living_there’] ?? ‘’))); @endphp
+                        @if($living === ‘yes’ || $living === ‘oui’)
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $v(‘years_at_address’) !== ‘-’ ? ($v(‘years_at_address’).’ an(s)’) : ‘-’ }}</span></div>
                         @else
-                        <div class="info-row"><span class="label">Date d’emménagement : </span><span class="value">N/A</span></div>
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">N/A</span></div>
                         @endif
 
                         <div class="info-row"><span class="label">Nb d’unités immeuble : </span><span class="value">{{ $v('units_in_building') }}</span></div>
@@ -386,7 +397,7 @@
                         <div class="info-row"><span class="label">Adresse : </span><span class="value">{{ $v('address') }}</span></div>
                         <div class="info-row"><span class="label">Profession : </span><span class="value">{{ $v('profession') }}</span></div>
 
-                        <div class="info-row"><span class="label">Produits existants : </span><span class="value">{{ $v('existing_products') }}</span></div>
+                        <div class="info-row"><span class="label">Produits existants : </span><span class="value">{{ $existingProductsLabel($d['existing_products'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">No permis : </span><span class="value">{{ $v('license_number') }}</span></div>
                     </div>
                     <div class="muted" style="margin-top:10px;">
@@ -436,7 +447,7 @@
                         <div class="info-row"><span class="label">Modèle : </span><span class="value">{{ $val($a,'model') }}</span></div>
                         <div class="info-row"><span class="label">Renouvellement : </span><span class="value">{{ $val($a,'renewal_date') }}</span></div>
                         <div class="info-row"><span class="label">KM annuel : </span><span class="value">{{ $val($a,'km_annuel') }}</span></div>
-                        <div class="info-row"><span class="label">Produits existants : </span><span class="value">{{ $val($a,'existing_products') }}</span></div>
+                        <div class="info-row"><span class="label">Produits existants : </span><span class="value">{{ $existingProductsLabel($a['existing_products'] ?? null) }}</span></div>
                         <div class="info-row"><span class="label">No permis : </span><span class="value">{{ $val($a,'license_number') }}</span></div>
                     </div>
                 </div>
@@ -454,10 +465,10 @@
                         <div class="info-row"><span class="label">Vit à cette adresse : </span><span class="value">{{ $yesNoLabel($h['living_there'] ?? null) }}</span></div>
 
                         @php $livingH = strtolower(trim((string)($h['living_there'] ?? ''))); @endphp
-                        @if($livingH === 'oui' || $livingH === 'yes' || $livingH === '1' || $livingH === 'true')
-                        <div class="info-row"><span class="label">Date d’emménagement : </span><span class="value">{{ $val($h,'move_in_date') }}</span></div>
+                        @if($livingH === ‘oui’ || $livingH === ‘yes’ || $livingH === ‘1’ || $livingH === ‘true’)
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">{{ $val($h,’years_at_address’) !== ‘-’ ? ($val($h,’years_at_address’).’ an(s)’) : ‘-’ }}</span></div>
                         @else
-                        <div class="info-row"><span class="label">Date d’emménagement : </span><span class="value">N/A</span></div>
+                        <div class="info-row"><span class="label">Années à cette adresse : </span><span class="value">N/A</span></div>
                         @endif
 
                         @php $prop = strtolower(trim((string)($h['property_type'] ?? ''))); @endphp
@@ -545,9 +556,7 @@
                             @endif
                         </span>
                     </div>
-                    @if($type === 'habitation')
                     <div class="info-row"><span class="label">Meilleur moment :&nbsp;</span><span class="value">{{ $contactTimeLabel($d['best_contact_time'] ?? null) }}</span></div>
-                    @endif
                 </div>
             </div>
             @endif

@@ -38,7 +38,8 @@ return [
     'q_identity' => 'What is your first name, last name, and you are?',
     'q_address' => "What is the address of the property to be insured?",
     'q_living_there' => "Do you currently live at this address?",
-    'q_move_in_date' => "Since what date have you been living at this address?",
+    'q_move_in_date' => "How many years have you been living at this address?",
+    'ph_years_at_address' => "Number of years (e.g., 5)",
     'q_units' => "How many units are in the building? (if a house: 1)",
     'q_contents_amount' => "For what amount would you like to insure all your belongings?",
     'q_electric_baseboard' => "Are electric baseboards the main heating source?",
@@ -81,36 +82,50 @@ return [
     'years_insured_6_10' => "6-10 years",
     'years_insured_11_plus' => "11+ years",
 
-    // Years insured (bubble display)
+    // Years insured (bubble display) — underscore keys = stored values
     'years_insured_label_0' => "0 years",
-    'years_insured_label_1-2' => "1-2 years",
-    'years_insured_label_3-5' => "3-5 years",
-    'years_insured_label_6-10' => "6-10 years",
-    'years_insured_label_11+' => "11+ years",
+    'years_insured_label_1_2' => "1-2 years",
+    'years_insured_label_3_5' => "3-5 years",
+    'years_insured_label_6_10' => "6-10 years",
+    'years_insured_label_11_plus' => "11+ years",
 
-    // Translated values for fields
+    // Translated values for fields (chat response bubbles)
     'marital_single' => 'Single',
     'marital_partner' => 'Common-law partner',
     'marital_married' => 'Married',
     'marital_other' => 'Other',
+
+    'marital_status_celibataire' => 'Single',
+    'marital_status_conjoint' => 'Common-law partner',
+    'marital_status_marie' => 'Married',
+    'marital_status_autre' => 'Other',
 
     'employment_status_employe' => 'Employed',
     'employment_status_self' => 'Self-employed',
     'employment_status_student' => 'Student',
     'employment_status_retired' => 'Retired',
     'employment_status_unemployed' => 'Unemployed',
+    'employment_status_travailleur_autonome' => 'Self-employed',
+    'employment_status_etudiant' => 'Student',
+    'employment_status_retraite' => 'Retired',
+    'employment_status_sans_emploi' => 'Unemployed',
 
     'edu_highschool' => 'High School',
     'edu_college' => 'College/CEGEP',
     'edu_university' => 'University',
     'edu_other' => 'Other',
 
-    'has_ia_products_Oui' => 'Yes',
-    'has_ia_products_Non' => 'No',
-    'marketing_email_Oui' => 'Yes',
-    'marketing_email_Non' => 'No',
-    'consent_credit_Oui' => 'Yes',
-    'consent_credit_Non' => 'No',
+    'education_level_secondaire' => 'High School',
+    'education_level_college' => 'College/CEGEP',
+    'education_level_universite' => 'University',
+    'education_level_autre' => 'Other',
+
+    'has_ia_products_yes' => 'Yes',
+    'has_ia_products_no' => 'No',
+    'marketing_email_yes' => 'Yes',
+    'marketing_email_no' => 'No',
+    'consent_credit_yes' => 'Yes',
+    'consent_credit_no' => 'No',
 
     'q_age' => "What is your age?",
     'ph_age' => "Age (e.g., 35)",

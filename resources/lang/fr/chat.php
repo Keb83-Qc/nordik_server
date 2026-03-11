@@ -20,6 +20,7 @@ return [
     'q_email' => "Parfait. À quelle adresse courriel puis-je vous envoyer la soumission ?",
     'q_phone' => "Dernière étape, votre numéro de téléphone ?",
     'q_license' => "Dernière petite chose : si vous avez votre numéro de permis, cela accélère le traitement. Sinon, vous pouvez passer cette étape !",
+    'loading' => '...',
     'q_finish' => "Excellent ! J'ai maintenant tout ce qu'il me faut pour analyser votre dossier. Cliquez sur le bouton ci-dessous pour m'envoyer le tout !",
 
     'q_renewal' => "Quelle est votre date de renouvellement prévue ?",

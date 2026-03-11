@@ -120,10 +120,11 @@
                 </button>
             </div>
 
-            @elseif($step === 'move_in_date')
+            @elseif($step === 'years_at_address')
             <div class="input-group" wire:key="movein">
-                <input type="date" wire:model="move_in_date" class="form-control form-control-lg">
-                <button wire:click="submitMoveInDate" class="btn btn-primary px-4">
+                <input type="number" wire:model="years_at_address" class="form-control form-control-lg"
+                    placeholder="{{ __('homechat.ph_years_at_address') }}" min="0" max="100">
+                <button wire:click="submitYearsAtAddress" class="btn btn-primary px-4">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
