@@ -1,9 +1,124 @@
 {{-- resources/views/livewire/quote-auto-steps.blade.php --}}
 
 {{-- ============================================================
+|  IDENTITÉ (Prénom + Nom) — première étape
+============================================================ --}}
+@if($step === 'identity' || isset($data['first_name']) || isset($data['last_name']))
+<div class="messages__item" wire:key="msg-identity">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_identity') }}</div>
+    </div>
+</div>
+
+@if(isset($data['first_name']) && isset($data['last_name']))
+<div class="messages__item" wire:key="resp-identity">
+    <div class="user-message" wire:click="goToStep('identity')">
+        <span>{{ $data['first_name'] }} {{ $data['last_name'] }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  ÂGE
+============================================================ --}}
+@if(isset($data['first_name']) && ($step === 'age' || isset($data['age'])))
+<div class="messages__item" wire:key="msg-age">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_age') }}</div>
+    </div>
+</div>
+
+@if(isset($data['age']))
+<div class="messages__item" wire:key="resp-age">
+    <div class="user-message" wire:click="goToStep('age')">
+        <span>{{ $data['age'] }} {{ __('chat.years_old') }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  EMAIL
+============================================================ --}}
+@if(isset($data['age']) && ($step === 'email' || isset($data['email'])))
+<div class="messages__item" wire:key="msg-email">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_email') }}</div>
+    </div>
+</div>
+
+@if(isset($data['email']))
+<div class="messages__item" wire:key="resp-email">
+    <div class="user-message" wire:click="goToStep('email')">
+        <span>{{ $data['email'] }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  TÉLÉPHONE
+============================================================ --}}
+@if(isset($data['email']) && ($step === 'phone' || isset($data['phone'])))
+<div class="messages__item" wire:key="msg-phone">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_phone') }}</div>
+    </div>
+</div>
+
+@if(isset($data['phone']))
+<div class="messages__item" wire:key="resp-phone">
+    <div class="user-message" wire:click="goToStep('phone')">
+        <span>{{ $data['phone'] }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  MEILLEUR MOMENT DE CONTACT
+============================================================ --}}
+@if(isset($data['phone']) && ($step === 'best_contact_time' || isset($data['best_contact_time'])))
+<div class="messages__item" wire:key="msg-contact-time">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_best_contact_time') }}</div>
+    </div>
+</div>
+
+@if(isset($data['best_contact_time']))
+<div class="messages__item" wire:key="resp-contact-time">
+    <div class="user-message" wire:click="goToStep('best_contact_time')">
+        @php
+        $contactTimeKey = 'chat.contact_time_' . $data['best_contact_time'];
+        $contactTimeLabel = __($contactTimeKey);
+        if ($contactTimeLabel === $contactTimeKey) $contactTimeLabel = $data['best_contact_time'];
+        @endphp
+        <span>{{ $contactTimeLabel }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
 |  ANNÉE
 ============================================================ --}}
-@if($step === 'year' || isset($data['year']))
+@if(isset($data['best_contact_time']) && ($step === 'year' || isset($data['year'])))
 <div class="messages__item" wire:key="msg-year">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
@@ -162,75 +277,9 @@
 
 
 {{-- ============================================================
-|  IDENTITÉ (Prénom + Nom)
+|  PRODUITS EXISTANTS
 ============================================================ --}}
-@if(isset($data['address']) && ($step === 'identity' || isset($data['first_name']) || isset($data['last_name'])))
-<div class="messages__item" wire:key="msg-identity">
-    <div class="messages__wrapper">
-        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_identity') }}</div>
-    </div>
-</div>
-
-@if(isset($data['first_name']) && isset($data['last_name']))
-<div class="messages__item" wire:key="resp-identity">
-    <div class="user-message" wire:click="goToStep('identity')">
-        <span>{{ $data['first_name'] }} {{ $data['last_name'] }}</span>
-        <span class="edit-badge"><i class="fas fa-pen"></i></span>
-    </div>
-</div>
-@endif
-@endif
-
-
-{{-- ============================================================
-|  ÂGE
-============================================================ --}}
-@if(isset($data['first_name']) && ($step === 'age' || isset($data['age'])))
-<div class="messages__item" wire:key="msg-age">
-    <div class="messages__wrapper">
-        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_age') }}</div>
-    </div>
-</div>
-
-@if(isset($data['age']))
-<div class="messages__item" wire:key="resp-age">
-    <div class="user-message" wire:click="goToStep('age')">
-        <span>{{ $data['age'] }} {{ __('chat.years_old') }}</span>
-        <span class="edit-badge"><i class="fas fa-pen"></i></span>
-    </div>
-</div>
-@endif
-@endif
-
-
-{{-- ============================================================
-|  PROFESSION (après ÂGE)
-============================================================ --}}
-@if(isset($data['age']) && ($step === 'profession' || isset($data['profession'])))
-<div class="messages__item" wire:key="msg-profession">
-    <div class="messages__wrapper">
-        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_profession') }}</div>
-    </div>
-</div>
-
-@if(isset($data['profession']))
-<div class="messages__item" wire:key="resp-profession">
-    <div class="user-message" wire:click="goToStep('profession')">
-        <span>{{ $data['profession'] }}</span>
-        <span class="edit-badge"><i class="fas fa-pen"></i></span>
-    </div>
-</div>
-@endif
-@endif
-
-
-{{-- ============================================================
-|  PRODUITS EXISTANTS (après PROFESSION)
-============================================================ --}}
-@if(isset($data['profession']) && ($step === 'existing_products' || isset($data['existing_products'])))
+@if(isset($data['address']) && ($step === 'existing_products' || isset($data['existing_products'])))
 <div class="messages__item" wire:key="msg-existing-products">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
@@ -255,20 +304,20 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 
 
 {{-- ============================================================
-|  EMAIL (après existing_products)
+|  PROFESSION
 ============================================================ --}}
-@if(isset($data['existing_products']) && ($step === 'email' || isset($data['email'])))
-<div class="messages__item" wire:key="msg-email">
+@if(isset($data['existing_products']) && ($step === 'profession' || isset($data['profession'])))
+<div class="messages__item" wire:key="msg-profession">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_email') }}</div>
+        <div class="agent-msg">{{ __('chat.q_profession') }}</div>
     </div>
 </div>
 
-@if(isset($data['email']))
-<div class="messages__item" wire:key="resp-email">
-    <div class="user-message" wire:click="goToStep('email')">
-        <span>{{ $data['email'] }}</span>
+@if(isset($data['profession']))
+<div class="messages__item" wire:key="resp-profession">
+    <div class="user-message" wire:click="goToStep('profession')">
+        <span>{{ $data['profession'] }}</span>
         <span class="edit-badge"><i class="fas fa-pen"></i></span>
     </div>
 </div>
@@ -277,58 +326,9 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 
 
 {{-- ============================================================
-|  TÉLÉPHONE (après email)
+|  NUMÉRO DE PERMIS
 ============================================================ --}}
-@if(isset($data['email']) && ($step === 'phone' || isset($data['phone'])))
-<div class="messages__item" wire:key="msg-phone">
-    <div class="messages__wrapper">
-        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_phone') }}</div>
-    </div>
-</div>
-
-@if(isset($data['phone']))
-<div class="messages__item" wire:key="resp-phone">
-    <div class="user-message" wire:click="goToStep('phone')">
-        <span>{{ $data['phone'] }}</span>
-        <span class="edit-badge"><i class="fas fa-pen"></i></span>
-    </div>
-</div>
-@endif
-@endif
-
-
-{{-- ============================================================
-|  MEILLEUR MOMENT DE CONTACT (après téléphone)
-============================================================ --}}
-@if(isset($data['phone']) && ($step === 'best_contact_time' || isset($data['best_contact_time'])))
-<div class="messages__item" wire:key="msg-contact-time">
-    <div class="messages__wrapper">
-        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_best_contact_time') }}</div>
-    </div>
-</div>
-
-@if(isset($data['best_contact_time']))
-<div class="messages__item" wire:key="resp-contact-time">
-    <div class="user-message" wire:click="goToStep('best_contact_time')">
-        @php
-        $contactTimeKey = 'chat.contact_time_' . $data['best_contact_time'];
-        $contactTimeLabel = __($contactTimeKey);
-        if ($contactTimeLabel === $contactTimeKey) $contactTimeLabel = $data['best_contact_time'];
-        @endphp
-        <span>{{ $contactTimeLabel }}</span>
-        <span class="edit-badge"><i class="fas fa-pen"></i></span>
-    </div>
-</div>
-@endif
-@endif
-
-
-{{-- ============================================================
-|  NUMÉRO DE PERMIS (après meilleur moment de contact)
-============================================================ --}}
-@if(isset($data['best_contact_time']) && ($step === 'license_number' || isset($data['license_number'])))
+@if(isset($data['profession']) && ($step === 'license_number' || isset($data['license_number'])))
 <div class="messages__item" wire:key="msg-license">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
