@@ -56,6 +56,9 @@ return [
     'products_both' => "Assurances et Placements",
     'products_none' => "Aucun",
 
+    'years_old' => 'ans',
+
+
     // Meilleur moment de contact
     'q_best_contact_time' => "Quel est le meilleur moment pour vous contacter ?",
     'btn_contact_matin' => "Matin (8h - 12h)",

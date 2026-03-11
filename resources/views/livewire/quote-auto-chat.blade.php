@@ -33,7 +33,12 @@
 
     {{-- ZONE DE RÉPONSE FIXE --}}
     <div class="response-area">
-        <div class="response-container mx-auto">
+        <div class="response-container mx-auto" wire:loading.class="opacity-50 pe-none">
+
+            <div wire:loading class="text-center text-muted small mb-2">
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                {{ __('chat.loading', ['default' => '...']) }}
+            </div>
 
             @if($step == 'year')
             <select wire:model.live="vehicle_year" class="form-select form-select-lg shadow-sm" wire:key="sel-year">

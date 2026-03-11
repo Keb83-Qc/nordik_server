@@ -2,35 +2,25 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\User;
-use App\Models\Submission;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Log;
-use App\Mail\NewSubmissionAdmin;
+use App\Livewire\Concerns\HasChatSteps;
 use App\Services\LeadDispatcher;
+use Livewire\Component;
 
 class QuoteHomeChat extends Component
 {
-    public $step = 'occupancy';
-    public $data = [];
-    public Submission $submission;
-
-    public $advisorCode;
-    public $agentName = 'Julie';
-    public $agentImage;
+    use HasChatSteps;
 
     public $occupancy;
     public $property_type;
     public $address;
-    public $living_there;       // yes|no
+    public $living_there;
     public $move_in_date;
     public $units_in_building;
     public $contents_amount;
-    public $electric_baseboard; // yes|no
-    public $supp_heating;       // yes|no
+    public $electric_baseboard;
+    public $supp_heating;
 
-    public $years_insured;      // 0|1_2|3_5|6_10|11_plus
+    public $years_insured;
     public $years_with_insurer;
     public $current_insurer;
 
@@ -41,88 +31,97 @@ class QuoteHomeChat extends Component
 
     public $email;
     public $phone;
-    public $phone_is_cell;      // yes|no
+    public $phone_is_cell;
 
     public $marital_status;
     public $employment_status;
     public $education_level;
     public $industry;
 
-    public $has_ia_products;    // yes|no
+    public $has_ia_products;
 
-    public $consent_profile;    // accept|refuse
-    public $consent_marketing;  // accept|refuse
-    public $marketing_email;    // yes|no
-    public $consent_credit;     // yes|no
+    public $consent_profile;
+    public $consent_marketing;
+    public $marketing_email;
+    public $consent_credit;
 
     public $best_contact_time;
     public $hab_renewal_date;
 
-    protected $stepOrder = [
-        'occupancy'          => 'occupancy',
-        'property_type'      => 'property_type',
-        'hab_renewal_date'   => 'hab_renewal_date',
-        'identity'           => ['first_name', 'last_name', 'gender'],
-        'address'            => 'address',
-        'living_there'       => 'living_there',
-        'move_in_date'       => 'move_in_date',      // conditionnel
-        'units_in_building'  => 'units_in_building',
-        'contents_amount'    => 'contents_amount',
-        'electric_baseboard' => 'electric_baseboard',
-        'supp_heating'       => 'supp_heating',
-        'years_insured'      => 'years_insured',
-        'years_with_insurer' => 'years_with_insurer',
-        'current_insurer'    => 'current_insurer',
-        'age'                => 'age',
-        'email'              => 'email',
-        'phone'              => 'phone',
-        'phone_is_cell'      => 'phone_is_cell',
-        'best_contact_time'  => 'best_contact_time',
-        'marital_status'     => 'marital_status',
-        'employment_status'  => 'employment_status',
-        'education_level'    => 'education_level',
-        'industry'           => 'industry',
-        'has_ia_products'    => 'has_ia_products',
-        'consent_profile'    => 'consent_profile',
-        'consent_marketing'  => 'consent_marketing',
-        'marketing_email'    => 'marketing_email',   // conditionnel
-        'consent_credit'     => 'consent_credit',
-    ];
+    // ── Trait contract ──────────────────────────
+
+    protected function chatType(): string { return 'habitation'; }
+    protected function sessionKey(): string { return 'current_submission_id'; }
+    protected function defaultAgentImage(): string { return asset('assets/img/agent-default.jpg'); }
+
+    protected function validSteps(): array
+    {
+        return array_keys($this->stepOrder());
+    }
+
+    protected function stepOrder(): array
+    {
+        return [
+            'occupancy'          => 'occupancy',
+            'property_type'      => 'property_type',
+            'hab_renewal_date'   => 'hab_renewal_date',
+            'identity'           => ['first_name', 'last_name', 'gender'],
+            'address'            => 'address',
+            'living_there'       => 'living_there',
+            'move_in_date'       => 'move_in_date',
+            'units_in_building'  => 'units_in_building',
+            'contents_amount'    => 'contents_amount',
+            'electric_baseboard' => 'electric_baseboard',
+            'supp_heating'       => 'supp_heating',
+            'years_insured'      => 'years_insured',
+            'years_with_insurer' => 'years_with_insurer',
+            'current_insurer'    => 'current_insurer',
+            'age'                => 'age',
+            'email'              => 'email',
+            'phone'              => 'phone',
+            'phone_is_cell'      => 'phone_is_cell',
+            'best_contact_time'  => 'best_contact_time',
+            'marital_status'     => 'marital_status',
+            'employment_status'  => 'employment_status',
+            'education_level'    => 'education_level',
+            'industry'           => 'industry',
+            'has_ia_products'    => 'has_ia_products',
+            'consent_profile'    => 'consent_profile',
+            'consent_marketing'  => 'consent_marketing',
+            'marketing_email'    => 'marketing_email',
+            'consent_credit'     => 'consent_credit',
+        ];
+    }
+
+    protected function shouldSkipStep(string $step): bool
+    {
+        if ($step === 'move_in_date' && ($this->data['living_there'] ?? null) === 'no') {
+            return true;
+        }
+        if ($step === 'marketing_email' && ($this->data['consent_marketing'] ?? null) !== 'accept') {
+            return true;
+        }
+        return false;
+    }
+
+    protected function afterPersist(): void
+    {
+        $this->calculateStep();
+    }
+
+    protected function afterHydrate(): void
+    {
+        $this->calculateStep();
+    }
+
+    // ── Mount ───────────────────────────────────
 
     public function mount(LeadDispatcher $dispatcher)
     {
-        if (!session('has_consented')) {
-            return redirect()->route('consent.show', [
-                'locale' => app()->getLocale(),
-                'code'   => session('current_advisor_code'),
-            ]);
-        }
-
-        if (!session()->has('current_advisor_code')) {
-            $assignedAdvisor = $dispatcher->assignAdvisor();
-            if ($assignedAdvisor) session(['current_advisor_code' => $assignedAdvisor->advisor_code]);
-        }
-
-        $this->advisorCode = session('current_advisor_code');
-        $advisor = User::where('advisor_code', $this->advisorCode)->first();
-
-        if ($advisor) {
-            $this->agentName  = $advisor->first_name;
-            $this->agentImage = $advisor->image_url;
-        } else {
-            $this->agentImage = asset('assets/img/agent-default.jpg');
-        }
-
-        if (session()->has('current_submission_id')) {
-            $submission = Submission::find(session('current_submission_id'));
-            if ($submission) {
-                $this->submission = $submission;
-                $this->data = $submission->data ?? [];
-                $this->fillPropertiesFromData();
-                $this->calculateStep();
-            }
-        }
+        $this->mountChat($dispatcher);
     }
+
+    // ── Normalizers ─────────────────────────────
 
     private function normalizeYesNo($v): string
     {
@@ -143,94 +142,26 @@ class QuoteHomeChat extends Component
         };
     }
 
-    public function calculateStep()
-    {
-        $this->step = 'final';
-
-        foreach ($this->stepOrder as $stepName => $requiredFields) {
-            $missing = false;
-
-            if (is_array($requiredFields)) {
-                foreach ($requiredFields as $field) {
-                    if (!isset($this->data[$field]) || $this->data[$field] === '') {
-                        $missing = true;
-                        break;
-                    }
-                }
-            } else {
-                if (!isset($this->data[$requiredFields]) || $this->data[$requiredFields] === '') {
-                    $missing = true;
-                }
-            }
-
-            // ✅ move_in_date seulement si living_there = yes
-            if ($stepName === 'move_in_date') {
-                if (($this->data['living_there'] ?? null) === 'no') {
-                    $missing = false;
-                }
-            }
-
-            // ✅ marketing_email seulement si consent_marketing = accept
-            if ($stepName === 'marketing_email') {
-                if (($this->data['consent_marketing'] ?? null) !== 'accept') {
-                    $missing = false;
-                }
-            }
-
-            if ($missing) {
-                $this->step = $stepName;
-                break;
-            }
-        }
-    }
-
-    public function persist($key, $value)
-    {
-        $this->data[$key] = $value;
-
-        if (!isset($this->submission)) {
-            $this->submission = Submission::create([
-                'type' => 'habitation',
-                'advisor_code' => $this->advisorCode,
-                'data' => $this->data,
-            ]);
-
-            // ✅ session unifiée
-            session(['current_submission_id' => $this->submission->id]);
-        } else {
-            $this->submission->update(['data' => $this->data]);
-        }
-
-        $this->calculateStep();
-        $this->dispatch('scroll-down');
-    }
+    // ── Step handlers ───────────────────────────
 
     public function save($field, $value)
     {
-        // ✅ Normaliser yes/no
         if (in_array($field, [
-            'living_there',
-            'electric_baseboard',
-            'supp_heating',
-            'phone_is_cell',
-            'has_ia_products',
-            'marketing_email',
-            'consent_credit',
+            'living_there', 'electric_baseboard', 'supp_heating',
+            'phone_is_cell', 'has_ia_products', 'marketing_email', 'consent_credit',
         ], true)) {
             $value = $this->normalizeYesNo($value);
         }
 
-        // ✅ Normaliser years_insured
         if ($field === 'years_insured') {
             $value = $this->normalizeYearsInsured($value);
         }
 
-        // ✅ Normaliser consents
         if (in_array($field, ['consent_profile', 'consent_marketing'], true)) {
             $value = match (strtolower(trim((string)$value))) {
                 'accept' => 'accept',
                 'refuse' => 'refuse',
-                default => $value,
+                default  => $value,
             };
         }
 
@@ -320,51 +251,6 @@ class QuoteHomeChat extends Component
     {
         $this->validate(['industry' => 'required|string|min:2|max:120']);
         $this->persist('industry', $this->industry);
-    }
-
-    public function goToStep($name)
-    {
-        $this->step = $name;
-        $this->dispatch('scroll-down');
-    }
-
-    private function fillPropertiesFromData()
-    {
-        foreach ($this->data as $key => $value) {
-            if (property_exists($this, $key)) $this->$key = $value;
-        }
-    }
-
-    public function finalize()
-    {
-        if (!isset($this->submission)) return;
-
-        $recipients = array_filter([
-            config('mail.submission_broker_to') ?: config('mail.from.address'),
-            User::where('advisor_code', $this->advisorCode)->value('email'),
-        ]);
-        $recipients = array_values(array_unique($recipients));
-
-        if (!empty($recipients)) {
-            try {
-                Mail::to($recipients)->send(new NewSubmissionAdmin($this->submission));
-                Log::info("Soumission Habitation {$this->submission->id} envoyée à : " . implode(', ', $recipients));
-            } catch (\Exception $e) {
-                Log::error("Erreur Mail Soumission Habitation {$this->submission->id}: " . $e->getMessage());
-            }
-        } else {
-            Log::warning("Aucun destinataire pour Soumission Habitation {$this->submission->id}");
-        }
-
-        session(['last_advisor_code' => $this->advisorCode]);
-
-        session()->forget([
-            'current_submission_id',
-            'current_submission_id_home',
-            'current_advisor_code',
-        ]);
-
-        return redirect()->route('quote.success', ['locale' => app()->getLocale()]);
     }
 
     public function render()

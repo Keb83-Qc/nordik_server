@@ -19,7 +19,12 @@
 
     {{-- RESPONSE AREA --}}
     <div class="response-area">
-        <div class="response-container mx-auto">
+        <div class="response-container mx-auto" wire:loading.class="opacity-50 pe-none">
+
+            <div wire:loading class="text-center text-muted small mb-2">
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                ...
+            </div>
 
             {{-- =========================
                  COMMON
