@@ -20,6 +20,7 @@ use Filament\Forms\Components\Placeholder;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Filament\Forms\Get;
@@ -42,22 +43,26 @@ class BlogPostResource extends Resource
     {
         $defaultLocale = Language::defaultCode() ?? config('app.fallback_locale', 'fr');
 
-        $languages = Language::query()
-            ->where('is_active', true)
-            ->orderBy('sort_order')
-            ->pluck('name', 'code')
-            ->toArray();
+        $languages = Cache::remember('active_languages_for_form', 3600, fn() =>
+            Language::query()
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->pluck('name', 'code')
+                ->toArray()
+        );
 
         $categories = array_keys(BlogPost::CATEGORY_MAPPING);
         $catOptions = array_combine($categories, $categories);
 
-        $authors = User::query()
-            ->select(['first_name', 'last_name'])
-            ->get()
-            ->mapWithKeys(fn($user) => [
-                trim("{$user->first_name} {$user->last_name}") => trim("{$user->first_name} {$user->last_name}")
-            ])
-            ->toArray();
+        $authors = Cache::remember('users_for_blog_author', 300, fn() =>
+            User::query()
+                ->select(['first_name', 'last_name'])
+                ->get()
+                ->mapWithKeys(fn($u) => [
+                    trim("{$u->first_name} {$u->last_name}") => trim("{$u->first_name} {$u->last_name}")
+                ])
+                ->toArray()
+        );
 
         return $form->schema([
             Grid::make(3)->schema([
