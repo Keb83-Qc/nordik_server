@@ -352,9 +352,106 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 
 
 {{-- ============================================================
+|  CONSENTEMENT PROFILAGE
+============================================================ --}}
+@if(isset($data['license_number']) && ($step === 'consent_profile' || isset($data['consent_profile'])))
+<div class="messages__item" wire:key="msg-cprofile">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_consent_profile') }}</div>
+    </div>
+</div>
+
+@if(isset($data['consent_profile']))
+<div class="messages__item" wire:key="resp-cprofile">
+    <div class="user-message" wire:click="goToStep('consent_profile')">
+        @php $k = 'chat.consent_profile_'.$data['consent_profile']; $t = __($k); @endphp
+        <span>{{ $t === $k ? $data['consent_profile'] : $t }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  CONSENTEMENT MARKETING
+============================================================ --}}
+@if(isset($data['consent_profile']) && ($step === 'consent_marketing' || isset($data['consent_marketing'])))
+<div class="messages__item" wire:key="msg-cmarket">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_consent_marketing') }}</div>
+    </div>
+</div>
+
+@if(isset($data['consent_marketing']))
+<div class="messages__item" wire:key="resp-cmarket">
+    <div class="user-message" wire:click="goToStep('consent_marketing')">
+        @php $k = 'chat.consent_marketing_'.$data['consent_marketing']; $t = __($k); @endphp
+        <span>{{ $t === $k ? $data['consent_marketing'] : $t }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  MARKETING PAR COURRIEL (si consentement marketing accepté)
+============================================================ --}}
+@if(isset($data['consent_marketing']) && ($data['consent_marketing'] === 'accept') && ($step === 'marketing_email' || isset($data['marketing_email'])))
+<div class="messages__item" wire:key="msg-memail">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_marketing_email') }}</div>
+    </div>
+</div>
+
+@if(isset($data['marketing_email']))
+<div class="messages__item" wire:key="resp-memail">
+    <div class="user-message" wire:click="goToStep('marketing_email')">
+        @php $k = 'chat.marketing_email_'.$data['marketing_email']; $t = __($k); @endphp
+        <span>{{ $t === $k ? $data['marketing_email'] : $t }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
+|  VÉRIFICATION CRÉDIT
+============================================================ --}}
+@php
+$beforeCredit = isset($data['consent_marketing']) && (
+    ($data['consent_marketing'] !== 'accept') || isset($data['marketing_email'])
+);
+@endphp
+@if($beforeCredit && ($step === 'consent_credit' || isset($data['consent_credit'])))
+<div class="messages__item" wire:key="msg-credit">
+    <div class="messages__wrapper">
+        <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+        <div class="agent-msg">{{ __('chat.q_consent_credit') }}</div>
+    </div>
+</div>
+
+@if(isset($data['consent_credit']))
+<div class="messages__item" wire:key="resp-credit">
+    <div class="user-message" wire:click="goToStep('consent_credit')">
+        @php $k = 'chat.consent_credit_'.$data['consent_credit']; $t = __($k); @endphp
+        <span>{{ $t === $k ? $data['consent_credit'] : $t }}</span>
+        <span class="edit-badge"><i class="fas fa-pen"></i></span>
+    </div>
+</div>
+@endif
+@endif
+
+
+{{-- ============================================================
 |  MESSAGE FINAL
 ============================================================ --}}
-@if(isset($data['license_number']) && $step === 'final')
+@if($step === 'final')
 <div class="messages__item" wire:key="msg-finish">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>

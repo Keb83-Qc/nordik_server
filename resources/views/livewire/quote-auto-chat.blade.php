@@ -194,6 +194,46 @@
                 </button>
             </div>
 
+            @elseif($step == 'consent_profile')
+            <div class="d-grid gap-2" wire:key="area-cprofile">
+                <button wire:click="setConsentProfile('accept')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_accept') }}
+                </button>
+                <button wire:click="setConsentProfile('refuse')" class="btn btn-outline-secondary btn-lg">
+                    {{ __('chat.btn_refuse') }}
+                </button>
+            </div>
+
+            @elseif($step == 'consent_marketing')
+            <div class="d-grid gap-2" wire:key="area-cmarket">
+                <button wire:click="setConsentMarketing('accept')" class="btn btn-outline-primary btn-lg">
+                    {{ __('chat.btn_accept') }}
+                </button>
+                <button wire:click="setConsentMarketing('refuse')" class="btn btn-outline-secondary btn-lg">
+                    {{ __('chat.btn_refuse') }}
+                </button>
+            </div>
+
+            @elseif($step == 'marketing_email')
+            <div class="d-flex gap-2" wire:key="area-memail">
+                <button wire:click="setMarketingEmail('yes')" class="btn btn-outline-primary flex-grow-1 py-3">
+                    {{ __('chat.btn_yes') }}
+                </button>
+                <button wire:click="setMarketingEmail('no')" class="btn btn-outline-primary flex-grow-1 py-3">
+                    {{ __('chat.btn_no') }}
+                </button>
+            </div>
+
+            @elseif($step == 'consent_credit')
+            <div class="d-flex gap-2" wire:key="area-credit">
+                <button wire:click="setConsentCredit('yes')" class="btn btn-outline-primary flex-grow-1 py-3">
+                    {{ __('chat.btn_yes') }}
+                </button>
+                <button wire:click="setConsentCredit('no')" class="btn btn-outline-primary flex-grow-1 py-3">
+                    {{ __('chat.btn_no') }}
+                </button>
+            </div>
+
             @elseif($step == 'final')
             <div wire:key="area-final" class="text-center p-2">
                 <div class="alert alert-success border-0 shadow-sm mb-3">

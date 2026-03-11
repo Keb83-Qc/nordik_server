@@ -33,6 +33,10 @@ class QuoteAutoChat extends Component
     public $profession;
     public $existing_products;
     public $best_contact_time;
+    public $consent_profile;
+    public $consent_marketing;
+    public $marketing_email;
+    public $consent_credit;
 
     // ── Trait contract ──────────────────────────
 
@@ -63,7 +67,20 @@ class QuoteAutoChat extends Component
             'existing_products' => 'existing_products',
             'profession'        => 'profession',
             'license_number'    => 'license_number',
+            'consent_profile'   => 'consent_profile',
+            'consent_marketing' => 'consent_marketing',
+            'marketing_email'   => 'marketing_email',
+            'consent_credit'    => 'consent_credit',
         ];
+    }
+
+    protected function shouldSkipStep(string $step): bool
+    {
+        // marketing_email ne s'affiche que si le consentement marketing est accepté
+        if ($step === 'marketing_email') {
+            return ($this->data['consent_marketing'] ?? null) !== 'accept';
+        }
+        return false;
     }
 
     protected function afterPersist(): void
@@ -219,6 +236,30 @@ class QuoteAutoChat extends Component
     public function skipLicense()
     {
         $this->persist('license_number', 'not_provided');
+    }
+
+    public function setConsentProfile($val)
+    {
+        if (!in_array($val, ['accept', 'refuse'], true)) return;
+        $this->persist('consent_profile', $val);
+    }
+
+    public function setConsentMarketing($val)
+    {
+        if (!in_array($val, ['accept', 'refuse'], true)) return;
+        $this->persist('consent_marketing', $val);
+    }
+
+    public function setMarketingEmail($val)
+    {
+        if (!in_array($val, ['yes', 'no'], true)) return;
+        $this->persist('marketing_email', $val);
+    }
+
+    public function setConsentCredit($val)
+    {
+        if (!in_array($val, ['yes', 'no'], true)) return;
+        $this->persist('consent_credit', $val);
     }
 
     public function goToStep(string $name): void

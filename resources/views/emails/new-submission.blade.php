@@ -419,6 +419,16 @@
                 </div>
             </div>
 
+            <div class="section">
+                <div class="section-title">✅ Consentements</div>
+                <div class="section-body">
+                    <div class="info-row"><span class="label">Profilage : </span><span class="value">{{ $consentLabel($d['consent_profile'] ?? null) }}</span></div>
+                    <div class="info-row"><span class="label">Marketing : </span><span class="value">{{ $consentLabel($d['consent_marketing'] ?? null) }}</span></div>
+                    <div class="info-row"><span class="label">Marketing par courriel : </span><span class="value">{{ $yesNoLabel($d['marketing_email'] ?? null) }}</span></div>
+                    <div class="info-row"><span class="label">Vérification crédit : </span><span class="value">{{ $yesNoLabel($d['consent_credit'] ?? null) }}</span></div>
+                </div>
+            </div>
+
             {{-- =========================================================
             BUNDLE (bucket common/auto/habitation)
         ========================================================== --}}
