@@ -70,6 +70,26 @@ return [
     'contact_time_soir' => "Soir (17h - 20h)",
     'contact_time_nimporte_quand' => "N'importe quand",
 
+    // Consentements
+    'q_consent_profile'   => "Consentement : recueillir/utiliser/communiquer certains renseignements pour mieux vous connaître.",
+    'q_consent_marketing' => "Consentement : vous faire part de promotions/produits/services/évènements.",
+    'q_marketing_email'   => "Souhaitez-vous recevoir ces communications par courriel?",
+    'q_consent_credit'    => "Nous permettez-vous de recueillir l'information de votre dossier de crédit (aucun impact)?",
+
+    'btn_accept' => "J'accepte",
+    'btn_refuse' => "Je refuse",
+    'btn_yes'    => "Oui",
+    'btn_no'     => "Non",
+
+    'consent_profile_accept'   => "J'accepte",
+    'consent_profile_refuse'   => "Je refuse",
+    'consent_marketing_accept' => "J'accepte",
+    'consent_marketing_refuse' => "Je refuse",
+    'marketing_email_yes'      => "Oui",
+    'marketing_email_no'       => "Non",
+    'consent_credit_yes'       => "Oui",
+    'consent_credit_no'        => "Non",
+
     // Page Merci / Success
     'success_title' => 'Merci !',
     'success_subtitle' => 'Votre demande de soumission a bien été reçue.',

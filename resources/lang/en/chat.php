@@ -70,6 +70,26 @@ return [
     'contact_time_soir' => "Evening (5pm - 8pm)",
     'contact_time_nimporte_quand' => "Anytime",
 
+    // Consents
+    'q_consent_profile'   => "Consent: collect/use/share certain information to know you better.",
+    'q_consent_marketing' => "Consent: share promotions/products/services/events with you.",
+    'q_marketing_email'   => "Would you like to receive these communications by email?",
+    'q_consent_credit'    => "Do you allow us to collect information from your credit file (no impact)?",
+
+    'btn_accept' => "I accept",
+    'btn_refuse' => "I decline",
+    'btn_yes'    => "Yes",
+    'btn_no'     => "No",
+
+    'consent_profile_accept'   => "I accept",
+    'consent_profile_refuse'   => "I decline",
+    'consent_marketing_accept' => "I accept",
+    'consent_marketing_refuse' => "I decline",
+    'marketing_email_yes'      => "Yes",
+    'marketing_email_no'       => "No",
+    'consent_credit_yes'       => "Yes",
+    'consent_credit_no'        => "No",
+
     // Thank You / Success Page
     'success_title' => 'Thank you!',
     'success_subtitle' => 'Your quote request has been received.',

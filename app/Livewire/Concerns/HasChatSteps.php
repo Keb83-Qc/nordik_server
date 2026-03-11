@@ -26,7 +26,7 @@ trait HasChatSteps
 {
     public string $step = '';
     public array $data = [];
-    public Submission $submission;
+    public ?Submission $submission = null;
 
     public ?string $advisorCode = null;
     public string $agentName = 'Julie';
@@ -118,7 +118,7 @@ trait HasChatSteps
     {
         $this->data[$key] = $value;
 
-        if (!isset($this->submission)) {
+        if ($this->submission === null) {
             // Lazy creation: only write to DB once we have an email
             if (!empty($this->data['email'])) {
                 $this->submission = Submission::create([
@@ -214,7 +214,13 @@ trait HasChatSteps
 
     public function finalize()
     {
-        if (!isset($this->submission)) {
+        // Fallback: reload from session if Livewire hydration missed the model
+        if ($this->submission === null && session()->has($this->sessionKey())) {
+            $this->submission = Submission::find(session($this->sessionKey()));
+        }
+
+        if ($this->submission === null) {
+            Log::error("finalize(): submission introuvable pour {$this->chatType()} advisor={$this->advisorCode}");
             return;
         }
 
