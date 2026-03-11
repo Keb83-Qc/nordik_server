@@ -36,10 +36,13 @@ class ConsentController extends Controller
         // Recherche du conseiller via le code
         $advisor = User::where('advisor_code', $advisorCode)->first();
 
-        // Si introuvable, fallback (Claude ID 1)
-        if (!$advisor) {
-            $advisor = User::find(1);
+        // Si introuvable, fallback sur le premier super_admin
+        if (! $advisor) {
+            $advisor = User::where('role_id', 1)->orderBy('id')->first();
         }
+
+        // Aucun admin trouvé : page 404 propre
+        abort_if(! $advisor, 404);
 
         session([
             'current_advisor_code' => $advisor->advisor_code,
