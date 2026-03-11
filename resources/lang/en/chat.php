@@ -20,6 +20,7 @@ return [
     'q_email' => "Perfect. What email address can I send the quote to?",
     'q_phone' => "Last step, your phone number?",
     'q_license' => "One last thing: if you have your driver’s license number, it speeds up processing. Otherwise, you can skip this step!",
+    'loading' => '...',
     'q_finish' => "Excellent! I now have everything I need to review your file. Click the button below to send it all!",
 
     'q_renewal' => "What is your expected renewal date?",

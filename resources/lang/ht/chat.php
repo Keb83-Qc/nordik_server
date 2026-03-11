@@ -20,6 +20,7 @@ return [
     'q_email' => "Trè byen. Nan ki adrès imel mwen ka voye sitasyon an ba ou?",
     'q_phone' => "Dènye etap: nimewo telefòn ou?",
     'q_license' => "Yon ti dènye bagay: si ou gen nimewo pèmi w, sa ap akselere tretman an. Sinon, ou ka sote etap sa a!",
+    'loading' => '...',
     'q_finish' => "Ekselan! Kounye a mwen gen tout sa mwen bezwen pou analize dosye w la. Klike sou bouton anba a pou voye tout bagay!",
 
     'q_renewal' => "Ki dat renouvèlman ou prevwa?",

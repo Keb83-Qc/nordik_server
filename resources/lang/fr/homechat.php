@@ -38,7 +38,8 @@ return [
     'q_identity' => 'Quel est votre prénom, nom de famille, et vous êtes?',
     'q_address' => "Quelle est l'adresse de l'habitation à assurer?",
     'q_living_there' => "Vivez-vous présentement à cette adresse?",
-    'q_move_in_date' => "Depuis quelle date résidez-vous à cette adresse?",
+    'q_move_in_date' => "Depuis combien d'années résidez-vous à cette adresse?",
+    'ph_years_at_address' => "Nombre d'années (ex: 5)",
     'q_units' => "Combien y a-t-il d’unités dans l’immeuble? (si maison : 1)",
     'q_contents_amount' => "Pour quel montant souhaitez-vous assurer tous vos biens?",
     'q_electric_baseboard' => "Les plinthes électriques sont-elles le chauffage principal?",
@@ -81,36 +82,51 @@ return [
     'years_insured_6_10' => "6-10 ans",
     'years_insured_11_plus' => "11 ans et plus",
 
-    // Années assurées (affichage bulle)
+    // Années assurées (affichage bulle) — clés avec underscore = valeurs stockées
     'years_insured_label_0' => "0 an",
-    'years_insured_label_1-2' => "1-2 ans",
-    'years_insured_label_3-5' => "3-5 ans",
-    'years_insured_label_6-10' => "6-10 ans",
-    'years_insured_label_11+' => "11 ans et plus",
+    'years_insured_label_1_2' => "1-2 ans",
+    'years_insured_label_3_5' => "3-5 ans",
+    'years_insured_label_6_10' => "6-10 ans",
+    'years_insured_label_11_plus' => "11 ans et plus",
 
-    // Valeurs traduites pour certains champs (si tu veux joli dans les bulles)
+    // Valeurs traduites pour certains champs (bulles de réponse dans le chat)
     'marital_single' => 'Célibataire',
     'marital_partner' => 'Conjoint(e) de fait',
     'marital_married' => 'Marié(e)',
     'marital_other' => 'Autre',
+
+    // Clés pour le loop de réponses (field_value)
+    'marital_status_celibataire' => 'Célibataire',
+    'marital_status_conjoint' => 'Conjoint(e) de fait',
+    'marital_status_marie' => 'Marié(e)',
+    'marital_status_autre' => 'Autre',
 
     'employment_status_employe' => 'Employé(e)',
     'employment_status_self' => 'Travailleur autonome',
     'employment_status_student' => 'Étudiant(e)',
     'employment_status_retired' => 'Retraité(e)',
     'employment_status_unemployed' => 'Sans emploi',
+    'employment_status_travailleur_autonome' => 'Travailleur autonome',
+    'employment_status_etudiant' => 'Étudiant(e)',
+    'employment_status_retraite' => 'Retraité(e)',
+    'employment_status_sans_emploi' => 'Sans emploi',
 
     'edu_highschool' => 'Secondaire',
     'edu_college' => 'Collège/Cégep',
     'edu_university' => 'Université',
     'edu_other' => 'Autre',
 
-    'has_ia_products_Oui' => 'Oui',
-    'has_ia_products_Non' => 'Non',
-    'marketing_email_Oui' => 'Oui',
-    'marketing_email_Non' => 'Non',
-    'consent_credit_Oui' => 'Oui',
-    'consent_credit_Non' => 'Non',
+    'education_level_secondaire' => 'Secondaire',
+    'education_level_college' => 'Collège/Cégep',
+    'education_level_universite' => 'Université',
+    'education_level_autre' => 'Autre',
+
+    'has_ia_products_yes' => 'Oui',
+    'has_ia_products_no' => 'Non',
+    'marketing_email_yes' => 'Oui',
+    'marketing_email_no' => 'Non',
+    'consent_credit_yes' => 'Oui',
+    'consent_credit_no' => 'Non',
 
     'q_age' => "Quel est votre âge?",
     'ph_age' => "Âge (ex: 35)",

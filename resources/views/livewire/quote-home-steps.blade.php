@@ -228,8 +228,8 @@ default => '',
 @endif
 @endif
 
-{{-- DATE D'EMMÉNAGEMENT (si living_there = yes) --}}
-@if(isset($data['living_there']) && ($step === 'move_in_date' || isset($data['move_in_date'])))
+{{-- ANNÉES À CETTE ADRESSE (si living_there = yes) --}}
+@if(isset($data['living_there']) && ($step === 'years_at_address' || isset($data['years_at_address'])))
 @if(($data['living_there'] ?? '') === 'yes')
 <div class="messages__item" wire:key="h-msg-move">
     <div class="messages__wrapper">
@@ -237,10 +237,10 @@ default => '',
         <div class="agent-msg">{{ __('homechat.q_move_in_date') }}</div>
     </div>
 </div>
-@if(isset($data['move_in_date']))
+@if(isset($data['years_at_address']))
 <div class="messages__item" wire:key="h-resp-move">
-    <div class="user-message" wire:click="goToStep('move_in_date')">
-        <span>{{ $data['move_in_date'] }}</span>
+    <div class="user-message" wire:click="goToStep('years_at_address')">
+        <span>{{ $data['years_at_address'] }} {{ __('homechat.years_old') }}</span>
         <span class="edit-badge"><i class="fas fa-pen"></i></span>
     </div>
 </div>

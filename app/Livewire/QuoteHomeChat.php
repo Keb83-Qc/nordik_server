@@ -14,7 +14,7 @@ class QuoteHomeChat extends Component
     public $property_type;
     public $address;
     public $living_there;
-    public $move_in_date;
+    public $years_at_address;
     public $units_in_building;
     public $contents_amount;
     public $electric_baseboard;
@@ -73,7 +73,7 @@ class QuoteHomeChat extends Component
             'address'            => 'address',
             'hab_renewal_date'   => 'hab_renewal_date',
             'living_there'       => 'living_there',
-            'move_in_date'       => 'move_in_date',
+            'years_at_address'   => 'years_at_address',
             'units_in_building'  => 'units_in_building',
             'contents_amount'    => 'contents_amount',
             'electric_baseboard' => 'electric_baseboard',
@@ -95,7 +95,7 @@ class QuoteHomeChat extends Component
 
     protected function shouldSkipStep(string $step): bool
     {
-        if ($step === 'move_in_date' && ($this->data['living_there'] ?? null) === 'no') {
+        if ($step === 'years_at_address' && ($this->data['living_there'] ?? null) === 'no') {
             return true;
         }
         if ($step === 'marketing_email' && ($this->data['consent_marketing'] ?? null) !== 'accept') {
@@ -187,10 +187,10 @@ class QuoteHomeChat extends Component
         $this->persist('address', $this->address);
     }
 
-    public function submitMoveInDate()
+    public function submitYearsAtAddress()
     {
-        $this->validate(['move_in_date' => 'required|date']);
-        $this->persist('move_in_date', $this->move_in_date);
+        $this->validate(['years_at_address' => 'required|integer|min:0|max:100']);
+        $this->persist('years_at_address', $this->years_at_address);
     }
 
     public function submitUnits()

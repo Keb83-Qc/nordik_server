@@ -20,6 +20,7 @@ return [
     'q_email' => "Perfecto. ¿A qué correo puedo enviarle la cotización?",
     'q_phone' => "Último paso: ¿su número de teléfono?",
     'q_license' => "Una última cosa: si tiene su número de licencia de conducir, acelera el trámite. Si no, ¡puede omitir este paso!",
+    'loading' => '...',
     'q_finish' => "¡Excelente! Ya tengo todo lo necesario para analizar su solicitud. Haga clic en el botón de abajo para enviarlo todo.",
 
     'q_renewal' => "¿Cuál es su fecha prevista de renovación?",
