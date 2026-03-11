@@ -222,15 +222,17 @@ class SystemRequestResource extends Resource
                                     $action->cancel();
                                 }),
 
-                            Tables\Actions\DeleteAction::make()
+                            Tables\Actions\Action::make('delete')
                                 ->label('Supprimer')
                                 ->icon('heroicon-o-trash')
                                 ->color('danger')
                                 ->requiresConfirmation()
-                                ->visible(fn() => auth()->user()?->hasAnyRole(['super_admin'])) // ou admin aussi si tu veux
-                                ->successNotification(
-                                    Notification::make()->success()->title('Demande supprimée.')
-                                ),
+                                ->visible(fn() => auth()->user()?->hasAnyRole(['super_admin']))
+                                ->action(function () use ($record, $action) {
+                                    $record->delete();
+                                    Notification::make()->success()->title('Demande supprimée.')->send();
+                                    $action->cancel(); // ferme le modal parent
+                                }),
 
                             Tables\Actions\Action::make('reject_registration')
                                 ->label('Refuser')

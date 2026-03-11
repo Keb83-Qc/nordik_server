@@ -47,15 +47,26 @@ return Application::configure(basePath: dirname(__DIR__))
                 $cacheKey = 'error_alert_sent_' . md5(get_class($e));
                 if (!Cache::has($cacheKey)) {
                     Cache::put($cacheKey, true, 3600);
-                    $to = config('mail.submission_broker_to') ?: config('mail.from.address');
-                    if ($to) {
+
+                    // Envoyer aux super_admins uniquement (pas à l'email de soumissions)
+                    $recipients = \App\Models\User::role('super_admin')
+                        ->pluck('email')
+                        ->filter()
+                        ->values()
+                        ->all();
+
+                    if (empty($recipients)) {
+                        $recipients = array_filter([config('mail.from.address')]);
+                    }
+
+                    if (!empty($recipients)) {
                         Mail::raw(
                             "[VIP GPI] Erreur PHP détectée\n\n"
                             . "Message : " . $e->getMessage() . "\n"
                             . "Fichier  : " . $e->getFile() . ':' . $e->getLine() . "\n"
                             . "URL      : " . request()->fullUrl() . "\n\n"
                             . mb_substr($e->getTraceAsString(), 0, 800),
-                            fn($m) => $m->to($to)->subject('[VIP GPI] 🚨 Erreur critique')
+                            fn($m) => $m->to($recipients)->subject('[VIP GPI] 🚨 Erreur critique')
                         );
                     }
                 }
