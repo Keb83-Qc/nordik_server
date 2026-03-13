@@ -204,10 +204,10 @@ class UserResource extends Resource
                                         ->disk('public')
                                         ->directory('team')
                                         ->helperText('PNG/JPG/WEBP — carré recommandé (min 400×400)')
-                                        // Filament gère les chemins inconnus (assets/img/...) :
-                                        // disk('public')->exists() retourne false → Filepond affiche vide.
-                                        // Pas besoin d'afterStateHydrated : laisser Filament gérer l'array.
-                                        // Mettre à jour la DB seulement si une photo est présente
+                                        // Filepond démarre toujours vide : la photo actuelle est visible
+                                        // dans la carte profil ci-dessus (pas de doublon, pas de spinner).
+                                        ->afterStateHydrated(fn ($set) => $set('image', null))
+                                        // Ne mettre à jour la DB que si une nouvelle photo est uploadée
                                         ->dehydrated(fn ($state) => filled($state))
                                         ->getUploadedFileNameForStorageUsing(function ($file, $record): string {
                                             $name = ($record && filled($record->first_name))
