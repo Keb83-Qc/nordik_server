@@ -209,19 +209,14 @@ class UserResource extends Resource
                                         ->label('Photo')
                                         ->image()
                                         ->avatar()
-                                        ->imageEditor()
-                                        ->imageCropAspectRatio('1:1')
-                                        ->imageResizeMode('cover')
-                                        ->imageResizeTargetWidth('800')
-                                        ->imageResizeTargetHeight('800')
                                         ->directory('team')
                                         ->visibility('public')
-                                        ->panelAspectRatio('1:1')
-                                        ->panelLayout('integrated')
-                                        ->helperText('PNG/JPG — recadrage automatique en 1:1')
-                                        ->getUploadedFileNameForStorageUsing(function ($file, $get) {
-                                            $name = $get('slug') ?? Str::slug($get('first_name') . '-' . $get('last_name'));
-                                            return $name . '-' . time() . '.' . $file->getClientOriginalExtension();
+                                        ->helperText('PNG/JPG/WEBP — carré recommandé (min 400×400)')
+                                        ->getUploadedFileNameForStorageUsing(function ($file, $record): string {
+                                            $name = ($record && filled($record->first_name))
+                                                ? Str::slug($record->first_name . '-' . $record->last_name) . '-' . time()
+                                                : (string) Str::uuid();
+                                            return $name . '.' . ($file->guessExtension() ?: 'jpg');
                                         })
                                         ->columnSpanFull(),
                                 ]),
