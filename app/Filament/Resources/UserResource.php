@@ -199,9 +199,10 @@ class UserResource extends Resource
                                     Forms\Components\FileUpload::make('image')
                                         ->label('Photo')
                                         ->image()
-                                        ->avatar()
+                                        ->imageEditor()
+                                        ->imageEditorAspectRatios(['1:1'])
+                                        ->disk('public')
                                         ->directory('team')
-                                        ->visibility('public')
                                         ->helperText('PNG/JPG/WEBP — carré recommandé (min 400×400)')
                                         ->getUploadedFileNameForStorageUsing(function ($file, $record): string {
                                             $name = ($record && filled($record->first_name))
