@@ -41,9 +41,18 @@ class UserResource extends Resource
             : in_array((int) ($user->role_id ?? 0), [1, 2], true);
     }
 
-    public static function canCreate(): bool  { return static::canViewAny(); }
-    public static function canEdit($record): bool   { return static::canViewAny(); }
-    public static function canDelete($record): bool { return static::canViewAny(); }
+    public static function canCreate(): bool
+    {
+        return static::canViewAny();
+    }
+    public static function canEdit($record): bool
+    {
+        return static::canViewAny();
+    }
+    public static function canDelete($record): bool
+    {
+        return static::canViewAny();
+    }
 
     public static function getNavigationGroup(): ?string
     {
