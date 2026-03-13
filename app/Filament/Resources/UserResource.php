@@ -209,9 +209,8 @@ class UserResource extends Resource
                                         ->panelAspectRatio('1:1')
                                         ->panelLayout('integrated')
                                         ->helperText('PNG/JPG — recadrage automatique en 1:1')
-                                        ->getUploadedFileNameForStorageUsing(function ($file, $get) {
-                                            $name = $get('slug') ?? Str::slug($get('first_name') . '-' . $get('last_name'));
-                                            return $name . '-' . time() . '.' . $file->getClientOriginalExtension();
+                                        ->getUploadedFileNameForStorageUsing(function ($file): string {
+                                            return (string) \Illuminate\Support\Str::uuid() . '.' . $file->guessExtension();
                                         })
                                         ->columnSpanFull(),
                                 ]),
