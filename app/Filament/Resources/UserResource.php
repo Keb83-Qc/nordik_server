@@ -200,7 +200,6 @@ class UserResource extends Resource
                                         ->label('Photo')
                                         ->image()
                                         ->avatar()
-                                        ->imageEditor()
                                         ->imageCropAspectRatio('1:1')
                                         ->imageResizeMode('cover')
                                         ->imageResizeTargetWidth('800')
