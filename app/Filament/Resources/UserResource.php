@@ -213,14 +213,9 @@ class UserResource extends Resource
                                         ->disk('public')
                                         ->directory('team')
                                         ->helperText('PNG/JPG/WEBP — carré recommandé (min 400×400)')
-                                        // Vider seulement les anciens chemins (assets/img/..., http://)
-                                        // qui ne sont pas dans le disk public → spinner infini.
-                                        // Les nouvelles photos (team/xxx.jpg) s'affichent normalement.
-                                        ->afterStateHydrated(function ($state, $set) {
-                                            if ($state && !str_starts_with((string) $state, 'team/')) {
-                                                $set('image', null);
-                                            }
-                                        })
+                                        // Filament gère les chemins inconnus (assets/img/...) :
+                                        // disk('public')->exists() retourne false → Filepond affiche vide.
+                                        // Pas besoin d'afterStateHydrated : laisser Filament gérer l'array.
                                         // Mettre à jour la DB seulement si une photo est présente
                                         ->dehydrated(fn ($state) => filled($state))
                                         ->getUploadedFileNameForStorageUsing(function ($file, $record): string {
