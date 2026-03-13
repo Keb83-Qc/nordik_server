@@ -213,6 +213,13 @@ class UserResource extends Resource
                                         ->disk('public')
                                         ->directory('team')
                                         ->helperText('PNG/JPG/WEBP — carré recommandé (min 400×400)')
+                                        // Ne jamais pré-charger l'image existante dans Filepond :
+                                        // anciens chemins (assets/img/...) absents du disk public
+                                        // → Livewire tente de les résoudre → spinner infini.
+                                        // La photo actuelle reste visible dans la carte profil ci-dessus.
+                                        ->afterStateHydrated(fn ($set) => $set('image', null))
+                                        // Mettre à jour la DB seulement si une nouvelle photo est uploadée
+                                        ->dehydrated(fn ($state) => filled($state))
                                         ->getUploadedFileNameForStorageUsing(function ($file, $record): string {
                                             $name = ($record && filled($record->first_name))
                                                 ? Str::slug($record->first_name . '-' . $record->last_name) . '-' . time()
