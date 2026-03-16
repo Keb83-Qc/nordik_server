@@ -137,7 +137,7 @@ class MessageResource extends Resource
                     ->icon('heroicon-o-eye')
                     ->modalHeading('Lecture du message')
                     ->modalSubmitAction(false)
-                    ->modalCancelAction(fn() => \Filament\Actions\StaticAction::make('close')->label('Fermer'))
+                    ->modalCancelAction(false)
                     ->form([
                         Forms\Components\TextInput::make('subject')->label('Sujet')->disabled(),
                         Forms\Components\RichEditor::make('body')->label('Message')->disabled(),
