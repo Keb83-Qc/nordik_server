@@ -8,7 +8,7 @@ return [
             'label'     => 'Espace Conseiller',
             'icon'      => 'heroicon-o-user-circle',
             'sort'      => 1,
-            'collapsed' => false,
+            'collapsed' => true,
         ],
 
         // ─── CLIENTS ─────────────────────────────────────────────
@@ -16,7 +16,7 @@ return [
             'label'     => 'Clients & Soumissions',
             'icon'      => 'heroicon-o-inbox-arrow-down',
             'sort'      => 2,
-            'collapsed' => false,
+            'collapsed' => true,
         ],
 
         // ─── SITE WEB ─────────────────────────────────────────────
