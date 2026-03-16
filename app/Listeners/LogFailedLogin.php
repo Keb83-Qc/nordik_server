@@ -4,21 +4,21 @@ namespace App\Listeners;
 
 use App\Models\SystemLog;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Support\Facades\Cache;
 
 class LogFailedLogin
 {
-    private static bool $fired = false;
-
     public function handle(Failed $event): void
     {
-        if (self::$fired) return;
-        self::$fired = true;
-
         $email = $event->credentials['email']
             ?? $event->credentials['username']
             ?? 'Inconnu';
 
-        // On peut détecter la raison selon si l'user existe ou non
+        // Filament peut déclencher Failed plusieurs fois — déduplication 8 sec
+        $cacheKey = 'login_fail_logged_' . md5($email) . '_' . request()->ip();
+        if (Cache::has($cacheKey)) return;
+        Cache::put($cacheKey, true, 8);
+
         $reason = $event->user === null
             ? 'Utilisateur introuvable'
             : 'Mot de passe incorrect';
