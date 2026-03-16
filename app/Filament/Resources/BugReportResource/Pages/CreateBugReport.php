@@ -10,7 +10,7 @@ class CreateBugReport extends CreateRecord
 {
     protected static string $resource = BugReportResource::class;
 
-    protected function getTitle(): string
+    public function getTitle(): string
     {
         return 'Nouveau rapport ou suggestion';
     }
