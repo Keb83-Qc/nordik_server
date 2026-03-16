@@ -7,8 +7,13 @@ use Illuminate\Auth\Events\Failed;
 
 class LogFailedLogin
 {
+    private static bool $fired = false;
+
     public function handle(Failed $event): void
     {
+        if (self::$fired) return;
+        self::$fired = true;
+
         $email = $event->credentials['email']
             ?? $event->credentials['username']
             ?? 'Inconnu';

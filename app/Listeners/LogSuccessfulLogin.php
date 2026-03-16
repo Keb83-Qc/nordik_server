@@ -7,8 +7,15 @@ use Illuminate\Auth\Events\Login;
 
 class LogSuccessfulLogin
 {
+    // Filament peut déclencher Login plusieurs fois par requête (multi-guard)
+    // Ce flag statique évite les doublons dans les logs
+    private static bool $fired = false;
+
     public function handle(Login $event): void
     {
+        if (self::$fired) return;
+        self::$fired = true;
+
         $user = $event->user;
 
         // Mise à jour du dernier login sans toucher updated_at
