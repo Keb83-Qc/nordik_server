@@ -72,10 +72,32 @@ class MenuItemResource extends Resource
             Forms\Components\Section::make('URL & Affichage')
                 ->columns(2)
                 ->schema([
-                    Forms\Components\TextInput::make('path')
-                        ->label('Chemin (sans /locale/)')
-                        ->helperText('Ex: home · about · contact · carrieres — laisser vide pour mega menu')
-                        ->placeholder('home')
+                    Forms\Components\Select::make('path')
+                        ->label('Page de destination')
+                        ->helperText('Choisissez une page ou tapez un chemin libre')
+                        ->searchable()
+                        ->options(self::frontendRoutes())
+                        ->getSearchResultsUsing(function (string $search) {
+                            // Aplatir les groupes en une liste clé => label
+                            $flat = collect(self::frontendRoutes())
+                                ->flatMap(fn($items) => $items);
+
+                            $results = $flat->filter(fn($label, $key) =>
+                                str_contains(strtolower($label), strtolower($search)) ||
+                                str_contains(strtolower($key),   strtolower($search))
+                            );
+
+                            // Ajoute le chemin tapé comme option si pas dans la liste
+                            if ($search && !$flat->has($search)) {
+                                $results->prepend("✏️ Chemin personnalisé : {$search}", $search);
+                            }
+
+                            return $results->toArray();
+                        })
+                        ->getOptionLabelUsing(function ($value) {
+                            $flat = collect(self::frontendRoutes())->flatMap(fn($items) => $items);
+                            return $flat->get($value) ?? "✏️ {$value}";
+                        })
                         ->columnSpan(1),
 
                     Forms\Components\TextInput::make('sort_order')
@@ -164,6 +186,37 @@ class MenuItemResource extends Resource
             'index'  => Pages\ListMenuItems::route('/'),
             'create' => Pages\CreateMenuItem::route('/create'),
             'edit'   => Pages\EditMenuItem::route('/{record}/edit'),
+        ];
+    }
+
+    /** Liste des pages frontend disponibles pour le sélecteur de chemin */
+    private static function frontendRoutes(): array
+    {
+        return [
+            'Pages principales' => [
+                'home'       => '🏠 Accueil',
+                'about'      => '📖 À Propos',
+                'management' => '💼 Gestion',
+                'contact'    => '✉️ Contact',
+            ],
+            'Équipe & Carrières' => [
+                'equipe'       => '👥 Notre Équipe',
+                'construction' => '🚧 Page en construction',
+                'carrieres'    => '🎓 Carrières',
+                'partenaires'  => '🤝 Partenaires',
+            ],
+            'Contenu' => [
+                'blog'       => '📝 Blog / Articles',
+                'evenements' => '📅 Événements',
+            ],
+            'Devis' => [
+                'quote/auto'       => '🚗 Devis Auto',
+                'quote/habitation' => '🏠 Devis Habitation',
+                'quote/bundle'     => '📦 Devis Groupé',
+            ],
+            'Accès' => [
+                'login' => '🔒 Connexion Conseiller',
+            ],
         ];
     }
 }
