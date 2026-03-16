@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use App\Settings\MailSettings;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Auth\Events\Failed;
 use App\Listeners\LogSuccessfulLogin;
+use App\Listeners\LogFailedLogin;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,7 +38,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Historique des connexions
-        Event::listen(Login::class, LogSuccessfulLogin::class);
+        Event::listen(Login::class,  LogSuccessfulLogin::class);
+        Event::listen(Failed::class, LogFailedLogin::class);
 
         // Invalide le cache HTML de page quand du contenu public change
         BlogPost::observe(ClearPageCacheObserver::class);

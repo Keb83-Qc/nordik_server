@@ -17,9 +17,14 @@ class ManageSystemLogs extends ManageRecords
             'tous' => Tab::make('Tous'),
 
             'connexions' => Tab::make('Connexions')
-                ->query(fn(Builder $query) => $query->where('level', 'login'))
+                ->query(fn(Builder $query) => $query->whereIn('level', ['login', 'login_fail']))
                 ->icon('heroicon-m-key')
-                ->badgeColor('primary'),
+                ->badgeColor('info'),
+
+            'echecs' => Tab::make('Échecs')
+                ->query(fn(Builder $query) => $query->where('level', 'login_fail'))
+                ->icon('heroicon-m-exclamation-circle')
+                ->badgeColor('danger'),
 
             'info' => Tab::make('Infos')
                 ->query(fn(Builder $query) => $query->where('level', 'info'))

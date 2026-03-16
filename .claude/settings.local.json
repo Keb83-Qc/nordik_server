@@ -154,7 +154,14 @@
       "Bash(gh pr:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(gh auth:*)"
+      "Bash(gh auth:*)",
+      "Bash(find /d/vipgpi__net/.claude/worktrees/happy-swartz -type f -path */database/* -name *.php)",
+      "Bash(grep -r \"last_login\\\\|LoginEvent\\\\|LogoutEvent\" /d/vipgpi__net/.claude/worktrees/happy-swartz/app --include=*.php)",
+      "Bash(grep -r \"createTable\\\\|system_logs\\\\|Schema::\" /d/vipgpi__net/.claude/worktrees/happy-swartz --include=*.php)",
+      "Bash(grep -r \"protected $table\\\\|protected.*fillable\\\\|protected.*casts\" /d/vipgpi__net/.claude/worktrees/happy-swartz/app/Models --include=\"*.php\")",
+      "Bash(grep -n \"SystemLog\\\\|LoginEvent\\\\|Logout\" /d/vipgpi__net/.claude/worktrees/happy-swartz/app/Providers/*.php)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ]
   }
 }

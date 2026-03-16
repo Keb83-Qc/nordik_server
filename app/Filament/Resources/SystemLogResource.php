@@ -68,22 +68,24 @@ class SystemLogResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('level')
+                    ->label('Statut')
                     ->badge()
                     ->colors([
-                        'danger'  => 'fatal',
+                        'danger'  => fn($state) => in_array($state, ['fatal', 'login_fail']),
                         'warning' => 'error',
                         'info'    => 'info',
-                        'success' => 'update',
-                        'primary' => 'login',
+                        'success' => fn($state) => in_array($state, ['update', 'login']),
                     ])
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'login'  => 'CONNEXION',
-                        default  => strtoupper($state),
+                        'login'      => '✓ Succès',
+                        'login_fail' => '✗ Échec',
+                        default      => strtoupper($state),
                     }),
 
                 Tables\Columns\TextColumn::make('message')
                     ->limit(50)
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('user.full_name')
                     ->label('Utilisateur')
@@ -105,6 +107,7 @@ class SystemLogResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
+            ->recordAction('view')
             ->actions([
                 Tables\Actions\ViewAction::make(),
 
