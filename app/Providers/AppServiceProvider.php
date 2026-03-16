@@ -17,7 +17,10 @@ use App\Models\Service;
 use App\Models\Slide;
 use App\Observers\ClearPageCacheObserver;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use App\Settings\MailSettings;
+use Illuminate\Auth\Events\Login;
+use App\Listeners\LogSuccessfulLogin;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,6 +34,9 @@ class AppServiceProvider extends ServiceProvider
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super_admin') ? true : null;
         });
+
+        // Historique des connexions
+        Event::listen(Login::class, LogSuccessfulLogin::class);
 
         // Invalide le cache HTML de page quand du contenu public change
         BlogPost::observe(ClearPageCacheObserver::class);

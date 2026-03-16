@@ -70,12 +70,16 @@ class SystemLogResource extends Resource
                 Tables\Columns\TextColumn::make('level')
                     ->badge()
                     ->colors([
-                        'danger' => 'fatal',
+                        'danger'  => 'fatal',
                         'warning' => 'error',
-                        'info' => 'info',
+                        'info'    => 'info',
                         'success' => 'update',
+                        'primary' => 'login',
                     ])
-                    ->formatStateUsing(fn(string $state): string => strtoupper($state)),
+                    ->formatStateUsing(fn(string $state): string => match ($state) {
+                        'login'  => 'CONNEXION',
+                        default  => strtoupper($state),
+                    }),
 
                 Tables\Columns\TextColumn::make('message')
                     ->limit(50)
@@ -93,6 +97,12 @@ class SystemLogResource extends Resource
                     ->label('Adresse IP')
                     ->searchable()
                     ->toggleable(),
+
+                Tables\Columns\TextColumn::make('context.user_agent')
+                    ->label('Navigateur / OS')
+                    ->limit(45)
+                    ->tooltip(fn($record) => $record->context['user_agent'] ?? null)
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('created_at', 'desc')
             ->actions([
