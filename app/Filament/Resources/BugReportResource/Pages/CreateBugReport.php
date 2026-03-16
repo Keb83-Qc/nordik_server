@@ -28,7 +28,7 @@ class CreateBugReport extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Envoie vers le super_admin (premier trouvé)
-        $superAdmin = User::query()->role('super_admin')->first();
+        $superAdmin = User::whereHas('roles', fn ($q) => $q->where('name', 'super_admin'))->first();
 
         return [
             'sender_id'   => auth()->id(),
