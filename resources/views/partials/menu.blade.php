@@ -68,125 +68,144 @@
             <ul class="navbar-nav ms-auto align-items-xl-center gap-xl-1">
 
                 @php $base = '/' . app()->getLocale(); @endphp
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/home">{{ __('menu.nav.home') }}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/about">{{ __('menu.nav.about') }}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/management">{{ __('menu.nav.management') }}</a></li>
 
-                {{-- MEGA MENU (Desktop) --}}
-                <li class="nav-item dropdown vip-mega d-none d-xl-block">
-                    <a class="nav-link dropdown-toggle" href="#" id="vipServices"
-                        role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-                        {{ __('menu.nav.services') }}
-                    </a>
+                @foreach($menuItems ?? [] as $item)
 
-                    <div class="dropdown-menu vip-mega-menu p-0 border-0 shadow-lg" aria-labelledby="vipServices">
-                        <div class="vip-mega-shell p-3 p-xxl-4">
-                            <div class="row g-4">
+                    {{-- ── Lien normal ─────────────────────────────── --}}
+                    @if($item['type'] === 'link')
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="{{ $base }}/{{ $item['path'] }}"
+                               @if($item['target'] === '_blank') target="_blank" rel="noopener noreferrer" @endif>
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
 
-                                {{-- Colonne gauche (tabs + CTA) --}}
-                                <div class="col-4 col-xxl-3">
-                                    <div class="nav flex-column nav-pills vip-mega-pills" id="vipMegaTabs" role="tablist" aria-orientation="vertical">
-                                        @foreach(($menuServices ?? []) as $i => $cat)
-                                        @php
-                                        $tabId = "vip-tab-{$i}";
-                                        $paneId = "vip-pane-{$i}";
-                                        @endphp
+                    {{-- ── Mega Menu Services (desktop seulement) ───── --}}
+                    @elseif($item['type'] === 'mega_services')
+                        <li class="nav-item dropdown vip-mega d-none d-xl-block">
+                            <a class="nav-link dropdown-toggle" href="#" id="vipServices"
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+                                {{ $item['label'] }}
+                            </a>
 
-                                        <button
-                                            class="nav-link {{ $i === 0 ? 'active' : '' }}"
-                                            id="{{ $tabId }}"
-                                            data-bs-toggle="pill"
-                                            data-bs-target="#{{ $paneId }}"
-                                            type="button"
-                                            role="tab"
-                                            aria-controls="{{ $paneId }}"
-                                            aria-selected="{{ $i === 0 ? 'true' : 'false' }}">
-                                            {{ $cat['name'] }}
-                                        </button>
-                                        @endforeach
-                                    </div>
+                            <div class="dropdown-menu vip-mega-menu p-0 border-0 shadow-lg" aria-labelledby="vipServices">
+                                <div class="vip-mega-shell p-3 p-xxl-4">
+                                    <div class="row g-4">
 
-                                    {{-- CTA (panel) --}}
-                                    <div class="vip-mega-panel vip-mega-cta mt-3">
-                                        <div class="vip-mega-cta-title">{{ __('menu.mega.cta.title') }}</div>
-                                        <div class="vip-mega-cta-sub">{{ __('menu.mega.cta.sub') }}</div>
+                                        {{-- Colonne gauche (tabs + CTA) --}}
+                                        <div class="col-4 col-xxl-3">
+                                            <div class="nav flex-column nav-pills vip-mega-pills" id="vipMegaTabs" role="tablist" aria-orientation="vertical">
+                                                @foreach(($menuServices ?? []) as $i => $cat)
+                                                @php
+                                                $tabId = "vip-tab-{$i}";
+                                                $paneId = "vip-pane-{$i}";
+                                                @endphp
 
-                                        <a class="btn vip-btn-gold w-100" href="{{ $base }}/contact">
-                                            {{ __('menu.mega.cta.btn') }}
-                                        </a>
-                                    </div>
-                                </div>
-
-                                {{-- Colonne droite (contenu) --}}
-                                <div class="col-8 col-xxl-9">
-                                    <div class="tab-content vip-mega-content">
-                                        @foreach(($menuServices ?? []) as $i => $cat)
-                                        @php
-                                        $tabId = "vip-tab-{$i}";
-                                        $paneId = "vip-pane-{$i}";
-                                        $services = $cat['services'] ?? [];
-                                        // 2 cartes égales : on split en 2 colonnes
-                                        $half = (int) ceil(count($services) / 2);
-                                        $left = array_slice($services, 0, $half);
-                                        $right = array_slice($services, $half);
-                                        @endphp
-
-                                        <div
-                                            class="tab-pane fade {{ $i === 0 ? 'show active' : '' }}"
-                                            id="{{ $paneId }}"
-                                            role="tabpanel"
-                                            aria-labelledby="{{ $tabId }}"
-                                            tabindex="0">
-
-                                            <div class="vip-mega-grid">
-                                                {{-- Card gauche --}}
-                                                <div class="vip-mega-panel vip-mega-card">
-                                                    @foreach($left as $srv)
-                                                    <a class="vip-mega-link"
-                                                        href="/{{ $loc }}/{{ $cat['slug'] }}/{{ $srv['slug'] }}">
-                                                        {{ $srv['title'] }}
-                                                    </a>
-                                                    @endforeach
-                                                </div>
-
-                                                {{-- Card droite --}}
-                                                <div class="vip-mega-panel vip-mega-card">
-                                                    @foreach($right as $srv)
-                                                    <a class="vip-mega-link"
-                                                        href="/{{ $loc }}/{{ $cat['slug'] }}/{{ $srv['slug'] }}">
-                                                        {{ $srv['title'] }}
-                                                    </a>
-                                                    @endforeach
-                                                </div>
+                                                <button
+                                                    class="nav-link {{ $i === 0 ? 'active' : '' }}"
+                                                    id="{{ $tabId }}"
+                                                    data-bs-toggle="pill"
+                                                    data-bs-target="#{{ $paneId }}"
+                                                    type="button"
+                                                    role="tab"
+                                                    aria-controls="{{ $paneId }}"
+                                                    aria-selected="{{ $i === 0 ? 'true' : 'false' }}">
+                                                    {{ $cat['name'] }}
+                                                </button>
+                                                @endforeach
                                             </div>
 
+                                            {{-- CTA (panel) --}}
+                                            <div class="vip-mega-panel vip-mega-cta mt-3">
+                                                <div class="vip-mega-cta-title">{{ __('menu.mega.cta.title') }}</div>
+                                                <div class="vip-mega-cta-sub">{{ __('menu.mega.cta.sub') }}</div>
+
+                                                <a class="btn vip-btn-gold w-100" href="{{ $base }}/contact">
+                                                    {{ __('menu.mega.cta.btn') }}
+                                                </a>
+                                            </div>
                                         </div>
-                                        @endforeach
+
+                                        {{-- Colonne droite (contenu) --}}
+                                        <div class="col-8 col-xxl-9">
+                                            <div class="tab-content vip-mega-content">
+                                                @foreach(($menuServices ?? []) as $i => $cat)
+                                                @php
+                                                $tabId = "vip-tab-{$i}";
+                                                $paneId = "vip-pane-{$i}";
+                                                $services = $cat['services'] ?? [];
+                                                $half = (int) ceil(count($services) / 2);
+                                                $left = array_slice($services, 0, $half);
+                                                $right = array_slice($services, $half);
+                                                @endphp
+
+                                                <div
+                                                    class="tab-pane fade {{ $i === 0 ? 'show active' : '' }}"
+                                                    id="{{ $paneId }}"
+                                                    role="tabpanel"
+                                                    aria-labelledby="{{ $tabId }}"
+                                                    tabindex="0">
+
+                                                    <div class="vip-mega-grid">
+                                                        <div class="vip-mega-panel vip-mega-card">
+                                                            @foreach($left as $srv)
+                                                            <a class="vip-mega-link"
+                                                                href="/{{ $loc }}/{{ $cat['slug'] }}/{{ $srv['slug'] }}">
+                                                                {{ $srv['title'] }}
+                                                            </a>
+                                                            @endforeach
+                                                        </div>
+
+                                                        <div class="vip-mega-panel vip-mega-card">
+                                                            @foreach($right as $srv)
+                                                            <a class="vip-mega-link"
+                                                                href="/{{ $loc }}/{{ $cat['slug'] }}/{{ $srv['slug'] }}">
+                                                                {{ $srv['title'] }}
+                                                            </a>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+
                                     </div>
                                 </div>
-
                             </div>
-                        </div>
-                    </div>
-                </li>
+                        </li>
 
-                <!-- Liens normaux -->
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/construction">{{ __('menu.nav.team') }}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/carrieres">{{ __('menu.nav.careers') }}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/partenaires">{{ __('menu.nav.partners') }}</a></li>
-                <li class="nav-item"><a class="nav-link" href="{{ $base }}/contact">{{ __('menu.nav.contact') }}</a></li>
+                        {{-- Lien Services simple pour mobile --}}
+                        <li class="nav-item d-xl-none">
+                            <a class="nav-link" href="{{ $base }}/services">{{ $item['label'] }}</a>
+                        </li>
 
-                <!-- CTA -->
-                <li class="nav-item ms-xl-2 my-3 my-xl-0">
-                    <a href="{{ $base }}/contact" class="btn vip-btn-gold rounded-pill px-4 py-2 w-100 w-xl-auto">
-                        {{ __('menu.nav.cta') }}
-                    </a>
-                </li>
+                    {{-- ── Bouton CTA (or) ──────────────────────────── --}}
+                    @elseif($item['type'] === 'cta')
+                        <li class="nav-item ms-xl-2 my-3 my-xl-0">
+                            <a href="{{ $base }}/{{ $item['path'] }}"
+                               class="btn vip-btn-gold rounded-pill px-4 py-2 w-100 w-xl-auto"
+                               @if($item['target'] === '_blank') target="_blank" rel="noopener noreferrer" @endif>
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
 
-                <!-- Mobile: lien Services simple -->
-                <li class="nav-item d-xl-none">
-                    <a class="nav-link" href="{{ $base }}/services">{{ __('menu.nav.services_mobile') }}</a>
-                </li>
+                    {{-- ── Lien externe ─────────────────────────────── --}}
+                    @elseif($item['type'] === 'external')
+                        <li class="nav-item">
+                            <a class="nav-link"
+                               href="{{ $item['path'] }}"
+                               target="{{ $item['target'] ?? '_blank' }}"
+                               rel="noopener noreferrer">
+                                {{ $item['label'] }}
+                            </a>
+                        </li>
+
+                    @endif
+
+                @endforeach
 
             </ul>
         </div>

@@ -12,6 +12,7 @@ use App\Models\BlogPost;
 use App\Models\Employee;
 use App\Models\HomepageStat;
 use App\Models\Partner;
+use App\Models\MenuItem;
 use App\Models\PublicServiceCategory;
 use App\Models\Service;
 use App\Models\Slide;
@@ -136,11 +137,25 @@ class AppServiceProvider extends ServiceProvider
                         ->all();
                 });
 
+                // ── Items de navigation depuis la DB ──────────────────
+                $menuItems = Cache::remember("menu_items_nav_$locale", 1800, function () use ($locale) {
+                    return MenuItem::active()->get()->map(fn($item) => [
+                        'key'    => $item->key,
+                        'type'   => $item->type,
+                        'path'   => $item->path,
+                        'target' => $item->target,
+                        'label'  => $item->getTranslation('label', $locale, false)
+                                 ?: $item->getTranslation('label', 'fr', false)
+                                 ?: $item->key,
+                    ])->all();
+                });
+
                 $view->with('menuServices', $menuServices);
+                $view->with('menuItems', $menuItems);
             });
         } catch (\Throwable $e) {
             // Fallback silencieux (si DB pas prête)
-            View::composer('partials.menu', fn($view) => $view->with('menuServices', []));
+            View::composer('partials.menu', fn($view) => $view->with('menuServices', [])->with('menuItems', []));
         }
     }
 }

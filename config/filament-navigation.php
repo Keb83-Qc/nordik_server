@@ -71,8 +71,9 @@ return [
         \App\Filament\Resources\SubmissionResource::class       => 1,
 
         // Site Web
-        \App\Filament\Resources\PublicServiceCategoryResource::class => 1,
-        \App\Filament\Resources\PublicServiceResource::class         => 2,
+        \App\Filament\Resources\MenuItemResource::class              => 1,
+        \App\Filament\Resources\PublicServiceCategoryResource::class => 2,
+        \App\Filament\Resources\PublicServiceResource::class         => 3,
 
         // Marketing & Blog
         \App\Filament\Resources\BlogPostResource::class         => 1,
