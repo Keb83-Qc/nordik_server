@@ -2,79 +2,109 @@
 
 return [
     'groups' => [
+
+        // ─── ESPACE CONSEILLER ───────────────────────────────────
         'Espace Conseiller' => [
-            'label' => 'Espace Conseiller',
-            'icon'  => 'heroicon-o-user-group',
-            'sort'  => 1,
-            'collapsed' => true,
+            'label'     => 'Espace Conseiller',
+            'icon'      => 'heroicon-o-user-circle',
+            'sort'      => 1,
+            'collapsed' => false,
         ],
+
+        // ─── CLIENTS ─────────────────────────────────────────────
         'Gestion Clients' => [
-            'label' => 'Gestion Clients',
-            'icon'  => 'heroicon-o-briefcase',
-            'sort'  => 2,
+            'label'     => 'Clients & Soumissions',
+            'icon'      => 'heroicon-o-inbox-arrow-down',
+            'sort'      => 2,
+            'collapsed' => false,
+        ],
+
+        // ─── SITE WEB ─────────────────────────────────────────────
+        'Site Web' => [
+            'label'     => 'Site Web',
+            'icon'      => 'heroicon-o-globe-alt',
+            'sort'      => 3,
             'collapsed' => true,
         ],
+
+        // ─── MARKETING ────────────────────────────────────────────
         'Marketing' => [
-            'label' => 'Marketing & Blog', // Changé ici
-            'icon'  => 'heroicon-o-megaphone', // Icône plus adaptée
-            'sort'  => 3,
+            'label'     => 'Marketing & Blog',
+            'icon'      => 'heroicon-o-megaphone',
+            'sort'      => 4,
             'collapsed' => true,
         ],
-        'Configuration' => [
-            'label' => 'Paramètres Système',
-            'icon'  => 'heroicon-o-cog-6-tooth',
-            'sort'  => 4,
-            'collapsed' => true,
-        ],
+
+        // ─── CONSEILLERS (RH / admin) ─────────────────────────────
         'Gestion Conseillers' => [
-            'label' => 'Gestion Conseillers',
-            'icon'  => 'heroicon-o-user-group',
-            'sort'  => 5,
+            'label'     => 'Équipe & Conseillers',
+            'icon'      => 'heroicon-o-users',
+            'sort'      => 5,
             'collapsed' => true,
         ],
+
+        // ─── ADMIN SYSTÈME ────────────────────────────────────────
+        'Configuration' => [
+            'label'     => 'Administration Système',
+            'icon'      => 'heroicon-o-cog-6-tooth',
+            'sort'      => 6,
+            'collapsed' => true,
+        ],
+
+        // ─── TRADUCTIONS ──────────────────────────────────────────
         'GestionLangues' => [
-            'label' => 'Gestionnaire de traductions',
-            'icon'  => 'heroicon-o-language',
-            'sort'  => 6,
+            'label'     => 'Traductions',
+            'icon'      => 'heroicon-o-language',
+            'sort'      => 7,
             'collapsed' => true,
         ],
     ],
 
     'sort' => [
-        \App\Filament\Resources\MessageResource::class => 1,
-        \App\Filament\Resources\WikiArticleResource::class => 1,
-        \App\Filament\Pages\CommissionCalculator::class => 1,
+        // Espace Conseiller
+        \App\Filament\Resources\MessageResource::class          => 1,
+        \App\Filament\Pages\CommissionCalculator::class         => 2,
+        \App\Filament\Resources\WikiArticleResource::class      => 3,
 
-        \App\Filament\Resources\SubmissionResource::class => 2,
+        // Clients & Soumissions
+        \App\Filament\Resources\SubmissionResource::class       => 1,
 
-        \App\Filament\Resources\BlogPostResource::class => 3,
-        \App\Filament\Resources\HomepageStatResource::class => 3,
-        \App\Filament\Resources\PartnerResource::class => 3,
-        \App\Filament\Resources\ServiceResource::class => 3,
-        \App\Filament\Resources\SlideResource::class => 3,
+        // Site Web
+        \App\Filament\Resources\PublicServiceCategoryResource::class => 1,
+        \App\Filament\Resources\PublicServiceResource::class         => 2,
 
-        \App\Filament\Resources\ToolResource::class => 4,
-        \App\Filament\Resources\SystemLogResource::class => 4,
-        \App\Filament\Resources\TauxCommissionResource::class => 4,
-        \App\Filament\Resources\CareerPageResource::class => 4,
-        \App\Filament\Resources\CompagnieInfoResource::class => 4,
-        \App\Filament\Resources\VehicleBrandResource::class => 4,
-        \App\Filament\Pages\AdvisorLinks::class => 4,
-        \App\Filament\Pages\ManageGoogleReviews::class => 4,
+        // Marketing & Blog
+        \App\Filament\Resources\BlogPostResource::class         => 1,
+        \App\Filament\Resources\SlideResource::class            => 2,
+        \App\Filament\Resources\HomepageStatResource::class     => 3,
+        \App\Filament\Resources\PartnerResource::class          => 4,
+        \App\Filament\Resources\ServiceResource::class          => 5,
 
-        \App\Filament\Resources\TeamTitleResource::class => 5,
-        \App\Filament\Resources\UserResource::class => 5,
-        \App\Filament\Resources\EmployeeResource::class => 5,
+        // Équipe & Conseillers
+        \App\Filament\Resources\UserResource::class             => 1,
+        \App\Filament\Resources\EmployeeResource::class         => 2,
+        \App\Filament\Resources\TeamTitleResource::class        => 3,
+
+        // Administration Système
+        \App\Filament\Resources\TauxCommissionResource::class   => 1,
+        \App\Filament\Resources\CompagnieInfoResource::class    => 2,
+        \App\Filament\Resources\VehicleBrandResource::class     => 3,
+        \App\Filament\Resources\CareerPageResource::class       => 4,
+        \App\Filament\Resources\ToolResource::class             => 5,
+        \App\Filament\Pages\AdvisorLinks::class                 => 6,
+        \App\Filament\Pages\ManageGoogleReviews::class          => 7,
+        \App\Filament\Pages\MailSettingsPage::class             => 8,
+        \App\Filament\Resources\SystemLogResource::class        => 9,
     ],
 
-    // ✅ Liens externes / panels séparés
+    // Liens externes / panels séparés
     'links' => [
         [
-            'label' => 'Analyse des Besoins Financiers',
-            'icon'  => 'heroicon-o-arrow-top-right-on-square',
-            'url'   => '/abf',
-            'group' => 'Espace Conseiller', // le group existant
-            'sort'  => 1, // même niveau que AbfCaseResource
+            'label'   => 'Analyse des Besoins Financiers',
+            'icon'    => 'heroicon-o-arrow-top-right-on-square',
+            'url'     => '/abf',
+            'group'   => 'Espace Conseiller',
+            'sort'    => 4,
             'new_tab' => true,
         ],
     ],
