@@ -16,6 +16,11 @@ class ManageSystemLogs extends ManageRecords
         return [
             'tous' => Tab::make('Tous'),
 
+            'connexions' => Tab::make('Connexions')
+                ->query(fn(Builder $query) => $query->where('level', 'login'))
+                ->icon('heroicon-m-key')
+                ->badgeColor('primary'),
+
             'info' => Tab::make('Infos')
                 ->query(fn(Builder $query) => $query->where('level', 'info'))
                 ->icon('heroicon-m-information-circle')
