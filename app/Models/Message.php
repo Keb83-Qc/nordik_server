@@ -64,21 +64,18 @@ class Message extends Model
             // ── 2. Alerte web@vipgpi.ca pour bug reports et demandes système
             $type = $message->data['type'] ?? null;
             $notifyAdmin = match ($type) {
-                'bug_report'        => true,
-                'bio_change_request'=> true,
-                null                => str_starts_with((string) $message->subject, 'Nouvelle inscription :'),
-                default             => !str_ends_with((string) $type, '_response'),
+                'bug_report'         => true,
+                'bio_change_request' => true,
+                null                 => str_starts_with((string) $message->subject, 'Nouvelle inscription :'),
+                default              => !str_ends_with((string) $type, '_response'),
             };
 
             if ($notifyAdmin) {
-                dispatch(function () use ($message) {
-                    try {
-                        Mail::to('web@vipgpi.ca')
-                            ->send(new AdminAlertMail($message));
-                    } catch (\Exception $e) {
-                        // Ne pas bloquer l'app si le mail échoue
-                    }
-                })->afterResponse();
+                try {
+                    Mail::to('web@vipgpi.ca')->send(new AdminAlertMail($message));
+                } catch (\Exception $e) {
+                    // Ne pas bloquer l'app si le mail échoue
+                }
             }
         });
     }
