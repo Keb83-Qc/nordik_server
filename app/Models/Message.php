@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Mail\AdminAlertMail;
 use Illuminate\Support\Facades\Mail;
 
 class Message extends Model
@@ -32,12 +33,12 @@ class Message extends Model
     protected static function booted(): void
     {
         static::created(function (Message $message) {
-            $receiver = $message->receiver;
-
+            $receiver   = $message->receiver;
             $senderName = $message->sender
                 ? $message->sender->first_name . ' ' . $message->sender->last_name
                 : 'Système VIP';
 
+            // ── 1. Notification interne au destinataire ───────────────────
             if ($receiver && $receiver->email) {
                 dispatch(function () use ($receiver, $senderName, $message) {
                     try {
@@ -54,6 +55,26 @@ class Message extends Model
                                     ->subject("Nouveau message interne de $senderName");
                             }
                         );
+                    } catch (\Exception $e) {
+                        // Ne pas bloquer l'app si le mail échoue
+                    }
+                })->afterResponse();
+            }
+
+            // ── 2. Alerte web@vipgpi.ca pour bug reports et demandes système
+            $type = $message->data['type'] ?? null;
+            $notifyAdmin = match ($type) {
+                'bug_report'        => true,
+                'bio_change_request'=> true,
+                null                => str_starts_with((string) $message->subject, 'Nouvelle inscription :'),
+                default             => !str_ends_with((string) $type, '_response'),
+            };
+
+            if ($notifyAdmin) {
+                dispatch(function () use ($message) {
+                    try {
+                        Mail::to('web@vipgpi.ca')
+                            ->send(new AdminAlertMail($message));
                     } catch (\Exception $e) {
                         // Ne pas bloquer l'app si le mail échoue
                     }
