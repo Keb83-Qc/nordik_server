@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Cache;
 class BugReportResource extends Resource
 {
     protected static ?string $model = Message::class;
+    protected static ?string $slug = 'bug-reports'; // Évite conflit URL avec MessageResource
     protected static ?string $navigationIcon = 'heroicon-o-bug-ant';
 
     // ── Navigation dynamique selon le rôle ───────────────────────────────────
