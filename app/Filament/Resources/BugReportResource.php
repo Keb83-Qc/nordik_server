@@ -226,9 +226,6 @@ class BugReportResource extends Resource
                     ->color('gray')
                     ->modalHeading(fn(Message $record) => $record->subject)
                     ->modalSubmitAction(false)
-                    ->modalCancelAction(
-                        fn() => \Filament\Actions\StaticAction::make('close')->label('Fermer')
-                    )
                     ->form([
                         Forms\Components\Select::make('category')
                             ->label('Type')
