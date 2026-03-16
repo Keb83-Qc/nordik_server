@@ -61,10 +61,11 @@ return [
     ],
 
     'sort' => [
-        // Espace Conseiller
+        // Espace Conseiller (+ admin: Gestion Conseillers)
         \App\Filament\Resources\MessageResource::class          => 1,
         \App\Filament\Pages\CommissionCalculator::class         => 2,
         \App\Filament\Resources\WikiArticleResource::class      => 3,
+        \App\Filament\Resources\BugReportResource::class        => 5,
 
         // Clients & Soumissions
         \App\Filament\Resources\SubmissionResource::class       => 1,

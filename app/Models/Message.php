@@ -78,10 +78,19 @@ class Message extends Model
     public function scopeSystem($query)
     {
         return $query->where(function ($q) {
-            $q->whereNotNull('data->type')
-                ->orWhereNotNull('data->action_type')
-                ->orWhere('subject', 'like', 'Nouvelle inscription :%');
+            $q->where(function ($inner) {
+                // Exclut les bug reports du flux système standard
+                $inner->whereNotNull('data->type')
+                    ->whereNotIn('data->type', ['bug_report', 'bug_report_response']);
+            })
+            ->orWhereNotNull('data->action_type')
+            ->orWhere('subject', 'like', 'Nouvelle inscription :%');
         });
+    }
+
+    public function scopeBugReport($query)
+    {
+        return $query->where('data->type', 'bug_report');
     }
 
     public function scopeInternal($query)
