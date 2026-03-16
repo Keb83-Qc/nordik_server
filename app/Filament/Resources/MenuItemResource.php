@@ -9,7 +9,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Cache;
 
 class MenuItemResource extends Resource
 {
@@ -150,10 +149,7 @@ class MenuItemResource extends Resource
                 Tables\Actions\Action::make('toggle')
                     ->label(fn(MenuItem $r) => $r->is_active ? 'Masquer' : 'Afficher')
                     ->icon(fn(MenuItem $r) => $r->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->action(function (MenuItem $r) {
-                        $r->update(['is_active' => !$r->is_active]);
-                        Cache::forget('menu_items_nav');
-                    }),
+                    ->action(fn(MenuItem $r) => $r->update(['is_active' => !$r->is_active])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

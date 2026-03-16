@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Translatable\HasTranslations;
 
 class MenuItem extends Model
@@ -95,5 +96,19 @@ class MenuItem extends Model
     public function scopeActive($query)
     {
         return $query->where('is_active', true)->orderBy('sort_order');
+    }
+
+    // ── Auto-invalidation cache ───────────────────────────────────────
+
+    protected static function booted(): void
+    {
+        $clear = function () {
+            foreach (Language::activeCodes() as $locale) {
+                \Illuminate\Support\Facades\Cache::forget("menu_items_nav_{$locale}");
+            }
+        };
+
+        static::saved($clear);
+        static::deleted($clear);
     }
 }
