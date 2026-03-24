@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use App\Http\Middleware\FullPageCache;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
@@ -146,6 +147,7 @@ class FooterSettingsPage extends Page implements HasForms
         }
 
         Cache::forget('app_settings');
+        FullPageCache::clearAll();
 
         Notification::make()
             ->title('Pied de page mis à jour')
