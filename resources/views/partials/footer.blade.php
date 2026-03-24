@@ -1,12 +1,13 @@
 @php
-// Récupération des paramètres dynamiques (toujours nécessaire)
-$copyrightText = $settings['footer_copyright'] ?? __('footer.default_copyright');
+    // Récupération des paramètres dynamiques (toujours nécessaire)
+    $copyrightText = $settings['footer_copyright'] ?? __('footer.default_copyright');
 
-// Description : On utilise la traduction du fichier PHP si le setting est vide
-$lang = app()->getLocale();
-$footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
-? $settings['footer_description_en']
-: ($settings['footer_description'] ?? __('footer.description'));
+    // Description : On utilise la traduction du fichier PHP si le setting est vide
+    $lang = app()->getLocale();
+    $footerDesc =
+        $lang == 'en' && !empty($settings['footer_description_en'])
+            ? $settings['footer_description_en']
+            : $settings['footer_description'] ?? __('footer.description');
 @endphp
 
 <footer class="footer-premium">
@@ -24,20 +25,20 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
                 </p>
 
                 <div class="d-flex gap-3">
-                    @if(!empty($settings['facebook_url']))
-                    <a href="{{ $settings['facebook_url'] }}" target="_blank"
-                        class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width:40px;height:40px;">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
+                    @if (!empty($settings['facebook_url']))
+                        <a href="{{ $settings['facebook_url'] }}" target="_blank"
+                            class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"
+                            style="width:40px;height:40px;">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
                     @endif
 
-                    @if(!empty($settings['linkedin_url']))
-                    <a href="{{ $settings['linkedin_url'] }}" target="_blank"
-                        class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"
-                        style="width:40px;height:40px;">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
+                    @if (!empty($settings['linkedin_url']))
+                        <a href="{{ $settings['linkedin_url'] }}" target="_blank"
+                            class="btn btn-outline-light rounded-circle d-flex align-items-center justify-content-center"
+                            style="width:40px;height:40px;">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     @endif
                 </div>
             </div>
@@ -52,7 +53,8 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
                     </li>
                     <li><a href="{{ url('/contact') }}"><i class="fas fa-chevron-right"></i>
                             {{ __('footer.contact') }}</a></li>
-                    <li><a href="{{ url('/login') }}"><i class="fas fa-lock"></i> {{ __('footer.advisor_access') }}</a>
+                    <li><a href="{{ url('/login') }}"><i class="fas fa-lock"></i>
+                            {{ __('footer.advisor_access') }}</a>
                     </li>
                 </ul>
             </div>
@@ -76,8 +78,8 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
                     <div class="footer-contact-text">
                         <h6>{{ __('footer.phone') }}</h6>
                         @php
-                        $phone = $settings['site_phone'] ?? '438 838-2630';
-                        $phoneLink = preg_replace('/[^0-9]/', '', $phone);
+                            $phone = $settings['site_phone'] ?? '(579) 640-3334';
+                            $phoneLink = preg_replace('/[^0-9]/', '', $phone);
                         @endphp
                         <a href="tel:{{ $phoneLink }}">
                             {{ $phone }}
@@ -100,7 +102,8 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
             {{-- COLONNE 4 : IMAGE AIGLE --}}
             <div
                 class="col-lg-3 col-md-6 text-center text-lg-end d-flex align-items-end justify-content-center justify-content-lg-end">
-                <img src="{{ asset('assets/img/footer/imageVIP-2.webp') }}" class="img-fluid footer-eagle" alt="VIP" loading="lazy" width="180" height="220">
+                <img src="{{ asset('assets/img/footer/imageVIP-2.webp') }}" class="img-fluid footer-eagle"
+                    alt="VIP" loading="lazy" width="180" height="220">
             </div>
 
         </div>
@@ -111,13 +114,14 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-md-6 text-center text-md-start mb-2 mb-md-0">
-                    © {{ date("Y") }} <strong class="text-white">{{ $copyrightText }}</strong>
+                    © {{ date('Y') }} <strong class="text-white">{{ $copyrightText }}</strong>
                     {{ __('footer.rights_reserved') }}
                 </div>
                 <div class="col-md-6 text-center text-md-end">
                     <a href="#"
                         class="text-decoration-none text-muted small me-3 hover-white">{{ __('footer.privacy') }}</a>
-                    <a href="#" class="text-decoration-none text-muted small hover-white">{{ __('footer.terms') }}</a>
+                    <a href="#"
+                        class="text-decoration-none text-muted small hover-white">{{ __('footer.terms') }}</a>
                 </div>
             </div>
         </div>
@@ -166,7 +170,8 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
     </style>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer
+    crossorigin="anonymous"></script>
 @php $jsVer = @filemtime(public_path('assets/js/script.js')) ?: '1'; @endphp
 <script src="{{ asset('assets/js/script.js') }}?v={{ $jsVer }}" defer></script>
 @php $menuJsVer = @filemtime(public_path('assets/js/mega-menu.js')) ?: '1'; @endphp
@@ -174,51 +179,72 @@ $footerDesc = ($lang == 'en' && !empty($settings['footer_description_en']))
 
 {{-- Prefetching: précharge les pages internes au survol pour navigation quasi-instantanée --}}
 <script>
-(function () {
-    // Utilise Speculation Rules API si disponible (Chrome 109+) — le plus rapide
-    if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
-        const s = document.createElement('script');
-        s.type = 'speculationrules';
-        s.textContent = JSON.stringify({
-            prefetch: [{
-                source: 'document',
-                eagerness: 'moderate',
-                where: { and: [{ href_matches: '/*' }, { not: { href_matches: '/admin/*' } }, { not: { href_matches: '/abf/*' } }, { not: { href_matches: '/conseiller/*' } }] }
-            }]
+    (function() {
+        // Utilise Speculation Rules API si disponible (Chrome 109+) — le plus rapide
+        if (HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')) {
+            const s = document.createElement('script');
+            s.type = 'speculationrules';
+            s.textContent = JSON.stringify({
+                prefetch: [{
+                    source: 'document',
+                    eagerness: 'moderate',
+                    where: {
+                        and: [{
+                            href_matches: '/*'
+                        }, {
+                            not: {
+                                href_matches: '/admin/*'
+                            }
+                        }, {
+                            not: {
+                                href_matches: '/abf/*'
+                            }
+                        }, {
+                            not: {
+                                href_matches: '/conseiller/*'
+                            }
+                        }]
+                    }
+                }]
+            });
+            document.head.appendChild(s);
+            return;
+        }
+
+        // Fallback: prefetch manuel au survol (65ms de délai pour éviter les prefetchs inutiles)
+        const prefetched = new Set();
+        let timer;
+
+        function prefetch(url) {
+            if (prefetched.has(url)) return;
+            prefetched.add(url);
+            const link = document.createElement('link');
+            link.rel = 'prefetch';
+            link.href = url;
+            link.as = 'document';
+            document.head.appendChild(link);
+        }
+
+        document.addEventListener('mouseover', function(e) {
+            const a = e.target.closest('a[href]');
+            if (!a) return;
+            const href = a.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:'))
+                return;
+            if (/\/(admin|abf|conseiller|logout)/.test(href)) return;
+
+            clearTimeout(timer);
+            timer = setTimeout(() => prefetch(a.href), 65);
+        }, {
+            passive: true
         });
-        document.head.appendChild(s);
-        return;
-    }
 
-    // Fallback: prefetch manuel au survol (65ms de délai pour éviter les prefetchs inutiles)
-    const prefetched = new Set();
-    let timer;
-
-    function prefetch(url) {
-        if (prefetched.has(url)) return;
-        prefetched.add(url);
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = url;
-        link.as = 'document';
-        document.head.appendChild(link);
-    }
-
-    document.addEventListener('mouseover', function (e) {
-        const a = e.target.closest('a[href]');
-        if (!a) return;
-        const href = a.getAttribute('href');
-        if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
-        if (/\/(admin|abf|conseiller|logout)/.test(href)) return;
-
-        clearTimeout(timer);
-        timer = setTimeout(() => prefetch(a.href), 65);
-    }, { passive: true });
-
-    document.addEventListener('mouseout', function () {
-        clearTimeout(timer);
-    }, { passive: true });
-})();
+        document.addEventListener('mouseout', function() {
+            clearTimeout(timer);
+        }, {
+            passive: true
+        });
+    })();
 </script>
 
 
