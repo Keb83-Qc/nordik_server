@@ -166,7 +166,14 @@
                         <i class="fas fa-sign-in-alt me-2"></i> Se connecter
                     </button>
 
-                    <div class="text-center mt-4 pt-3 border-top">
+                    <div class="text-center mt-3">
+                        <a href="{{ route('password.request', ['locale' => app()->getLocale()]) }}"
+                           class="text-decoration-none small" style="color: #c9a050;">
+                            <i class="fas fa-key me-1"></i> Mot de passe oublié ?
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3 pt-3 border-top">
                         <small class="text-muted d-block mb-2">Vous n'avez pas d'accès ?</small>
                         <a href="{{ route('access.request', ['locale' => app()->getLocale()]) }}"
                             class="btn btn-outline-secondary btn-sm rounded-pill px-3">
