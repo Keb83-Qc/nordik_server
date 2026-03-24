@@ -8,7 +8,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Pages\Concerns\InteractsWithFormActions;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
+use App\Models\Setting;
 
 class FooterSettingsPage extends Page
 {
@@ -29,7 +29,7 @@ class FooterSettingsPage extends Page
 
     public function mount(): void
     {
-        $settings = DB::table('settings')->pluck('setting_value', 'setting_key')->toArray();
+        $settings = Setting::pluck('value', 'key')->toArray();
 
         $this->data = [
             'footer_copyright'    => $settings['footer_copyright']    ?? '',
@@ -123,9 +123,9 @@ class FooterSettingsPage extends Page
         $state = $this->form->getState();
 
         foreach ($state as $key => $value) {
-            DB::table('settings')->updateOrInsert(
-                ['setting_key' => $key],
-                ['setting_value' => $value ?? '']
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value ?? '']
             );
         }
 

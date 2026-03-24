@@ -78,8 +78,7 @@ class ChatStepResource extends Resource
                         ->label('Options')
                         ->keyLabel('Valeur (clé)')
                         ->valueLabel('Libellé affiché')
-                        ->addButtonLabel('Ajouter une option')
-                        ->reorderable(),
+                        ->addButtonLabel('Ajouter une option'),
                 ])
                 ->visible(fn (Forms\Get $get) => in_array($get('input_type'), ['select', 'radio', 'checkbox'])),
 
@@ -115,8 +114,9 @@ class ChatStepResource extends Resource
                     ->searchable()
                     ->wrap(),
 
-                Tables\Columns\BadgeColumn::make('input_type')
+                Tables\Columns\TextColumn::make('input_type')
                     ->label('Type')
+                    ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'text'     => 'Texte',
                         'email'    => 'Email',
@@ -129,13 +129,13 @@ class ChatStepResource extends Resource
                         'consent'  => 'Consentement',
                         default    => $state,
                     })
-                    ->colors([
-                        'gray'    => fn ($state) => in_array($state, ['text', 'number']),
-                        'info'    => fn ($state) => in_array($state, ['email', 'phone']),
-                        'warning' => fn ($state) => in_array($state, ['select', 'radio', 'checkbox']),
-                        'primary' => 'date',
-                        'success' => 'consent',
-                    ]),
+                    ->color(fn (string $state): string => match ($state) {
+                        'email', 'phone'             => 'info',
+                        'select', 'radio', 'checkbox' => 'warning',
+                        'date'                        => 'primary',
+                        'consent'                     => 'success',
+                        default                       => 'gray',
+                    }),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Actif')
