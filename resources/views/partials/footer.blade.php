@@ -78,7 +78,7 @@
                     <div class="footer-contact-text">
                         <h6>{{ __('footer.phone') }}</h6>
                         @php
-                            $phone = $settings['site_phone'] ?? '(579) 640-3334';
+                            $phone = $settings['site_phone'] ?? '579 640-3334';
                             $phoneLink = preg_replace('/[^0-9]/', '', $phone);
                         @endphp
                         <a href="tel:{{ $phoneLink }}">
