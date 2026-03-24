@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Http\Middleware\FullPageCache;
+use App\Models\Setting;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
@@ -10,9 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use App\Http\Middleware\FullPageCache;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class FooterSettingsPage extends Page implements HasForms
 {
@@ -33,21 +33,7 @@ class FooterSettingsPage extends Page implements HasForms
 
     public function mount(): void
     {
-        // Lecture depuis le cache AppServiceProvider (évite les problèmes de colonnes DB)
-        $settings = Cache::get('app_settings', []);
-
-        // Si le cache est vide, tentative directe
-        if (empty($settings)) {
-            try {
-                $settings = DB::table('settings')->pluck('setting_value', 'setting_key')->toArray();
-            } catch (\Throwable $e) {
-                try {
-                    $settings = DB::table('settings')->pluck('value', 'key')->toArray();
-                } catch (\Throwable $e2) {
-                    $settings = [];
-                }
-            }
-        }
+        $settings = Setting::pluck('value', 'key')->toArray();
 
         $this->form->fill([
             'footer_copyright'      => $settings['footer_copyright']      ?? '',
@@ -131,19 +117,11 @@ class FooterSettingsPage extends Page implements HasForms
     {
         $state = $this->form->getState();
 
-        foreach ($state as $settingKey => $settingValue) {
-            // Essaie setting_key/setting_value (AppServiceProvider), puis key/value (model)
-            try {
-                DB::table('settings')->updateOrInsert(
-                    ['setting_key' => $settingKey],
-                    ['setting_value' => $settingValue ?? '']
-                );
-            } catch (\Throwable $e) {
-                DB::table('settings')->updateOrInsert(
-                    ['key' => $settingKey],
-                    ['value' => $settingValue ?? '']
-                );
-            }
+        foreach ($state as $key => $value) {
+            Setting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value ?? '']
+            );
         }
 
         Cache::forget('app_settings');
