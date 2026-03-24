@@ -89,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
         try {
             $settingsData = Cache::remember('app_settings', 1800, function () {
                 return DB::table('settings')
-                    ->pluck('setting_value', 'setting_key')
+                    ->pluck('value', 'key')
                     ->toArray();
             });
 

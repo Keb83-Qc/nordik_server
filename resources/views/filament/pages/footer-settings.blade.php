@@ -1,8 +1,11 @@
 <x-filament-panels::page>
-    <form wire:submit.prevent="save" class="space-y-6">
+    <div>
         {{ $this->form }}
-        <x-filament::button type="submit" icon="heroicon-o-check">
-            Sauvegarder
-        </x-filament::button>
-    </form>
+
+        <div class="mt-4">
+            <x-filament::button wire:click="save" color="primary">
+                Sauvegarder
+            </x-filament::button>
+        </div>
+    </div>
 </x-filament-panels::page>
