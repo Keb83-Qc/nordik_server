@@ -8,6 +8,7 @@ class ChatStep extends Model
 {
     protected $fillable = [
         'identifier',
+        'chat_type',
         'question',
         'input_type',
         'options',
