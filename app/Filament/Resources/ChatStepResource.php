@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Validation\Rules\Unique;
 
 class ChatStepResource extends Resource
 {
@@ -32,12 +33,29 @@ class ChatStepResource extends Resource
             Forms\Components\Section::make('Identification')
                 ->columns(3)
                 ->schema([
+                    Forms\Components\Select::make('chat_type')
+                        ->label('Chatbot')
+                        ->required()
+                        ->options([
+                            'auto'        => 'Auto',
+                            'habitation'  => 'Habitation',
+                            'bundle'      => 'Bundle (Auto + Habitation)',
+                            'commercial'  => 'Commercial',
+                        ])
+                        ->default('auto')
+                        ->columnSpan(1),
+
                     Forms\Components\TextInput::make('identifier')
                         ->label('Identifiant unique')
                         ->required()
-                        ->unique(ignoreRecord: true)
+                        ->unique(
+                            table: ChatStep::class,
+                            column: 'identifier',
+                            ignoreRecord: true,
+                            modifyRuleUsing: fn (Unique $rule, Forms\Get $get) => $rule->where('chat_type', $get('chat_type')),
+                        )
                         ->helperText('Ex: identity, email, phone — ne pas modifier après création')
-                        ->columnSpan(2),
+                        ->columnSpan(1),
 
                     Forms\Components\TextInput::make('sort_order')
                         ->label('Ordre')
@@ -72,7 +90,7 @@ class ChatStepResource extends Resource
                 ]),
 
             Forms\Components\Section::make('Options de réponse')
-                ->description('Pour les types select, radio et checkbox — une option par ligne sous format "valeur|Libellé"')
+                ->description('Pour les types select, radio et checkbox — clé: valeur interne, libellé: texte affiché')
                 ->schema([
                     Forms\Components\KeyValue::make('options')
                         ->label('Options')
@@ -102,6 +120,24 @@ class ChatStepResource extends Resource
                     ->sortable()
                     ->width(50),
 
+                Tables\Columns\TextColumn::make('chat_type')
+                    ->label('Chatbot')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state) => match ($state) {
+                        'auto'       => 'Auto',
+                        'habitation' => 'Habitation',
+                        'bundle'     => 'Bundle',
+                        'commercial' => 'Commercial',
+                        default      => $state,
+                    })
+                    ->color(fn (string $state): string => match ($state) {
+                        'auto'       => 'info',
+                        'habitation' => 'success',
+                        'bundle'     => 'warning',
+                        'commercial' => 'danger',
+                        default      => 'gray',
+                    }),
+
                 Tables\Columns\TextColumn::make('identifier')
                     ->label('Identifiant')
                     ->badge()
@@ -130,7 +166,7 @@ class ChatStepResource extends Resource
                         default    => $state,
                     })
                     ->color(fn (string $state): string => match ($state) {
-                        'email', 'phone'             => 'info',
+                        'email', 'phone'              => 'info',
                         'select', 'radio', 'checkbox' => 'warning',
                         'date'                        => 'primary',
                         'consent'                     => 'success',
