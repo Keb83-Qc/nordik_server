@@ -74,6 +74,8 @@ return [
         \App\Filament\Resources\MenuItemResource::class              => 1,
         \App\Filament\Resources\PublicServiceCategoryResource::class => 2,
         \App\Filament\Resources\PublicServiceResource::class         => 3,
+        \App\Filament\Pages\FooterSettingsPage::class                => 4,
+        \App\Filament\Resources\ChatStepResource::class              => 5,
 
         // Marketing & Blog
         \App\Filament\Resources\BlogPostResource::class         => 1,

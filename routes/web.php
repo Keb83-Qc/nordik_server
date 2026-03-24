@@ -14,6 +14,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\AbfPdfController;
 use App\Http\Controllers\ServicePublicController;
@@ -213,6 +214,18 @@ Route::prefix('{locale}')
             ->middleware(['throttle:10,1'])
             ->name('register.ajax');
         Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+        // Mot de passe oublié
+        Route::get('/forgot-password', [ForgotPasswordController::class, 'showForgotForm'])
+            ->name('password.request');
+        Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])
+            ->middleware(['throttle:5,1'])
+            ->name('password.email');
+        Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])
+            ->name('password.reset');
+        Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])
+            ->middleware(['throttle:5,1'])
+            ->name('password.store');
 
         // Partenaires / carrières / construction
         Route::get('/partenaires', [PageController::class, 'partenaires'])->name('partenaires');
