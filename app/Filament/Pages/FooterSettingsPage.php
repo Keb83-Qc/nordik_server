@@ -2,17 +2,20 @@
 
 namespace App\Filament\Pages;
 
-use Filament\Forms;
-use Filament\Pages\Page;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
-use Filament\Pages\Concerns\InteractsWithFormActions;
+use Filament\Pages\Page;
 use Illuminate\Support\Facades\Cache;
-use App\Models\Setting;
+use Illuminate\Support\Facades\DB;
 
-class FooterSettingsPage extends Page
+class FooterSettingsPage extends Page implements HasForms
 {
-    use InteractsWithFormActions;
+    use InteractsWithForms;
 
     protected static ?string $navigationIcon  = 'heroicon-o-building-office-2';
     protected static ?string $navigationGroup = 'Site Web';
@@ -20,7 +23,7 @@ class FooterSettingsPage extends Page
     protected static ?string $title           = 'Gestion du pied de page';
     protected static string  $view            = 'filament.pages.footer-settings';
 
-    public array $data = [];
+    public ?array $data = [];
 
     public static function getNavigationSort(): ?int
     {
@@ -29,104 +32,117 @@ class FooterSettingsPage extends Page
 
     public function mount(): void
     {
-        $settings = Setting::pluck('value', 'key')->toArray();
+        // Lecture depuis le cache AppServiceProvider (évite les problèmes de colonnes DB)
+        $settings = Cache::get('app_settings', []);
 
-        $this->data = [
-            'footer_copyright'    => $settings['footer_copyright']    ?? '',
-            'footer_description'  => $settings['footer_description']  ?? '',
+        // Si le cache est vide, tentative directe
+        if (empty($settings)) {
+            try {
+                $settings = DB::table('settings')->pluck('setting_value', 'setting_key')->toArray();
+            } catch (\Throwable $e) {
+                try {
+                    $settings = DB::table('settings')->pluck('value', 'key')->toArray();
+                } catch (\Throwable $e2) {
+                    $settings = [];
+                }
+            }
+        }
+
+        $this->form->fill([
+            'footer_copyright'      => $settings['footer_copyright']      ?? '',
+            'footer_description'    => $settings['footer_description']    ?? '',
             'footer_description_en' => $settings['footer_description_en'] ?? '',
-            'site_address'        => $settings['site_address']        ?? '',
-            'site_phone'          => $settings['site_phone']          ?? '',
-            'site_email'          => $settings['site_email']          ?? '',
-            'facebook_url'        => $settings['facebook_url']        ?? '',
-            'linkedin_url'        => $settings['linkedin_url']        ?? '',
-        ];
-
-        $this->form->fill($this->data);
+            'site_address'          => $settings['site_address']          ?? '',
+            'site_phone'            => $settings['site_phone']            ?? '',
+            'site_email'            => $settings['site_email']            ?? '',
+            'facebook_url'          => $settings['facebook_url']          ?? '',
+            'linkedin_url'          => $settings['linkedin_url']          ?? '',
+        ]);
     }
 
     public function form(Form $form): Form
     {
         return $form
-            ->statePath('data')
             ->schema([
-                Forms\Components\Section::make('Informations légales')
-                    ->icon('heroicon-o-document-text')
+                Section::make('Informations légales')
                     ->columns(1)
                     ->schema([
-                        Forms\Components\TextInput::make('footer_copyright')
+                        TextInput::make('footer_copyright')
                             ->label('Texte copyright')
                             ->placeholder('VIP Services Financiers Inc.')
                             ->helperText('Affiché après © 2025 dans le bas de page.')
                             ->maxLength(200),
                     ]),
 
-                Forms\Components\Section::make('Description')
-                    ->icon('heroicon-o-chat-bubble-left-right')
+                Section::make('Description')
                     ->columns(1)
                     ->schema([
-                        Forms\Components\Textarea::make('footer_description')
+                        Textarea::make('footer_description')
                             ->label('Description (Français)')
                             ->rows(3)
                             ->maxLength(500),
 
-                        Forms\Components\Textarea::make('footer_description_en')
+                        Textarea::make('footer_description_en')
                             ->label('Description (Anglais)')
                             ->rows(3)
                             ->maxLength(500),
                     ]),
 
-                Forms\Components\Section::make('Coordonnées')
-                    ->icon('heroicon-o-phone')
+                Section::make('Coordonnées')
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('site_address')
+                        TextInput::make('site_address')
                             ->label('Adresse')
                             ->placeholder('2990 av. Pierre-Péladeau, Suite 400, Laval, QC H7T 3B3')
                             ->columnSpanFull()
                             ->maxLength(300),
 
-                        Forms\Components\TextInput::make('site_phone')
+                        TextInput::make('site_phone')
                             ->label('Téléphone')
                             ->placeholder('579 640-3334')
-                            ->tel()
                             ->maxLength(30),
 
-                        Forms\Components\TextInput::make('site_email')
+                        TextInput::make('site_email')
                             ->label('Courriel')
                             ->email()
                             ->placeholder('admin@vipgpi.ca')
                             ->maxLength(100),
                     ]),
 
-                Forms\Components\Section::make('Réseaux sociaux')
-                    ->icon('heroicon-o-share')
+                Section::make('Réseaux sociaux')
                     ->columns(2)
                     ->schema([
-                        Forms\Components\TextInput::make('facebook_url')
+                        TextInput::make('facebook_url')
                             ->label('URL Facebook')
-                            ->url()
                             ->placeholder('https://facebook.com/vipgpi')
                             ->maxLength(300),
 
-                        Forms\Components\TextInput::make('linkedin_url')
+                        TextInput::make('linkedin_url')
                             ->label('URL LinkedIn')
-                            ->url()
                             ->placeholder('https://linkedin.com/company/vipgpi')
                             ->maxLength(300),
                     ]),
-            ]);
+            ])
+            ->statePath('data');
     }
 
     public function save(): void
     {
         $state = $this->form->getState();
 
-        foreach ($state as $key => $value) {
-            Setting::updateOrCreate(
-                ['key' => $key],
-                ['value' => $value ?? '']
-            );
+        foreach ($state as $settingKey => $settingValue) {
+            // Essaie setting_key/setting_value (AppServiceProvider), puis key/value (model)
+            try {
+                DB::table('settings')->updateOrInsert(
+                    ['setting_key' => $settingKey],
+                    ['setting_value' => $settingValue ?? '']
+                );
+            } catch (\Throwable $e) {
+                DB::table('settings')->updateOrInsert(
+                    ['key' => $settingKey],
+                    ['value' => $settingValue ?? '']
+                );
+            }
         }
 
         Cache::forget('app_settings');
