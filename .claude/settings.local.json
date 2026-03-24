@@ -161,7 +161,17 @@
       "Bash(grep -r \"protected $table\\\\|protected.*fillable\\\\|protected.*casts\" /d/vipgpi__net/.claude/worktrees/happy-swartz/app/Models --include=\"*.php\")",
       "Bash(grep -n \"SystemLog\\\\|LoginEvent\\\\|Logout\" /d/vipgpi__net/.claude/worktrees/happy-swartz/app/Providers/*.php)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(ls -la config/filament*)",
+      "Read(//d/vipgpi__net/storage/logs/**)",
+      "Bash(dir \"D:\\\\vipgpi__net\\\\.claude\\\\worktrees\\\\happy-swartz\\\\database\\\\migrations\")",
+      "Bash(grep -v \"^$\")",
+      "Bash(powershell -Command \"Get-ChildItem ''D:\\\\vipgpi__net\\\\database\\\\migrations'' | Select-Object -Last 5 -ExpandProperty Name\")",
+      "Bash(powershell -Command \"Get-ChildItem ''D:\\\\vipgpi__net\\\\database\\\\migrations'' | Measure-Object\")",
+      "Bash(powershell -Command \"Get-ChildItem ''D:\\\\vipgpi__net\\\\'' -Recurse -Name ''*.php'' -Path ''*migrations*'' | Select-Object -Last 5\")",
+      "Bash(php artisan:*)",
+      "Bash(grep -n slug /d/vipgpi__net/app/Models/Employee.php /d/vipgpi__net/database/migrations/*employee*)",
+      "Bash(sqlite3 /d/vipgpi__net/database/database.sqlite \".tables\")"
     ]
   }
 }
