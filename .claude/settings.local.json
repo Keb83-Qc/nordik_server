@@ -170,7 +170,8 @@
       "Bash(php \"D:/vipgpi__net/artisan\" migrate --force)",
       "Bash(dir \"D:\\\\vipgpi__net\\\\vendor\")",
       "Bash(cmd.exe /c \"dir D:\\\\vipgpi__net\\\\vendor 2>&1\")",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(php -r \"require ''''vendor/autoload.php'''';\")"
     ]
   }
 }
