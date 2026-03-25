@@ -13,6 +13,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 use App\Models\Employee;
 use App\Models\Role;
+use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
@@ -277,5 +278,10 @@ class User extends Authenticatable implements HasName, FilamentUser
     public function isSuperAdmin(): bool
     {
         return $this->hasRoleByName(self::ROLE_SUPER_ADMIN);
+    }
+
+    public function sendPasswordResetNotification($token): void
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 }
