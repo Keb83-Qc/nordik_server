@@ -341,6 +341,47 @@
                     {{ __('homechat.btn_finalize') }}
                 </button>
             </div>
+
+            @else
+            {{-- Step générique géré depuis la DB / Filament --}}
+            @php
+            $__cfg    = $this->getStepConfig($step);
+            $__locale = app()->getLocale();
+            @endphp
+            @if($__cfg)
+                @php $__opts = $__cfg->options ?? []; @endphp
+                @if($__cfg->input_type === 'select' && !empty($__opts))
+                <div class="d-grid gap-2" wire:key="area-gen-{{ $step }}">
+                    @foreach($__opts as $__opt)
+                    @php
+                    $__val   = is_array($__opt) ? ($__opt['value'] ?? (string)$__opt) : (string)$__opt;
+                    $__label = is_array($__opt) && isset($__opt['label'])
+                        ? (is_array($__opt['label']) ? ($__opt['label'][$__locale] ?? $__opt['label']['fr'] ?? $__val) : $__opt['label'])
+                        : $__val;
+                    @endphp
+                    <button wire:click="selectGenericOption('{{ $step }}', '{{ $__val }}')"
+                            class="btn btn-outline-primary btn-lg">
+                        {{ $__label }}
+                    </button>
+                    @endforeach
+                </div>
+                @elseif($__cfg->input_type === 'date')
+                <div class="input-group" wire:key="area-gen-{{ $step }}">
+                    <input type="date" wire:model="genericInput" class="form-control form-control-lg shadow-sm">
+                    <button wire:click="submitGenericStep('{{ $step }}')" class="btn btn-primary px-4">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                @else
+                <div class="input-group" wire:key="area-gen-{{ $step }}">
+                    <input type="text" wire:model="genericInput" class="form-control form-control-lg shadow-sm"
+                           placeholder="{{ $this->getQuestion($step) }}">
+                    <button wire:click="submitGenericStep('{{ $step }}')" class="btn btn-primary px-4">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                @endif
+            @endif
             @endif
         </div>
     </div>

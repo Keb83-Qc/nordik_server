@@ -29,6 +29,7 @@ trait HasChatSteps
     public string $step = '';
     public array $data = [];
     public ?Submission $submission = null;
+    public string $genericInput = '';
 
     public ?string $advisorCode = null;
     public string $agentName = 'Julie';
@@ -184,24 +185,75 @@ trait HasChatSteps
     }
 
     /**
+     * Retourne tous les steps actifs du chatType courant, ordonnés par sort_order,
+     * mis en cache. Utilisé par getQuestion, buildStepOrderFromDb et getStepConfig.
+     */
+    private function getCachedSteps(): \Illuminate\Support\Collection
+    {
+        return Cache::remember("chat_steps_{$this->chatType()}", 3600, function () {
+            return ChatStep::where('chat_type', $this->chatType())
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get()
+                ->keyBy('identifier');
+        });
+    }
+
+    /**
      * Retourne le texte de la question depuis la DB, dans la locale active.
      * Fallback : locale fr, puis chaîne vide.
      */
     public function getQuestion(string $identifier): string
     {
-        $steps = Cache::remember("chat_steps_{$this->chatType()}", 3600, function () {
-            return ChatStep::where('chat_type', $this->chatType())
-                ->where('is_active', true)
-                ->get()
-                ->keyBy('identifier');
-        });
-
-        $chatStep = $steps->get($identifier);
+        $chatStep = $this->getCachedSteps()->get($identifier);
         if (!$chatStep) return '';
 
         $locale = app()->getLocale();
         $q = is_array($chatStep->question) ? $chatStep->question : [];
         return $q[$locale] ?? $q['fr'] ?? '';
+    }
+
+    /**
+     * Construit dynamiquement le tableau stepOrder depuis la DB.
+     * Les steps y sont ordonnés par sort_order.
+     *
+     * @param array $specialFields  ['identifier' => 'field'] ou ['identifier' => ['f1','f2']]
+     *                              pour les steps multi-champs comme identity.
+     */
+    public function buildStepOrderFromDb(array $specialFields = []): array
+    {
+        $order = [];
+        foreach ($this->getCachedSteps() as $identifier => $step) {
+            $order[$identifier] = $specialFields[$identifier] ?? $identifier;
+        }
+        return $order;
+    }
+
+    /**
+     * Retourne la config complète d'un step (input_type, options, etc.).
+     */
+    public function getStepConfig(string $identifier): ?object
+    {
+        return $this->getCachedSteps()->get($identifier);
+    }
+
+    /**
+     * Soumet la valeur saisie dans l'input générique pour un step DB.
+     */
+    public function submitGenericStep(string $identifier): void
+    {
+        $value = trim($this->genericInput);
+        if ($value === '') return;
+        $this->genericInput = '';
+        $this->persist($identifier, $value);
+    }
+
+    /**
+     * Enregistre l'option sélectionnée pour un step DB de type select.
+     */
+    public function selectGenericOption(string $identifier, string $value): void
+    {
+        $this->persist($identifier, $value);
     }
 
     // ──────────────────────────────────────────────

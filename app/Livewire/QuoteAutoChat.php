@@ -51,27 +51,9 @@ class QuoteAutoChat extends Component
 
     protected function stepOrder(): array
     {
-        return [
-            'identity'          => ['first_name', 'last_name'],
-            'age'               => 'age',
-            'email'             => 'email',
-            'phone'             => 'phone',
-            'best_contact_time' => 'best_contact_time',
-            'year'              => 'year',
-            'brand'             => 'brand',
-            'model'             => 'model',
-            'renewal_date'      => 'renewal_date',
-            'usage'             => 'usage',
-            'km_annuel'         => 'km_annuel',
-            'address'           => 'address',
-            'existing_products' => 'existing_products',
-            'profession'        => 'profession',
-            'license_number'    => 'license_number',
-            'consent_profile'   => 'consent_profile',
-            'consent_marketing' => 'consent_marketing',
-            'marketing_email'   => 'marketing_email',
-            'consent_credit'    => 'consent_credit',
-        ];
+        return $this->buildStepOrderFromDb([
+            'identity' => ['first_name', 'last_name'],
+        ]);
     }
 
     protected function shouldSkipStep(string $step): bool
