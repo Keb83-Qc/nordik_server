@@ -377,6 +377,42 @@
                 </div>
             </div>
 
+            {{-- Champs additionnels habitation (nouveaux steps Filament) --}}
+            @php
+            $__knownHab = ['occupancy','property_type','hab_renewal_date','address','living_there',
+                           'years_at_address','units_in_building','contents_amount','electric_baseboard',
+                           'supp_heating','years_insured','years_with_insurer','current_insurer',
+                           'first_name','last_name','gender','age','email','phone','phone_is_cell',
+                           'best_contact_time','marital_status','employment_status','education_level',
+                           'industry','has_ia_products','consent_profile','consent_marketing',
+                           'marketing_email','consent_credit'];
+            $__extraHab = $chatSteps->filter(
+                fn($s) => !in_array($s->identifier, $__knownHab)
+                       && isset($d[$s->identifier])
+                       && $d[$s->identifier] !== ''
+            );
+            @endphp
+            @if($__extraHab->isNotEmpty())
+            <div class="section">
+                <div class="section-title">📋 Champs additionnels</div>
+                <div class="section-body">
+                    <div class="grid">
+                        @foreach($__extraHab as $__step)
+                        @php
+                        $__q = is_array($__step->question)
+                            ? ($__step->question['fr'] ?? $__step->identifier)
+                            : ($__step->question ?? $__step->identifier);
+                        @endphp
+                        <div class="info-row">
+                            <span class="label">{{ $__q }} : </span>
+                            <span class="value">{{ $d[$__step->identifier] }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
+
             {{-- =========================================================
             AUTO (flat)
         ========================================================== --}}
@@ -428,6 +464,39 @@
                     <div class="info-row"><span class="label">Vérification crédit : </span><span class="value">{{ $yesNoLabel($d['consent_credit'] ?? null) }}</span></div>
                 </div>
             </div>
+
+            {{-- Champs additionnels auto (nouveaux steps Filament) --}}
+            @php
+            $__knownAuto = ['year','usage','brand','brand_id','model','model_id','renewal_date',
+                            'km_annuel','address','profession','existing_products','license_number',
+                            'first_name','last_name','age','email','phone','best_contact_time',
+                            'consent_profile','consent_marketing','marketing_email','consent_credit'];
+            $__extraAuto = $chatSteps->filter(
+                fn($s) => !in_array($s->identifier, $__knownAuto)
+                       && isset($d[$s->identifier])
+                       && $d[$s->identifier] !== ''
+            );
+            @endphp
+            @if($__extraAuto->isNotEmpty())
+            <div class="section">
+                <div class="section-title">📋 Champs additionnels</div>
+                <div class="section-body">
+                    <div class="grid">
+                        @foreach($__extraAuto as $__step)
+                        @php
+                        $__q = is_array($__step->question)
+                            ? ($__step->question['fr'] ?? $__step->identifier)
+                            : ($__step->question ?? $__step->identifier);
+                        @endphp
+                        <div class="info-row">
+                            <span class="label">{{ $__q }} : </span>
+                            <span class="value">{{ $d[$__step->identifier] }}</span>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            @endif
 
             {{-- =========================================================
             BUNDLE (bucket common/auto/habitation)
