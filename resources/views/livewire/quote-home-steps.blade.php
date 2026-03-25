@@ -28,7 +28,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-id">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_identity') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('identity') }}</div>
     </div>
 </div>
 
@@ -47,7 +47,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-age">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_age') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('age') }}</div>
     </div>
 </div>
 
@@ -66,7 +66,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-email">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_email') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('email') }}</div>
     </div>
 </div>
 @if(isset($data['email']))
@@ -84,7 +84,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-phone">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_phone') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('phone') }}</div>
     </div>
 </div>
 @if(isset($data['phone']))
@@ -102,7 +102,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-cell">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_phone_is_cell') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('phone_is_cell') }}</div>
     </div>
 </div>
 @if(isset($data['phone_is_cell']))
@@ -120,7 +120,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-contact-time">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_best_contact_time') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('best_contact_time') }}</div>
     </div>
 </div>
 @if(isset($data['best_contact_time']))
@@ -143,7 +143,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-occ">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_occupancy') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('occupancy') }}</div>
     </div>
 </div>
 @if(isset($data['occupancy']))
@@ -161,7 +161,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-ptype">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_property_type') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('property_type') }}</div>
     </div>
 </div>
 @if(isset($data['property_type']))
@@ -179,7 +179,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-addr">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_address') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('address') }}</div>
     </div>
 </div>
 @if(isset($data['address']))
@@ -197,7 +197,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-hab-renewal">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_hab_renewal_date') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('hab_renewal_date') }}</div>
     </div>
 </div>
 @if(isset($data['hab_renewal_date']))
@@ -215,7 +215,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-live">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_living_there') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('living_there') }}</div>
     </div>
 </div>
 @if(isset($data['living_there']))
@@ -234,7 +234,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-move">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_move_in_date') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('years_at_address') }}</div>
     </div>
 </div>
 @if(isset($data['years_at_address']))
@@ -253,7 +253,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-units">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_units') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('units_in_building') }}</div>
     </div>
 </div>
 @if(isset($data['units_in_building']))
@@ -271,7 +271,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-cont">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_contents_amount') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('contents_amount') }}</div>
     </div>
 </div>
 @if(isset($data['contents_amount']))
@@ -289,7 +289,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-heat1">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_electric_baseboard') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('electric_baseboard') }}</div>
     </div>
 </div>
 @if(isset($data['electric_baseboard']))
@@ -307,7 +307,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-heat2">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_supp_heating') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('supp_heating') }}</div>
     </div>
 </div>
 @if(isset($data['supp_heating']))
@@ -325,7 +325,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-yrsins">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_years_insured') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('years_insured') }}</div>
     </div>
 </div>
 @if(isset($data['years_insured']))
@@ -343,7 +343,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-yrswith">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_years_with_insurer') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('years_with_insurer') }}</div>
     </div>
 </div>
 @if(isset($data['years_with_insurer']))
@@ -361,7 +361,7 @@ default => '',
 <div class="messages__item" wire:key="h-msg-ins">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.q_current_insurer') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('current_insurer') }}</div>
     </div>
 </div>
 @if(isset($data['current_insurer']))
@@ -376,26 +376,16 @@ default => '',
 
 {{-- STATUTS / CONSENTEMENTS --}}
 @php
-$pairs = [
-['marital_status','q_marital_status'],
-['employment_status','q_employment_status'],
-['education_level','q_education_level'],
-['industry','q_industry'],
-['has_ia_products','q_has_ia_products'],
-['consent_profile','q_consent_profile'],
-['consent_marketing','q_consent_marketing'],
-['marketing_email','q_marketing_email'],
-['consent_credit','q_consent_credit'],
-];
+$profileFields = ['marital_status', 'employment_status', 'education_level', 'industry', 'has_ia_products', 'consent_profile', 'consent_marketing', 'marketing_email', 'consent_credit'];
 $profileVisible = isset($data['current_insurer']);
 @endphp
 
-@foreach($pairs as [$field,$qKey])
+@foreach($profileFields as $field)
 @if($profileVisible && (isset($data[$field]) || $step === $field))
 <div class="messages__item" wire:key="h-msg-{{ $field }}">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('homechat.'.$qKey) }}</div>
+        <div class="agent-msg">{{ $this->getQuestion($field) }}</div>
     </div>
 </div>
 
@@ -415,4 +405,3 @@ $profileVisible = isset($data['current_insurer']);
 @endif
 @endif
 @endforeach
-

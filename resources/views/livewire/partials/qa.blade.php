@@ -6,7 +6,7 @@
             <img src="{{ $agentImage }}" onerror="this.src='{{ asset('assets/img/agent-default.jpg') }}'">
         </div>
         <div class="agent-msg">
-            {{ __($questionKey) }}
+            {{ $questionText ?? __($questionKey ?? '') }}
         </div>
     </div>
 </div>

@@ -128,7 +128,7 @@ $identityAnswer = $hasIdentity
 @if($show('common_identity', !empty($common)))
 @include('livewire.partials.qa', [
 'baseKey' => 'common_identity',
-'questionKey' => 'bundlechat.q_identity',
+'questionText' => $this->getQuestion('common_identity'),
 'answerText' => $identityAnswer,
 'goTo' => 'common_identity',
 'agentImage' => $agentImage,
@@ -139,7 +139,7 @@ $identityAnswer = $hasIdentity
 @php $answer = isset($common['age']) ? ($common['age'].' '.$t('bundlechat.years_old','ans')) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'common_age',
-'questionKey' => 'bundlechat.q_age',
+'questionText' => $this->getQuestion('common_age'),
 'answerText' => $answer,
 'goTo' => 'common_age',
 'agentImage' => $agentImage,
@@ -150,7 +150,7 @@ $identityAnswer = $hasIdentity
 @php $answer = isset($common['email']) ? (string)$common['email'] : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'common_email',
-'questionKey' => 'bundlechat.q_email',
+'questionText' => $this->getQuestion('common_email'),
 'answerText' => $answer,
 'goTo' => 'common_email',
 'agentImage' => $agentImage,
@@ -161,7 +161,7 @@ $identityAnswer = $hasIdentity
 @php $answer = isset($common['phone']) ? (string)$common['phone'] : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'common_phone',
-'questionKey' => 'bundlechat.q_phone',
+'questionText' => $this->getQuestion('common_phone'),
 'answerText' => $answer,
 'goTo' => 'common_phone',
 'agentImage' => $agentImage,
@@ -179,7 +179,7 @@ if (isset($common['best_contact_time'])) {
 @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'common_best_contact_time',
-'questionKey' => 'bundlechat.q_best_contact_time',
+'questionText' => $this->getQuestion('common_best_contact_time'),
 'answerText' => $answer,
 'goTo' => 'common_best_contact_time',
 'agentImage' => $agentImage,
@@ -192,20 +192,20 @@ if (isset($common['best_contact_time'])) {
 
 @php
 $profileBeforeAuto = [
-['marital_status', 'hab_marital_status', 'bundlechat.q_marital_status', fn($v) => __($k="bundlechat.marital_{$v}") === $k ? (string)$v : __($k)],
-['employment_status', 'hab_employment_status', 'bundlechat.q_employment_status', fn($v) => __($k="bundlechat.employment_{$v}") === $k ? (string)$v : __($k)],
-['education_level', 'hab_education_level', 'bundlechat.q_education_level', fn($v) => __($k="bundlechat.education_{$v}") === $k ? (string)$v : __($k)],
-['industry', 'hab_industry', 'bundlechat.q_industry', fn($v) => (string)$v],
-['has_ia_products', 'hab_has_ia_products', 'bundlechat.q_has_ia_products', fn($v) => $labelYesNo($v)],
+['marital_status', 'hab_marital_status', $this->getQuestion('hab_marital_status'), fn($v) => __($k="bundlechat.marital_{$v}") === $k ? (string)$v : __($k)],
+['employment_status', 'hab_employment_status', $this->getQuestion('hab_employment_status'), fn($v) => __($k="bundlechat.employment_{$v}") === $k ? (string)$v : __($k)],
+['education_level', 'hab_education_level', $this->getQuestion('hab_education_level'), fn($v) => __($k="bundlechat.education_{$v}") === $k ? (string)$v : __($k)],
+['industry', 'hab_industry', $this->getQuestion('hab_industry'), fn($v) => (string)$v],
+['has_ia_products', 'hab_has_ia_products', $this->getQuestion('hab_ia_products'), fn($v) => $labelYesNo($v)],
 ];
 @endphp
 
-@foreach($profileBeforeAuto as [$field, $stepName, $qKey, $fmt])
+@foreach($profileBeforeAuto as [$field, $stepName, $questionText, $fmt])
 @if($show($stepName, isset($hab[$field])))
 @php $answer = isset($hab[$field]) ? (string)$fmt($hab[$field]) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => $stepName,
-'questionKey' => $qKey,
+'questionText' => $questionText,
 'answerText' => $answer,
 'goTo' => $stepName,
 'agentImage' => $agentImage,
@@ -234,23 +234,23 @@ $isAutoSection = str_starts_with($step, 'auto_') || !empty($auto);
 
 @php
 $autoFields = [
-['year', 'auto_year', 'bundlechat.q_year', fn($v) => (string)$v],
-['brand', 'auto_brand', 'bundlechat.q_brand', fn($v) => (string)$v],
-['model', 'auto_model', 'bundlechat.q_model', fn($v) => (string)$v],
-['renewal_date', 'auto_renewal_date', 'bundlechat.q_renewal', fn($v) => (string)$v],
-['usage', 'auto_usage', 'bundlechat.q_usage', fn($v) => $labelUsage($v)],
-['km_annuel', 'auto_km_annuel', 'bundlechat.q_km', fn($v) => (string)$v],
-['existing_products', 'auto_existing_products', 'bundlechat.q_existing_products', fn($v) => $labelExistingProducts($v)],
-['license_number', 'auto_license_number', 'bundlechat.q_license', fn($v) => ($v === 'not_provided' ? $t('bundlechat.not_provided','Non fourni') : (string)$v)],
+['year', 'auto_year', $this->getQuestion('auto_year'), fn($v) => (string)$v],
+['brand', 'auto_brand', $this->getQuestion('auto_brand'), fn($v) => (string)$v],
+['model', 'auto_model', $this->getQuestion('auto_model'), fn($v) => (string)$v],
+['renewal_date', 'auto_renewal_date', $this->getQuestion('auto_renewal'), fn($v) => (string)$v],
+['usage', 'auto_usage', $this->getQuestion('auto_usage'), fn($v) => $labelUsage($v)],
+['km_annuel', 'auto_km_annuel', $this->getQuestion('auto_km'), fn($v) => (string)$v],
+['existing_products', 'auto_existing_products', $this->getQuestion('auto_existing_products'), fn($v) => $labelExistingProducts($v)],
+['license_number', 'auto_license_number', $this->getQuestion('auto_license'), fn($v) => ($v === 'not_provided' ? $t('bundlechat.not_provided','Non fourni') : (string)$v)],
 ];
 @endphp
 
-@foreach($autoFields as [$field, $stepName, $qKey, $fmt])
+@foreach($autoFields as [$field, $stepName, $questionText, $fmt])
 @if($show($stepName, isset($auto[$field])))
 @php $answer = isset($auto[$field]) ? (string)$fmt($auto[$field]) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => $stepName,
-'questionKey' => $qKey,
+'questionText' => $questionText,
 'answerText' => $answer,
 'goTo' => $stepName,
 'agentImage' => $agentImage,
@@ -319,20 +319,20 @@ str_starts_with($step, 'hab_')
 {{-- Hab fields (hors conditionnels) --}}
 @php
 $habFieldsTop = [
-['occupancy', 'hab_occupancy', 'bundlechat.q_occupancy', fn($v) => $labelOccupancy($v)],
-['property_type', 'hab_property_type', 'bundlechat.q_property_type', fn($v) => $labelPropertyType($v)],
-['renewal_date', 'hab_renewal_date', 'bundlechat.q_hab_renewal_date', fn($v) => (string)$v],
-['address', 'hab_address', 'bundlechat.q_address_home', fn($v) => (string)$v],
-['living_there', 'hab_living_there', 'bundlechat.q_living_there', fn($v) => $labelYesNo($v)],
+['occupancy', 'hab_occupancy', $this->getQuestion('hab_occupancy'), fn($v) => $labelOccupancy($v)],
+['property_type', 'hab_property_type', $this->getQuestion('hab_property_type'), fn($v) => $labelPropertyType($v)],
+['renewal_date', 'hab_renewal_date', $this->getQuestion('hab_renewal_date'), fn($v) => (string)$v],
+['address', 'hab_address', $this->getQuestion('hab_address'), fn($v) => (string)$v],
+['living_there', 'hab_living_there', $this->getQuestion('hab_living_there'), fn($v) => $labelYesNo($v)],
 ];
 @endphp
 
-@foreach($habFieldsTop as [$field, $stepName, $qKey, $fmt])
+@foreach($habFieldsTop as [$field, $stepName, $questionText, $fmt])
 @if($show($stepName, isset($hab[$field])))
 @php $answer = isset($hab[$field]) ? (string)$fmt($hab[$field]) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => $stepName,
-'questionKey' => $qKey,
+'questionText' => $questionText,
 'answerText' => $answer,
 'goTo' => $stepName,
 'agentImage' => $agentImage,
@@ -345,7 +345,7 @@ $habFieldsTop = [
 @php $answer = isset($hab['move_in_date']) ? (string)$hab['move_in_date'] : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'hab_move_in_date',
-'questionKey' => 'bundlechat.q_move_in_date',
+'questionText' => $this->getQuestion('hab_years_at_address'),
 'answerText' => $answer,
 'goTo' => 'hab_move_in_date',
 'agentImage' => $agentImage,
@@ -357,7 +357,7 @@ $habFieldsTop = [
 @php $answer = isset($hab['units_in_building']) ? (string)$hab['units_in_building'] : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => 'hab_units_in_building',
-'questionKey' => 'bundlechat.q_units',
+'questionText' => $this->getQuestion('hab_units_in_building'),
 'answerText' => $answer,
 'goTo' => 'hab_units_in_building',
 'agentImage' => $agentImage,
@@ -366,21 +366,21 @@ $habFieldsTop = [
 
 @php
 $habFieldsBottom = [
-['contents_amount', 'hab_contents_amount', 'bundlechat.q_contents_amount', fn($v) => $fmtMoney($v)],
-['electric_baseboard', 'hab_electric_baseboard', 'bundlechat.q_electric_baseboard', fn($v) => $labelYesNo($v)],
-['supp_heating', 'hab_supp_heating', 'bundlechat.q_supp_heating', fn($v) => $labelYesNo($v)],
-['years_insured', 'hab_years_insured', 'bundlechat.q_years_insured', fn($v) => $labelYearsInsured($v)],
-['years_with_insurer', 'hab_years_with_insurer', 'bundlechat.q_years_with_insurer', fn($v) => (string)$v],
-['current_insurer', 'hab_current_insurer', 'bundlechat.q_current_insurer', fn($v) => (string)$v],
+['contents_amount', 'hab_contents_amount', $this->getQuestion('hab_contents_amount'), fn($v) => $fmtMoney($v)],
+['electric_baseboard', 'hab_electric_baseboard', $this->getQuestion('hab_electric_baseboard'), fn($v) => $labelYesNo($v)],
+['supp_heating', 'hab_supp_heating', $this->getQuestion('hab_supp_heating'), fn($v) => $labelYesNo($v)],
+['years_insured', 'hab_years_insured', $this->getQuestion('hab_years_insured'), fn($v) => $labelYearsInsured($v)],
+['years_with_insurer', 'hab_years_with_insurer', $this->getQuestion('hab_years_with_insurer'), fn($v) => (string)$v],
+['current_insurer', 'hab_current_insurer', $this->getQuestion('hab_current_insurer'), fn($v) => (string)$v],
 ];
 @endphp
 
-@foreach($habFieldsBottom as [$field, $stepName, $qKey, $fmt])
+@foreach($habFieldsBottom as [$field, $stepName, $questionText, $fmt])
 @if($show($stepName, isset($hab[$field])))
 @php $answer = isset($hab[$field]) ? (string)$fmt($hab[$field]) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => $stepName,
-'questionKey' => $qKey,
+'questionText' => $questionText,
 'answerText' => $answer,
 'goTo' => $stepName,
 'agentImage' => $agentImage,
@@ -391,24 +391,24 @@ $habFieldsBottom = [
 {{-- CONSENTEMENTS --}}
 @php
 $habConsents = [
-['consent_profile', 'hab_consent_profile', 'bundlechat.q_consent_profile'],
-['consent_marketing', 'hab_consent_marketing', 'bundlechat.q_consent_marketing'],
+['consent_profile', 'hab_consent_profile', $this->getQuestion('common_consent_profile')],
+['consent_marketing', 'hab_consent_marketing', $this->getQuestion('common_consent_marketing')],
 ];
 
 // marketing_email seulement si consent_marketing = accept
 if (($hab['consent_marketing'] ?? null) === 'accept') {
-$habConsents[] = ['marketing_email', 'hab_marketing_email', 'bundlechat.q_marketing_email'];
+$habConsents[] = ['marketing_email', 'hab_marketing_email', $this->getQuestion('common_marketing_email')];
 }
 
-$habConsents[] = ['consent_credit', 'hab_consent_credit', 'bundlechat.q_consent_credit'];
+$habConsents[] = ['consent_credit', 'hab_consent_credit', $this->getQuestion('hab_consent_credit')];
 @endphp
 
-@foreach($habConsents as [$field, $stepName, $qKey])
+@foreach($habConsents as [$field, $stepName, $questionText])
 @if($show($stepName, isset($hab[$field])))
 @php $answer = isset($hab[$field]) ? (string)$labelConsent($hab[$field]) : null; @endphp
 @include('livewire.partials.qa', [
 'baseKey' => $stepName,
-'questionKey' => $qKey,
+'questionText' => $questionText,
 'answerText' => $answer,
 'goTo' => $stepName,
 'agentImage' => $agentImage,

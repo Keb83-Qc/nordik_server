@@ -3,9 +3,11 @@
 namespace App\Livewire\Concerns;
 
 use App\Mail\NewSubmissionAdmin;
+use App\Models\ChatStep;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\LeadDispatcher;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -179,6 +181,27 @@ trait HasChatSteps
     protected function shouldSkipStep(string $step): bool
     {
         return false;
+    }
+
+    /**
+     * Retourne le texte de la question depuis la DB, dans la locale active.
+     * Fallback : locale fr, puis chaîne vide.
+     */
+    public function getQuestion(string $identifier): string
+    {
+        $steps = Cache::remember("chat_steps_{$this->chatType()}", 3600, function () {
+            return ChatStep::where('chat_type', $this->chatType())
+                ->where('is_active', true)
+                ->get()
+                ->keyBy('identifier');
+        });
+
+        $chatStep = $steps->get($identifier);
+        if (!$chatStep) return '';
+
+        $locale = app()->getLocale();
+        $q = is_array($chatStep->question) ? $chatStep->question : [];
+        return $q[$locale] ?? $q['fr'] ?? '';
     }
 
     // ──────────────────────────────────────────────
