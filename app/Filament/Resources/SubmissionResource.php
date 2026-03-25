@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SubmissionResource\Pages;
+use App\Models\ChatStep;
 use App\Models\Submission;
 use App\Models\User;
 use Filament\Forms;
@@ -66,6 +67,42 @@ class SubmissionResource extends Resource
         }
 
         return null;
+    }
+
+    /** Identifiants déjà affichés dans les sections hardcodées */
+    private const KNOWN_FIELDS = [
+        'first_name','last_name','email','phone','age','profession','existing_products',
+        'best_contact_time','gender','phone_is_cell','marital_status','employment_status',
+        'education_level','industry','has_ia_products',
+        'vehicle_year','year','vehicle_brand_name','brand','brand_id',
+        'vehicle_model_name','model','model_id','usage','km_annuel','renewal_date',
+        'address','license_number',
+        'occupancy','property_type','hab_renewal_date','living_there','years_at_address',
+        'units_in_building','contents_amount','electric_baseboard','supp_heating',
+        'years_insured','years_with_insurer','current_insurer',
+        'consent_profile','consent_marketing','marketing_email','consent_credit',
+    ];
+
+    /**
+     * Retourne les steps DB actifs non hardcodés qui ont une réponse dans la soumission.
+     */
+    private static function extraSteps(Submission $record): \Illuminate\Support\Collection
+    {
+        if (!in_array($record->type, ['auto', 'habitation'], true)) {
+            return collect();
+        }
+
+        $data = $record->data ?? [];
+
+        return ChatStep::where('chat_type', $record->type)
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->filter(fn($step) =>
+                !in_array($step->identifier, self::KNOWN_FIELDS, true)
+                && isset($data[$step->identifier])
+                && $data[$step->identifier] !== ''
+            );
     }
 
     private static function typeLabel(?string $type): string
@@ -479,6 +516,40 @@ class SubmissionResource extends Resource
                         }),
                 ])
                 ->columns(2),
+
+            // ── Champs additionnels (steps Filament non hardcodés) ───────────────
+            Forms\Components\Section::make('Champs additionnels')
+                ->compact()
+                ->visible(fn(?Submission $record): bool =>
+                    $record !== null && self::extraSteps($record)->isNotEmpty()
+                )
+                ->schema([
+                    Forms\Components\Placeholder::make('extra_fields_html')
+                        ->label('')
+                        ->columnSpanFull()
+                        ->content(function (?Submission $record): HtmlString {
+                            if (!$record) return new HtmlString('');
+
+                            $data  = $record->data ?? [];
+                            $steps = self::extraSteps($record);
+
+                            $html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;">';
+                            foreach ($steps as $step) {
+                                $label = is_array($step->question)
+                                    ? ($step->question['fr'] ?? $step->identifier)
+                                    : ($step->question ?? $step->identifier);
+                                $value = e($data[$step->identifier] ?? '-');
+                                $html .= '<div style="padding:6px 0;border-bottom:1px solid #f0f0f0;">'
+                                    . '<span style="font-weight:600;color:#374151;">' . e($label) . ' :</span> '
+                                    . '<span style="color:#111827;">' . $value . '</span>'
+                                    . '</div>';
+                            }
+                            $html .= '</div>';
+
+                            return new HtmlString($html);
+                        }),
+                ])
+                ->columns(1),
 
             // ── Suivi ────────────────────────────────────────────────────────────
             Forms\Components\Section::make('Suivi')
