@@ -185,6 +185,14 @@ trait HasChatSteps
     }
 
     /**
+     * Version publique de shouldSkipStep — appelable depuis les vues Blade.
+     */
+    public function isStepSkipped(string $step): bool
+    {
+        return $this->shouldSkipStep($step);
+    }
+
+    /**
      * Retourne tous les steps actifs du chatType courant, ordonnés par sort_order,
      * mis en cache. Utilisé par getQuestion, buildStepOrderFromDb et getStepConfig.
      */
