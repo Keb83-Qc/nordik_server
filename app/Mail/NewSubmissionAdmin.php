@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\ChatStep;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -9,18 +10,30 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Collection;
 
 class NewSubmissionAdmin extends Mailable
 {
     use Queueable, SerializesModels;
 
     public Submission $submission;
-    public ?User $advisor; // Le point d'interrogation signifie que ça peut être null
+    public ?User $advisor;
+    public Collection $chatSteps;
 
     public function __construct(Submission $submission)
     {
         $this->submission = $submission;
-        $this->advisor = User::where('advisor_code', $submission->advisor_code)->first();
+        $this->advisor    = User::where('advisor_code', $submission->advisor_code)->first();
+
+        // Charge les steps actifs pour ce type (auto / habitation)
+        // Les champs non hardcodés dans l'email seront affichés dynamiquement.
+        $type = $submission->type ?? '';
+        $this->chatSteps = in_array($type, ['auto', 'habitation'])
+            ? ChatStep::where('chat_type', $type)
+                ->where('is_active', true)
+                ->orderBy('sort_order')
+                ->get()
+            : collect();
     }
 
     public function envelope(): Envelope
