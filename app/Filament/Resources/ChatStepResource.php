@@ -64,13 +64,40 @@ class ChatStepResource extends Resource
                         ->columnSpan(1),
                 ]),
 
-            Forms\Components\Section::make('Question')
+            Forms\Components\Section::make('Question (toutes langues)')
                 ->schema([
-                    Forms\Components\Textarea::make('question')
-                        ->label('Texte de la question')
-                        ->required()
-                        ->rows(2)
-                        ->maxLength(500),
+                    Forms\Components\Tabs::make('Traductions')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
+                                ->schema([
+                                    Forms\Components\Textarea::make('question.fr')
+                                        ->label('Question en français')
+                                        ->required()
+                                        ->rows(2)
+                                        ->maxLength(500),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
+                                ->schema([
+                                    Forms\Components\Textarea::make('question.en')
+                                        ->label('Question in English')
+                                        ->rows(2)
+                                        ->maxLength(500),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
+                                ->schema([
+                                    Forms\Components\Textarea::make('question.es')
+                                        ->label('Pregunta en español')
+                                        ->rows(2)
+                                        ->maxLength(500),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
+                                ->schema([
+                                    Forms\Components\Textarea::make('question.ht')
+                                        ->label('Kesyon an kreyòl')
+                                        ->rows(2)
+                                        ->maxLength(500),
+                                ]),
+                        ]),
 
                     Forms\Components\Select::make('input_type')
                         ->label("Type de réponse")
@@ -145,9 +172,9 @@ class ChatStepResource extends Resource
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('question')
-                    ->label('Question')
+                    ->label('Question (FR)')
+                    ->formatStateUsing(fn ($state) => is_array($state) ? ($state['fr'] ?? '') : $state)
                     ->limit(60)
-                    ->searchable()
                     ->wrap(),
 
                 Tables\Columns\TextColumn::make('input_type')
