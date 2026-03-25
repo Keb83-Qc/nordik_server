@@ -12,6 +12,20 @@ class EditAbfCase extends BaseEditRecord
 {
     protected static string $resource = AbfCaseResource::class;
 
+    public function getTitle(): string|\Illuminate\Contracts\Support\Htmlable
+    {
+        if (! $this->record) {
+            return 'Analyse de Besoin Financier';
+        }
+        $first = (string) data_get($this->record->payload, 'client.first_name', '');
+        $last  = (string) data_get($this->record->payload, 'client.last_name', '');
+        $name  = trim("$first $last");
+
+        return $name
+            ? "Analyse de Besoin Financier — $name"
+            : 'Analyse de Besoin Financier';
+    }
+
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $client = (array) data_get($data, 'payload.client', []);
