@@ -366,6 +366,29 @@
     $liabTotal = array_sum($liabSums);
     $netTotal = $assetTotal - $liabTotal;
 
+    // ── Profil investisseur ──────────────────────────────────────────────
+    $ip = (array) data_get($payload, 'investor_profile', []);
+    $ipQuestions = [
+        'q1' => ['section' => 'Horizon d\'investissement', 'label' => '1. Quel âge avez-vous?', 'options' => [1=>'Plus de 71 ans',2=>'Entre 65 et 70 ans',5=>'Entre 55 et 64 ans',10=>'Entre 41 et 54 ans',20=>'Entre 18 et 40 ans']],
+        'q2' => ['section' => 'Horizon d\'investissement', 'label' => '2. Sorties de fonds (≥25 % de l\'épargne)?', 'options' => [1=>'Dans moins de 1 an',2=>'Entre 1 et 3 ans',5=>'Entre 4 et 5 ans',10=>'Entre 6 et 9 ans',20=>'Dans plus de 10 ans']],
+        'q3' => ['section' => 'Horizon d\'investissement', 'label' => '3. Retraits prévus (5 prochaines années)?', 'options' => [1=>'Retraits réguliers du capital',2=>'Totalité du rendement + partie du capital',5=>'Tout le rendement sans toucher au capital',10=>'Partie du rendement seulement',20=>'Accumulation (aucun retrait)']],
+        'q4' => ['section' => 'Situation financière', 'label' => '4. Revenu annuel brut (avant impôts)?', 'options' => [1=>'25 000 $ et moins',2=>'25 001 $ à 35 000 $',5=>'35 001 $ à 50 000 $',10=>'50 001 $ à 100 000 $',20=>'100 001 $ et plus']],
+        'q5' => ['section' => 'Situation financière', 'label' => '5. Valeur nette (actif moins passif)?', 'options' => [1=>'25 000 $ et moins',2=>'25 001 $ à 50 000 $',5=>'50 001 $ à 100 000 $',10=>'100 001 $ à 200 000 $',20=>'200 001 $ et plus']],
+        'q6' => ['section' => 'Tolérance au risque', 'label' => '6. Niveau de tolérance au risque?', 'options' => [1=>'Très faible',2=>'Faible',5=>'Modéré',10=>'Élevé',20=>'Très élevé']],
+        'q7' => ['section' => 'Tolérance au risque', 'label' => '7. Fourchette acceptée pour un placement de 10 000 $?', 'options' => [1=>'10 000 $ à 10 300 $',2=>'9 500 $ à 11 000 $',5=>'9 000 $ à 11 500 $',10=>'8 500 $ à 12 000 $',20=>'8 000 $ à 12 500 $']],
+        'q8' => ['section' => 'Connaissance des placements', 'label' => '8. Niveau de connaissance des placements?', 'options' => [1=>'Très faible',2=>'Faible',5=>'Modéré',10=>'Avancé',20=>'Très avancé']],
+    ];
+    $ipScore = 0;
+    foreach (array_keys($ipQuestions) as $k) { $ipScore += (int) ($ip[$k] ?? 0); }
+    $ipProfile = match(true) {
+        $ipScore <= 25  => 'Conservateur',
+        $ipScore <= 55  => 'Modérément conservateur',
+        $ipScore <= 90  => 'Équilibré',
+        $ipScore <= 120 => 'Croissance',
+        default         => 'Croissance agressive',
+    };
+    $ipFilled = $ipScore > 0;
+
     $goalsSelected = (array) data_get($payload, 'goals.selected', []);
     $goalsAnswers = (array) data_get($payload, 'goals.answers', []);
     $goalsLabels = [
@@ -454,6 +477,10 @@
         </div>
         <div class="toc-item clearfix">
             <div class="name">Budget au décès</div>
+            <div class="page">—</div>
+        </div>
+        <div class="toc-item clearfix">
+            <div class="name">Profil d'investisseur</div>
             <div class="page">—</div>
         </div>
         <div class="toc-item clearfix">
@@ -992,6 +1019,55 @@
     <p class="small muted" style="margin-top:6mm;">
         * Les résultats ci-dessus sont calculés à partir des hypothèses et des informations fournies. Ils doivent être validés et ajustés selon la situation réelle.
     </p>
+
+    <div class="page-break"></div>
+
+    {{-- ======================
+     PROFIL INVESTISSEUR
+     ====================== --}}
+    <h1>Profil d'investisseur</h1>
+
+    @if($ipFilled)
+    {{-- Score badge --}}
+    <table class="simple" style="margin-bottom:6mm;">
+        <tbody>
+            <tr>
+                <td style="width:50%;"><strong>Score total</strong></td>
+                <td>{{ $ipScore }} / 160</td>
+            </tr>
+            <tr>
+                <td><strong>Profil déterminé</strong></td>
+                <td><strong>{{ $ipProfile }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+    {{-- Questions par section --}}
+    @php
+    $currentSection = null;
+    @endphp
+    @foreach($ipQuestions as $key => $q)
+    @if($q['section'] !== $currentSection)
+    @php $currentSection = $q['section']; @endphp
+    <h2>{{ $currentSection }}</h2>
+    @endif
+    @php
+    $pts = (int) ($ip[$key] ?? 0);
+    $answer = $pts > 0 ? ($q['options'][$pts] ?? '—') : '—';
+    $ptLabel = $pts === 1 ? '1 point' : ($pts > 0 ? "{$pts} points" : '—');
+    @endphp
+    <table class="simple" style="margin-bottom:2mm;">
+        <tbody>
+            <tr>
+                <td style="width:70%;">{{ $q['label'] }}<br><em style="color:#555;">{{ $answer }}</em></td>
+                <td style="text-align:right;font-weight:700;">{{ $ptLabel }}</td>
+            </tr>
+        </tbody>
+    </table>
+    @endforeach
+    @else
+    <p class="muted">Le questionnaire du profil d'investisseur n'a pas encore été complété.</p>
+    @endif
 
     <div class="page-break"></div>
 
