@@ -11,6 +11,7 @@
     "require": {
         "php": "^8.2",
         "awcodes/filament-tiptap-editor": "^3.5",
+        "barryvdh/laravel-dompdf": "^2.0",
         "bezhansalleh/filament-shield": "^3.9",
         "filament/filament": "^3.2",
         "filament/spatie-laravel-settings-plugin": "^3.0",
