@@ -449,6 +449,35 @@ $beforeCredit = isset($data['consent_marketing']) && (
 
 
 {{-- ============================================================
+|  STEPS GÉNÉRIQUES — nouveaux steps ajoutés via Filament
+|  Affiche les questions/réponses pour tout step non hardcodé ci-dessus
+============================================================ --}}
+@php
+$__autoHandled = ['identity','age','email','phone','best_contact_time','year','brand','model',
+                  'renewal_date','usage','km_annuel','address','existing_products','profession',
+                  'license_number','consent_profile','consent_marketing','marketing_email','consent_credit'];
+@endphp
+@foreach($this->buildStepOrderFromDb(['identity' => ['first_name','last_name']]) as $__genId => $__)
+    @if(!in_array($__genId, $__autoHandled) && ($step === $__genId || isset($data[$__genId])))
+    <div class="messages__item" wire:key="msg-gen-{{ $__genId }}">
+        <div class="messages__wrapper">
+            <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+            <div class="agent-msg">{{ $this->getQuestion($__genId) }}</div>
+        </div>
+    </div>
+    @if(isset($data[$__genId]))
+    <div class="messages__item" wire:key="resp-gen-{{ $__genId }}">
+        <div class="user-message" wire:click='goToStep(@json($__genId))'>
+            <span>{{ $data[$__genId] }}</span>
+            <span class="edit-badge"><i class="fas fa-pen"></i></span>
+        </div>
+    </div>
+    @endif
+    @endif
+@endforeach
+
+
+{{-- ============================================================
 |  MESSAGE FINAL
 ============================================================ --}}
 @if($step === 'final')

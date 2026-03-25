@@ -61,36 +61,9 @@ class QuoteHomeChat extends Component
 
     protected function stepOrder(): array
     {
-        return [
-            'identity'           => ['first_name', 'last_name', 'gender'],
-            'age'                => 'age',
-            'email'              => 'email',
-            'phone'              => 'phone',
-            'phone_is_cell'      => 'phone_is_cell',
-            'best_contact_time'  => 'best_contact_time',
-            'occupancy'          => 'occupancy',
-            'property_type'      => 'property_type',
-            'address'            => 'address',
-            'hab_renewal_date'   => 'hab_renewal_date',
-            'living_there'       => 'living_there',
-            'years_at_address'   => 'years_at_address',
-            'units_in_building'  => 'units_in_building',
-            'contents_amount'    => 'contents_amount',
-            'electric_baseboard' => 'electric_baseboard',
-            'supp_heating'       => 'supp_heating',
-            'years_insured'      => 'years_insured',
-            'years_with_insurer' => 'years_with_insurer',
-            'current_insurer'    => 'current_insurer',
-            'marital_status'     => 'marital_status',
-            'employment_status'  => 'employment_status',
-            'education_level'    => 'education_level',
-            'industry'           => 'industry',
-            'has_ia_products'    => 'has_ia_products',
-            'consent_profile'    => 'consent_profile',
-            'consent_marketing'  => 'consent_marketing',
-            'marketing_email'    => 'marketing_email',
-            'consent_credit'     => 'consent_credit',
-        ];
+        return $this->buildStepOrderFromDb([
+            'identity' => ['first_name', 'last_name', 'gender'],
+        ]);
     }
 
     protected function shouldSkipStep(string $step): bool

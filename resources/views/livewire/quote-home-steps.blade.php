@@ -405,3 +405,35 @@ $profileVisible = isset($data['current_insurer']);
 @endif
 @endif
 @endforeach
+
+
+{{-- ============================================================
+|  STEPS GÉNÉRIQUES — nouveaux steps ajoutés via Filament
+|  Affiche les questions/réponses pour tout step non hardcodé ci-dessus
+============================================================ --}}
+@php
+$__habHandled = ['identity','age','email','phone','phone_is_cell','best_contact_time',
+                 'occupancy','property_type','address','hab_renewal_date','living_there',
+                 'years_at_address','units_in_building','contents_amount','electric_baseboard',
+                 'supp_heating','years_insured','years_with_insurer','current_insurer',
+                 'marital_status','employment_status','education_level','industry',
+                 'has_ia_products','consent_profile','consent_marketing','marketing_email','consent_credit'];
+@endphp
+@foreach($this->buildStepOrderFromDb(['identity' => ['first_name','last_name','gender']]) as $__genId => $__)
+    @if(!in_array($__genId, $__habHandled) && ($step === $__genId || isset($data[$__genId])))
+    <div class="messages__item" wire:key="h-msg-gen-{{ $__genId }}">
+        <div class="messages__wrapper">
+            <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
+            <div class="agent-msg">{{ $this->getQuestion($__genId) }}</div>
+        </div>
+    </div>
+    @if(isset($data[$__genId]))
+    <div class="messages__item" wire:key="h-resp-gen-{{ $__genId }}">
+        <div class="user-message" wire:click='goToStep(@json($__genId))'>
+            <span>{{ $data[$__genId] }}</span>
+            <span class="edit-badge"><i class="fas fa-pen"></i></span>
+        </div>
+    </div>
+    @endif
+    @endif
+@endforeach
