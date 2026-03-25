@@ -3,9 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class ChatStep extends Model
 {
+    protected static function booted(): void
+    {
+        $clear = fn (self $step) => Cache::forget("chat_steps_{$step->chat_type}");
+
+        static::saved($clear);
+        static::deleted($clear);
+    }
+
     protected $fillable = [
         'identifier',
         'chat_type',
