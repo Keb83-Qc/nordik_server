@@ -11,7 +11,7 @@ class CreateAbfCase extends BaseCreateRecord
 {
     protected static string $resource = AbfCaseResource::class;
 
-    protected static ?string $title = 'Création - Analyse des Besoins Financiers';
+    protected static ?string $title = 'Nouveau dossier — Analyse de Besoin Financier';
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

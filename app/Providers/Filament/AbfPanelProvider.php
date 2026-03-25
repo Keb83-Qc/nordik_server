@@ -41,8 +41,12 @@ class AbfPanelProvider extends PanelProvider
 
             // ✅ Panel “focus” : pas de sidebar (CSS-only, stable)
 
+            ->darkMode(true)
+
             ->renderHook('panels::head.end', fn() => $this->abfFocusCss() . $this->abfFontsCss())
-            ->renderHook('panels::body.start', fn() => '<div class="abf-panel"></div>')
+            ->renderHook('panels::body.start', fn() =>
+                '<div class="abf-panel"></div>' . view('filament.abf.topbar')->render()
+            )
 
             // ✅ Ne découvre QUE les ressources ABF (dans un dossier dédié)
             ->discoverResources(in: app_path('Filament/Abf/Resources'), for: 'App\\Filament\\Abf\\Resources')
@@ -81,9 +85,58 @@ HTML;
         return <<<'HTML'
 <style>
 /* ==========================================================================
+ABF TOP BAR CUSTOM
+========================================================================== */
+.abf-topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #0E1030;
+    color: #fff;
+    padding: 0 20px;
+    height: 44px;
+    font-size: 13px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.3);
+}
+.dark .abf-topbar {
+    background: #05060f;
+    border-bottom: 1px solid rgba(201,160,80,.2);
+}
+.abf-topbar-left { display: flex; align-items: center; gap: 12px; }
+.abf-topbar-right { display: flex; align-items: center; gap: 14px; }
+.abf-topbar-date {
+    color: #C9A050;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: capitalize;
+    letter-spacing: .01em;
+}
+.abf-topbar-user {
+    display: flex; align-items: center; gap: 5px;
+    color: #d1d5db;
+    font-size: 12px;
+}
+.abf-topbar-theme-btn {
+    background: transparent;
+    border: 1px solid rgba(201,160,80,.45);
+    color: #C9A050;
+    padding: 4px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: background .15s;
+}
+.abf-topbar-theme-btn:hover { background: rgba(201,160,80,.18); }
+
+/* ==========================================================================
 ABF PANEL (focus)
-- Cache sidebar + topbar
+- Cache sidebar + topbar Filament natif
 - Met le contenu en vrai full width
+- Décale vers le bas pour laisser la place à notre top bar
 ========================================================================== */
 .abf-panel ~ .fi-layout .fi-sidebar,
 .abf-panel ~ .fi-layout .fi-topbar {
@@ -109,6 +162,11 @@ ABF PANEL (focus)
 .abf-panel ~ .fi-layout .fi-page-body {
     padding-left: 1rem !important;
     padding-right: 1rem !important;
+}
+
+/* Décale le layout pour notre top bar fixe (44px) */
+.abf-panel ~ .fi-layout {
+    padding-top: 44px !important;
 }
 
 /* ==========================================================================
