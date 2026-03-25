@@ -6,6 +6,7 @@ use App\Filament\Abf\Resources\AbfCaseResource;
 use App\Filament\Pages\BaseEditRecord;
 use Filament\Actions;
 use Filament\Support\Enums\MaxWidth;
+use Illuminate\Contracts\View\View;
 
 class EditAbfCase extends BaseEditRecord
 {
@@ -66,6 +67,29 @@ class EditAbfCase extends BaseEditRecord
     public function getMaxContentWidth(): MaxWidth|string|null
     {
         return MaxWidth::Full;
+    }
+
+    /**
+     * Sauvegarde silencieuse appelée par le JS toutes les 30 s.
+     * Utilise la même logique que mutateFormDataBeforeSave() mais sans redirection ni notification.
+     */
+    public function autoSave(): void
+    {
+        try {
+            $data = $this->mutateFormDataBeforeSave($this->data ?? []);
+            $this->record->update($data);
+            $this->dispatch('abf-auto-saved');
+        } catch (\Throwable) {
+            // Échec silencieux — ne pas interrompre l'utilisateur
+        }
+    }
+
+    public function getFooter(): ?View
+    {
+        return view('filament.abf.partials.auto-save-bar', [
+            'mode'     => 'edit',
+            'recordId' => $this->record?->id,
+        ]);
     }
 
     protected function getCustomHeaderActions(): array
