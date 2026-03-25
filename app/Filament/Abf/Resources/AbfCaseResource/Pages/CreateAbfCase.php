@@ -5,6 +5,7 @@ namespace App\Filament\Abf\Resources\AbfCaseResource\Pages;
 use App\Filament\Abf\Resources\AbfCaseResource;
 use App\Filament\Pages\BaseCreateRecord;
 use Filament\Support\Enums\MaxWidth;
+use Illuminate\Contracts\View\View;
 
 class CreateAbfCase extends BaseCreateRecord
 {
@@ -47,6 +48,22 @@ class CreateAbfCase extends BaseCreateRecord
         $data['payload']['death_budget']['income_sources'] ??= [];
 
         return $data;
+    }
+
+    public function getFooter(): ?View
+    {
+        return view('filament.abf.partials.auto-save-bar', [
+            'mode'     => 'create',
+            'recordId' => null,
+        ]);
+    }
+
+    /**
+     * Nettoie le brouillon localStorage après création réussie du dossier.
+     */
+    protected function afterCreate(): void
+    {
+        $this->dispatch('abf-draft-clear');
     }
 
     public function getExtraBodyAttributes(): array
