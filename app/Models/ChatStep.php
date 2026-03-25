@@ -18,7 +18,8 @@ class ChatStep extends Model
 
     // C'est ce bloc qui corrige l'erreur de conversion
     protected $casts = [
-        'options' => 'json',
+        'question'  => 'array',
+        'options'   => 'array',
         'is_active' => 'boolean',
     ];
 }
