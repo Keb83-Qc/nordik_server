@@ -7,7 +7,7 @@
 <div class="messages__item" wire:key="msg-identity">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_identity') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('identity') }}</div>
     </div>
 </div>
 
@@ -29,7 +29,7 @@
 <div class="messages__item" wire:key="msg-age">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_age') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('age') }}</div>
     </div>
 </div>
 
@@ -51,7 +51,7 @@
 <div class="messages__item" wire:key="msg-email">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_email') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('email') }}</div>
     </div>
 </div>
 
@@ -73,7 +73,7 @@
 <div class="messages__item" wire:key="msg-phone">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_phone') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('phone') }}</div>
     </div>
 </div>
 
@@ -95,7 +95,7 @@
 <div class="messages__item" wire:key="msg-contact-time">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_best_contact_time') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('best_contact_time') }}</div>
     </div>
 </div>
 
@@ -122,7 +122,7 @@
 <div class="messages__item" wire:key="msg-year">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_year') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('year') }}</div>
     </div>
 </div>
 
@@ -144,7 +144,7 @@
 <div class="messages__item" wire:key="msg-brand">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_brand') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('brand') }}</div>
     </div>
 </div>
 
@@ -166,7 +166,7 @@
 <div class="messages__item" wire:key="msg-model">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_model') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('model') }}</div>
     </div>
 </div>
 
@@ -188,7 +188,7 @@
 <div class="messages__item" wire:key="msg-renewal">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_renewal') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('renewal_date') }}</div>
     </div>
 </div>
 
@@ -210,7 +210,7 @@
 <div class="messages__item" wire:key="msg-usage">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_usage') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('usage') }}</div>
     </div>
 </div>
 
@@ -239,7 +239,7 @@
 <div class="messages__item" wire:key="msg-km">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_km') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('km_annuel') }}</div>
     </div>
 </div>
 
@@ -261,7 +261,7 @@
 <div class="messages__item" wire:key="msg-addr">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_address') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('address') }}</div>
     </div>
 </div>
 
@@ -283,7 +283,7 @@
 <div class="messages__item" wire:key="msg-existing-products">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_existing_products') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('existing_products') }}</div>
     </div>
 </div>
 
@@ -310,7 +310,7 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 <div class="messages__item" wire:key="msg-profession">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_profession') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('profession') }}</div>
     </div>
 </div>
 
@@ -332,7 +332,7 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 <div class="messages__item" wire:key="msg-license">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_license') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('license_number') }}</div>
     </div>
 </div>
 
@@ -358,7 +358,7 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 <div class="messages__item" wire:key="msg-cprofile">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_consent_profile') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('consent_profile') }}</div>
     </div>
 </div>
 
@@ -381,7 +381,7 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 <div class="messages__item" wire:key="msg-cmarket">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_consent_marketing') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('consent_marketing') }}</div>
     </div>
 </div>
 
@@ -404,7 +404,7 @@ if ($productsLabel === $productsKey) $productsLabel = $data['existing_products']
 <div class="messages__item" wire:key="msg-memail">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_marketing_email') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('marketing_email') }}</div>
     </div>
 </div>
 
@@ -432,7 +432,7 @@ $beforeCredit = isset($data['consent_marketing']) && (
 <div class="messages__item" wire:key="msg-credit">
     <div class="messages__wrapper">
         <div class="agent-avatar__icon"><img src="{{ $agentImage }}"></div>
-        <div class="agent-msg">{{ __('chat.q_consent_credit') }}</div>
+        <div class="agent-msg">{{ $this->getQuestion('consent_credit') }}</div>
     </div>
 </div>
 
