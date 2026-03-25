@@ -7,6 +7,7 @@ use App\Filament\Abf\Resources\AbfCaseResource\Steps\AssetsLiabilitiesStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\DeathBudgetStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\DossierStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\HouseholdStep;
+use App\Filament\Abf\Resources\AbfCaseResource\Steps\InvestorProfileStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\ObjectivesStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\ProtectionsStep;
 use App\Filament\Abf\Resources\AbfCaseResource\Steps\SummaryStep;
@@ -38,6 +39,7 @@ class AbfCaseResource extends Resource
                 AssetsLiabilitiesStep::make(),
                 ProtectionsStep::make(),
                 DeathBudgetStep::make(),
+                InvestorProfileStep::make(),
                 SummaryStep::make(),
             ])
                 ->extraAttributes(['class' => 'abf-wizard'])
