@@ -273,8 +273,6 @@
 
 <body>
     @php
-    use Illuminate\Support\Carbon;
-
     $payload = (array) ($case->payload ?? []);
     $client = (array) data_get($payload, 'client', []);
     $spouse = (array) data_get($payload, 'spouse', []);
@@ -286,7 +284,7 @@
     $docDateRaw = data_get($payload, 'document_meta.document_date');
     $docDate = null;
     try {
-    $docDate = $docDateRaw ? Carbon::parse($docDateRaw)->locale('fr_CA')->isoFormat('D MMMM YYYY') : null;
+    $docDate = $docDateRaw ? \Carbon\Carbon::parse($docDateRaw)->locale('fr_CA')->isoFormat('D MMMM YYYY') : null;
     } catch(\Throwable) {}
     $docDate ??= now()->locale('fr_CA')->isoFormat('D MMMM YYYY');
 
@@ -298,7 +296,7 @@
 
     $age = function($d){
     if (blank($d)) return null;
-    try { return Carbon::parse($d)->age; } catch(\Throwable) { return null; }
+    try { return \Carbon\Carbon::parse($d)->age; } catch(\Throwable) { return null; }
     };
 
     $maritalLabel = fn($k) => [
