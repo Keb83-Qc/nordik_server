@@ -12,6 +12,11 @@ class ListAbfCases extends ListRecords
 
     protected static ?string $title = 'Liste - Analyse de Besoins Financiers';
 
+    public function mount(): void
+    {
+        $this->redirect(route('abf.landing'));
+    }
+
     protected function getHeaderActions(): array
     {
         return [

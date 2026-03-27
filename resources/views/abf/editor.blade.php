@@ -3,11 +3,18 @@
 <head>
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <script>
-    window.ABF_RECORD_ID   = {{ $record->id }};
-    window.ABF_SAVE_URL    = '{{ route("abf.editor.save", $record) }}';
-    window.ABF_CSRF_TOKEN  = '{{ csrf_token() }}';
-    window.ABF_ADVISOR_NAME = '{{ auth()->user()->full_name ?? auth()->user()->name ?? "" }}';
-    window.ABF_INITIAL_PAYLOAD = {!! json_encode($record->payload ?? []) !!};
+    @if($record)
+    window.ABF_RECORD_ID        = {{ $record->id }};
+    window.ABF_SAVE_URL         = '{{ route("abf.editor.save", $record) }}';
+    window.ABF_INITIAL_PAYLOAD  = {!! json_encode($record->payload ?? []) !!};
+    @else
+    window.ABF_RECORD_ID        = null;
+    window.ABF_SAVE_URL         = null;
+    window.ABF_CREATE_URL       = '{{ route("abf.create.json") }}';
+    window.ABF_INITIAL_PAYLOAD  = null;
+    @endif
+    window.ABF_CSRF_TOKEN       = '{{ csrf_token() }}';
+    window.ABF_ADVISOR_NAME     = '{{ auth()->user()->full_name ?? auth()->user()->name ?? "" }}';
   </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -641,7 +648,27 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
       </div>
       <div class="ia-accordion-body">
-        Aucun parcours récent dans cette démo.
+        @if(isset($recentCases) && $recentCases->count())
+          <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px">
+            @foreach($recentCases as $case)
+              @php
+                $prenom = data_get($case->payload, 'client.prenom', '');
+                $nom    = data_get($case->payload, 'client.nom', '');
+                $label  = trim("$prenom $nom") ?: 'Dossier #'.$case->id;
+              @endphp
+              <li>
+                <a href="{{ route('abf.editor.show', $case) }}"
+                   style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#f4f6fb;color:#1a2340;text-decoration:none;font-size:14px;transition:background .15s"
+                   onmouseover="this.style.background='#e8ecf5'" onmouseout="this.style.background='#f4f6fb'">
+                  <span style="font-weight:600">{{ $label }}</span>
+                  <span style="color:#7a86a3;font-size:12px">{{ $case->updated_at->diffForHumans() }}</span>
+                </a>
+              </li>
+            @endforeach
+          </ul>
+        @else
+          <p style="color:var(--muted);font-size:14px;margin:0">Aucun parcours récent.</p>
+        @endif
       </div>
     </div>
   </div>
@@ -6531,7 +6558,30 @@
   }
 
   /* ── INITIALISATION LARAVEL ──────────────────────────── */
-  // Saute page-accueil seulement si le dossier a déjà des données
+
+  // Mode landing : demarrerABF() crée un dossier via AJAX puis redirige
+  if (!window.ABF_RECORD_ID && window.ABF_CREATE_URL) {
+    window.demarrerABF = async function() {
+      const btn = document.querySelector('.ia-demarrer-btn');
+      if (btn) { btn.textContent = 'Création…'; btn.disabled = true; }
+      try {
+        const res = await fetch(window.ABF_CREATE_URL, {
+          method: 'POST',
+          headers: {
+            'X-CSRF-TOKEN':   window.ABF_CSRF_TOKEN,
+            'Accept':         'application/json',
+            'Content-Type':   'application/json',
+          },
+        });
+        const data = await res.json();
+        if (data.url) window.location.href = data.url;
+      } catch (e) {
+        if (btn) { btn.textContent = 'Démarrer'; btn.disabled = false; }
+      }
+    };
+  }
+
+  // Mode éditeur : saute page-accueil si le dossier a déjà des données
   if (window.ABF_INITIAL_PAYLOAD && window.ABF_INITIAL_PAYLOAD.client?.prenom) {
     demarrerABF();
     populateFromPayload(window.ABF_INITIAL_PAYLOAD);

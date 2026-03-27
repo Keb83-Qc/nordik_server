@@ -28,6 +28,8 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
  * ABF Editor — standalone page (hors Filament)
  */
 Route::middleware(['auth'])->group(function () {
+    Route::get('/abf-landing', [AbfEditorController::class, 'landing'])->name('abf.landing');
+    Route::post('/abf-create-json', [AbfEditorController::class, 'createJson'])->name('abf.create.json');
     Route::get('/abf-new', [AbfEditorController::class, 'create'])->name('abf.new');
     Route::get('/abf-editor/{record}', [AbfEditorController::class, 'show'])->name('abf.editor.show');
     Route::post('/abf-editor/{record}/save', [AbfEditorController::class, 'save'])->name('abf.editor.save');
