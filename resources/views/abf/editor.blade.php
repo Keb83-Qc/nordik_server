@@ -6531,7 +6531,8 @@
   }
 
   /* ── INITIALISATION LARAVEL ──────────────────────────── */
-  if (window.ABF_INITIAL_PAYLOAD) {
+  // Saute page-accueil seulement si le dossier a déjà des données
+  if (window.ABF_INITIAL_PAYLOAD && window.ABF_INITIAL_PAYLOAD.client?.prenom) {
     demarrerABF();
     populateFromPayload(window.ABF_INITIAL_PAYLOAD);
   }
