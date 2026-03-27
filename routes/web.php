@@ -17,11 +17,21 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\AbfPdfController;
+use App\Http\Controllers\AbfEditorController;
 use App\Http\Controllers\ServicePublicController;
 use App\Models\Language;
 use App\Http\Controllers\AccessRequestController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
+
+/**
+ * ABF Editor — standalone page (hors Filament)
+ */
+Route::middleware(['auth'])->group(function () {
+    Route::get('/abf-new', [AbfEditorController::class, 'create'])->name('abf.new');
+    Route::get('/abf-editor/{record}', [AbfEditorController::class, 'show'])->name('abf.editor.show');
+    Route::post('/abf-editor/{record}/save', [AbfEditorController::class, 'save'])->name('abf.editor.save');
+});
 
 /**
  * Récepteur d'erreurs JavaScript — toutes les pages l'utilisent.

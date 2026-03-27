@@ -58,12 +58,9 @@ class CreateAbfCase extends BaseCreateRecord
         ]);
     }
 
-    /**
-     * Nettoie le brouillon localStorage après création réussie du dossier.
-     */
-    protected function afterCreate(): void
+    protected function getRedirectUrl(): string
     {
-        $this->dispatch('abf-draft-clear');
+        return route('abf.editor.show', $this->getRecord());
     }
 
     public function getExtraBodyAttributes(): array

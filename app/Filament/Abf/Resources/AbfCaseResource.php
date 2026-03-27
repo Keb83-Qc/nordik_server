@@ -90,11 +90,10 @@ class AbfCaseResource extends Resource
                     ->sortable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()->label('Ouvrir'),
-                Action::make('open_abf_panel')
-                    ->label('Ouvrir ABF (nouvel onglet)')
-                    ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn($record) => url("/abf/abf-cases/{$record->id}/edit"))
+                Action::make('edit')
+                    ->label('Ouvrir ABF')
+                    ->icon('heroicon-o-pencil-square')
+                    ->url(fn($record) => route('abf.editor.show', $record))
                     ->openUrlInNewTab(),
                 Action::make('pdf')
                     ->label('Télécharger PDF')

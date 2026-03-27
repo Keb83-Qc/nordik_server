@@ -15,7 +15,10 @@ class ListAbfCases extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()->label('Nouveau dossier ABF'),
+            Actions\Action::make('new')
+                ->label('Nouveau dossier ABF')
+                ->icon('heroicon-o-plus')
+                ->url(route('abf.new')),
         ];
     }
 }
