@@ -3528,6 +3528,10 @@
   function goNext() {
     if (current < pages.length - 1) {
       if (!validateCurrentPage()) return;
+      // Sauvegarde automatique avant de changer de page
+      if (window.ABF_SAVE_URL) {
+        autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, true);
+      }
       const navItems = document.querySelectorAll('.nav-item');
       // mark current done, unlock next
       navItems[current]?.classList.add('done');
