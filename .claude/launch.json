@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "abf-demo",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "tmp", "-p", "3333", "--no-clipboard"],
+      "port": 3333
+    },
+    {
       "name": "laravel",
       "runtimeExecutable": "php",
       "runtimeArgs": ["artisan", "serve"],
