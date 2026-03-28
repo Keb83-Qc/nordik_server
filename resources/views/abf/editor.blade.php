@@ -21,6 +21,7 @@
     @endif
     window.ABF_CSRF_TOKEN      = '{{ csrf_token() }}';
     window.ABF_ADVISOR_NAME    = '{{ auth()->user()->full_name ?? auth()->user()->name ?? "" }}';
+    window.ABF_PARAMS_SAVE_URL = '{{ route("abf.params.save") }}';
 
     {{-- Paramètres système chargés depuis la base de données --}}
     window.ABF_PARAMS = {!! json_encode($abfParams ?? []) !!};

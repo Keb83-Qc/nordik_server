@@ -63,7 +63,7 @@
           <div style="position:relative;margin-top:10px">
             <button class="btn btn-primary btn-sm" onclick="toggleDecesDep()">+ Ajouter une dépense</button>
             <div id="deces-dep-dd" style="display:none;position:fixed;z-index:9999;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:4px 0;min-width:200px">
-              <div class="deces-dep-item" onclick="addDecesDep('Frais funéraires',25000)">Frais funéraires</div>
+              <div class="deces-dep-item" onclick="addDecesDep('Frais funéraires', parseFloat(String(window.ABF_PARAMS?.deces?.funerailles??'10000').replace(/\s/g,'').replace(',','.'))||10000)">Frais funéraires</div>
               <div class="deces-dep-item" onclick="addDecesDep('Fonds d\'urgence',0)">Fonds d'urgence</div>
               <div class="deces-dep-item" onclick="addDecesDep('Héritage',0)">Héritage</div>
               <div class="deces-dep-item" onclick="addDecesDep('Impôts',0)">Impôts</div>

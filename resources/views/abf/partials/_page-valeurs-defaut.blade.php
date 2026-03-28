@@ -15,10 +15,11 @@
 
 <div id="page-valeurs-defaut" style="display:none">
   <div class="vd-header">
-    <div style="font-size:20px;font-weight:800;color:#003DA5">Valeurs par défaut</div>
-    <div style="display:flex;gap:8px">
+    <div style="font-size:20px;font-weight:800;color:var(--navy, #1a2340)">Valeurs par défaut</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span id="vd-save-status" style="font-size:12px;color:var(--muted);display:none"></span>
       <button class="btn btn-secondary" onclick="closeValeursDefaut()">Annuler</button>
-      <button class="btn btn-primary" onclick="closeValeursDefaut()">Enregistrer</button>
+      <button class="btn btn-primary" id="vd-save-btn" onclick="saveValeursDefaut()">Enregistrer</button>
     </div>
   </div>
   <div class="vd-body">
@@ -144,8 +145,8 @@
       </tbody>
     </table>
     <div style="margin-top:20px;font-size:13px;color:#4a5568">
-      <button style="background:none;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;margin-right:8px">↻ Réinitialiser</button>
-      aux <a href="https://app.institutpf.org/?locale=fr#/guidelines" target="_blank" style="color:#003DA5">normes de l'Institut de planification financière</a>
+      <button style="background:none;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer;margin-right:8px" onclick="resetValeursDefaut()">↻ Réinitialiser</button>
+      aux <a href="https://app.institutpf.org/?locale=fr#/guidelines" target="_blank" style="color:var(--navy, #1a2340)">normes de l'Institut de planification financière</a>
     </div>
   </div>
 </div>

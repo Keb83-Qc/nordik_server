@@ -1722,6 +1722,73 @@
   function closeValeursDefaut() {
     document.getElementById('page-valeurs-defaut').style.display = 'none';
   }
+
+  /** Collecte tous les champs vd-* et les envoie au serveur pour les persister en DB. */
+  function saveValeursDefaut() {
+    const v = id => document.getElementById(id)?.value ?? null;
+    const r = name => document.querySelector(`input[name="${name}"]:checked`)?.value ?? null;
+
+    const params = {
+      fonds_urgence: { type: r('vd-fu'), mois: v('vd-fu-mois') },
+      deces:         { funerailles: v('vd-funerailles'), rr_type: r('vd-deces-rr'),
+                       rr_pct: v('vd-deces-pct'), salaire_type: r('vd-deces-sal'),
+                       frequence: r('vd-deces-freq') },
+      invalidite:    { type: r('vd-inv-type'), salaire_type: r('vd-inv-sal'), rr_pct: v('vd-inv-pct') },
+      maladie_grave: { niveau: r('vd-mg') },
+      retraite:      { rr_pct: v('vd-ret-pct'), frequence: r('vd-ret-freq'), calcul: r('vd-ret-calc') },
+      hypotheses:    { inflation: v('vd-inflation') },
+      portefeuilles: { prudent: v('vd-p-prudent'), modere: v('vd-p-modere'),
+                       equilibre: v('vd-p-equilibre'), croissance: v('vd-p-croissance'),
+                       audacieux: v('vd-p-audacieux') },
+      abf:           { province_defaut: v('vd-province') },
+    };
+
+    const btn    = document.getElementById('vd-save-btn');
+    const status = document.getElementById('vd-save-status');
+    if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
+    if (status) { status.textContent = ''; status.style.display = 'none'; }
+
+    fetch(window.ABF_PARAMS_SAVE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': window.ABF_CSRF_TOKEN },
+      body: JSON.stringify({ params }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        // Mettre à jour ABF_PARAMS en mémoire pour que les sections du formulaire utilisent les nouvelles valeurs
+        if (data.params) window.ABF_PARAMS = data.params;
+        if (status) { status.textContent = '✓ Enregistré'; status.style.display = 'inline'; status.style.color = 'var(--valid, #22c55e)'; }
+        showToast('Valeurs par défaut enregistrées');
+        setTimeout(closeValeursDefaut, 800);
+      }
+    })
+    .catch(() => {
+      if (status) { status.textContent = 'Erreur réseau'; status.style.display = 'inline'; status.style.color = '#ef4444'; }
+    })
+    .finally(() => {
+      if (btn) { btn.disabled = false; btn.textContent = 'Enregistrer'; }
+    });
+  }
+
+  /** Remet les valeurs IPF par défaut dans les champs (ne sauvegarde pas). */
+  function resetValeursDefaut() {
+    const defaults = {
+      'vd-fu-mois': '3', 'vd-funerailles': '10 000', 'vd-deces-pct': '70',
+      'vd-inv-pct': '70', 'vd-ret-pct': '70', 'vd-inflation': '2,10',
+      'vd-p-prudent': '3,00', 'vd-p-modere': '3,30', 'vd-p-equilibre': '3,70',
+      'vd-p-croissance': '4,00', 'vd-p-audacieux': '4,30',
+    };
+    Object.entries(defaults).forEach(([id, val]) => {
+      const el = document.getElementById(id); if (el) el.value = val;
+    });
+    // Radios par défaut
+    const setR = (name, val) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; };
+    setR('vd-fu', 'income'); setR('vd-deces-rr', 'family'); setR('vd-deces-sal', 'gross');
+    setR('vd-deces-freq', 'yearly'); setR('vd-inv-type', 'incomeReplacement');
+    setR('vd-inv-sal', 'gross'); setR('vd-mg', 'comfort'); setR('vd-ret-freq', 'yearly');
+    setR('vd-ret-calc', 'average');
+  }
   function toggleAccordion(header) {
     const body = header.nextElementSibling;
     body.classList.toggle('open');
@@ -1939,11 +2006,14 @@
       if (rrqJ && !parseFloat(rrqJ.value)) rrqJ.value = '2500';
     }
 
-    // Pre-populate frais funéraires if list empty
+    // Pre-populate frais funéraires if list empty (valeur depuis ABF_PARAMS ou fallback)
+    const _funeraillesDefault = parseFloat(
+      String(window.ABF_PARAMS?.deces?.funerailles ?? '10000').replace(/\s/g, '').replace(',', '.')
+    ) || 10000;
     const depList = document.getElementById('deces-dep-list');
     if (depList && depList.children.length === 0) {
       _decesDepActiveTab = 'client';
-      addDecesDep('Frais funéraires', 25000);
+      addDecesDep('Frais funéraires', _funeraillesDefault);
     }
 
     // Couple-mode adaptations
@@ -1966,7 +2036,7 @@
       const conjList = document.getElementById('deces-dep-list-conjoint');
       if (conjList && conjList.children.length === 0) {
         _decesDepActiveTab = 'conjoint';
-        addDecesDep('Frais funéraires', 25000);
+        addDecesDep('Frais funéraires', _funeraillesDefault);
         _decesDepActiveTab = 'client';
       }
 

@@ -127,6 +127,37 @@ class AbfEditorController extends Controller
         ]);
     }
 
+    /**
+     * Enregistre les valeurs par défaut dans la table abf_parameters.
+     * Ces valeurs deviennent les nouvelles valeurs par défaut pour tous les nouveaux dossiers.
+     */
+    public function saveParams(Request $request)
+    {
+        $data = $request->input('params', []);
+
+        // Mapping groupe → clés autorisées
+        $allowed = [
+            'fonds_urgence' => ['type', 'mois'],
+            'deces'         => ['funerailles', 'rr_pct', 'rr_type', 'salaire_type', 'frequence'],
+            'invalidite'    => ['type', 'rr_pct', 'salaire_type'],
+            'maladie_grave' => ['niveau'],
+            'retraite'      => ['rr_pct', 'frequence', 'calcul'],
+            'hypotheses'    => ['inflation'],
+            'portefeuilles' => ['prudent', 'modere', 'equilibre', 'croissance', 'audacieux'],
+            'abf'           => ['province_defaut'],
+        ];
+
+        foreach ($allowed as $group => $keys) {
+            foreach ($keys as $key) {
+                if (isset($data[$group][$key])) {
+                    AbfParameter::setValue($group, $key, $data[$group][$key]);
+                }
+            }
+        }
+
+        return response()->json(['ok' => true, 'params' => AbfParameter::allAsMap()]);
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private function resolveRecord(string $identifier): AbfCase

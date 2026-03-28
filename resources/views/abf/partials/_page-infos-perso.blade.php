@@ -96,7 +96,7 @@
           <div class="row">
             <div class="col form-group">
               <label class="form-label">Cellulaire</label>
-              <input class="form-input" type="tel" value="(438) 449-0965" placeholder="(514) 000-0000"/>
+              <input class="form-input" id="client-cellulaire" type="tel" value="" placeholder="(514) 000-0000"/>
             </div>
             <div class="col form-group">
               <label class="form-label">Téléphone domicile</label>
@@ -109,11 +109,11 @@
             <div class="row">
               <div class="col form-group" style="max-width:120px">
                 <label class="form-label">N° civique</label>
-                <input class="form-input" type="text" id="client-addr-civique" value="11952" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-civique" value="" oninput="syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Rue</label>
-                <input class="form-input" type="text" id="client-addr-rue" value="AV JUBINVILLE" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-rue" value="" oninput="syncConjointInfo()"/>
               </div>
             </div>
             <div class="row">
@@ -126,7 +126,7 @@
               </div>
               <div class="col form-group" style="max-width:100px">
                 <label class="form-label">Numéro</label>
-                <input class="form-input" type="text" id="client-addr-numero" value="2" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-numero" value="" oninput="syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Case postale</label>
@@ -136,15 +136,15 @@
             <div class="row">
               <div class="col form-group">
                 <label class="form-label">Ville</label>
-                <input class="form-input" type="text" id="client-addr-ville" value="MONTRÉAL-NORD" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-ville" value="" oninput="syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Province</label>
-                <input class="form-input" type="text" id="client-addr-province" value="Québec" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-province" value="" oninput="syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Code postal</label>
-                <input class="form-input" type="text" id="client-addr-postal" value="H1G 3T2" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-postal" value="" oninput="syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Pays</label>
