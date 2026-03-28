@@ -12,6 +12,9 @@ class AbfCase extends Model
     protected $fillable = [
         'advisor_user_id',
         'advisor_code',
+        'client_first_name',
+        'client_last_name',
+        'client_birth_date',
         'status',
         'payload',
         'results',
@@ -20,10 +23,11 @@ class AbfCase extends Model
     ];
 
     protected $casts = [
-        'payload' => 'array',
-        'results' => 'array',
-        'completed_at' => 'datetime',
-        'signed_at' => 'datetime',
+        'payload'          => 'encrypted:array',
+        'results'          => 'array',
+        'client_birth_date'=> 'date',
+        'completed_at'     => 'datetime',
+        'signed_at'        => 'datetime',
     ];
 
     public function getProgressPercentAttribute(): ?int
