@@ -37,17 +37,11 @@
     {{-- ── Page d'accueil (landing) ───────────────────────── --}}
     @include('abf.partials._page-accueil')
 
-    {{-- ── Modal profil conseiller ────────────────────────── --}}
-    @include('abf.partials._modals-profil')
-
-    {{-- ── Page valeurs par défaut ────────────────────────── --}}
-    @include('abf.partials._page-valeurs-defaut')
+    {{-- ── Modal Configuration unifié (Profil / Valeurs / Impôt / Rente) ── --}}
+    @include('abf.partials._modal-config')
 
     {{-- ── Modal hypothèses du parcours ───────────────────── --}}
     @include('abf.partials._modal-hypotheses')
-
-    {{-- ── Modal rente conjoint survivant ─────────────────── --}}
-    @include('abf.partials._modal-rente-conj')
 
     {{-- ── Topbar + Sidebar ────────────────────────────────── --}}
     @include('abf.partials._topbar-sidebar')

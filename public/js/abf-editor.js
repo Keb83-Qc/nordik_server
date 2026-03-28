@@ -1369,14 +1369,9 @@
     document.getElementById('page-accueil').style.display = 'none';
   }
   // ── Gestion de l'impôt ────────────────────────
-  function openImpotModal() {
-    impotRenderParams();
-    document.getElementById('modal-impot').classList.add('open');
-  }
-  function openImpotModalFor() { openImpotModal(); }
-  function closeImpotModal() {
-    document.getElementById('modal-impot').classList.remove('open');
-  }
+  function openImpotModal()    { openConfigModal('impot'); }
+  function openImpotModalFor() { openConfigModal('impot'); }
+  function closeImpotModal()   { closeConfigModal(); }
 
   // ── Hypothèses ────────────────────────────────
   let hypotheses = { evClient:94, evConj:96 };
@@ -1459,24 +1454,8 @@
       if (defWrap) defWrap.style.display = isCpp ? '' : 'none';
     });
   }
-  function openRenteConjModal() {
-    const isCpp = rrqRenteParams.regime === 'cpp';
-    document.getElementById('rc-regime-cpp').checked = isCpp;
-    document.getElementById('rc-regime-rrq').checked = !isCpp;
-    rcToggleRegime();
-    document.getElementById('rc-annee').value = rrqRenteParams.annee;
-    const fmt = v => v.toLocaleString('fr-CA', {minimumFractionDigits:2, maximumFractionDigits:2});
-    document.getElementById('rc-m45-sans').value = fmt(rrqRenteParams.m45SansEnfant);
-    document.getElementById('rc-m45-avec').value = fmt(rrqRenteParams.m45AvecEnfant);
-    document.getElementById('rc-m45-inv').value  = fmt(rrqRenteParams.m45Invalide);
-    document.getElementById('rc-45-65').value    = fmt(rrqRenteParams.de45a65);
-    document.getElementById('rc-65plus').value   = fmt(rrqRenteParams.de65plus);
-    document.getElementById('rc-cpp-fixed').value = fmt(rrqRenteParams.cppFixedPortion);
-    document.getElementById('modal-rente-conj').classList.add('open');
-  }
-  function closeRenteConjModal() {
-    document.getElementById('modal-rente-conj').classList.remove('open');
-  }
+  function openRenteConjModal()  { openConfigModal('rente'); }
+  function closeRenteConjModal() { closeConfigModal(); }
   function saveRenteConjModal() {
     const parse = id => parseFloat((document.getElementById(id)?.value||'0').replace(/\s/g,'').replace(',','.')) || 0;
     rrqRenteParams.regime        = document.querySelector('input[name="rc-regime"]:checked')?.value || 'rrq';
@@ -1705,23 +1684,54 @@
     return { rrq, ae, rqap, fed, qc, total, net: brut - total, taux: total / brut * 100 };
   }
 
-  // ── Profil ────────────────────────────────────
-  function openProfilModal() {
-    document.getElementById('modal-profil').classList.add('open');
+  // ── Modal Configuration unifié ────────────────
+  function openConfigModal(tab) {
+    switchConfigTab(tab || 'profil');
+    if (tab === 'impot') impotRenderParams();
+    if (tab === 'rente') _rcPopulateFields();
+    document.getElementById('modal-config').classList.add('open');
   }
-  function closeProfilModal() {
-    document.getElementById('modal-profil').classList.remove('open');
+  function closeConfigModal() {
+    document.getElementById('modal-config').classList.remove('open');
   }
+  function switchConfigTab(tab) {
+    document.querySelectorAll('.cfg-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    document.querySelectorAll('.cfg-tab-pane').forEach(p => p.classList.toggle('active', p.id === 'cfg-tab-' + tab));
+    document.querySelectorAll('.cfg-footer-pane').forEach(f => f.classList.toggle('active', f.id === 'cfg-footer-' + tab));
+    if (tab === 'impot') impotRenderParams();
+    if (tab === 'rente') _rcPopulateFields();
+  }
+  function _rcPopulateFields() {
+    const fmt = v => v.toLocaleString('fr-CA', {minimumFractionDigits:2, maximumFractionDigits:2});
+    const isCpp = rrqRenteParams.regime === 'cpp';
+    const rrqRadio = document.getElementById('rc-regime-rrq');
+    const cppRadio = document.getElementById('rc-regime-cpp');
+    if (rrqRadio) rrqRadio.checked = !isCpp;
+    if (cppRadio) cppRadio.checked = isCpp;
+    rcToggleRegime();
+    const sv = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+    sv('rc-annee',    rrqRenteParams.annee);
+    sv('rc-m45-sans', fmt(rrqRenteParams.m45SansEnfant));
+    sv('rc-m45-avec', fmt(rrqRenteParams.m45AvecEnfant));
+    sv('rc-m45-inv',  fmt(rrqRenteParams.m45Invalide));
+    sv('rc-45-65',    fmt(rrqRenteParams.de45a65));
+    sv('rc-65plus',   fmt(rrqRenteParams.de65plus));
+    sv('rc-cpp-fixed',fmt(rrqRenteParams.cppFixedPortion));
+  }
+  // Fermeture sur clic fond
+  document.getElementById('modal-config')?.addEventListener('click', e => {
+    if (e.target === document.getElementById('modal-config')) closeConfigModal();
+  });
+
+  // ── Aliases pour compatibilité (ancien code / boutons existants) ──
+  function openProfilModal()  { openConfigModal('profil'); }
+  function closeProfilModal() { closeConfigModal(); }
   function saveProfilModal() {
-    closeProfilModal();
+    closeConfigModal();
     showToast('Profil enregistré');
   }
-  function openValeursDefaut() {
-    document.getElementById('page-valeurs-defaut').style.display = 'block';
-  }
-  function closeValeursDefaut() {
-    document.getElementById('page-valeurs-defaut').style.display = 'none';
-  }
+  function openValeursDefaut()  { openConfigModal('valeurs'); }
+  function closeValeursDefaut() { closeConfigModal(); }
 
   /** Collecte tous les champs vd-* et les envoie au serveur pour les persister en DB. */
   function saveValeursDefaut() {
