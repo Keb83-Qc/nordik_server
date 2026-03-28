@@ -707,19 +707,19 @@
       id: 'famille', label: 'Famille',
       icon: '👨‍👩‍👧',
       items: [
-        { id: 'getMarried',                label: 'Se marier / s\'unir (conjoint de fait)', checked: true },
+        { id: 'getMarried',                label: 'Se marier / s\'unir (conjoint de fait)', checked: false },
         { id: 'moveInTogether',            label: 'Prévoir une cohabitation', checked: false },
-        { id: 'haveChildren',              label: 'Avoir des enfants', checked: true },
+        { id: 'haveChildren',              label: 'Avoir des enfants', checked: false },
         { id: 'financeChildrenEducation',  label: 'Financer les études des enfants', checked: false },
         { id: 'buySellPropertyFamily',     label: 'Acheter / vendre une propriété', checked: false },
-        { id: 'specialProjects',           label: 'Projets spéciaux', checked: true },
+        { id: 'specialProjects',           label: 'Projets spéciaux', checked: false },
       ]
     },
     {
       id: 'travail', label: 'Travail',
       icon: '💼',
       items: [
-        { id: 'returnToStudies',    label: 'Reprendre les études', checked: true },
+        { id: 'returnToStudies',    label: 'Reprendre les études', checked: false },
         { id: 'getAPromotion',      label: 'Obtenir une promotion', checked: false },
         { id: 'changeCareers',      label: 'Changer de carrière', checked: false },
         { id: 'withdrawFromJob',    label: 'Se retirer du marché du travail', checked: false },
@@ -770,7 +770,7 @@
       icon: '🛡️',
       items: [
         { id: 'repayLoansDeath',       label: 'Rembourser les emprunts en cas de décès', checked: false },
-        { id: 'deathExpenses',         label: 'Prévoir les dépenses liées au décès', checked: true },
+        { id: 'deathExpenses',         label: 'Prévoir les dépenses liées au décès', checked: false },
         { id: 'familyLifeStyleDeath',  label: 'Maintenir le niveau de vie familial en cas de décès', checked: false },
         { id: 'leaveInheritance',      label: 'Léguer un héritage', checked: false },
         { id: 'taxesAtDeath',          label: 'Prévoir les impôts au décès', checked: false },
