@@ -66,7 +66,7 @@ class AbfCase extends Model
     public function getEditorUrlAttribute(): string
     {
         $identifier = $this->slug ?: 'nouveau-' . $this->id;
-        return route('abf.editor.show', $identifier);
+        return route('abf.editor.show', ['record' => $identifier]);
     }
 
     /**

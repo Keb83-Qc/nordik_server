@@ -75,7 +75,8 @@
                 $dateAbs  = $case->updated_at->locale('fr')->isoFormat('D MMM YYYY [à] H[h]mm');
               @endphp
               <li>
-                <a href="{{ route('abf.editor.show', $case) }}"
+                @php $caseIdentifier = $case->slug ?: 'nouveau-' . $case->id; @endphp
+                <a href="{{ route('abf.editor.show', ['record' => $caseIdentifier]) }}"
                    style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 14px;border-radius:8px;background:#f4f6fb;color:#1a2340;text-decoration:none;transition:background .15s"
                    onmouseover="this.style.background='#e8ecf5'" onmouseout="this.style.background='#f4f6fb'">
                   <!-- Noms -->

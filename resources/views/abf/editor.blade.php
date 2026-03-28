@@ -9,8 +9,9 @@
   {{-- ── Variables Laravel injectées pour le JS ─────────── --}}
   <script>
     @if($record)
+    @php $recordIdentifier = $record->slug ?: 'nouveau-' . $record->id; @endphp
     window.ABF_RECORD_ID       = {{ $record->id }};
-    window.ABF_SAVE_URL        = '{{ route("abf.editor.save", $record) }}';
+    window.ABF_SAVE_URL        = '{{ route("abf.editor.save", ["record" => $recordIdentifier]) }}';
     window.ABF_INITIAL_PAYLOAD = {!! json_encode($record->payload ?? []) !!};
     @else
     window.ABF_RECORD_ID       = null;

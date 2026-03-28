@@ -11,15 +11,30 @@ class AbfEditorController extends Controller
 {
     public function landing()
     {
-        $recentCases = AbfCase::where('advisor_user_id', auth()->id())
-            ->orderByDesc('updated_at')
-            ->limit(10)
-            ->get(['id', 'slug', 'client_first_name', 'client_last_name', 'updated_at', 'status', 'results', 'payload']);
+        try {
+            $recentCases = AbfCase::where('advisor_user_id', auth()->id())
+                ->orderByDesc('updated_at')
+                ->limit(10)
+                ->get(['id', 'slug', 'client_first_name', 'client_last_name', 'updated_at', 'status', 'results', 'payload']);
+        } catch (\Throwable $e) {
+            // Colonnes manquantes (migration pas encore jouée) — fallback sans crash
+            $recentCases = AbfCase::where('advisor_user_id', auth()->id())
+                ->orderByDesc('updated_at')
+                ->limit(10)
+                ->get(['id', 'updated_at', 'status', 'results']);
+        }
+
+        try {
+            $abfParams = AbfParameter::allAsMap();
+        } catch (\Throwable $e) {
+            // Table abf_parameters manquante (migration pas encore jouée)
+            $abfParams = [];
+        }
 
         return view('abf.editor', [
             'record'      => null,
             'recentCases' => $recentCases,
-            'abfParams'   => AbfParameter::allAsMap(),
+            'abfParams'   => $abfParams,
         ]);
     }
 
@@ -59,9 +74,15 @@ class AbfEditorController extends Controller
         $abfCase = $this->resolveRecord($record);
         abort_unless($abfCase->advisor_user_id === auth()->id(), 403);
 
+        try {
+            $abfParams = AbfParameter::allAsMap();
+        } catch (\Throwable $e) {
+            $abfParams = [];
+        }
+
         return view('abf.editor', [
             'record'    => $abfCase,
-            'abfParams' => AbfParameter::allAsMap(),
+            'abfParams' => $abfParams,
         ]);
     }
 
