@@ -111,15 +111,15 @@
   function goNext() {
     if (current < pages.length - 1) {
       if (!validateCurrentPage()) return;
-      // Sauvegarde automatique avant de changer de page
-      if (window.ABF_SAVE_URL) {
-        autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, true);
-      }
       const navItems = document.querySelectorAll('.nav-item');
-      // mark current done, unlock next
+      // Marquer la page courante comme terminée et débloquer la suivante
       navItems[current]?.classList.add('done');
       navItems[current + 1]?.classList.remove('locked');
       goTo(pages[current + 1], navItems[current + 1]);
+      // Sauvegarder APRÈS goTo() pour que current_page = la nouvelle page
+      if (window.ABF_SAVE_URL) {
+        autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, true);
+      }
     }
   }
 
@@ -2928,6 +2928,17 @@
         p_equilibre: v('vd-p-equilibre'), p_croissance: v('vd-p-croissance'), p_audacieux: v('vd-p-audacieux'),
       },
       hypotheses: typeof hypotheses !== 'undefined' ? { ...hypotheses } : { evClient: 94, evConj: 96 },
+      objectifs: JSON.parse(JSON.stringify(objState)),
+      navigation: {
+        current_page: pages[current],
+        done_pages: (() => {
+          const done = [];
+          document.querySelectorAll('.nav-item').forEach((el, i) => {
+            if (el.classList.contains('done') && pages[i]) done.push(pages[i]);
+          });
+          return done;
+        })(),
+      },
     };
   }
 
@@ -3184,6 +3195,27 @@
     if (typeof _invalAvList !== 'undefined' && Array.isArray(inv.av_list)) {
       _invalAvList = inv.av_list;
       if (typeof invalRenderAvList === 'function') invalRenderAvList();
+    }
+
+    // Objectifs
+    if (p.objectifs) {
+      Object.keys(p.objectifs).forEach(catId => {
+        if (objState[catId]) objState[catId] = p.objectifs[catId];
+      });
+    }
+
+    // Navigation : restaurer la page et l'état done/locked du nav
+    const nav = p.navigation || {};
+    const savedPage = nav.current_page;
+    const donePagesSet = new Set(nav.done_pages || []);
+    if (savedPage && pages.includes(savedPage)) {
+      const navItems = document.querySelectorAll('.nav-item');
+      const savedIdx = pages.indexOf(savedPage);
+      navItems.forEach((el, i) => {
+        if (i <= savedIdx) el.classList.remove('locked');
+        if (donePagesSet.has(pages[i])) el.classList.add('done');
+      });
+      goTo(savedPage, navItems[savedIdx]);
     }
 
     // Recalculs
