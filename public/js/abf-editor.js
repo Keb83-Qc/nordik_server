@@ -3155,6 +3155,65 @@
     window.addEventListener('beforeunload', () => autoSave(recordId, saveUrl, csrfToken, true));
   }
 
+  /**
+   * Vide TOUS les champs de l'éditeur pour garantir un formulaire
+   * 100 % vierge quand on crée un nouveau client.
+   * Nécessaire car le navigateur restaure parfois les valeurs de la
+   * session précédente (form-state cache / bfcache).
+   */
+  function clearEditorForm() {
+    // 1. Tous les inputs texte/number/email/tel + textareas hors landing page
+    document.querySelectorAll(
+      'input[type="text"], input[type="number"], input[type="email"], ' +
+      'input[type="tel"], input[type="date"], textarea'
+    ).forEach(el => {
+      if (!el.closest('#page-accueil')) el.value = '';
+    });
+
+    // 2. Tous les selects → première option
+    document.querySelectorAll('select').forEach(el => {
+      if (!el.closest('#page-accueil')) el.selectedIndex = 0;
+    });
+
+    // 3. Radios : remettre le plan à "individuel"
+    const radioInd = document.querySelector('input[name="plan"][value="individuel"]');
+    if (radioInd) radioInd.checked = true;
+    const radioConj = document.querySelector('input[name="plan"][value="conjoint"]');
+    if (radioConj) radioConj.checked = false;
+
+    // 4. Masquer la section conjoint
+    const conjSection = document.getElementById('conjoint-section');
+    if (conjSection) conjSection.style.display = 'none';
+
+    // 5. Vider les listes dynamiques
+    const listIds = ['enfants-list', 'actifs-list', 'passifs-list', 'revenu-list'];
+    const placeholders = {
+      'enfants-list' : 'Aucun enfant ou personne à charge ajouté.',
+      'actifs-list'  : 'Aucun actif ajouté.',
+      'passifs-list' : 'Aucun passif ajouté.',
+      'revenu-list'  : '',
+    };
+    listIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const placeholder = placeholders[id];
+      if (placeholder) {
+        el.classList.add('list-empty');
+        el.textContent = placeholder;
+      } else {
+        el.innerHTML = '';
+      }
+    });
+
+    // 6. Décocher tous les checkboxes/radios hors landing (sauf le plan déjà remis)
+    document.querySelectorAll('input[type="checkbox"]').forEach(el => {
+      if (!el.closest('#page-accueil')) el.checked = false;
+    });
+    document.querySelectorAll('input[type="radio"]').forEach(el => {
+      if (!el.closest('#page-accueil') && el.name !== 'plan') el.checked = false;
+    });
+  }
+
   /* ── INITIALISATION LARAVEL ──────────────────────────── */
 
   // ── Mode landing : "Démarrer" cache la page d'accueil immédiatement,
@@ -3170,6 +3229,10 @@
 
       // 1. Cacher page-accueil IMMÉDIATEMENT → l'utilisateur voit l'éditeur vide
       document.getElementById('page-accueil').style.display = 'none';
+
+      // 2. Vider tous les champs (le navigateur peut avoir restauré des données
+      //    d'une session précédente via son form-state cache / bfcache)
+      clearEditorForm();
 
       try {
         const res = await fetch(window.ABF_CREATE_URL, {
