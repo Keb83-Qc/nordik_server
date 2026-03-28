@@ -10,33 +10,33 @@
           <div class="row">
             <div class="col form-group">
               <label class="form-label required">Prénom</label>
-              <input class="form-input" id="client-prenom" type="text" value="WIGALIE" placeholder="Prénom"/>
+              <input class="form-input" id="client-prenom" type="text" value="" placeholder="Prénom"/>
             </div>
             <div class="col form-group">
               <label class="form-label required">Nom</label>
-              <input class="form-input" id="client-nom" type="text" value="RAPHAEL" placeholder="Nom de famille"/>
+              <input class="form-input" id="client-nom" type="text" value="" placeholder="Nom de famille"/>
             </div>
           </div>
           <div class="row">
             <div class="col form-group">
               <label class="form-label required">Date de naissance</label>
               <div class="date-row">
-                <input class="form-input" id="client-ddn-jour" type="text" value="17" placeholder="Jour" style="max-width:70px" maxlength="2" oninput="this.value=this.value.replace(/\D/g,'').slice(0,2)"/>
+                <input class="form-input" id="client-ddn-jour" type="text" value="" placeholder="Jour" style="max-width:70px" maxlength="2" oninput="this.value=this.value.replace(/\D/g,'').slice(0,2)"/>
                 <select class="form-select" id="client-ddn-mois">
                   <option value="">Mois</option>
-                  <option>Janvier</option><option selected>Février</option><option>Mars</option>
+                  <option>Janvier</option><option>Février</option><option>Mars</option>
                   <option>Avril</option><option>Mai</option><option>Juin</option>
                   <option>Juillet</option><option>Août</option><option>Septembre</option>
                   <option>Octobre</option><option>Novembre</option><option>Décembre</option>
                 </select>
-                <input class="form-input" type="text" value="2005" placeholder="Année" style="max-width:90px" id="client-naissance-annee" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
+                <input class="form-input" type="text" value="" placeholder="Année" style="max-width:90px" id="client-naissance-annee" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
               </div>
             </div>
             <div class="col form-group">
               <label class="form-label">Sexe</label>
               <div class="radio-group">
                 <div class="radio-pill"><input type="radio" name="sexe" id="masculin" value="M"/><label for="masculin">Masculin</label></div>
-                <div class="radio-pill"><input type="radio" name="sexe" id="feminin" value="F" checked/><label for="feminin">Féminin</label></div>
+                <div class="radio-pill"><input type="radio" name="sexe" id="feminin" value="F"/><label for="feminin">Féminin</label></div>
               </div>
             </div>
           </div>
@@ -44,7 +44,8 @@
             <div class="col form-group">
               <label class="form-label required">État civil</label>
               <select class="form-select" id="client-etat-civil" onchange="syncConjointInfo()">
-                <option>Marié(e)</option><option selected>Célibataire</option>
+                <option value="">— Sélectionner —</option>
+                <option>Marié(e)</option><option>Célibataire</option>
                 <option>Divorcé(e)</option><option>Séparé(e)</option>
                 <option>Conjoint(e) de fait</option><option>Union civile</option><option>Veuf/veuve</option>
               </select>
@@ -61,7 +62,7 @@
           <div class="row">
             <div class="col form-group">
               <label class="form-label">Courriel personnel</label>
-              <input class="form-input" type="email" value="wigalieraphael@icloud.com"/>
+              <input class="form-input" id="client-courriel" type="email" value="" placeholder="courriel@exemple.com"/>
             </div>
             <div class="col form-group">
               <label class="form-label required">Réside au Canada depuis</label>

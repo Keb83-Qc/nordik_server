@@ -102,7 +102,7 @@
             <div class="ap-sb-total-val" id="ap-total-vn">0 $</div>
           </div>
           <div class="ap-sidebar-section">
-            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px" id="ap-client-name">WIGALIE</div>
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px" id="ap-client-name">Client</div>
             <div class="ap-sb-row"><span class="ap-sb-label">Valeur nette</span><span class="ap-sb-val" id="ap-client-vn">0 $</span></div>
             <div class="ap-sb-row"><span class="ap-sb-label">Actifs</span><span class="ap-sb-val" style="color:var(--valid)" id="ap-client-actifs">0 $</span></div>
             <div class="ap-sb-row"><span class="ap-sb-label">Passifs</span><span class="ap-sb-val" style="color:#ef4444" id="ap-client-passifs">0 $</span></div>
