@@ -515,18 +515,18 @@
       background:white;border-bottom:1px solid #e0e3ef;padding:0 32px;height:64px;
       display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10;
     }
-    .vd-title { font-size:22px;font-weight:800;color:#003DA5; }
+    .vd-title { font-size:22px;font-weight:800;color:var(--navy, #1a2340); }
     .vd-body { max-width:700px;margin:0 auto;padding:32px; }
-    .vd-section-title { font-size:16px;font-weight:700;color:#003DA5;margin:24px 0 12px; }
-    .vd-section-subtitle { font-size:13px;font-weight:600;color:#4a5568;margin:16px 0 8px; }
-    .vd-divider { border:none;border-top:1px solid #e0e3ef;margin:24px 0; }
+    .vd-section-title { font-size:16px;font-weight:700;color:var(--navy, #1a2340);margin:24px 0 12px; }
+    .vd-section-subtitle { font-size:13px;font-weight:600;color:var(--muted, #4a5568);margin:16px 0 8px; }
+    .vd-divider { border:none;border-top:1px solid var(--border, #e0e3ef);margin:24px 0; }
     .vd-radio-group { display:flex;gap:8px;flex-wrap:wrap; }
     .vd-radio-pill input[type=radio] { display:none; }
     .vd-radio-pill label {
-      padding:7px 16px;border:1px solid #c8cdd8;border-radius:20px;font-size:13px;
-      cursor:pointer;color:#4a5568;background:white;transition:all .15s;
+      padding:7px 16px;border:1px solid var(--border, #c8cdd8);border-radius:20px;font-size:13px;
+      cursor:pointer;color:var(--muted, #4a5568);background:white;transition:all .15s;
     }
-    .vd-radio-pill input:checked + label { background:#003DA5;border-color:#003DA5;color:white; }
+    .vd-radio-pill input:checked + label { background:var(--navy, #1a2340);border-color:var(--navy, #1a2340);color:white; }
     .vd-inline { display:flex;align-items:center;gap:12px;flex-wrap:wrap; }
     /* Fonds d'urgence radio pills */
     .fu-radio-pill { display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border:1px solid var(--border);border-radius:20px;font-size:13px;cursor:pointer;color:var(--muted);background:var(--bg);transition:all .15s;user-select:none; }

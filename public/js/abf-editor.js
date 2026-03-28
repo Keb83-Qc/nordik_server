@@ -3135,7 +3135,18 @@
       body: JSON.stringify({ payload }),
     })
     .then(r => r.json())
-    .then(data => { if (!silent && data.ok) showToast('Brouillon sauvegardé'); })
+    .then(data => {
+      if (data.ok) {
+        // Mettre à jour l'URL et le save_url si le slug a été généré
+        if (data.url) {
+          history.replaceState(history.state, '', data.url);
+        }
+        if (data.save_url) {
+          window.ABF_SAVE_URL = data.save_url;
+        }
+        if (!silent) showToast('Brouillon sauvegardé');
+      }
+    })
     .catch(() => {});
   }
 
@@ -3146,33 +3157,67 @@
 
   /* ── INITIALISATION LARAVEL ──────────────────────────── */
 
-  // Mode landing : demarrerABF() crée un dossier via AJAX puis redirige
+  // ── Mode landing : "Démarrer" cache la page d'accueil immédiatement,
+  //    puis crée le dossier en DB via AJAX et met à jour l'URL discrètement.
+  //    Aucune redirection de page = pas de flash ni de données fantômes.
   if (!window.ABF_RECORD_ID && window.ABF_CREATE_URL) {
+    let _creating = false;
     window.demarrerABF = async function() {
+      if (_creating) return;          // anti double-clic
+      _creating = true;
       const btn = document.querySelector('.ia-demarrer-btn');
       if (btn) { btn.textContent = 'Création…'; btn.disabled = true; }
+
+      // 1. Cacher page-accueil IMMÉDIATEMENT → l'utilisateur voit l'éditeur vide
+      document.getElementById('page-accueil').style.display = 'none';
+
       try {
         const res = await fetch(window.ABF_CREATE_URL, {
           method: 'POST',
           headers: {
-            'X-CSRF-TOKEN':   window.ABF_CSRF_TOKEN,
-            'Accept':         'application/json',
-            'Content-Type':   'application/json',
+            'X-CSRF-TOKEN': window.ABF_CSRF_TOKEN,
+            'Accept':       'application/json',
+            'Content-Type': 'application/json',
           },
         });
         const data = await res.json();
-        if (data.url) window.location.href = data.url;
+        if (data.id && data.url) {
+          // 2. Mettre à jour les variables JS sans rechargement de page
+          window.ABF_RECORD_ID = data.id;
+          window.ABF_SAVE_URL  = data.save_url;
+          // 3. Mettre à jour l'URL dans la barre d'adresse
+          history.replaceState({ abfId: data.id }, '', data.url);
+          // 4. Activer l'auto-save maintenant qu'on a un ID
+          initAutoSave(data.id, data.save_url, window.ABF_CSRF_TOKEN);
+        }
       } catch (e) {
-        if (btn) { btn.textContent = 'Démarrer'; btn.disabled = false; }
+        // En cas d'erreur réseau : l'éditeur reste ouvert (vide)
+        // L'auto-save tentera de recréer au prochain Suivant
+        console.warn('[ABF] Création dossier échouée:', e);
       }
     };
+
+    // ── Recherche dans la liste des parcours récents ──────
+    const searchInput = document.getElementById('accueil-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', function() {
+        const q = this.value.trim().toLowerCase();
+        document.querySelectorAll('.ia-accordion-body li').forEach(li => {
+          const text = li.textContent.toLowerCase();
+          li.style.display = (!q || text.includes(q)) ? '' : 'none';
+        });
+      });
+    }
   }
 
-  // Mode éditeur : saute page-accueil si le dossier a déjà des données
-  if (window.ABF_INITIAL_PAYLOAD && window.ABF_INITIAL_PAYLOAD.client?.prenom) {
-    demarrerABF();
-    populateFromPayload(window.ABF_INITIAL_PAYLOAD);
+  // ── Mode éditeur : toujours cacher page-accueil, puis restaurer données ──
+  if (window.ABF_RECORD_ID) {
+    document.getElementById('page-accueil').style.display = 'none';
+    if (window.ABF_INITIAL_PAYLOAD && window.ABF_INITIAL_PAYLOAD.client?.prenom) {
+      populateFromPayload(window.ABF_INITIAL_PAYLOAD);
+    }
   }
+
   if (window.ABF_SAVE_URL) {
     initAutoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN);
   }

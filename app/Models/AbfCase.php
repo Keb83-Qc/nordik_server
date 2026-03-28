@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use App\Services\AbfCaseCalculator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class AbfCase extends Model
 {
@@ -15,6 +15,7 @@ class AbfCase extends Model
         'client_first_name',
         'client_last_name',
         'client_birth_date',
+        'slug',
         'status',
         'payload',
         'results',
@@ -30,12 +31,76 @@ class AbfCase extends Model
         'signed_at'        => 'datetime',
     ];
 
+    // ── Route model binding ───────────────────────────────────────────────
+    // Accepte deux formats : "nouveau-{id}" ou "{slug}"
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug_or_id';  // fictif — on override resolveRouteBinding
+    }
+
+    public function resolveRouteBinding($value, $field = null): ?self
+    {
+        // Format "nouveau-{id}" → résolution par ID
+        if (preg_match('/^nouveau-(\d+)$/', $value, $m)) {
+            return static::where('id', $m[1])->firstOrFail();
+        }
+
+        // Sinon résolution par slug (scopé à l'advisor connecté)
+        return static::where('slug', $value)
+            ->where('advisor_user_id', auth()->id())
+            ->firstOrFail();
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────
+
     public function getProgressPercentAttribute(): ?int
     {
         $p = $this->results['progress']['percent'] ?? null;
         return $p === null ? null : (int) $p;
     }
 
+    /**
+     * URL propre : /conseiller/bilan/nom-prenom ou /conseiller/bilan/nouveau-{id}
+     */
+    public function getEditorUrlAttribute(): string
+    {
+        $identifier = $this->slug ?: 'nouveau-' . $this->id;
+        return route('abf.editor.show', $identifier);
+    }
+
+    /**
+     * Génère et persiste le slug à partir du nom/prénom du client.
+     * Appelé après sauvegarde du payload step 1.
+     */
+    public function generateSlug(): void
+    {
+        if (! $this->client_last_name && ! $this->client_first_name) return;
+
+        $base = Str::slug(
+            strtolower($this->client_last_name ?? '') . '-' . strtolower($this->client_first_name ?? ''),
+            '-',
+            'fr'
+        );
+
+        if (! $base) return;
+
+        // Garantir l'unicité par conseiller
+        $slug = $base;
+        $i    = 2;
+        while (
+            static::where('advisor_user_id', $this->advisor_user_id)
+                ->where('slug', $slug)
+                ->where('id', '!=', $this->id)
+                ->exists()
+        ) {
+            $slug = $base . '-' . $i++;
+        }
+
+        $this->updateQuietly(['slug' => $slug]);
+    }
+
+    // ── Relations ─────────────────────────────────────────────────────────
 
     public function advisor()
     {

@@ -31,8 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/conseiller/bilan', [AbfEditorController::class, 'landing'])->name('abf.landing');
     Route::post('/conseiller/bilan/nouveau', [AbfEditorController::class, 'createJson'])->name('abf.create.json');
     Route::get('/conseiller/bilan/creer', [AbfEditorController::class, 'create'])->name('abf.new');
-    Route::get('/conseiller/bilan/{record}', [AbfEditorController::class, 'show'])->name('abf.editor.show');
-    Route::post('/conseiller/bilan/{record}/sauvegarder', [AbfEditorController::class, 'save'])->name('abf.editor.save');
+    Route::get('/conseiller/bilan/{record}', [AbfEditorController::class, 'show'])->name('abf.editor.show')->where('record', '.*');
+    Route::post('/conseiller/bilan/{record}/sauvegarder', [AbfEditorController::class, 'save'])->name('abf.editor.save')->where('record', '.*');
 });
 
 /**
