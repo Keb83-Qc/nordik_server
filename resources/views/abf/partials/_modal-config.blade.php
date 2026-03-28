@@ -28,10 +28,9 @@
     <div class="cfg-tabs" style="flex-shrink:0">
       <button class="cfg-tab-btn active" data-tab="profil"  onclick="switchConfigTab('profil')">Profil</button>
       <button class="cfg-tab-btn"        data-tab="valeurs" onclick="switchConfigTab('valeurs')">Valeurs par défaut</button>
-      <button class="cfg-tab-btn"        data-tab="impot"   onclick="switchConfigTab('impot')">
-        Gestion de l'impôt
-        @if(!$isAdmin)<span style="font-size:10px;margin-left:4px;opacity:.6">🔒</span>@endif
-      </button>
+      @if($isAdmin)
+      <button class="cfg-tab-btn"        data-tab="impot"   onclick="switchConfigTab('impot')">Gestion de l'impôt</button>
+      @endif
       <button class="cfg-tab-btn"        data-tab="rente"   onclick="switchConfigTab('rente')">Rente conjoint survivant</button>
     </div>
 
@@ -176,13 +175,9 @@
       </div>{{-- /cfg-tab-valeurs --}}
 
       {{-- ═══ ONGLET GESTION DE L'IMPÔT ═══ --}}
+      @if($isAdmin)
       <div id="cfg-tab-impot" class="cfg-tab-pane">
-        @if(!$isAdmin)
-          <div style="background:#fff8e6;border:1px solid var(--gold);border-radius:8px;padding:12px 16px;margin-bottom:20px;font-size:13px">
-            <strong style="color:var(--navy)">Accès restreint</strong> — La modification des paramètres fiscaux est réservée aux administrateurs. Les valeurs affichées sont celles actuellement en vigueur.
-          </div>
-        @endif
-        <fieldset style="border:none;padding:0" @if(!$isAdmin) disabled @endif>
+        <fieldset style="border:none;padding:0">
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Québec 2026 — taux et plafonds utilisés dans les calculs</div>
 
           <div class="impot-section-title">Paliers d'imposition — Fédéral</div>
@@ -243,6 +238,7 @@
           </div>
         </fieldset>
       </div>{{-- /cfg-tab-impot --}}
+      @endif
 
       {{-- ═══ ONGLET RENTE CONJOINT SURVIVANT ═══ --}}
       <div id="cfg-tab-rente" class="cfg-tab-pane">
@@ -341,19 +337,16 @@
         </div>
       </div>
 
-      {{-- Footer Gestion de l'impôt --}}
+      {{-- Footer Gestion de l'impôt (admin seulement) --}}
+      @if($isAdmin)
       <div id="cfg-footer-impot" class="cfg-footer-pane">
-        @if($isAdmin)
-          <button class="btn btn-secondary" onclick="impotResetParams()" style="font-size:12px">↻ Rétablir 2026</button>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-secondary" onclick="closeConfigModal()">Annuler</button>
-            <button class="btn btn-primary" onclick="impotSaveParams()">Enregistrer</button>
-          </div>
-        @else
-          <div style="font-size:12px;color:var(--muted)">Lecture seule — contactez un administrateur pour modifier ces paramètres</div>
-          <button class="btn btn-secondary" onclick="closeConfigModal()">Fermer</button>
-        @endif
+        <button class="btn btn-secondary" onclick="impotResetParams()" style="font-size:12px">↻ Rétablir 2026</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary" onclick="closeConfigModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="impotSaveParams()">Enregistrer</button>
+        </div>
       </div>
+      @endif
 
       {{-- Footer Rente conjoint survivant --}}
       <div id="cfg-footer-rente" class="cfg-footer-pane">
