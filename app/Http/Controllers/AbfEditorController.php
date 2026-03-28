@@ -14,7 +14,7 @@ class AbfEditorController extends Controller
         $recentCases = AbfCase::where('advisor_user_id', auth()->id())
             ->orderByDesc('updated_at')
             ->limit(10)
-            ->get(['id', 'client_first_name', 'client_last_name', 'updated_at', 'status', 'results']);
+            ->get(['id', 'client_first_name', 'client_last_name', 'updated_at', 'status', 'results', 'payload']);
 
         return view('abf.editor', [
             'record'      => null,

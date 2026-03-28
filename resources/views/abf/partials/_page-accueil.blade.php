@@ -56,16 +56,44 @@
           <ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px">
             @foreach($recentCases as $case)
               @php
-                $prenom = data_get($case->payload, 'client.prenom', '');
-                $nom    = data_get($case->payload, 'client.nom', '');
-                $label  = trim("$prenom $nom") ?: 'Dossier #'.$case->id;
+                // Nom du client — colonnes indexées en priorité, fallback payload
+                $prenom = $case->client_first_name
+                    ?: (data_get($case->payload, 'client.prenom', ''));
+                $nom    = $case->client_last_name
+                    ?: (data_get($case->payload, 'client.nom', ''));
+                $clientLabel = trim(strtoupper($nom) . ' ' . ucfirst(strtolower($prenom)));
+                $clientLabel = $clientLabel ?: ('Dossier #' . $case->id);
+
+                // Conjoint
+                $hasSpouse    = (bool) data_get($case->payload, 'has_spouse', false);
+                $conjPrenom   = data_get($case->payload, 'conjoint.prenom', '');
+                $conjNom      = data_get($case->payload, 'conjoint.nom', '');
+                $conjLabel    = $hasSpouse ? trim(strtoupper($conjNom) . ' ' . ucfirst(strtolower($conjPrenom))) : '';
+
+                // Date
+                $dateRel  = $case->updated_at->locale('fr')->diffForHumans();
+                $dateAbs  = $case->updated_at->locale('fr')->isoFormat('D MMM YYYY [à] H[h]mm');
               @endphp
               <li>
                 <a href="{{ route('abf.editor.show', $case) }}"
-                   style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-radius:8px;background:#f4f6fb;color:#1a2340;text-decoration:none;font-size:14px;transition:background .15s"
+                   style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 14px;border-radius:8px;background:#f4f6fb;color:#1a2340;text-decoration:none;transition:background .15s"
                    onmouseover="this.style.background='#e8ecf5'" onmouseout="this.style.background='#f4f6fb'">
-                  <span style="font-weight:600">{{ $label }}</span>
-                  <span style="color:#7a86a3;font-size:12px">{{ $case->updated_at->diffForHumans() }}</span>
+                  <!-- Noms -->
+                  <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                    <span style="font-size:14px;font-weight:700;color:#1a2340;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                      {{ $clientLabel }}
+                    </span>
+                    @if($conjLabel)
+                      <span style="font-size:12px;color:#7a86a3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+                        &amp; {{ $conjLabel }}
+                      </span>
+                    @endif
+                  </div>
+                  <!-- Date -->
+                  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:1px;flex-shrink:0">
+                    <span style="font-size:12px;color:#7a86a3" title="{{ $dateAbs }}">{{ $dateRel }}</span>
+                    <span style="font-size:11px;color:#b0bac8">{{ $dateAbs }}</span>
+                  </div>
                 </a>
               </li>
             @endforeach
