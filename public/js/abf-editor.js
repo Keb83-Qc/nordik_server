@@ -3216,9 +3216,9 @@
 
   /* ── INITIALISATION LARAVEL ──────────────────────────── */
 
-  // ── Mode landing : "Démarrer" cache la page d'accueil immédiatement,
-  //    puis crée le dossier en DB via AJAX et met à jour l'URL discrètement.
-  //    Aucune redirection de page = pas de flash ni de données fantômes.
+  // ── Mode landing : "Démarrer" crée le dossier en DB via AJAX,
+  //    puis navigue vers l'URL du nouveau dossier (page fraîche du serveur).
+  //    Navigation réelle = formulaire garanti vierge, zéro donnée fantôme.
   if (!window.ABF_RECORD_ID && window.ABF_CREATE_URL) {
     let _creating = false;
     window.demarrerABF = async function() {
@@ -3226,13 +3226,6 @@
       _creating = true;
       const btn = document.querySelector('.ia-demarrer-btn');
       if (btn) { btn.textContent = 'Création…'; btn.disabled = true; }
-
-      // 1. Cacher page-accueil IMMÉDIATEMENT → l'utilisateur voit l'éditeur vide
-      document.getElementById('page-accueil').style.display = 'none';
-
-      // 2. Vider tous les champs (le navigateur peut avoir restauré des données
-      //    d'une session précédente via son form-state cache / bfcache)
-      clearEditorForm();
 
       try {
         const res = await fetch(window.ABF_CREATE_URL, {
@@ -3245,18 +3238,17 @@
         });
         const data = await res.json();
         if (data.id && data.url) {
-          // 2. Mettre à jour les variables JS sans rechargement de page
-          window.ABF_RECORD_ID = data.id;
-          window.ABF_SAVE_URL  = data.save_url;
-          // 3. Mettre à jour l'URL dans la barre d'adresse
-          history.replaceState({ abfId: data.id }, '', data.url);
-          // 4. Activer l'auto-save maintenant qu'on a un ID
-          initAutoSave(data.id, data.save_url, window.ABF_CSRF_TOKEN);
+          // Navigation réelle → le serveur renvoie une page fraîche et vide
+          window.location.href = data.url;
+        } else {
+          // Réponse inattendue : réactiver le bouton
+          if (btn) { btn.textContent = 'Démarrer'; btn.disabled = false; }
+          _creating = false;
         }
       } catch (e) {
-        // En cas d'erreur réseau : l'éditeur reste ouvert (vide)
-        // L'auto-save tentera de recréer au prochain Suivant
         console.warn('[ABF] Création dossier échouée:', e);
+        if (btn) { btn.textContent = 'Démarrer'; btn.disabled = false; }
+        _creating = false;
       }
     };
 
