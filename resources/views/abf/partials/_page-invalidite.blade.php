@@ -1,3 +1,11 @@
+@php
+  $_inv        = $abfParams['invalidite'] ?? [];
+  // DB stocke 'incomeReplacement'/'expensesCoverage' → on mappe vers les valeurs du formulaire
+  $_invType    = ['incomeReplacement' => 'remplacement', 'expensesCoverage' => 'depenses'][$_inv['type'] ?? 'incomeReplacement'] ?? 'remplacement';
+  $_invBrutNet = $_inv['salaire_type'] ?? 'gross';
+  $_invCk      = fn($v, $f) => $f === $v ? 'checked' : '';
+  $_invBtnActive = fn($v) => ($_invBrutNet === $v) ? 'active' : '';
+@endphp
     <div id="page-invalidite" class="page">
       <div class="page-title">Invalidité</div>
       <div class="page-subtitle">Analyse des besoins en cas d'invalidité</div>
@@ -37,8 +45,8 @@
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">Approche de calcul</div>
             <div class="card-body">
               <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <label class="fu-radio-pill"><input type="radio" name="inval-approche" value="remplacement" checked onchange="invaliditeApproche()"/> Remplacement du revenu</label>
-                <label class="fu-radio-pill"><input type="radio" name="inval-approche" value="depenses" onchange="invaliditeApproche()"/> Dépenses courantes</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-approche" value="remplacement" {{ $_invCk('remplacement', $_invType) }} onchange="invaliditeApproche()"/> Remplacement du revenu</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-approche" value="depenses" {{ $_invCk('depenses', $_invType) }} onchange="invaliditeApproche()"/> Dépenses courantes</label>
               </div>
             </div>
           </div>
@@ -48,8 +56,8 @@
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <span>Remplacement du revenu en cas d'invalidité</span>
               <div style="display:flex;gap:2px">
-                <button id="inval-bn-brut" class="toggle-btn active" onclick="setInvalBrutNet('brut')">Brut</button>
-                <button id="inval-bn-net" class="toggle-btn" onclick="setInvalBrutNet('net')">Net</button>
+                <button id="inval-bn-brut" class="toggle-btn {{ $_invBtnActive('gross') }}" onclick="setInvalBrutNet('brut')">Brut</button>
+                <button id="inval-bn-net" class="toggle-btn {{ $_invBtnActive('net') }}" onclick="setInvalBrutNet('net')">Net</button>
               </div>
             </div>
             <div class="card-body" id="inval-rr-body"></div>

@@ -2621,7 +2621,7 @@
 
   function invalRrPanelHtml(owner, prenom, isNet) {
     const revMensuel = getRevenusByOwner(owner, isNet).total / 12;
-    const pct = 70;
+    const pct = parseFloat(window.ABF_PARAMS?.invalidite?.rr_pct ?? '70') || 70;
     const montant = Math.round(revMensuel * pct / 100);
     const brutNetLabel = isNet ? 'net' : 'brut';
     return `<div>

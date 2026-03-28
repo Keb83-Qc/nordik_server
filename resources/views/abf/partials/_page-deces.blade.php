@@ -1,3 +1,13 @@
+@php
+  $_dc     = $abfParams['deces']         ?? [];
+  $_port   = $abfParams['portefeuilles'] ?? [];
+  $_dcRrType  = ['family' => 'familial', 'individual' => 'individuel'][$_dc['rr_type']      ?? 'individual'] ?? 'individuel';
+  $_dcBrutNet = ['gross'  => 'brut',     'net'        => 'net'       ][$_dc['salaire_type'] ?? 'gross']      ?? 'brut';
+  $_dcFreq    = ['yearly' => 'annuel',   'monthly'    => 'mensuel'   ][$_dc['frequence']    ?? 'yearly']     ?? 'annuel';
+  $_dcRrPct   = (int) ($_dc['rr_pct'] ?? 70);
+  $_dcTaux    = number_format((float)($_port['equilibre'] ?? 3.70), 2, '.', '');
+  $_dcCk      = fn($v, $f) => $f === $v ? 'checked' : '';
+@endphp
 <!-- ── PAGE: Décès ── -->
 <div id="page-deces" class="page">
   <div class="page-title">Protection en cas de décès</div>
@@ -84,23 +94,23 @@
             <div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px">TYPE</div>
               <div style="display:flex;gap:6px" id="deces-rr-type-group">
-                <label class="fu-radio-pill" id="deces-rr-familial-pill" style="display:none"><input type="radio" name="deces-rr-type" value="familial" onchange="decesCalc()"/> Familial</label>
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-type" value="individuel" checked onchange="decesCalc()"/> Individuel</label>
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-type" value="aucun" onchange="decesCalc()"/> Aucun</label>
+                <label class="fu-radio-pill" id="deces-rr-familial-pill" style="display:none"><input type="radio" name="deces-rr-type" value="familial" {{ $_dcCk('familial', $_dcRrType) }} onchange="decesCalc()"/> Familial</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-type" value="individuel" {{ $_dcCk('individuel', $_dcRrType) }} onchange="decesCalc()"/> Individuel</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-type" value="aucun" {{ $_dcCk('aucun', $_dcRrType) }} onchange="decesCalc()"/> Aucun</label>
               </div>
             </div>
             <div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px">REVENU</div>
               <div style="display:flex;gap:6px">
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-brutnnet" value="brut" checked onchange="decesCalc()"/> Brut</label>
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-brutnnet" value="net" onchange="decesCalc()"/> Net</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-brutnnet" value="brut" {{ $_dcCk('brut', $_dcBrutNet) }} onchange="decesCalc()"/> Brut</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-brutnnet" value="net" {{ $_dcCk('net', $_dcBrutNet) }} onchange="decesCalc()"/> Net</label>
               </div>
             </div>
             <div>
               <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px">FRÉQUENCE</div>
               <div style="display:flex;gap:6px">
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-freq" value="annuel" checked onchange="decesCalc()"/> Annuel</label>
-                <label class="fu-radio-pill"><input type="radio" name="deces-rr-freq" value="mensuel" onchange="decesCalc()"/> Mensuel</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-freq" value="annuel" {{ $_dcCk('annuel', $_dcFreq) }} onchange="decesCalc()"/> Annuel</label>
+                <label class="fu-radio-pill"><input type="radio" name="deces-rr-freq" value="mensuel" {{ $_dcCk('mensuel', $_dcFreq) }} onchange="decesCalc()"/> Mensuel</label>
               </div>
             </div>
           </div>
@@ -121,7 +131,7 @@
               <div style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Revenus visés</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:13px">
                 <span id="deces-rr-beneficiaire-label-c">Le bénéficiaire désire recevoir</span>
-                <input class="form-input" id="deces-rr-pct-c" type="text" value="70" style="width:80px;text-align:center" oninput="decesCalc()"/>
+                <input class="form-input" id="deces-rr-pct-c" type="text" value="{{ $_dcRrPct }}" style="width:80px;text-align:center" oninput="decesCalc()"/>
                 <div style="display:flex;gap:4px">
                   <label class="fu-radio-pill" style="padding:5px 10px;font-size:12px"><input type="radio" name="deces-rr-target-c" value="pct" checked onchange="decesCalc()"/> %</label>
                   <label class="fu-radio-pill" style="padding:5px 10px;font-size:12px"><input type="radio" name="deces-rr-target-c" value="montant" onchange="decesCalc()"/> $</label>
@@ -153,7 +163,7 @@
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0">
                   <span style="color:var(--muted)">Rendement</span>
-                  <div class="input-sfx" style="max-width:100px"><input class="form-input" id="deces-rr-taux-c" type="text" value="3.70" oninput="decesCalc()"/><span class="sfx">%</span></div>
+                  <div class="input-sfx" style="max-width:100px"><input class="form-input" id="deces-rr-taux-c" type="text" value="{{ $_dcTaux }}" oninput="decesCalc()"/><span class="sfx">%</span></div>
                 </div>
               </div>
             </div>
@@ -167,7 +177,7 @@
               <div id="deces-lbl-j-vises" style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Revenus visés</div>
               <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;font-size:13px">
                 <span id="deces-rr-beneficiaire-label-j">Le bénéficiaire désire recevoir</span>
-                <input class="form-input" id="deces-rr-pct-j" type="text" value="70" style="width:80px;text-align:center" oninput="decesCalc()"/>
+                <input class="form-input" id="deces-rr-pct-j" type="text" value="{{ $_dcRrPct }}" style="width:80px;text-align:center" oninput="decesCalc()"/>
                 <div style="display:flex;gap:4px">
                   <label class="fu-radio-pill" style="padding:5px 10px;font-size:12px"><input type="radio" name="deces-rr-target-j" value="pct" checked onchange="decesCalc()"/> %</label>
                   <label class="fu-radio-pill" style="padding:5px 10px;font-size:12px"><input type="radio" name="deces-rr-target-j" value="montant" onchange="decesCalc()"/> $</label>
@@ -199,7 +209,7 @@
                 </div>
                 <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0">
                   <span style="color:var(--muted)">Rendement</span>
-                  <div class="input-sfx" style="max-width:100px"><input class="form-input" id="deces-rr-taux-j" type="text" value="3.70" oninput="decesCalc()"/><span class="sfx">%</span></div>
+                  <div class="input-sfx" style="max-width:100px"><input class="form-input" id="deces-rr-taux-j" type="text" value="{{ $_dcTaux }}" oninput="decesCalc()"/><span class="sfx">%</span></div>
                 </div>
               </div>
             </div>

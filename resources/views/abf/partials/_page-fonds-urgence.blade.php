@@ -1,3 +1,9 @@
+@php
+  $_fu     = $abfParams['fonds_urgence'] ?? [];
+  $_fuType = $_fu['type'] ?? 'income';
+  $_fuMois = $_fu['mois'] ?? 3;
+  $_fuCk   = fn($v) => $_fuType === $v ? 'checked' : '';
+@endphp
     <!-- ── PAGE: Fonds d'urgence ── -->
     <div id="page-fonds-urgence" class="page">
       <div class="page-title">Fonds d'urgence</div>
@@ -12,15 +18,15 @@
             <div class="card-body">
               <!-- Radio type -->
               <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
-                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="income" checked onchange="fuTypeChange()"/> Revenu mensuel</label>
-                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="expenses" onchange="fuTypeChange()"/> Dépenses mensuelles</label>
-                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="amount" onchange="fuTypeChange()"/> Montant fixe</label>
-                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="none" onchange="fuTypeChange()"/> Aucun</label>
+                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="income"   {{ $_fuCk('income') }}   onchange="fuTypeChange()"/> Revenu mensuel</label>
+                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="expenses" {{ $_fuCk('expenses') }} onchange="fuTypeChange()"/> Dépenses mensuelles</label>
+                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="amount"   {{ $_fuCk('amount') }}   onchange="fuTypeChange()"/> Montant fixe</label>
+                <label class="fu-radio-pill"><input type="radio" name="fu-type" value="none"     {{ $_fuCk('none') }}     onchange="fuTypeChange()"/> Aucun</label>
               </div>
 
               <!-- Revenu mensuel: mois seulement -->
               <div id="fu-row-income" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <input class="form-input" id="fu-months" type="text" value="3" style="width:60px;text-align:center" oninput="fuCalc()"/>
+                <input class="form-input" id="fu-months" type="text" value="{{ $_fuMois }}" style="width:60px;text-align:center" oninput="fuCalc()"/>
                 <span style="font-size:13px;color:var(--text)">mois de revenu familial net, correspondant à <strong id="fu-montant-cible-income">0 $</strong></span>
               </div>
 
@@ -31,7 +37,7 @@
                   <span class="sfx">$</span>
                 </div>
                 <span style="font-size:13px;color:var(--muted)">/mois ×</span>
-                <input class="form-input" id="fu-months-dep" type="text" value="3" style="width:60px;text-align:center" oninput="fuCalc()"/>
+                <input class="form-input" id="fu-months-dep" type="text" value="{{ $_fuMois }}" style="width:60px;text-align:center" oninput="fuCalc()"/>
                 <span style="font-size:13px;color:var(--text)">mois, correspondant à <strong id="fu-montant-cible-dep">0 $</strong></span>
               </div>
 
