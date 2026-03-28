@@ -1,5 +1,5 @@
 @php
-  $isAdmin    = auth()->user()?->hasAnyRole(['admin', 'super_admin']) ?? false;
+  $isAdmin    = auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
   $p          = $abfParams ?? [];
   $fmt        = fn($v, $dec=2) => number_format((float)($v ?? 0), $dec, ',', ' ');
   $pct        = fn($v, $dec=2) => number_format((float)($v ?? 0), $dec, ',', '');
