@@ -96,6 +96,7 @@ return [
 
         // Gestion Clients
         \App\Filament\Resources\AbfCaseAdminResource::class     => 1,
+        \App\Filament\Resources\AbfAnnouncementResource::class  => 2,
 
         // Site Web
         \App\Filament\Resources\MenuItemResource::class              => 1,

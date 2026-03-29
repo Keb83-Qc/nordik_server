@@ -16,7 +16,7 @@ class AbfAnnouncementResource extends Resource
 
     protected static ?string $navigationIcon  = 'heroicon-o-megaphone';
     protected static ?string $navigationLabel = 'Nouveautés ABF';
-    protected static ?string $navigationGroup = 'ABF';
+    protected static ?string $navigationGroup = 'Gestion Clients';
     protected static ?int    $navigationSort  = 5;
     protected static ?string $modelLabel      = 'Nouveauté';
     protected static ?string $pluralModelLabel = 'Nouveautés ABF';
