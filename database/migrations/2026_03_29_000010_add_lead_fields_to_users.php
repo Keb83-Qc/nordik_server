@@ -10,16 +10,24 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             // Active/désactive la réception de leads pour ce conseiller
-            $table->boolean('accepts_leads')->default(false)->after('advisor_code');
+            if (! Schema::hasColumn('users', 'accepts_leads')) {
+                $table->boolean('accepts_leads')->default(false)->after('advisor_code');
+            }
 
             // Poids dans la rotation : 1 = 1 lead par cycle, 2 = 2 leads par cycle, etc.
-            $table->unsignedTinyInteger('lead_weight')->default(1)->after('accepts_leads');
+            if (! Schema::hasColumn('users', 'lead_weight')) {
+                $table->unsignedTinyInteger('lead_weight')->default(1)->after('accepts_leads');
+            }
 
             // Compteur du cycle en cours (remis à 0 quand tout le monde atteint son quota)
-            $table->unsignedInteger('leads_received_cycle')->default(0)->after('lead_weight');
+            if (! Schema::hasColumn('users', 'leads_received_cycle')) {
+                $table->unsignedInteger('leads_received_cycle')->default(0)->after('lead_weight');
+            }
 
             // Horodatage du dernier lead reçu (pour le tie-break dans la rotation)
-            $table->timestamp('last_lead_received_at')->nullable()->after('leads_received_cycle');
+            if (! Schema::hasColumn('users', 'last_lead_received_at')) {
+                $table->timestamp('last_lead_received_at')->nullable()->after('leads_received_cycle');
+            }
         });
     }
 
