@@ -26,6 +26,11 @@ class FooterSettingsPage extends Page implements HasForms
 
     public ?array $data = [];
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
+    }
+
     public static function getNavigationSort(): ?int
     {
         return 10;

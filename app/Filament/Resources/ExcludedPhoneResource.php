@@ -30,17 +30,6 @@ class ExcludedPhoneResource extends Resource
         return config('filament-navigation.sort.' . static::class, 1);
     }
 
-    // Visible et accessible uniquement aux administrateurs
-    public static function canAccess(): bool
-    {
-        return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
-    }
-
     // ─── Formulaire ───────────────────────────────────────────────────────────
 
     public static function form(Form $form): Form

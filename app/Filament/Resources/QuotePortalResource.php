@@ -143,7 +143,8 @@ class QuotePortalResource extends Resource
                 ->schema([
                     Forms\Components\Tabs::make('Langues texte')
                         ->tabs(self::translationTabs(
-                            'consent_text', 'textarea', rows: 5,
+                            'consent_text', 'textarea', rows: 10,
+                            maxLength: 10000,
                             helperText: 'HTML accepté — ex: <p>...</p>, <strong>...</strong>'
                         )),
                 ]),
