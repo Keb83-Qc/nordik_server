@@ -4,6 +4,7 @@ namespace App\Livewire\Concerns;
 
 use App\Mail\NewSubmissionAdmin;
 use App\Models\ChatStep;
+use App\Models\ExcludedPhone;
 use App\Models\Submission;
 use App\Models\User;
 use App\Services\LeadDispatcher;
@@ -121,19 +122,37 @@ trait HasChatSteps
     {
         $this->data[$key] = $value;
 
+        // ─── Vérification LNNTE interne ───────────────────────────────────
+        // Dès que le numéro de téléphone est saisi, on vérifie la liste d'exclusion.
+        // Le flag est stocké dans data['_phone_excluded'] (invisible pour le client)
+        // ET dans la colonne is_phone_excluded de la soumission pour un accès rapide.
+        if ($key === 'phone') {
+            $this->data['_phone_excluded'] = ExcludedPhone::isExcluded($value);
+        }
+
+        $isPhoneExcluded = (bool) ($this->data['_phone_excluded'] ?? false);
+
         if ($this->submission === null) {
             // Lazy creation: only write to DB once we have an email
             if (!empty($this->data['email'])) {
                 $this->submission = Submission::create([
-                    'type'         => $this->chatType(),
-                    'advisor_code' => $this->advisorCode,
-                    'data'         => $this->data,
+                    'type'              => $this->chatType(),
+                    'advisor_code'      => $this->advisorCode,
+                    'data'              => $this->data,
+                    'is_phone_excluded' => $isPhoneExcluded,
+                    'client_phone'      => $this->data['phone'] ?? null,
+                    'client_email'      => $this->data['email'] ?? null,
                 ]);
                 session([$this->sessionKey() => $this->submission->id]);
             }
             // else: keep data in Livewire snapshot only until email is provided
         } else {
-            $this->submission->update(['data' => $this->data]);
+            $this->submission->update([
+                'data'              => $this->data,
+                'is_phone_excluded' => $isPhoneExcluded,
+                'client_phone'      => $this->data['phone'] ?? $this->submission->client_phone,
+                'client_email'      => $this->data['email'] ?? $this->submission->client_email,
+            ]);
         }
 
         $this->afterPersist();

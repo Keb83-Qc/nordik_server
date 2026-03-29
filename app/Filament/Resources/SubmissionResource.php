@@ -69,8 +69,9 @@ class SubmissionResource extends Resource
         return null;
     }
 
-    /** Identifiants déjà affichés dans les sections hardcodées */
+    /** Identifiants déjà affichés dans les sections hardcodées (+ champs internes préfixés _) */
     private const KNOWN_FIELDS = [
+        '_phone_excluded',
         'first_name','last_name','email','phone','age','profession','existing_products',
         'best_contact_time','gender','phone_is_cell','marital_status','employment_status',
         'education_level','industry','has_ia_products',
@@ -145,6 +146,34 @@ class SubmissionResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
+            // ── Alerte LNNTE ─────────────────────────────────────────────────────
+            Forms\Components\Placeholder::make('lnnte_warning')
+                ->label('')
+                ->columnSpanFull()
+                ->visible(fn (?Submission $record): bool => (bool) $record?->is_phone_excluded)
+                ->content(function (?Submission $record): HtmlString {
+                    if (! $record?->is_phone_excluded) return new HtmlString('');
+
+                    $phone = self::d($record, 'phone') ?? 'inconnu';
+                    $entry  = \App\Models\ExcludedPhone::findByPhone($phone);
+                    $reason = $entry
+                        ? (\App\Models\ExcludedPhone::REASONS[$entry->reason] ?? $entry->reason)
+                        : 'Non précisé';
+                    $notes = $entry?->notes
+                        ? '<br><span style="font-size:12px;">Notes : ' . e($entry->notes) . '</span>'
+                        : '';
+
+                    return new HtmlString(
+                        '<div style="background:#fff3cd;border:2px solid #ffc107;border-radius:10px;padding:14px 18px;margin-bottom:8px;">' .
+                        '<div style="font-size:15px;font-weight:800;color:#7a4f00;margin-bottom:4px;">⚠️ Numéro exclu — LNNTE interne</div>' .
+                        '<div style="font-size:13px;color:#664d03;line-height:1.6;">' .
+                        'Le numéro <strong>' . e($phone) . '</strong> est dans votre liste d\'exclusion.<br>' .
+                        '<strong>Ne pas contacter par téléphone</strong> sauf consentement explicite.<br>' .
+                        '<span>Raison : ' . e($reason) . '</span>' . $notes .
+                        '</div></div>'
+                    );
+                }),
+
             Forms\Components\Placeholder::make('fiche_titre')
                 ->label('')
                 ->columnSpanFull()
@@ -584,6 +613,19 @@ class SubmissionResource extends Resource
                     ->formatStateUsing(fn($state) => self::typeLabel($state))
                     ->color(fn($state) => self::typeColor($state)),
 
+                Tables\Columns\IconColumn::make('is_phone_excluded')
+                    ->label('LNNTE')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-phone-x-mark')
+                    ->falseIcon('heroicon-o-phone')
+                    ->trueColor('danger')
+                    ->falseColor('success')
+                    ->tooltip(fn (Submission $record): string =>
+                        $record->is_phone_excluded
+                            ? '⚠️ Numéro dans la liste d\'exclusion LNNTE interne'
+                            : 'Numéro libre'
+                    ),
+
                 Tables\Columns\TextColumn::make('client')
                     ->label('Client')
                     ->getStateUsing(function ($record) {
@@ -639,6 +681,12 @@ class SubmissionResource extends Resource
                             ->when($data['from'] ?? null, fn(Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
                             ->when($data['until'] ?? null, fn(Builder $q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
+
+                Tables\Filters\TernaryFilter::make('is_phone_excluded')
+                    ->label('Numéros exclus LNNTE')
+                    ->placeholder('Tous')
+                    ->trueLabel('Exclus seulement ⚠️')
+                    ->falseLabel('Non exclus ✅'),
 
                 Tables\Filters\SelectFilter::make('advisor_code')
                     ->label('Conseiller')

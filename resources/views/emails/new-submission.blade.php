@@ -313,6 +313,31 @@
         <div class="content">
 
             {{-- =========================================================
+            LNNTE — Bannière d'avertissement numéro exclu
+        ========================================================== --}}
+            @if($submission->is_phone_excluded || ($d['_phone_excluded'] ?? false))
+            @php
+                $excludedPhone = \App\Models\ExcludedPhone::findByPhone($d['phone'] ?? '');
+                $excludedReason = $excludedPhone
+                    ? (\App\Models\ExcludedPhone::REASONS[$excludedPhone->reason] ?? $excludedPhone->reason)
+                    : 'Non précisé';
+            @endphp
+            <div style="background:#fff3cd;border:2px solid #ffc107;border-radius:10px;padding:14px 18px;margin-bottom:20px;">
+                <div style="font-size:16px;font-weight:800;color:#7a4f00;margin-bottom:6px;">
+                    ⚠️ ATTENTION — Numéro exclu (LNNTE interne)
+                </div>
+                <div style="font-size:13px;color:#664d03;line-height:1.6;">
+                    Le numéro <strong>{{ $d['phone'] ?? 'inconnu' }}</strong> est inscrit dans votre liste interne de numéros exclus.<br>
+                    <strong>Ne pas contacter par téléphone</strong> sauf consentement explicite du client.<br>
+                    <span style="font-size:12px;">Raison : {{ $excludedReason }}</span>
+                    @if($excludedPhone?->notes)
+                        <br><span style="font-size:12px;">Notes : {{ $excludedPhone->notes }}</span>
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            {{-- =========================================================
             HABITATION (flat)
         ========================================================== --}}
             @if($type === 'habitation')

@@ -18,10 +18,12 @@ class Submission extends Model
         'data',
         'client_email',
         'client_phone',
+        'is_phone_excluded',
     ];
 
     protected $casts = [
-        'data' => 'array',
+        'data'              => 'array',
+        'is_phone_excluded' => 'boolean',
     ];
 
     // ─── Relations ────────────────────────────────────────────────────────────
