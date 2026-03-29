@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DeeplTranslateAction;
 use App\Filament\Resources\QuoteTypeResource\Pages;
 use App\Models\QuoteType;
 use Filament\Forms;
@@ -52,6 +53,9 @@ class QuoteTypeResource extends Resource
 
             Forms\Components\Section::make('Libellés (toutes langues)')
                 ->description('Le libellé affiché sur les boutons de sélection')
+                ->headerActions([
+                    DeeplTranslateAction::forField('label'),
+                ])
                 ->schema([
                     Forms\Components\Tabs::make('Traductions')
                         ->tabs([

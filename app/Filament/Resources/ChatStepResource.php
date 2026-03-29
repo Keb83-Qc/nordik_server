@@ -2,14 +2,18 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DeeplTranslateAction;
 use App\Filament\Resources\ChatStepResource\Pages;
 use App\Models\ChatStep;
 use App\Models\QuoteType;
+use App\Services\DeeplTranslator;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Validation\Rules\Unique;
 
 class ChatStepResource extends Resource
@@ -74,6 +78,9 @@ class ChatStepResource extends Resource
                 ]),
 
             Forms\Components\Section::make('Question (toutes langues)')
+                ->headerActions([
+                    DeeplTranslateAction::forField('question'),
+                ])
                 ->schema([
                     Forms\Components\Tabs::make('Traductions')
                         ->tabs([
@@ -246,6 +253,63 @@ class ChatStepResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
+                    // ─── Traduction en lot ────────────────────────────────
+                    Tables\Actions\BulkAction::make('translate_missing')
+                        ->label('Traduire les manquants (DeepL)')
+                        ->icon('heroicon-o-language')
+                        ->color('info')
+                        ->requiresConfirmation()
+                        ->modalHeading('Traduction DeepL en lot')
+                        ->modalDescription('Traduit FR → EN, ES, HT pour toutes les questions sélectionnées. Seules les langues VIDES seront remplies.')
+                        ->modalSubmitActionLabel('Lancer la traduction')
+                        ->action(function (Collection $records) {
+                            /** @var DeeplTranslator $deepl */
+                            $deepl     = app(DeeplTranslator::class);
+                            $added     = 0;
+                            $errors    = 0;
+                            $targets   = ['en' => 'EN', 'es' => 'ES', 'ht' => 'HT'];
+
+                            foreach ($records as $record) {
+                                /** @var ChatStep $record */
+                                $q      = $record->question ?? [];
+                                $frText = trim($q['fr'] ?? '');
+
+                                if ($frText === '') continue;
+
+                                $changed = false;
+
+                                foreach ($targets as $lang => $deepLCode) {
+                                    if (!empty(trim($q[$lang] ?? ''))) continue; // déjà traduit
+
+                                    try {
+                                        $q[$lang] = $deepl->translatePlain($frText, 'FR', $deepLCode);
+                                        $added++;
+                                        $changed = true;
+                                    } catch (\Throwable $e) {
+                                        $errors++;
+                                    }
+                                }
+
+                                if ($changed) {
+                                    $record->question = $q;
+                                    $record->save(); // déclenche l'invalidation du cache
+                                }
+                            }
+
+                            if ($errors > 0) {
+                                Notification::make()
+                                    ->warning()
+                                    ->title("Traduction partielle : {$added} ajoutée(s), {$errors} échec(s)")
+                                    ->body('Vérifiez votre clé DEEPL_API_KEY si les erreurs persistent.')
+                                    ->send();
+                            } else {
+                                Notification::make()
+                                    ->success()
+                                    ->title("{$added} traduction(s) ajoutée(s)")
+                                    ->send();
+                            }
+                        }),
+
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);

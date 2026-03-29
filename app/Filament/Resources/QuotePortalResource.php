@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\DeeplTranslateAction;
 use App\Filament\Resources\QuotePortalResource\Pages;
 use App\Models\QuotePortal;
 use App\Models\QuoteType;
@@ -120,47 +121,74 @@ class QuotePortalResource extends Resource
                         ->gridDirection('row'),
                 ]),
 
-            // ─── Consentement ─────────────────────────────────────────────────
-            Forms\Components\Section::make('Texte de consentement')
-                ->description('Le texte affiché avant que le client commence sa soumission')
+            // ─── Titre du consentement ────────────────────────────────────────
+            Forms\Components\Section::make('Titre du consentement')
+                ->description('Titre affiché en haut de la page de consentement')
+                ->headerActions([
+                    DeeplTranslateAction::forField('consent_title'),
+                ])
                 ->schema([
-                    Forms\Components\Tabs::make('Langues')
+                    Forms\Components\Tabs::make('Langues titre')
                         ->tabs([
                             Forms\Components\Tabs\Tab::make('🇫🇷 Français')
                                 ->schema([
                                     Forms\Components\TextInput::make('consent_title.fr')
-                                        ->label('Titre')
+                                        ->label('Titre (FR)')
                                         ->maxLength(200),
-                                    Forms\Components\Textarea::make('consent_text.fr')
-                                        ->label('Texte de consentement')
-                                        ->rows(5)
-                                        ->helperText('HTML accepté (ex: <p>...</p>, <strong>...</strong>)'),
                                 ]),
                             Forms\Components\Tabs\Tab::make('🇬🇧 English')
                                 ->schema([
                                     Forms\Components\TextInput::make('consent_title.en')
-                                        ->label('Title')
+                                        ->label('Title (EN)')
                                         ->maxLength(200),
-                                    Forms\Components\Textarea::make('consent_text.en')
-                                        ->label('Consent text')
-                                        ->rows(5),
                                 ]),
                             Forms\Components\Tabs\Tab::make('🇪🇸 Español')
                                 ->schema([
                                     Forms\Components\TextInput::make('consent_title.es')
-                                        ->label('Título')
+                                        ->label('Título (ES)')
                                         ->maxLength(200),
-                                    Forms\Components\Textarea::make('consent_text.es')
-                                        ->label('Texto de consentimiento')
-                                        ->rows(5),
                                 ]),
                             Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
                                 ->schema([
                                     Forms\Components\TextInput::make('consent_title.ht')
-                                        ->label('Tit')
+                                        ->label('Tit (HT)')
                                         ->maxLength(200),
+                                ]),
+                        ]),
+                ]),
+
+            // ─── Texte du consentement ────────────────────────────────────────
+            Forms\Components\Section::make('Texte de consentement')
+                ->description('Texte affiché avant que le client commence sa soumission (HTML accepté)')
+                ->headerActions([
+                    DeeplTranslateAction::forField('consent_text', isHtml: true),
+                ])
+                ->schema([
+                    Forms\Components\Tabs::make('Langues texte')
+                        ->tabs([
+                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
+                                ->schema([
+                                    Forms\Components\Textarea::make('consent_text.fr')
+                                        ->label('Texte (FR)')
+                                        ->rows(5)
+                                        ->helperText('HTML accepté — ex: <p>...</p>, <strong>...</strong>'),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
+                                ->schema([
+                                    Forms\Components\Textarea::make('consent_text.en')
+                                        ->label('Text (EN)')
+                                        ->rows(5),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
+                                ->schema([
+                                    Forms\Components\Textarea::make('consent_text.es')
+                                        ->label('Texto (ES)')
+                                        ->rows(5),
+                                ]),
+                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
+                                ->schema([
                                     Forms\Components\Textarea::make('consent_text.ht')
-                                        ->label('Tèks konsantman')
+                                        ->label('Tèks (HT)')
                                         ->rows(5),
                                 ]),
                         ]),
