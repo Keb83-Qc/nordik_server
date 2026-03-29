@@ -31,9 +31,22 @@ return Application::configure(basePath: dirname(__DIR__))
         // --- LOGIQUE DE CAPTURE AUTOMATIQUE ---
         $exceptions->reportable(function (Throwable $e) {
             try {
-                // On vérifie si ce n'est pas une erreur 404 (pour éviter de polluer les logs)
-                if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
-                    return;
+                $source = SystemLog::detectSource();
+
+                // ── 404 / Modèle introuvable ────────────────────────────────────────
+                // On log uniquement les 404 du site public (pas le panel admin — trop de bruit)
+                if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+                    || $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException
+                ) {
+                    if ($source === SystemLog::SOURCE_PUBLIC) {
+                        SystemLog::record('warning', '[404] ' . request()->path(), [
+                            'url'        => request()->fullUrl(),
+                            'method'     => request()->method(),
+                            'referer'    => request()->header('referer', ''),
+                            'user_agent' => mb_substr(request()->userAgent() ?? '', 0, 200),
+                        ], SystemLog::SOURCE_PUBLIC);
+                    }
+                    return; // Ne pas remonter davantage pour les 404
                 }
 
                 SystemLog::record('danger', 'Crash Automatique: ' . $e->getMessage(), [
@@ -41,7 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'line'  => $e->getLine(),
                     'trace' => mb_substr($e->getTraceAsString(), 0, 500),
                     'url'   => request()->fullUrl(),
-                ]);
+                ], $source);
 
                 // ── Notification email (max 1 par heure pour éviter le spam) ──
                 $cacheKey = 'error_alert_sent_' . md5(get_class($e));

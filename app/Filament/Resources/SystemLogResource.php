@@ -26,33 +26,52 @@ class SystemLogResource extends Resource
         return config('filament-navigation.sort.' . static::class);
     }
 
+    // Badge de navigation = nb de logs "danger" des dernières 24h
+    public static function getNavigationBadge(): ?string
+    {
+        $count = SystemLog::where('level', 'danger')
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+
+        return $count > 0 ? (string) $count : null;
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'danger';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('level')
-                    ->label('Niveau')
-                    ->readOnly(),
-                Forms\Components\DateTimePicker::make('created_at')
-                    ->label('Date')
-                    ->readOnly(),
+                Forms\Components\Grid::make(3)->schema([
+                    Forms\Components\TextInput::make('level')
+                        ->label('Niveau')
+                        ->readOnly(),
+                    Forms\Components\TextInput::make('source')
+                        ->label('Source')
+                        ->readOnly(),
+                    Forms\Components\DateTimePicker::make('created_at')
+                        ->label('Date')
+                        ->readOnly(),
+                ]),
+
                 Forms\Components\Textarea::make('message')
                     ->label('Message')
                     ->columnSpanFull()
                     ->readOnly(),
 
-                // ZONE JSON (Corrigée avec Textarea)
                 Forms\Components\Textarea::make('context')
                     ->label('Détails techniques (JSON complet)')
                     ->columnSpanFull()
                     ->rows(15)
                     ->readOnly()
-                    ->extraAttributes(['class' => 'font-mono']) // Police style "code"
-                    // Transformation du tableau PHP en texte JSON lisible
+                    ->extraAttributes(['class' => 'font-mono'])
                     ->formatStateUsing(fn($state) => json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
 
                 Forms\Components\TextInput::make('ip_address')
-                    ->label('Adresse IP de l\'auteur')
+                    ->label('Adresse IP')
                     ->readOnly(),
             ]);
     }
@@ -61,52 +80,127 @@ class SystemLogResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('level')
-                    ->label('Statut')
+                // Source (public / admin / cli / api)
+                Tables\Columns\TextColumn::make('source')
+                    ->label('Source')
                     ->badge()
-                    ->colors([
-                        'danger'  => fn($state) => in_array($state, ['fatal', 'login_fail']),
-                        'warning' => 'error',
-                        'info'    => 'info',
-                        'success' => fn($state) => in_array($state, ['update', 'login']),
-                    ])
+                    ->color(fn(?string $state): string => match ($state) {
+                        'public' => 'info',
+                        'admin'  => 'gray',
+                        'cli'    => 'gray',
+                        'api'    => 'warning',
+                        default  => 'gray',
+                    })
+                    ->formatStateUsing(fn(?string $state): string => match ($state) {
+                        'public' => '🌐 Site',
+                        'admin'  => '🔧 Admin',
+                        'cli'    => '⚙️ CLI',
+                        'api'    => '🔌 API',
+                        default  => $state ?? '—',
+                    })
+                    ->sortable(),
+
+                // Niveau (danger / warning / info / login / etc.)
+                Tables\Columns\TextColumn::make('level')
+                    ->label('Niveau')
+                    ->badge()
+                    ->color(fn(?string $state): string => match ($state) {
+                        'danger', 'fatal', 'login_fail' => 'danger',
+                        'warning', 'error'              => 'warning',
+                        'info'                          => 'info',
+                        'login', 'update', 'success'    => 'success',
+                        default                         => 'gray',
+                    })
                     ->formatStateUsing(fn(string $state): string => match ($state) {
-                        'login'      => '✓ Succès',
-                        'login_fail' => '✗ Échec',
+                        'login'      => '✓ Connexion',
+                        'login_fail' => '✗ Échec login',
+                        'danger'     => '🔴 Critique',
+                        'warning'    => '⚠ Avertissement',
+                        'info'       => 'ℹ Info',
                         default      => strtoupper($state),
                     }),
 
+                // Message
                 Tables\Columns\TextColumn::make('message')
-                    ->limit(50)
-                    ->searchable()
+                    ->label('Message')
+                    ->limit(60)
+                    ->tooltip(fn($record) => $record->message)
+                    ->searchable(),
+
+                // URL (depuis context)
+                Tables\Columns\TextColumn::make('context.url')
+                    ->label('URL')
+                    ->limit(40)
+                    ->tooltip(fn($record) => $record->context['url'] ?? null)
+                    ->toggleable(),
+
+                // Référant (depuis context)
+                Tables\Columns\TextColumn::make('context.referer')
+                    ->label('Référant')
+                    ->limit(35)
+                    ->tooltip(fn($record) => $record->context['referer'] ?? null)
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('user.full_name')
                     ->label('Utilisateur')
-                    ->placeholder('Système'),
-
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('d/m/Y H:i:s')
-                    ->sortable(),
+                    ->placeholder('—')
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('ip_address')
-                    ->label('Adresse IP')
+                    ->label('IP')
                     ->searchable()
                     ->toggleable(),
 
                 Tables\Columns\TextColumn::make('context.user_agent')
-                    ->label('Navigateur / OS')
-                    ->limit(45)
+                    ->label('Navigateur')
+                    ->limit(40)
                     ->tooltip(fn($record) => $record->context['user_agent'] ?? null)
                     ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Date')
+                    ->dateTime('d/m/Y H:i:s')
+                    ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->recordAction('view')
+            ->filters([
+                // Filtre par source
+                Tables\Filters\SelectFilter::make('source')
+                    ->label('Source')
+                    ->options([
+                        'public' => '🌐 Site public',
+                        'admin'  => '🔧 Panel admin',
+                        'cli'    => '⚙️ CLI / Queue',
+                        'api'    => '🔌 API',
+                    ]),
+
+                // Filtre par niveau
+                Tables\Filters\SelectFilter::make('level')
+                    ->label('Niveau')
+                    ->options([
+                        'danger'     => '🔴 Critique (crash)',
+                        'warning'    => '⚠ Avertissement',
+                        'info'       => 'ℹ Info',
+                        'login'      => '✓ Connexion réussie',
+                        'login_fail' => '✗ Échec de connexion',
+                        'update'     => 'Mise à jour',
+                    ]),
+
+                // Filtre par période
+                Tables\Filters\Filter::make('today')
+                    ->label("Aujourd'hui seulement")
+                    ->query(fn($query) => $query->whereDate('created_at', today())),
+
+                Tables\Filters\Filter::make('last_24h')
+                    ->label('Dernières 24h')
+                    ->query(fn($query) => $query->where('created_at', '>=', now()->subDay())),
+            ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
 
                 Tables\Actions\Action::make('voir_json')
-                    ->label('Voir JSON')
+                    ->label('JSON')
                     ->icon('heroicon-o-code-bracket')
                     ->modalHeading('Détails Techniques')
                     ->modalContent(fn($record) => new \Illuminate\Support\HtmlString(
@@ -117,18 +211,16 @@ class SystemLogResource extends Resource
                     ->modalSubmitAction(false)
                     ->modalCancelAction(false),
             ])
-            // --- AJOUT : BOUTON POUR VIDER LES LOGS ---
             ->headerActions([
                 Tables\Actions\Action::make('clear_logs')
                     ->label('Vider l\'historique')
                     ->icon('heroicon-o-trash')
-                    ->color('danger') // Rouge
-                    ->requiresConfirmation() // Demande "Êtes-vous sûr ?"
+                    ->color('danger')
+                    ->requiresConfirmation()
                     ->modalHeading('Supprimer tous les logs ?')
                     ->modalDescription('Cette action est irréversible. Tout l\'historique système sera effacé.')
                     ->modalSubmitActionLabel('Oui, tout supprimer')
                     ->action(function () {
-                        // On vide la table complètement (c'est plus rapide que delete())
                         SystemLog::truncate();
 
                         \Filament\Notifications\Notification::make()

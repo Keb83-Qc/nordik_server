@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\User;
 use App\Models\TeamTitle;
+use App\Models\SystemLog;
 
 class TeamController extends Controller
 {
@@ -58,14 +59,29 @@ class TeamController extends Controller
         ]));
     }
 
-    public function show($slug)
+    public function show(string $slug)
     {
-        // Cache individuel par profil conseiller (24h — change très rarement)
-        $member = Cache::remember("team_member_{$slug}", 86400, function () use ($slug) {
-            return User::with(['title', 'role'])
-                ->where('slug', $slug)
-                ->firstOrFail();
-        });
+        // On essaie d'abord le cache, mais on attrape le ModelNotFoundException
+        // pour logger proprement avant de renvoyer une 404
+        try {
+            $member = Cache::remember("team_member_{$slug}", 86400, function () use ($slug) {
+                return User::with(['title', 'role'])
+                    ->where('slug', $slug)
+                    ->firstOrFail();
+            });
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+            // Invalide le cache au cas où l'entrée corrompue serait mise en cache
+            Cache::forget("team_member_{$slug}");
+
+            SystemLog::record('warning', "[404] Profil conseiller introuvable : {$slug}", [
+                'slug'       => $slug,
+                'url'        => request()->fullUrl(),
+                'referer'    => request()->header('referer', ''),
+                'user_agent' => mb_substr(request()->userAgent() ?? '', 0, 200),
+            ], SystemLog::SOURCE_PUBLIC);
+
+            abort(404, "Le profil conseiller « {$slug} » est introuvable.");
+        }
 
         $display_role = $member->title
             ? $member->title->title_name
