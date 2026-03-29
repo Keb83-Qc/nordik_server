@@ -4,23 +4,40 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Submission extends Model
 {
     use HasFactory;
 
-    // 1. Autoriser l'écriture sur ces colonnes
     protected $fillable = [
         'advisor_code',
-        'type',
+        'type',             // Conservé pour rétrocompatibilité
+        'quote_type_id',    // Nouvelle FK vers quote_types
         'current_step',
         'data',
         'client_email',
         'client_phone',
     ];
 
-    // 2. LA CORRECTION EST ICI : On dit à Laravel de traiter 'data' comme un tableau
     protected $casts = [
         'data' => 'array',
     ];
+
+    // ─── Relations ────────────────────────────────────────────────────────────
+
+    public function quoteType(): BelongsTo
+    {
+        return $this->belongsTo(QuoteType::class);
+    }
+
+    // ─── Helpers ──────────────────────────────────────────────────────────────
+
+    /**
+     * Retourne le slug du type de quote (depuis la relation ou le champ legacy).
+     */
+    public function getTypeSlug(): string
+    {
+        return $this->quoteType?->slug ?? $this->type ?? '';
+    }
 }
