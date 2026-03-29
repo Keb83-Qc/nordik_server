@@ -3,11 +3,14 @@
 namespace App\Filament\Resources\ExcludedPhoneResource\Pages;
 
 use App\Filament\Resources\ExcludedPhoneResource;
+use App\Jobs\ImportLnnteFileJob;
 use App\Models\ExcludedPhone;
 use Filament\Actions;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Storage;
 
 class ListExcludedPhones extends ListRecords
 {
@@ -55,6 +58,65 @@ class ListExcludedPhones extends ListRecords
                 })
                 ->modalSubmitActionLabel('Vérifier')
                 ->modalWidth('sm'),
+
+            // ─── Import LNNTE officielle (fichier CRTC) ──────────────────────
+            Actions\Action::make('import_lnnte')
+                ->label('Import LNNTE officielle')
+                ->icon('heroicon-o-document-arrow-up')
+                ->color('danger')
+                ->modalHeading('Import fichier LNNTE officiel (CRTC)')
+                ->modalDescription(
+                    'Importez le fichier téléchargé depuis le portail CRTC (lnnte-dncl.gc.ca). ' .
+                    'L\'import se fait en arrière-plan — vous recevrez une notification Filament à la fin.'
+                )
+                ->form([
+                    FileUpload::make('lnnte_file')
+                        ->label('Fichier LNNTE (.txt ou .csv)')
+                        ->required()
+                        ->acceptedFileTypes(['text/plain', 'text/csv', 'application/csv', 'application/octet-stream'])
+                        ->maxSize(102400) // 100 Mo max
+                        ->storeFiles(false) // on gère le stockage manuellement
+                        ->helperText(
+                            'Fichier téléchargé depuis lnnte-dncl.gc.ca — format : un numéro par ligne ' .
+                            '(ex: 4185551234) ou CSV avec numéro en première colonne.'
+                        ),
+
+                    \Filament\Forms\Components\Textarea::make('notes')
+                        ->label('Notes (optionnel)')
+                        ->rows(2)
+                        ->placeholder('Ex: Import LNNTE — mars 2026 — Zone Québec'),
+                ])
+                ->action(function (array $data): void {
+                    $uploadedFile = $data['lnnte_file'];
+
+                    if (! $uploadedFile) {
+                        Notification::make()
+                            ->warning()
+                            ->title('Aucun fichier sélectionné')
+                            ->send();
+                        return;
+                    }
+
+                    // Déplacer le fichier temporaire vers un emplacement permanent pour le Job
+                    $filename    = 'lnnte/import_' . now()->format('YmdHis') . '_' . auth()->id() . '.txt';
+                    $tmpPath     = $uploadedFile->getRealPath();
+                    Storage::put($filename, file_get_contents($tmpPath));
+
+                    // Dispatcher le job en arrière-plan
+                    ImportLnnteFileJob::dispatch(
+                        $filename,
+                        $data['notes'] ?? '',
+                        auth()->user(),
+                    );
+
+                    Notification::make()
+                        ->success()
+                        ->title('🚀 Import lancé en arrière-plan')
+                        ->body('Le fichier LNNTE est en cours de traitement. Vous recevrez une notification Filament lorsque l\'import sera terminé.')
+                        ->send();
+                })
+                ->modalSubmitActionLabel('Lancer l\'import')
+                ->modalWidth('lg'),
 
             // ─── Import en lot ────────────────────────────────────────────────
             Actions\Action::make('import_bulk')
