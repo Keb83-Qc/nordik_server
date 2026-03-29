@@ -125,6 +125,7 @@ return [
         \App\Filament\Pages\AdvisorLinks::class                 => 6,
         \App\Filament\Pages\ManageGoogleReviews::class          => 7,
         \App\Filament\Resources\SystemLogResource::class        => 8,
+        \App\Filament\Resources\ActivityLogResource::class      => 9,
     ],
 
     // Liens externes / panels séparés

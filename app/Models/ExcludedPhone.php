@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * Liste interne de numéros exclus du démarchage (inspirée de la LNNTE).
@@ -25,6 +27,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ExcludedPhone extends Model
 {
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['phone', 'reason', 'notes', 'expires_at'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('excluded_phone');
+    }
+
     protected $fillable = [
         'phone',
         'phone_normalized',

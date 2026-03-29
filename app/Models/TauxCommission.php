@@ -3,9 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class TauxCommission extends Model
 {
+    use LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['company', 'type_placement', 'option_nom', 'taux_mensuel', 'taux_initial'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('taux_commission');
+    }
+
     // IMPORTANT : On force le nom de la table tel qu'il est dans votre SQL
     protected $table = 'taux_commissions';
 

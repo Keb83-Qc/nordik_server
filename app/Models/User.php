@@ -11,13 +11,24 @@ use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use App\Models\Employee;
 use App\Models\Role;
 use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements HasName, FilamentUser
 {
-    use HasFactory, Notifiable, HasRoles, HasTranslations;
+    use HasFactory, Notifiable, HasRoles, HasTranslations, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['first_name', 'last_name', 'email', 'role_id', 'is_active', 'advisor_code'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('user');
+    }
 
     // 1. Configuration des traductions (Bio uniquement ici)
     public $translatable = ['bio'];

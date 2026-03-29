@@ -4,10 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AbfCase extends Model
 {
+    use LogsActivity;
+
     protected $table = 'abf_cases';
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['client_first_name', 'client_last_name', 'status', 'advisor_user_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('abf_case');
+    }
 
     protected $fillable = [
         'advisor_user_id',
