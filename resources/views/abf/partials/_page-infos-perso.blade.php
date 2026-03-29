@@ -54,15 +54,20 @@
               <label class="form-label required">Province d'imposition</label>
               <select class="form-select" id="client-province">
                 <option>Alberta</option><option>Colombie-Britannique</option>
-                <option>Ontario</option><option selected>Québec</option>
-                <option>Saskatchewan</option>
+                <option>Île-du-Prince-Édouard</option><option>Manitoba</option>
+                <option>Nouveau-Brunswick</option><option>Nouvelle-Écosse</option>
+                <option>Nunavut</option><option>Ontario</option>
+                <option selected>Québec</option><option>Saskatchewan</option>
+                <option>Terre-Neuve-et-Labrador</option>
+                <option>Territoires du Nord-Ouest</option><option>Yukon</option>
               </select>
             </div>
           </div>
           <div class="row">
             <div class="col form-group">
               <label class="form-label">Courriel personnel</label>
-              <input class="form-input" id="client-courriel" type="email" value="" placeholder="courriel@exemple.com"/>
+              <input class="form-input" id="client-courriel" type="email" value="" placeholder="courriel@exemple.com"
+                pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Format requis : courriel@domaine.com"/>
             </div>
             <div class="col form-group">
               <label class="form-label required">Réside au Canada depuis</label>
@@ -96,11 +101,13 @@
           <div class="row">
             <div class="col form-group">
               <label class="form-label">Cellulaire</label>
-              <input class="form-input" id="client-cellulaire" type="tel" value="" placeholder="(514) 000-0000"/>
+              <input class="form-input" id="client-cellulaire" type="tel" value="" placeholder="514 000-0000" maxlength="12"
+                oninput="const d=this.value.replace(/\D/g,'').slice(0,10);this.value=d.length<=3?d:d.length<=6?d.slice(0,3)+' '+d.slice(3):d.slice(0,3)+' '+d.slice(3,6)+'-'+d.slice(6)"/>
             </div>
             <div class="col form-group">
               <label class="form-label">Téléphone domicile</label>
-              <input class="form-input" type="tel" placeholder="(514) 000-0000"/>
+              <input class="form-input" id="client-telephone" type="tel" placeholder="514 000-0000" maxlength="12"
+                oninput="const d=this.value.replace(/\D/g,'').slice(0,10);this.value=d.length<=3?d:d.length<=6?d.slice(0,3)+' '+d.slice(3):d.slice(0,3)+' '+d.slice(3,6)+'-'+d.slice(6)"/>
             </div>
           </div>
           <!-- Adresse structurée -->
@@ -140,11 +147,21 @@
               </div>
               <div class="col form-group">
                 <label class="form-label">Province</label>
-                <input class="form-input" type="text" id="client-addr-province" value="" oninput="syncConjointInfo()"/>
+                <select class="form-select" id="client-addr-province" onchange="syncConjointInfo()">
+                  <option value="">—</option>
+                  <option>Alberta</option><option>Colombie-Britannique</option>
+                  <option>Île-du-Prince-Édouard</option><option>Manitoba</option>
+                  <option>Nouveau-Brunswick</option><option>Nouvelle-Écosse</option>
+                  <option>Nunavut</option><option>Ontario</option>
+                  <option selected>Québec</option><option>Saskatchewan</option>
+                  <option>Terre-Neuve-et-Labrador</option>
+                  <option>Territoires du Nord-Ouest</option><option>Yukon</option>
+                </select>
               </div>
               <div class="col form-group">
                 <label class="form-label">Code postal</label>
-                <input class="form-input" type="text" id="client-addr-postal" value="" oninput="syncConjointInfo()"/>
+                <input class="form-input" type="text" id="client-addr-postal" value="" placeholder="A1A 1A1" maxlength="7"
+                  oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v;syncConjointInfo()"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Pays</label>
@@ -249,8 +266,12 @@
                 <label class="form-label required">Province d'imposition</label>
                 <select class="form-select" id="conjoint-province">
                   <option>Alberta</option><option>Colombie-Britannique</option>
-                  <option>Ontario</option><option selected>Québec</option>
-                  <option>Saskatchewan</option>
+                  <option>Île-du-Prince-Édouard</option><option>Manitoba</option>
+                  <option>Nouveau-Brunswick</option><option>Nouvelle-Écosse</option>
+                  <option>Nunavut</option><option>Ontario</option>
+                  <option selected>Québec</option><option>Saskatchewan</option>
+                  <option>Terre-Neuve-et-Labrador</option>
+                  <option>Territoires du Nord-Ouest</option><option>Yukon</option>
                 </select>
               </div>
             </div>
@@ -258,7 +279,8 @@
             <div class="row">
               <div class="col form-group">
                 <label class="form-label">Courriel personnel</label>
-                <input class="form-input" type="email" placeholder="courriel@exemple.com"/>
+                <input class="form-input" id="conjoint-courriel" type="email" placeholder="courriel@exemple.com"
+                  pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Format requis : courriel@domaine.com"/>
               </div>
               <div class="col form-group">
                 <label class="form-label required">Réside au Canada depuis</label>
@@ -320,11 +342,21 @@
               </div>
               <div class="col form-group">
                 <label class="form-label">Province</label>
-                <input class="form-input" type="text" id="conjoint-addr-province"/>
+                <select class="form-select" id="conjoint-addr-province">
+                  <option value="">—</option>
+                  <option>Alberta</option><option>Colombie-Britannique</option>
+                  <option>Île-du-Prince-Édouard</option><option>Manitoba</option>
+                  <option>Nouveau-Brunswick</option><option>Nouvelle-Écosse</option>
+                  <option>Nunavut</option><option>Ontario</option>
+                  <option selected>Québec</option><option>Saskatchewan</option>
+                  <option>Terre-Neuve-et-Labrador</option>
+                  <option>Territoires du Nord-Ouest</option><option>Yukon</option>
+                </select>
               </div>
               <div class="col form-group">
                 <label class="form-label">Code postal</label>
-                <input class="form-input" type="text" id="conjoint-addr-postal"/>
+                <input class="form-input" type="text" id="conjoint-addr-postal" placeholder="A1A 1A1" maxlength="7"
+                  oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Pays</label>
@@ -341,11 +373,13 @@
             <div class="row">
               <div class="col form-group">
                 <label class="form-label">Cellulaire</label>
-                <input class="form-input" type="tel" placeholder="(514) 000-0000"/>
+                <input class="form-input" id="conjoint-cellulaire" type="tel" placeholder="514 000-0000" maxlength="12"
+                  oninput="const d=this.value.replace(/\D/g,'').slice(0,10);this.value=d.length<=3?d:d.length<=6?d.slice(0,3)+' '+d.slice(3):d.slice(0,3)+' '+d.slice(3,6)+'-'+d.slice(6)"/>
               </div>
               <div class="col form-group">
                 <label class="form-label">Téléphone domicile</label>
-                <input class="form-input" type="tel" placeholder="(514) 000-0000"/>
+                <input class="form-input" id="conjoint-telephone" type="tel" placeholder="514 000-0000" maxlength="12"
+                  oninput="const d=this.value.replace(/\D/g,'').slice(0,10);this.value=d.length<=3?d:d.length<=6?d.slice(0,3)+' '+d.slice(3):d.slice(0,3)+' '+d.slice(3,6)+'-'+d.slice(6)"/>
               </div>
             </div>
           </div>
