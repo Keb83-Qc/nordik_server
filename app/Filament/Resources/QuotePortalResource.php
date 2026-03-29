@@ -86,7 +86,6 @@ class QuotePortalResource extends Resource
                         ->label('Conseiller fixe')
                         ->placeholder('— Rotation automatique —')
                         ->options(fn () => User::whereNotNull('advisor_code')
-                            ->where('accepts_leads', true)
                             ->orderBy('first_name')
                             ->get()
                             ->mapWithKeys(fn (User $u) => [
