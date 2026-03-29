@@ -260,17 +260,17 @@ Route::prefix('{locale}')
         Route::middleware(['throttle:60,1'])->group(function () {
             Route::get('/quote/auto', function () {
                 abort_unless(session('has_consented') === true, 403);
-                return view('quote-auto-page');
+                return view('quote.auto');
             })->name('quote.auto');
 
             Route::get('/quote/habitation', function () {
                 abort_unless(session('has_consented') === true, 403);
-                return view('quote-home-page');
+                return view('quote.home');
             })->name('quote.habitation');
 
             Route::get('/quote/bundle', function () {
                 abort_unless(session('has_consented') === true, 403);
-                return view('quote-bundle-page');
+                return view('quote.bundle');
             })->name('quote.bundle');
         });
 

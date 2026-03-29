@@ -18,7 +18,7 @@ $advisorPhone = $advisor && $advisor->phone ? $advisor->phone : null;
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     @livewireStyles
 
-    @include('partials.quote-chat-styles')
+    @include('quote.partials.chat-styles')
 </head>
 
 <body>

@@ -260,6 +260,6 @@ class QuoteAutoChat extends Component
 
     public function render()
     {
-        return view('livewire.quote-auto-chat');
+        return view('livewire.quote.auto-chat');
     }
 }

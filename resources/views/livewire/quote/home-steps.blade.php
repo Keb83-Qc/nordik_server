@@ -1,4 +1,4 @@
-{{-- resources/views/livewire/quote-home-steps.blade.php --}}
+{{-- resources/views/livewire/quote/home-steps.blade.php --}}
 {{-- Rendu dynamique depuis la DB — ordre respecte sort_order --}}
 
 @php

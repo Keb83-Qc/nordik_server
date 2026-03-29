@@ -12,7 +12,7 @@
         </div>
 
         {{-- Q/A --}}
-        @include('livewire.quote-bundle-steps')
+        @include('livewire.quote.bundle-steps')
 
         <div id="chat-end" style="height:1px;"></div>
     </div>

@@ -1,4 +1,4 @@
-{{-- resources/views/livewire/quote-auto-steps.blade.php --}}
+{{-- resources/views/livewire/quote/auto-steps.blade.php --}}
 {{-- Rendu dynamique depuis la DB — ordre respecte sort_order --}}
 
 @php

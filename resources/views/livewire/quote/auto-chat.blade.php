@@ -26,7 +26,7 @@
         </div>
 
         {{-- QUESTIONS / RÉPONSES --}}
-        @include('livewire.quote-auto-steps')
+        @include('livewire.quote.auto-steps')
 
         <div id="chat-end" style="height:1px;"></div>
     </div>

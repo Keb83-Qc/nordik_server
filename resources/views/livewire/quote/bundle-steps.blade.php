@@ -1,4 +1,4 @@
-{{-- resources/views/livewire/quote-bundle-steps.blade.php --}}
+{{-- resources/views/livewire/quote/bundle-steps.blade.php --}}
 
 @php
 $common = $data['common'] ?? [];

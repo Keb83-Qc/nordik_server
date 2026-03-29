@@ -12,7 +12,7 @@
         </div>
 
         {{-- Questions / Réponses --}}
-        @include('livewire.quote-home-steps')
+        @include('livewire.quote.home-steps')
 
         <div id="chat-end" style="height:1px;"></div>
     </div>

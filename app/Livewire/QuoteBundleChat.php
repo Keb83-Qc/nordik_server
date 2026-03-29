@@ -417,6 +417,6 @@ class QuoteBundleChat extends Component
 
     public function render()
     {
-        return view('livewire.quote-bundle-chat');
+        return view('livewire.quote.bundle-chat');
     }
 }
