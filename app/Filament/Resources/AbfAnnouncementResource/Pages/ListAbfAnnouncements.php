@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Abf\Resources\AbfAnnouncementResource\Pages;
+namespace App\Filament\Resources\AbfAnnouncementResource\Pages;
 
-use App\Filament\Abf\Resources\AbfAnnouncementResource;
+use App\Filament\Resources\AbfAnnouncementResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 

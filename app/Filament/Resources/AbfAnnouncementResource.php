@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Abf\Resources;
+namespace App\Filament\Resources;
 
-use App\Filament\Abf\Resources\AbfAnnouncementResource\Pages;
+use App\Filament\Resources\AbfAnnouncementResource\Pages;
 use App\Models\AbfAnnouncement;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -15,11 +15,11 @@ class AbfAnnouncementResource extends Resource
     protected static ?string $model = AbfAnnouncement::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-megaphone';
-    protected static ?string $navigationLabel = 'Nouveautés conseillers';
-    protected static ?string $navigationGroup = 'Administration';
+    protected static ?string $navigationLabel = 'Nouveautés ABF';
+    protected static ?string $navigationGroup = 'ABF';
     protected static ?int    $navigationSort  = 5;
     protected static ?string $modelLabel      = 'Nouveauté';
-    protected static ?string $pluralModelLabel = 'Nouveautés conseillers';
+    protected static ?string $pluralModelLabel = 'Nouveautés ABF';
 
     public static function canAccess(): bool
     {
