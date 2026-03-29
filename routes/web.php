@@ -16,6 +16,7 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ConsentController;
+use App\Http\Controllers\PortalController;
 use App\Http\Controllers\AbfPdfController;
 use App\Http\Controllers\AbfEditorController;
 use App\Http\Controllers\ServicePublicController;
@@ -277,6 +278,22 @@ Route::prefix('{locale}')
         Route::get('/quote/success', function () {
             return view('quote.success');
         })->name('quote.success');
+
+        // ─── Portails partenaires (/p/{slug}/quote) ──────────────────────────
+        Route::get('/p/{portalSlug}/quote',
+            [PortalController::class, 'consent']
+        )->name('portal.consent');
+
+        Route::post('/p/{portalSlug}/quote/accept',
+            [PortalController::class, 'accept']
+        )->name('portal.accept');
+
+        Route::middleware(['throttle:60,1'])->group(function () {
+            Route::get('/p/{portalSlug}/quote/{typeSlug}',
+                [PortalController::class, 'chat']
+            )->name('portal.quote.chat')
+             ->where('typeSlug', 'auto|habitation|bundle|commercial');
+        });
 
         // ABF PDF
         Route::middleware(['auth'])
