@@ -6,7 +6,9 @@ use App\Models\AbfAnnouncement;
 use App\Models\AbfCase;
 use App\Models\AbfParameter;
 use App\Services\AbfCaseCalculator;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AbfEditorController extends Controller
 {
@@ -33,7 +35,12 @@ class AbfEditorController extends Controller
         }
 
         try {
+            $seenIds = DB::table('abf_announcement_reads')
+                ->where('user_id', auth()->id())
+                ->pluck('announcement_id');
+
             $announcements = AbfAnnouncement::active()
+                ->whereNotIn('id', $seenIds)
                 ->orderByDesc('published_at')
                 ->orderByDesc('created_at')
                 ->get(['id', 'title', 'body', 'published_at', 'created_at']);
@@ -47,6 +54,20 @@ class AbfEditorController extends Controller
             'abfParams'     => $abfParams,
             'announcements' => $announcements,
         ]);
+    }
+
+    public function markAnnouncementSeen(int $id): JsonResponse
+    {
+        try {
+            DB::table('abf_announcement_reads')->updateOrInsert(
+                ['user_id' => auth()->id(), 'announcement_id' => $id],
+                ['seen_at' => now()]
+            );
+        } catch (\Throwable $e) {
+            // Table pas encore migrée — pas critique
+        }
+
+        return response()->json(['ok' => true]);
     }
 
     public function createJson()

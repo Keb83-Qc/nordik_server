@@ -56,10 +56,18 @@
         <button onclick="closeNouveautes()" style="background:none;border:none;cursor:pointer;color:#aab;font-size:1.4rem;line-height:1;padding:0">&times;</button>
       </div>
       <!-- Corps scrollable -->
-      <div style="overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px">
+      <div id="nouveautes-list" style="overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px">
         @forelse($announcements ?? [] as $ann)
-          <div style="border-left:3px solid #1a2340;padding:0 0 0 16px">
-            <div style="font-weight:700;font-size:0.95rem;color:#1a2340;margin-bottom:4px">{{ $ann->title }}</div>
+          <div id="ann-{{ $ann->id }}" style="border-left:3px solid #1a2340;padding:12px 12px 12px 16px;border-radius:0 10px 10px 0;background:#f8f9fc;transition:opacity .35s,transform .35s">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px">
+              <div style="font-weight:700;font-size:0.95rem;color:#1a2340">{{ $ann->title }}</div>
+              <button
+                onclick="markSeen({{ $ann->id }}, '{{ route('abf.announcement.seen', $ann->id) }}')"
+                style="flex-shrink:0;background:#f0f4ff;border:1px solid #d0d8ee;color:#1a2340;font-size:0.75rem;font-weight:700;border-radius:20px;padding:3px 12px;cursor:pointer;white-space:nowrap;transition:background .2s"
+                onmouseover="this.style.background='#e0e8ff'" onmouseout="this.style.background='#f0f4ff'">
+                Vu ✓
+              </button>
+            </div>
             <div style="font-size:0.78rem;color:#9aa3b5;margin-bottom:10px">
               {{ ($ann->published_at ?? $ann->created_at)->locale('fr')->isoFormat('D MMMM YYYY') }}
             </div>
@@ -68,7 +76,7 @@
             @endif
           </div>
         @empty
-          <p style="color:#9aa3b5;font-size:0.9rem;text-align:center;margin:20px 0">Aucune nouveauté pour le moment.</p>
+          <p id="no-news-msg" style="color:#9aa3b5;font-size:0.9rem;text-align:center;margin:20px 0">Aucune nouveauté pour le moment.</p>
         @endforelse
       </div>
     </div>
@@ -180,8 +188,7 @@
 
 <script>
 function openNouveautes() {
-    const m = document.getElementById('modal-nouveautes');
-    m.style.display = 'flex';
+    document.getElementById('modal-nouveautes').style.display = 'flex';
 }
 function closeNouveautes() {
     document.getElementById('modal-nouveautes').style.display = 'none';
@@ -189,4 +196,52 @@ function closeNouveautes() {
 document.getElementById('modal-nouveautes').addEventListener('click', function(e) {
     if (e.target === this) closeNouveautes();
 });
+
+function markSeen(id, url) {
+    const el = document.getElementById('ann-' + id);
+    if (!el) return;
+
+    // Appel AJAX
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content
+                         || '{{ csrf_token() }}',
+            'Accept': 'application/json',
+        },
+    });
+
+    // Retrait animé
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(30px)';
+    setTimeout(() => {
+        el.remove();
+        updateBadge();
+    }, 350);
+}
+
+function updateBadge() {
+    const remaining = document.querySelectorAll('#nouveautes-list [id^="ann-"]').length;
+    const badge     = document.querySelector('.badge-ring');
+    const btn       = document.querySelector('.btn-has-news');
+    const list      = document.getElementById('nouveautes-list');
+
+    // Mettre à jour ou supprimer le badge
+    if (badge) {
+        if (remaining === 0) {
+            badge.remove();
+        } else {
+            badge.textContent = remaining > 9 ? '9+' : remaining;
+        }
+    }
+
+    // Supprimer les effets wow si plus rien
+    if (remaining === 0 && btn) {
+        btn.classList.remove('btn-has-news');
+        // Afficher message vide
+        if (list && !document.getElementById('no-news-msg')) {
+            list.innerHTML = '<p id="no-news-msg" style="color:#9aa3b5;font-size:0.9rem;text-align:center;margin:20px 0">Aucune nouveauté pour le moment.</p>';
+        }
+    }
+}
 </script>
