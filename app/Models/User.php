@@ -50,17 +50,25 @@ class User extends Authenticatable implements HasName, FilamentUser
         'facebook_url',
         'booking_url',
         'last_login',
-        'must_change_password'
+        'must_change_password',
+        'accepts_leads',
+        'lead_weight',
+        'leads_received_cycle',
+        'last_lead_received_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = [
-        'email_verified_at' => 'datetime',
-        'password' => 'hashed',
-        'last_login' => 'datetime',
-        'must_change_password' => 'boolean',
-        'languages' => 'array', // Crucial pour le Select multiple
+        'email_verified_at'     => 'datetime',
+        'password'              => 'hashed',
+        'last_login'            => 'datetime',
+        'must_change_password'  => 'boolean',
+        'languages'             => 'array', // Crucial pour le Select multiple
+        'accepts_leads'         => 'boolean',
+        'lead_weight'           => 'integer',
+        'leads_received_cycle'  => 'integer',
+        'last_lead_received_at' => 'datetime',
     ];
 
     protected $appends = ['bio_fr', 'bio_en', 'image_url', 'full_name'];

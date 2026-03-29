@@ -250,6 +250,21 @@ class UserResource extends Resource
                                         ->label('Code conseiller')
                                         ->maxLength(50),
 
+                                    Forms\Components\Toggle::make('accepts_leads')
+                                        ->label('Reçoit des leads')
+                                        ->helperText('Active la réception de soumissions via la rotation automatique')
+                                        ->live()
+                                        ->default(false),
+
+                                    Forms\Components\TextInput::make('lead_weight')
+                                        ->label('Poids dans la rotation')
+                                        ->numeric()
+                                        ->default(1)
+                                        ->minValue(1)
+                                        ->maxValue(10)
+                                        ->helperText('Ex: 2 = reçoit 2 leads pour chaque lead des autres')
+                                        ->visible(fn (Forms\Get $get) => (bool) $get('accepts_leads')),
+
                                     Forms\Components\Select::make('zoho_id')
                                         ->label('Compte Zoho People')
                                         ->options(
@@ -337,8 +352,21 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable()
-                    ->wrap(false)          // 👈 évite le retour à la ligne
+                    ->wrap(false)
                     ->size('sm'),
+
+                Tables\Columns\IconColumn::make('accepts_leads')
+                    ->label('Leads')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-inbox-arrow-down')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('success')
+                    ->falseColor('gray')
+                    ->tooltip(fn ($record) => $record->accepts_leads
+                        ? 'Reçoit des leads (poids : ' . ($record->lead_weight ?? 1) . ')'
+                        : 'Ne reçoit pas de leads'
+                    )
+                    ->toggleable(),
 
                 Tables\Columns\IconColumn::make('employee.status')
                     ->label('Zoho')
