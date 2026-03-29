@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Actions\DeeplTranslateAction;
+use App\Filament\Concerns\HasTranslationTabs;
 use App\Filament\Resources\QuotePortalResource\Pages;
 use App\Models\QuotePortal;
 use App\Models\QuoteType;
@@ -15,6 +16,7 @@ use Filament\Tables\Table;
 
 class QuotePortalResource extends Resource
 {
+    use HasTranslationTabs;
     protected static ?string $model = QuotePortal::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-building-storefront';
@@ -129,32 +131,7 @@ class QuotePortalResource extends Resource
                 ])
                 ->schema([
                     Forms\Components\Tabs::make('Langues titre')
-                        ->tabs([
-                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
-                                ->schema([
-                                    Forms\Components\TextInput::make('consent_title.fr')
-                                        ->label('Titre (FR)')
-                                        ->maxLength(200),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
-                                ->schema([
-                                    Forms\Components\TextInput::make('consent_title.en')
-                                        ->label('Title (EN)')
-                                        ->maxLength(200),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
-                                ->schema([
-                                    Forms\Components\TextInput::make('consent_title.es')
-                                        ->label('Título (ES)')
-                                        ->maxLength(200),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
-                                ->schema([
-                                    Forms\Components\TextInput::make('consent_title.ht')
-                                        ->label('Tit (HT)')
-                                        ->maxLength(200),
-                                ]),
-                        ]),
+                        ->tabs(self::translationTabs('consent_title', 'text', maxLength: 200)),
                 ]),
 
             // ─── Texte du consentement ────────────────────────────────────────
@@ -165,33 +142,10 @@ class QuotePortalResource extends Resource
                 ])
                 ->schema([
                     Forms\Components\Tabs::make('Langues texte')
-                        ->tabs([
-                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
-                                ->schema([
-                                    Forms\Components\Textarea::make('consent_text.fr')
-                                        ->label('Texte (FR)')
-                                        ->rows(5)
-                                        ->helperText('HTML accepté — ex: <p>...</p>, <strong>...</strong>'),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
-                                ->schema([
-                                    Forms\Components\Textarea::make('consent_text.en')
-                                        ->label('Text (EN)')
-                                        ->rows(5),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
-                                ->schema([
-                                    Forms\Components\Textarea::make('consent_text.es')
-                                        ->label('Texto (ES)')
-                                        ->rows(5),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
-                                ->schema([
-                                    Forms\Components\Textarea::make('consent_text.ht')
-                                        ->label('Tèks (HT)')
-                                        ->rows(5),
-                                ]),
-                        ]),
+                        ->tabs(self::translationTabs(
+                            'consent_text', 'textarea', rows: 5,
+                            helperText: 'HTML accepté — ex: <p>...</p>, <strong>...</strong>'
+                        )),
                 ]),
 
         ]);

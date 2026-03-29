@@ -3,8 +3,10 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Actions\DeeplTranslateAction;
+use App\Filament\Concerns\HasTranslationTabs;
 use App\Filament\Resources\ChatStepResource\Pages;
 use App\Models\ChatStep;
+use App\Models\Language;
 use App\Models\QuoteType;
 use App\Services\DeeplTranslator;
 use Filament\Forms;
@@ -18,6 +20,7 @@ use Illuminate\Validation\Rules\Unique;
 
 class ChatStepResource extends Resource
 {
+    use HasTranslationTabs;
     protected static ?string $model = ChatStep::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-chat-bubble-bottom-center-text';
@@ -83,37 +86,7 @@ class ChatStepResource extends Resource
                 ])
                 ->schema([
                     Forms\Components\Tabs::make('Traductions')
-                        ->tabs([
-                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
-                                ->schema([
-                                    Forms\Components\Textarea::make('question.fr')
-                                        ->label('Question en français')
-                                        ->required()
-                                        ->rows(2)
-                                        ->maxLength(500),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
-                                ->schema([
-                                    Forms\Components\Textarea::make('question.en')
-                                        ->label('Question in English')
-                                        ->rows(2)
-                                        ->maxLength(500),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
-                                ->schema([
-                                    Forms\Components\Textarea::make('question.es')
-                                        ->label('Pregunta en español')
-                                        ->rows(2)
-                                        ->maxLength(500),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
-                                ->schema([
-                                    Forms\Components\Textarea::make('question.ht')
-                                        ->label('Kesyon an kreyòl')
-                                        ->rows(2)
-                                        ->maxLength(500),
-                                ]),
-                        ]),
+                        ->tabs(self::translationTabs('question', 'textarea', rows: 2, maxLength: 500)),
 
                     Forms\Components\Select::make('input_type')
                         ->label("Type de réponse")
@@ -196,29 +169,16 @@ class ChatStepResource extends Resource
                 // Indicateur de traductions complètes
                 Tables\Columns\TextColumn::make('translations_status')
                     ->label('Traductions')
-                    ->state(function (ChatStep $record): string {
-                        $q      = $record->question ?? [];
-                        $langs  = ['fr', 'en', 'es', 'ht'];
-                        $filled = array_filter($langs, fn ($l) => !empty(trim($q[$l] ?? '')));
-                        $count  = count($filled);
-                        $total  = count($langs);
-                        return "{$count}/{$total}";
-                    })
+                    ->state(fn (ChatStep $record): string =>
+                        self::translationCount($record->question ?? [])
+                    )
                     ->badge()
-                    ->color(function (ChatStep $record): string {
-                        $q      = $record->question ?? [];
-                        $langs  = ['fr', 'en', 'es', 'ht'];
-                        $filled = array_filter($langs, fn ($l) => !empty(trim($q[$l] ?? '')));
-                        return count($filled) === count($langs) ? 'success' : 'warning';
-                    })
-                    ->tooltip(function (ChatStep $record): string {
-                        $q     = $record->question ?? [];
-                        $langs = ['fr' => '🇫🇷', 'en' => '🇬🇧', 'es' => '🇪🇸', 'ht' => '🇭🇹'];
-                        return implode('  ', array_map(
-                            fn ($flag, $l) => $flag . ' ' . (!empty(trim($q[$l] ?? '')) ? '✅' : '🔴'),
-                            $langs, array_keys($langs)
-                        ));
-                    }),
+                    ->color(fn (ChatStep $record): string =>
+                        self::translationColor($record->question ?? [])
+                    )
+                    ->tooltip(fn (ChatStep $record): string =>
+                        self::translationTooltip($record->question ?? [])
+                    ),
 
                 Tables\Columns\TextColumn::make('input_type')
                     ->label('Type')
@@ -267,7 +227,7 @@ class ChatStepResource extends Resource
                             $deepl     = app(DeeplTranslator::class);
                             $added     = 0;
                             $errors    = 0;
-                            $targets   = ['en' => 'EN', 'es' => 'ES', 'ht' => 'HT'];
+                            $targets   = DeeplTranslateAction::buildTargets();
 
                             foreach ($records as $record) {
                                 /** @var ChatStep $record */

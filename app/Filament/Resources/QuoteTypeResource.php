@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Actions\DeeplTranslateAction;
+use App\Filament\Concerns\HasTranslationTabs;
 use App\Filament\Resources\QuoteTypeResource\Pages;
 use App\Models\QuoteType;
 use Filament\Forms;
@@ -13,6 +14,7 @@ use Filament\Tables\Table;
 
 class QuoteTypeResource extends Resource
 {
+    use HasTranslationTabs;
     protected static ?string $model = QuoteType::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-tag';
@@ -58,33 +60,7 @@ class QuoteTypeResource extends Resource
                 ])
                 ->schema([
                     Forms\Components\Tabs::make('Traductions')
-                        ->tabs([
-                            Forms\Components\Tabs\Tab::make('🇫🇷 Français')
-                                ->schema([
-                                    Forms\Components\TextInput::make('label.fr')
-                                        ->label('Libellé en français')
-                                        ->required()
-                                        ->maxLength(100),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇬🇧 English')
-                                ->schema([
-                                    Forms\Components\TextInput::make('label.en')
-                                        ->label('Label in English')
-                                        ->maxLength(100),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇪🇸 Español')
-                                ->schema([
-                                    Forms\Components\TextInput::make('label.es')
-                                        ->label('Etiqueta en español')
-                                        ->maxLength(100),
-                                ]),
-                            Forms\Components\Tabs\Tab::make('🇭🇹 Kreyòl')
-                                ->schema([
-                                    Forms\Components\TextInput::make('label.ht')
-                                        ->label('Etikèt an kreyòl')
-                                        ->maxLength(100),
-                                ]),
-                        ]),
+                        ->tabs(self::translationTabs('label', 'text', maxLength: 100)),
                 ]),
 
             Forms\Components\Section::make('Apparence')
