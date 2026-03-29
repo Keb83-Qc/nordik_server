@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\User;
+use App\Models\Submission;
 
 class QuotePortal extends Model
 {
@@ -11,6 +13,7 @@ class QuotePortal extends Model
         'slug',
         'name',
         'type',
+        'advisor_code',
         'logo_path',
         'primary_color',
         'secondary_color',
@@ -26,6 +29,22 @@ class QuotePortal extends Model
     ];
 
     // ─── Relations ────────────────────────────────────────────────────────────
+
+    /**
+     * Conseiller fixe associé à ce portail (null = rotation automatique).
+     */
+    public function advisor(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'advisor_code', 'advisor_code');
+    }
+
+    /**
+     * Soumissions reçues via ce portail.
+     */
+    public function submissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Submission::class, 'portal_id');
+    }
 
     public function quoteTypes(): BelongsToMany
     {

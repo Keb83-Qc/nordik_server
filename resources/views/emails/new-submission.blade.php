@@ -313,6 +313,26 @@
         <div class="content">
 
             {{-- =========================================================
+            PORTAIL PARTENAIRE — Bannière d'origine
+        ========================================================== --}}
+            @if(isset($portal) && $portal && $portal->isPartner())
+            <div style="background:#e8f4fd;border:2px solid #3b82f6;border-radius:10px;padding:14px 18px;margin-bottom:16px;">
+                <div style="font-size:15px;font-weight:800;color:#1e40af;margin-bottom:6px;">
+                    🤝 Soumission via portail partenaire
+                </div>
+                <div style="font-size:13px;color:#1e3a8a;line-height:1.7;">
+                    <strong>Portail :</strong> {{ $portal->name }}<br>
+                    <strong>Assignation conseiller :</strong>
+                    @if($portal->advisor_code)
+                        🔒 Conseiller fixe — {{ $advisor?->first_name }} {{ $advisor?->last_name }} (<code>{{ $portal->advisor_code }}</code>)
+                    @else
+                        🔄 Rotation automatique — {{ $advisor?->first_name }} {{ $advisor?->last_name }}
+                    @endif
+                </div>
+            </div>
+            @endif
+
+            {{-- =========================================================
             LNNTE — Bannière d'avertissement numéro exclu
         ========================================================== --}}
             @if($submission->is_phone_excluded || ($d['_phone_excluded'] ?? false))

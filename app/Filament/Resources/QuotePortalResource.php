@@ -7,6 +7,7 @@ use App\Filament\Concerns\HasTranslationTabs;
 use App\Filament\Resources\QuotePortalResource\Pages;
 use App\Models\QuotePortal;
 use App\Models\QuoteType;
+use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -74,6 +75,27 @@ class QuotePortalResource extends Resource
                         ->label('Portail actif')
                         ->default(true)
                         ->columnSpan(1),
+                ]),
+
+            // ─── Assignation conseiller (partenaires) ─────────────────────────
+            Forms\Components\Section::make('Assignation du conseiller')
+                ->description('Pour les portails partenaires seulement. Laissez vide pour utiliser la rotation automatique.')
+                ->visible(fn (Get $get) => $get('type') === 'partner')
+                ->schema([
+                    Forms\Components\Select::make('advisor_code')
+                        ->label('Conseiller fixe')
+                        ->placeholder('— Rotation automatique —')
+                        ->options(fn () => User::whereNotNull('advisor_code')
+                            ->where('accepts_leads', true)
+                            ->orderBy('first_name')
+                            ->get()
+                            ->mapWithKeys(fn (User $u) => [
+                                $u->advisor_code => $u->first_name . ' ' . $u->last_name . ' (' . $u->advisor_code . ')',
+                            ])
+                        )
+                        ->searchable()
+                        ->nullable()
+                        ->helperText('Si défini, toutes les soumissions de ce portail seront assignées à ce conseiller. Sinon, la rotation automatique s\'applique.'),
                 ]),
 
             // ─── Branding ─────────────────────────────────────────────────────

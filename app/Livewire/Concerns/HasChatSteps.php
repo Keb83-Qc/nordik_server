@@ -138,6 +138,7 @@ trait HasChatSteps
                 $this->submission = Submission::create([
                     'type'              => $this->chatType(),
                     'advisor_code'      => $this->advisorCode,
+                    'portal_id'         => session('portal_id'),
                     'data'              => $this->data,
                     'is_phone_excluded' => $isPhoneExcluded,
                     'client_phone'      => $this->data['phone'] ?? null,

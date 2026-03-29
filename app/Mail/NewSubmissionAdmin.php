@@ -3,6 +3,7 @@
 namespace App\Mail;
 
 use App\Models\ChatStep;
+use App\Models\QuotePortal;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
@@ -18,12 +19,14 @@ class NewSubmissionAdmin extends Mailable
 
     public Submission $submission;
     public ?User $advisor;
+    public ?QuotePortal $portal;
     public Collection $chatSteps;
 
     public function __construct(Submission $submission)
     {
         $this->submission = $submission;
         $this->advisor    = User::where('advisor_code', $submission->advisor_code)->first();
+        $this->portal     = $submission->portal;
 
         // Charge les steps actifs pour ce type (auto / habitation)
         // Les champs non hardcodés dans l'email seront affichés dynamiquement.
@@ -49,8 +52,13 @@ class NewSubmissionAdmin extends Mailable
         $type = ucfirst($this->submission->type ?? 'Soumission');
 
         // Résultat : "[Auto] Nouvelle Soumission (Julie) - Jean Dupont"
+        // Ajouter le nom du portail partenaire dans le sujet si applicable
+        $portalTag = ($this->portal && $this->portal->isPartner())
+            ? ' [' . $this->portal->name . ']'
+            : '';
+
         return new Envelope(
-            subject: "[$type] Nouvelle Soumission ($advisorName) - $clientName",
+            subject: "[$type]{$portalTag} Nouvelle Soumission ($advisorName) - $clientName",
         );
     }
 

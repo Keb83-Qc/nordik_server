@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\QuotePortal;
 
 class Submission extends Model
 {
@@ -14,6 +15,7 @@ class Submission extends Model
         'advisor_code',
         'type',             // Conservé pour rétrocompatibilité
         'quote_type_id',    // Nouvelle FK vers quote_types
+        'portal_id',        // Portail d'origine (null = accès direct)
         'current_step',
         'data',
         'client_email',
@@ -31,6 +33,11 @@ class Submission extends Model
     public function quoteType(): BelongsTo
     {
         return $this->belongsTo(QuoteType::class);
+    }
+
+    public function portal(): BelongsTo
+    {
+        return $this->belongsTo(QuotePortal::class, 'portal_id');
     }
 
     // ─── Helpers ──────────────────────────────────────────────────────────────

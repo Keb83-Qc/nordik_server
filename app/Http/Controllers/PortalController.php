@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\QuotePortal;
+use App\Models\User;
 use App\Services\LeadDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,12 +44,28 @@ class PortalController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        // Assigner un conseiller via round-robin
-        $advisor = app(LeadDispatcher::class)->assignAdvisor();
+        // Assigner un conseiller :
+        // - Si le portail a un conseiller fixe → on l'utilise directement
+        // - Sinon → rotation automatique (LeadDispatcher)
+        if ($portal->advisor_code) {
+            $advisor      = User::where('advisor_code', $portal->advisor_code)->first();
+            $assignedType = 'fixed';
+
+            // Fallback si le conseiller fixe n'existe plus
+            if (! $advisor) {
+                $advisor      = app(LeadDispatcher::class)->assignAdvisor();
+                $assignedType = 'roundrobin';
+            }
+        } else {
+            $advisor      = app(LeadDispatcher::class)->assignAdvisor();
+            $assignedType = 'roundrobin';
+        }
 
         session([
             'has_consented'        => true,
             'portal_slug'          => $portalSlug,
+            'portal_id'            => $portal->id,
+            'advisor_assigned_type' => $assignedType,
             'current_advisor_code' => $advisor?->advisor_code,
         ]);
 

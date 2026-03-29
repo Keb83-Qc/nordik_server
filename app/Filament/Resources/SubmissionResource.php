@@ -586,6 +586,23 @@ class SubmissionResource extends Resource
                     Forms\Components\Placeholder::make('created_at')
                         ->label('Date de réception')
                         ->content(fn($record) => $record->created_at?->format('d/m/Y H:i') ?? '-'),
+
+                    Forms\Components\Placeholder::make('portal_info')
+                        ->label('Portail d\'origine')
+                        ->content(function ($record) {
+                            if (! $record?->portal) return new HtmlString('<span class="text-gray-400">Accès direct</span>');
+
+                            $portal = $record->portal;
+                            $type   = $portal->isPartner() ? '🤝 Partenaire' : '🏢 Interne';
+                            $assign = $portal->advisor_code
+                                ? '🔒 Conseiller fixe (' . $portal->advisor_code . ')'
+                                : '🔄 Rotation automatique';
+
+                            return new HtmlString(
+                                '<strong>' . e($portal->name) . '</strong> — ' . $type .
+                                '<br><span class="text-sm text-gray-500">' . $assign . '</span>'
+                            );
+                        }),
                 ])
                 ->columns(2),
         ]);
@@ -653,6 +670,20 @@ class SubmissionResource extends Resource
                     ->color('primary')
                     ->wrap(),
 
+                Tables\Columns\TextColumn::make('portal.name')
+                    ->label('Portail')
+                    ->badge()
+                    ->color(fn (Submission $record): string =>
+                        $record->portal?->isPartner() ? 'info' : 'gray'
+                    )
+                    ->formatStateUsing(fn ($state, Submission $record): string =>
+                        $record->portal
+                            ? ($record->portal->isPartner() ? '🤝 ' : '🏢 ') . $state
+                            : '—'
+                    )
+                    ->placeholder('Direct')
+                    ->toggleable(),
+
                 Tables\Columns\TextColumn::make('advisor_code')
                     ->label('Conseiller')
                     ->badge()
@@ -676,6 +707,11 @@ class SubmissionResource extends Resource
                             ->when($data['from'] ?? null, fn(Builder $q, $date) => $q->whereDate('created_at', '>=', $date))
                             ->when($data['until'] ?? null, fn(Builder $q, $date) => $q->whereDate('created_at', '<=', $date));
                     }),
+
+                Tables\Filters\SelectFilter::make('portal_id')
+                    ->label('Portail')
+                    ->relationship('portal', 'name')
+                    ->placeholder('Tous les portails'),
 
                 Tables\Filters\TernaryFilter::make('is_phone_excluded')
                     ->label('Numéros exclus LNNTE')
