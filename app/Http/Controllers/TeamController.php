@@ -10,7 +10,7 @@ use App\Models\SystemLog;
 
 class TeamController extends Controller
 {
-    public function index(Request $request)
+    public function index(string $locale, Request $request)
     {
         $ville   = $request->get('ville', '');
         $langue  = $request->get('langue', '');
@@ -59,7 +59,7 @@ class TeamController extends Controller
         ]));
     }
 
-    public function show(string $slug)
+    public function show(string $locale, string $slug)
     {
         // On essaie d'abord le cache, mais on attrape le ModelNotFoundException
         // pour logger proprement avant de renvoyer une 404
