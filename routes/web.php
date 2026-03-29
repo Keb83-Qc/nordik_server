@@ -176,11 +176,11 @@ Route::prefix('{locale}')
     ->middleware(['set-locale'])
     ->group(function () {
         Route::get('/admin', fn(string $locale) => redirect('/admin', 302));
-        Route::get('/conseiller', fn(string $locale) => redirect('/conseiller', 302));
+        Route::get('/conseiller', fn(string $locale) => redirect('/admin', 302));
         Route::get('/abf', fn(string $locale) => redirect('/abf', 302));
 
         Route::get('/admin', fn() => redirect('/admin'));
-        Route::get('/conseiller', fn() => redirect('/conseiller'));
+        Route::get('/conseiller', fn() => redirect('/admin'));
         Route::get('/abf', fn() => redirect('/abf'));
 
         Route::get('/demande-acces', function (string $locale) {
