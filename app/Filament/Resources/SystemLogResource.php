@@ -26,12 +26,6 @@ class SystemLogResource extends Resource
         return config('filament-navigation.sort.' . static::class);
     }
 
-    // SÉCURITÉ : Seul le Super Admin voit ça
-    public static function canViewAny(): bool
-    {
-        return auth()->user()->isSuperAdmin();
-    }
-
     public static function form(Form $form): Form
     {
         return $form
@@ -152,13 +146,6 @@ class SystemLogResource extends Resource
         ];
     }
 
-    public static function canCreate(): bool
-    {
-        return false;
-    }
-
-    public static function canEdit($record): bool
-    {
-        return false;
-    }
+    public static function canCreate(): bool { return false; }
+    public static function canEdit($record): bool { return false; }
 }

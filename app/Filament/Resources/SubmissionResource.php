@@ -32,11 +32,6 @@ class SubmissionResource extends Resource
         return config('filament-navigation.sort.' . static::class);
     }
 
-    public static function canViewAny(): bool
-    {
-        return auth()->check();
-    }
-
     /**
      * Helper: lit les champs depuis data JSON
      * - supporte flat legacy: data[first_name]

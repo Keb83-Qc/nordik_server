@@ -62,17 +62,18 @@ class BugReportResource extends Resource
         return 'warning';
     }
 
-    // ── Permissions ───────────────────────────────────────────────────────────
-    // Bypass Shield (qui vérifie view_any_message en DB) — accès direct selon auth
-    public static function canViewAny(): bool   { return auth()->check(); }
-    public static function canView($record): bool { return auth()->check(); }
-    public static function canCreate(): bool    { return auth()->check(); }
+    // ── Permissions Shield ────────────────────────────────────────────────────
+    public static function canViewAny(): bool   { return auth()->user()?->can('view_any_bug_report') ?? false; }
+    public static function canView($record): bool { return auth()->user()?->can('view_any_bug_report') ?? false; }
+    public static function canCreate(): bool    { return auth()->user()?->can('create_bug_report') ?? false; }
     public static function canEdit($record): bool { return false; }
     public static function canDelete($record): bool
     {
         $user = auth()->user();
-        if ($user?->hasAnyRole(['admin', 'super_admin'])) return true;
-        return $record->sender_id === $user?->id && ($record->status ?? 'pending') === 'pending';
+        if (! $user) return false;
+        if ($user->can('delete_bug_report')) return true;
+        // Conseiller peut supprimer ses propres rapports en attente
+        return $record->sender_id === $user->id && ($record->status ?? 'pending') === 'pending';
     }
 
     // ── Query ─────────────────────────────────────────────────────────────────

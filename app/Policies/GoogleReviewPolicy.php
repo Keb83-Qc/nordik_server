@@ -15,7 +15,7 @@ class GoogleReviewPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_google::review');
+        return $user->can('view_any_google_review');
     }
 
     /**
@@ -23,7 +23,7 @@ class GoogleReviewPolicy
      */
     public function view(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('view_google::review');
+        return $user->can('view_google_review');
     }
 
     /**
@@ -31,7 +31,7 @@ class GoogleReviewPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_google::review');
+        return $user->can('create_google_review');
     }
 
     /**
@@ -39,7 +39,7 @@ class GoogleReviewPolicy
      */
     public function update(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('update_google::review');
+        return $user->can('update_google_review');
     }
 
     /**
@@ -47,7 +47,7 @@ class GoogleReviewPolicy
      */
     public function delete(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('delete_google::review');
+        return $user->can('delete_google_review');
     }
 
     /**
@@ -55,7 +55,7 @@ class GoogleReviewPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_google::review');
+        return $user->can('delete_any_google_review');
     }
 
     /**
@@ -63,7 +63,7 @@ class GoogleReviewPolicy
      */
     public function forceDelete(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('force_delete_google::review');
+        return $user->can('force_delete_google_review');
     }
 
     /**
@@ -71,7 +71,7 @@ class GoogleReviewPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_google::review');
+        return $user->can('force_delete_any_google_review');
     }
 
     /**
@@ -79,7 +79,7 @@ class GoogleReviewPolicy
      */
     public function restore(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('restore_google::review');
+        return $user->can('restore_google_review');
     }
 
     /**
@@ -87,7 +87,7 @@ class GoogleReviewPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_google::review');
+        return $user->can('restore_any_google_review');
     }
 
     /**
@@ -95,7 +95,7 @@ class GoogleReviewPolicy
      */
     public function replicate(User $user, GoogleReview $googleReview): bool
     {
-        return $user->can('replicate_google::review');
+        return $user->can('replicate_google_review');
     }
 
     /**
@@ -103,6 +103,6 @@ class GoogleReviewPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_google::review');
+        return $user->can('reorder_google_review');
     }
 }

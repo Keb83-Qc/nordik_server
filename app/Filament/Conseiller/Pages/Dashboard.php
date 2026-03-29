@@ -13,6 +13,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             \App\Filament\Widgets\WelcomeOverview::class,
+            \App\Filament\Widgets\QuickLinks::class,
             \App\Filament\Widgets\DocumentsWidget::class,
             \App\Filament\Widgets\LatestWikiWidget::class,
         ];

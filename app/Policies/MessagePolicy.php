@@ -15,7 +15,7 @@ class MessagePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_system::request');
+        return $user->can('view_any_message');
     }
 
     /**
@@ -23,7 +23,7 @@ class MessagePolicy
      */
     public function view(User $user, Message $message): bool
     {
-        return $user->can('view_system::request');
+        return $user->can('view_message');
     }
 
     /**
@@ -31,7 +31,7 @@ class MessagePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_system::request');
+        return $user->can('create_message');
     }
 
     /**
@@ -39,7 +39,7 @@ class MessagePolicy
      */
     public function update(User $user, Message $message): bool
     {
-        return $user->can('update_system::request');
+        return $user->can('update_message');
     }
 
     /**
@@ -47,7 +47,7 @@ class MessagePolicy
      */
     public function delete(User $user, Message $message): bool
     {
-        return $user->can('delete_system::request');
+        return $user->can('delete_message');
     }
 
     /**
@@ -55,7 +55,7 @@ class MessagePolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_system::request');
+        return $user->can('delete_any_message');
     }
 
     /**
@@ -63,7 +63,7 @@ class MessagePolicy
      */
     public function forceDelete(User $user, Message $message): bool
     {
-        return $user->can('force_delete_system::request');
+        return $user->can('force_delete_message');
     }
 
     /**
@@ -71,7 +71,7 @@ class MessagePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_system::request');
+        return $user->can('force_delete_any_message');
     }
 
     /**
@@ -79,7 +79,7 @@ class MessagePolicy
      */
     public function restore(User $user, Message $message): bool
     {
-        return $user->can('restore_system::request');
+        return $user->can('restore_message');
     }
 
     /**
@@ -87,7 +87,7 @@ class MessagePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_system::request');
+        return $user->can('restore_any_message');
     }
 
     /**
@@ -95,7 +95,7 @@ class MessagePolicy
      */
     public function replicate(User $user, Message $message): bool
     {
-        return $user->can('replicate_system::request');
+        return $user->can('replicate_message');
     }
 
     /**
@@ -103,6 +103,6 @@ class MessagePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_system::request');
+        return $user->can('reorder_message');
     }
 }

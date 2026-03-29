@@ -15,7 +15,7 @@ class SystemLogPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_system::log');
+        return $user->can('view_any_system_log');
     }
 
     /**
@@ -23,7 +23,7 @@ class SystemLogPolicy
      */
     public function view(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('view_system::log');
+        return $user->can('view_system_log');
     }
 
     /**
@@ -31,7 +31,7 @@ class SystemLogPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_system::log');
+        return $user->can('create_system_log');
     }
 
     /**
@@ -39,7 +39,7 @@ class SystemLogPolicy
      */
     public function update(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('update_system::log');
+        return $user->can('update_system_log');
     }
 
     /**
@@ -47,7 +47,7 @@ class SystemLogPolicy
      */
     public function delete(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('delete_system::log');
+        return $user->can('delete_system_log');
     }
 
     /**
@@ -55,7 +55,7 @@ class SystemLogPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_system::log');
+        return $user->can('delete_any_system_log');
     }
 
     /**
@@ -63,7 +63,7 @@ class SystemLogPolicy
      */
     public function forceDelete(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('force_delete_system::log');
+        return $user->can('force_delete_system_log');
     }
 
     /**
@@ -71,7 +71,7 @@ class SystemLogPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_system::log');
+        return $user->can('force_delete_any_system_log');
     }
 
     /**
@@ -79,7 +79,7 @@ class SystemLogPolicy
      */
     public function restore(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('restore_system::log');
+        return $user->can('restore_system_log');
     }
 
     /**
@@ -87,7 +87,7 @@ class SystemLogPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_system::log');
+        return $user->can('restore_any_system_log');
     }
 
     /**
@@ -95,7 +95,7 @@ class SystemLogPolicy
      */
     public function replicate(User $user, SystemLog $systemLog): bool
     {
-        return $user->can('replicate_system::log');
+        return $user->can('replicate_system_log');
     }
 
     /**
@@ -103,6 +103,6 @@ class SystemLogPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_system::log');
+        return $user->can('reorder_system_log');
     }
 }

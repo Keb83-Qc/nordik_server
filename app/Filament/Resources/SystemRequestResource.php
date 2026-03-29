@@ -32,20 +32,12 @@ class SystemRequestResource extends Resource
 
     public static function shouldRegisterNavigation(): bool
     {
-        $user = Auth::user();
-
-        return $user
-            && method_exists($user, 'hasAnyRole')
-            && $user->hasAnyRole(['admin', 'super_admin']);
+        return static::canViewAny();
     }
 
     public static function canViewAny(): bool
     {
-        $user = Auth::user();
-
-        return $user
-            && method_exists($user, 'hasAnyRole')
-            && $user->hasAnyRole(['admin', 'super_admin']);
+        return Auth::user()?->can('view_any_system_request') ?? false;
     }
 
     public static function getNavigationGroup(): ?string
