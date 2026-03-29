@@ -1,5 +1,49 @@
 <div id="page-accueil">
 
+@if(($announcements ?? collect())->isNotEmpty())
+<style>
+@keyframes bell-shake {
+  0%,55%,100% { transform: rotate(0deg); }
+  60%          { transform: rotate(-18deg); }
+  65%          { transform: rotate(16deg); }
+  70%          { transform: rotate(-12deg); }
+  75%          { transform: rotate(10deg); }
+  80%          { transform: rotate(-6deg); }
+  85%          { transform: rotate(4deg); }
+  90%          { transform: rotate(0deg); }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0   rgba(232,184,75,.85); }
+  60%  { box-shadow: 0 0 0 7px rgba(232,184,75,0);   }
+  100% { box-shadow: 0 0 0 0   rgba(232,184,75,0);   }
+}
+@keyframes glow-btn {
+  0%,100% { box-shadow: 0 0 8px rgba(232,184,75,.35), inset 0 0 0 1px rgba(232,184,75,.45); }
+  50%     { box-shadow: 0 0 22px rgba(232,184,75,.75), inset 0 0 0 1px rgba(232,184,75,.8); }
+}
+@keyframes shimmer-sweep {
+  0%   { background-position: -220% center; }
+  100% { background-position: 220% center;  }
+}
+.btn-has-news {
+  animation: glow-btn 2.2s ease-in-out infinite !important;
+  background: linear-gradient(135deg,rgba(232,184,75,.18) 0%,rgba(232,184,75,.06) 100%) !important;
+  overflow: hidden;
+}
+.btn-has-news::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg,transparent 20%,rgba(255,255,255,.18) 50%,transparent 80%);
+  background-size: 220% 100%;
+  animation: shimmer-sweep 2.4s linear infinite;
+  pointer-events: none;
+}
+.bell-animated { animation: bell-shake 3.5s ease-in-out infinite; transform-origin: top center; display:inline-block; }
+.badge-ring     { animation: pulse-ring 1.6s ease-out infinite; }
+</style>
+@endif
+
   {{-- ─── Modal Nouveautés ───────────────────────────────────────────────── --}}
   <div id="modal-nouveautes" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center">
     <div style="background:#fff;border-radius:16px;width:min(600px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden">
@@ -38,12 +82,15 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         Configuration
       </button>
-      <button class="ia-btn-primary" onclick="openNouveautes()" style="position:relative">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2m6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
+      @php $annCount = ($announcements ?? collect())->count(); @endphp
+      <button class="ia-btn-primary {{ $annCount ? 'btn-has-news' : '' }}" onclick="openNouveautes()" style="position:relative">
+        <span class="{{ $annCount ? 'bell-animated' : '' }}" style="display:inline-flex;align-items:center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2m6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
+        </span>
         Nouveautés
-        @if(($announcements ?? collect())->isNotEmpty())
-          <span style="position:absolute;top:-5px;right:-5px;background:#e8b84b;color:#1a2340;font-size:10px;font-weight:800;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;line-height:1">
-            {{ min(($announcements ?? collect())->count(), 9) }}{{ ($announcements ?? collect())->count() > 9 ? '+' : '' }}
+        @if($annCount)
+          <span class="badge-ring" style="position:absolute;top:-6px;right:-6px;background:#e8b84b;color:#1a2340;font-size:10px;font-weight:900;border-radius:50%;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;line-height:1;padding:0 3px;border:2px solid #fff">
+            {{ $annCount > 9 ? '9+' : $annCount }}
           </span>
         @endif
       </button>
