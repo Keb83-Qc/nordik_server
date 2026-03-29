@@ -11,11 +11,19 @@ return [
             'collapsed' => true,
         ],
 
-        // ─── CLIENTS ─────────────────────────────────────────────
-        'Gestion Clients' => [
-            'label'     => 'Clients & Soumissions',
+        // ─── SOUMISSIONS ──────────────────────────────────────────
+        'Soumissions' => [
+            'label'     => 'Soumissions',
             'icon'      => 'heroicon-o-inbox-arrow-down',
             'sort'      => 2,
+            'collapsed' => false,
+        ],
+
+        // ─── CLIENTS ─────────────────────────────────────────────
+        'Gestion Clients' => [
+            'label'     => 'Gestion Clients',
+            'icon'      => 'heroicon-o-user-group',
+            'sort'      => 3,
             'collapsed' => true,
         ],
 
@@ -23,7 +31,7 @@ return [
         'Site Web' => [
             'label'     => 'Site Web',
             'icon'      => 'heroicon-o-globe-alt',
-            'sort'      => 3,
+            'sort'      => 4,
             'collapsed' => true,
         ],
 
@@ -31,7 +39,7 @@ return [
         'Marketing' => [
             'label'     => 'Marketing & Blog',
             'icon'      => 'heroicon-o-megaphone',
-            'sort'      => 4,
+            'sort'      => 5,
             'collapsed' => true,
         ],
 
@@ -39,7 +47,7 @@ return [
         'Gestion Conseillers' => [
             'label'     => 'Équipe & Conseillers',
             'icon'      => 'heroicon-o-users',
-            'sort'      => 5,
+            'sort'      => 6,
             'collapsed' => true,
         ],
 
@@ -47,7 +55,7 @@ return [
         'Configuration' => [
             'label'     => 'Administration Système',
             'icon'      => 'heroicon-o-cog-6-tooth',
-            'sort'      => 6,
+            'sort'      => 7,
             'collapsed' => true,
         ],
 
@@ -55,28 +63,33 @@ return [
         'GestionLangues' => [
             'label'     => 'Traductions',
             'icon'      => 'heroicon-o-language',
-            'sort'      => 7,
+            'sort'      => 8,
             'collapsed' => true,
         ],
     ],
 
     'sort' => [
-        // Espace Conseiller (+ admin: Gestion Conseillers)
+        // Espace Conseiller
         \App\Filament\Resources\MessageResource::class          => 1,
         \App\Filament\Pages\CommissionCalculator::class         => 2,
         \App\Filament\Resources\WikiArticleResource::class      => 3,
         \App\Filament\Resources\BugReportResource::class        => 5,
 
-        // Clients & Soumissions
+        // Soumissions (nouveau groupe regroupant tout ce qui touche aux quotes)
         \App\Filament\Resources\SubmissionResource::class       => 1,
-        \App\Filament\Resources\AbfCaseAdminResource::class     => 2,
+        \App\Filament\Resources\QuotePortalResource::class      => 2,
+        \App\Filament\Resources\QuoteTypeResource::class        => 3,
+        \App\Filament\Resources\ChatStepResource::class         => 4,
+        \App\Filament\Pages\MailSettingsPage::class             => 5,
+
+        // Gestion Clients
+        \App\Filament\Resources\AbfCaseAdminResource::class     => 1,
 
         // Site Web
         \App\Filament\Resources\MenuItemResource::class              => 1,
         \App\Filament\Resources\PublicServiceCategoryResource::class => 2,
         \App\Filament\Resources\PublicServiceResource::class         => 3,
         \App\Filament\Pages\FooterSettingsPage::class                => 4,
-        \App\Filament\Resources\ChatStepResource::class              => 5,
 
         // Marketing & Blog
         \App\Filament\Resources\BlogPostResource::class         => 1,
@@ -98,8 +111,7 @@ return [
         \App\Filament\Resources\ToolResource::class             => 5,
         \App\Filament\Pages\AdvisorLinks::class                 => 6,
         \App\Filament\Pages\ManageGoogleReviews::class          => 7,
-        \App\Filament\Pages\MailSettingsPage::class             => 8,
-        \App\Filament\Resources\SystemLogResource::class        => 9,
+        \App\Filament\Resources\SystemLogResource::class        => 8,
     ],
 
     // Liens externes / panels séparés

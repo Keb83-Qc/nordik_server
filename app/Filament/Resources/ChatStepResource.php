@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ChatStepResource\Pages;
 use App\Models\ChatStep;
+use App\Models\QuoteType;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,14 +17,18 @@ class ChatStepResource extends Resource
     protected static ?string $model = ChatStep::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-chat-bubble-bottom-center-text';
-    protected static ?string $navigationGroup = 'Site Web';
     protected static ?string $navigationLabel = 'Questions Chatbot';
     protected static ?string $modelLabel      = 'Question';
     protected static ?string $pluralModelLabel = 'Questions Chatbot';
 
+    public static function getNavigationGroup(): ?string
+    {
+        return 'Soumissions';
+    }
+
     public static function getNavigationSort(): ?int
     {
-        return 11;
+        return config('filament-navigation.sort.' . static::class, 3);
     }
 
     public static function form(Form $form): Form
@@ -33,16 +38,19 @@ class ChatStepResource extends Resource
             Forms\Components\Section::make('Identification')
                 ->columns(3)
                 ->schema([
-                    Forms\Components\Select::make('chat_type')
-                        ->label('Chatbot')
+                    Forms\Components\Select::make('quote_type_id')
+                        ->label('Type de soumission')
                         ->required()
-                        ->options([
-                            'auto'        => 'Auto',
-                            'habitation'  => 'Habitation',
-                            'bundle'      => 'Bundle (Auto + Habitation)',
-                            'commercial'  => 'Commercial',
-                        ])
-                        ->default('auto')
+                        ->options(
+                            fn () => QuoteType::orderBy('sort_order')
+                                ->get()
+                                ->mapWithKeys(fn (QuoteType $qt) => [
+                                    $qt->id => $qt->getLabel('fr'),
+                                ])
+                        )
+                        ->searchable()
+                        ->preload()
+                        ->live()
                         ->columnSpan(1),
 
                     Forms\Components\TextInput::make('identifier')
@@ -52,7 +60,8 @@ class ChatStepResource extends Resource
                             table: ChatStep::class,
                             column: 'identifier',
                             ignoreRecord: true,
-                            modifyRuleUsing: fn (Unique $rule, Forms\Get $get) => $rule->where('chat_type', $get('chat_type')),
+                            modifyRuleUsing: fn (Unique $rule, Forms\Get $get) =>
+                                $rule->where('quote_type_id', $get('quote_type_id')),
                         )
                         ->helperText('Ex: identity, email, phone — ne pas modifier après création')
                         ->columnSpan(1),
@@ -147,17 +156,17 @@ class ChatStepResource extends Resource
                     ->sortable()
                     ->width(50),
 
-                Tables\Columns\TextColumn::make('chat_type')
+                Tables\Columns\TextColumn::make('quoteType.slug')
                     ->label('Chatbot')
                     ->badge()
-                    ->formatStateUsing(fn (string $state) => match ($state) {
+                    ->formatStateUsing(fn (?string $state, ChatStep $record) => match ($state ?? $record->chat_type) {
                         'auto'       => 'Auto',
                         'habitation' => 'Habitation',
                         'bundle'     => 'Bundle',
                         'commercial' => 'Commercial',
-                        default      => $state,
+                        default      => $state ?? $record->chat_type ?? '—',
                     })
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state, ChatStep $record) => match ($state ?? $record->chat_type) {
                         'auto'       => 'info',
                         'habitation' => 'success',
                         'bundle'     => 'warning',
@@ -176,6 +185,33 @@ class ChatStepResource extends Resource
                     ->formatStateUsing(fn ($state) => is_array($state) ? ($state['fr'] ?? '') : $state)
                     ->limit(60)
                     ->wrap(),
+
+                // Indicateur de traductions complètes
+                Tables\Columns\TextColumn::make('translations_status')
+                    ->label('Traductions')
+                    ->state(function (ChatStep $record): string {
+                        $q      = $record->question ?? [];
+                        $langs  = ['fr', 'en', 'es', 'ht'];
+                        $filled = array_filter($langs, fn ($l) => !empty(trim($q[$l] ?? '')));
+                        $count  = count($filled);
+                        $total  = count($langs);
+                        return "{$count}/{$total}";
+                    })
+                    ->badge()
+                    ->color(function (ChatStep $record): string {
+                        $q      = $record->question ?? [];
+                        $langs  = ['fr', 'en', 'es', 'ht'];
+                        $filled = array_filter($langs, fn ($l) => !empty(trim($q[$l] ?? '')));
+                        return count($filled) === count($langs) ? 'success' : 'warning';
+                    })
+                    ->tooltip(function (ChatStep $record): string {
+                        $q     = $record->question ?? [];
+                        $langs = ['fr' => '🇫🇷', 'en' => '🇬🇧', 'es' => '🇪🇸', 'ht' => '🇭🇹'];
+                        return implode('  ', array_map(
+                            fn ($flag, $l) => $flag . ' ' . (!empty(trim($q[$l] ?? '')) ? '✅' : '🔴'),
+                            $langs, array_keys($langs)
+                        ));
+                    }),
 
                 Tables\Columns\TextColumn::make('input_type')
                     ->label('Type')

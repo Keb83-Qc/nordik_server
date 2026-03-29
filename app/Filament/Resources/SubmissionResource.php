@@ -20,11 +20,11 @@ class SubmissionResource extends Resource
 {
     protected static ?string $model = Submission::class;
     protected static ?string $navigationIcon = 'heroicon-o-inbox-arrow-down';
-    protected static ?string $navigationLabel = 'Soumissions';
+    protected static ?string $navigationLabel = 'Soumissions reçues';
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Gestion Clients';
+        return 'Soumissions';
     }
 
     public static function getNavigationSort(): ?int
