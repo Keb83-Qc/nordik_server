@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AbfAnnouncement;
 use App\Models\AbfCase;
 use App\Models\AbfParameter;
 use App\Services\AbfCaseCalculator;
@@ -31,10 +32,20 @@ class AbfEditorController extends Controller
             $abfParams = [];
         }
 
+        try {
+            $announcements = AbfAnnouncement::active()
+                ->orderByDesc('published_at')
+                ->orderByDesc('created_at')
+                ->get(['id', 'title', 'body', 'published_at', 'created_at']);
+        } catch (\Throwable $e) {
+            $announcements = collect();
+        }
+
         return view('abf.editor', [
-            'record'      => null,
-            'recentCases' => $recentCases,
-            'abfParams'   => $abfParams,
+            'record'        => null,
+            'recentCases'   => $recentCases,
+            'abfParams'     => $abfParams,
+            'announcements' => $announcements,
         ]);
     }
 

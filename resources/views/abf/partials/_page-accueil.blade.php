@@ -1,4 +1,35 @@
 <div id="page-accueil">
+
+  {{-- ─── Modal Nouveautés ───────────────────────────────────────────────── --}}
+  <div id="modal-nouveautes" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:16px;width:min(600px,92vw);max-height:80vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden">
+      <!-- Header modal -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e9ecf0;background:#1a2340">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#e8b84b"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2m6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
+          <span style="color:#fff;font-weight:700;font-size:1rem">Nouveautés</span>
+        </div>
+        <button onclick="closeNouveautes()" style="background:none;border:none;cursor:pointer;color:#aab;font-size:1.4rem;line-height:1;padding:0">&times;</button>
+      </div>
+      <!-- Corps scrollable -->
+      <div style="overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:20px">
+        @forelse($announcements ?? [] as $ann)
+          <div style="border-left:3px solid #1a2340;padding:0 0 0 16px">
+            <div style="font-weight:700;font-size:0.95rem;color:#1a2340;margin-bottom:4px">{{ $ann->title }}</div>
+            <div style="font-size:0.78rem;color:#9aa3b5;margin-bottom:10px">
+              {{ ($ann->published_at ?? $ann->created_at)->locale('fr')->isoFormat('D MMMM YYYY') }}
+            </div>
+            @if($ann->body)
+              <div style="font-size:0.88rem;color:#444;line-height:1.65">{!! $ann->body !!}</div>
+            @endif
+          </div>
+        @empty
+          <p style="color:#9aa3b5;font-size:0.9rem;text-align:center;margin:20px 0">Aucune nouveauté pour le moment.</p>
+        @endforelse
+      </div>
+    </div>
+  </div>
+
   <!-- Header iA -->
   <div class="ia-topbar">
     <img src="{{ asset('assets/vip-logo.png') }}" class="ia-logo" alt="VIP GPI"/>
@@ -7,9 +38,14 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         Configuration
       </button>
-      <button class="ia-btn-primary">
+      <button class="ia-btn-primary" onclick="openNouveautes()" style="position:relative">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2m6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1z"/></svg>
         Nouveautés
+        @if(($announcements ?? collect())->isNotEmpty())
+          <span style="position:absolute;top:-5px;right:-5px;background:#e8b84b;color:#1a2340;font-size:10px;font-weight:800;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;line-height:1">
+            {{ min(($announcements ?? collect())->count(), 9) }}{{ ($announcements ?? collect())->count() > 9 ? '+' : '' }}
+          </span>
+        @endif
       </button>
     </div>
   </div>
@@ -94,3 +130,16 @@
     </div>
   </div>
 </div>
+
+<script>
+function openNouveautes() {
+    const m = document.getElementById('modal-nouveautes');
+    m.style.display = 'flex';
+}
+function closeNouveautes() {
+    document.getElementById('modal-nouveautes').style.display = 'none';
+}
+document.getElementById('modal-nouveautes').addEventListener('click', function(e) {
+    if (e.target === this) closeNouveautes();
+});
+</script>
