@@ -247,12 +247,31 @@ class QuotePortalResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('copy_url')
-                    ->label('Copier URL')
-                    ->icon('heroicon-o-clipboard')
+                    ->label('URL')
+                    ->icon('heroicon-o-link')
                     ->color('gray')
-                    ->action(fn () => null) // handled client-side via JS copy
                     ->visible(fn (QuotePortal $record) => $record->type === 'partner')
-                    ->tooltip(fn (QuotePortal $record) => url('/fr/p/' . $record->slug . '/quote')),
+                    ->modalHeading('URL du portail partenaire')
+                    ->modalDescription('Partagez cette URL avec votre partenaire.')
+                    ->modalContent(fn (QuotePortal $record) => new \Illuminate\Support\HtmlString(
+                        '<div x-data="{ copied: false }" class="px-1 py-2">'
+                        . '<div class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg border border-gray-200">'
+                        . '<code class="flex-1 text-sm break-all select-all text-gray-700">'
+                        .     url('/fr/p/' . $record->slug . '/quote')
+                        . '</code>'
+                        . '<button type="button"'
+                        . ' x-on:click="navigator.clipboard.writeText(\''
+                        .     url('/fr/p/' . $record->slug . '/quote')
+                        . '\').then(() => { copied = true; setTimeout(() => copied = false, 2500) })"'
+                        . ' class="shrink-0 px-3 py-1.5 text-xs font-semibold rounded-md transition-colors"'
+                        . ' :class="copied ? \'bg-green-500 text-white\' : \'bg-gray-800 text-white hover:bg-gray-700\'"'
+                        . ' x-text="copied ? \'✓ Copié !\' : \'Copier\'"'
+                        . '></button>'
+                        . '</div>'
+                        . '</div>'
+                    ))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Fermer'),
 
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
