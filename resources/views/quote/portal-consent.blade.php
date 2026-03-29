@@ -143,6 +143,15 @@
                         @endif
                     </p>
 
+                    @php
+                        $acceptLabel = match(session('locale', 'fr')) {
+                            'en' => "I accept",
+                            'es' => "Acepto",
+                            'ht' => "Mwen aksepte",
+                            default => "J'accepte",
+                        };
+                    @endphp
+
                     <div class="d-flex flex-column gap-3">
                         @foreach($activeTypes as $quoteType)
                             <form method="POST"
@@ -151,21 +160,19 @@
                                 <input type="hidden" name="quote_type" value="{{ $quoteType->slug }}">
 
                                 <button type="submit" class="btn-quote-type">
-                                    @if($quoteType->icon)
-                                        {{-- Heroicon via SVG inline ou fallback Font Awesome --}}
-                                        @switch($quoteType->slug)
-                                            @case('auto')        <i class="fas fa-car"></i>        @break
-                                            @case('habitation')  <i class="fas fa-home"></i>       @break
-                                            @case('bundle')      <i class="fas fa-layer-group"></i> @break
-                                            @case('commercial')  <i class="fas fa-building"></i>   @break
-                                            @default             <i class="fas fa-file-alt"></i>
-                                        @endswitch
-                                    @else
-                                        <i class="fas fa-file-alt"></i>
-                                    @endif
+                                    @switch($quoteType->slug)
+                                        @case('auto')        <i class="fas fa-car"></i>         @break
+                                        @case('habitation')  <i class="fas fa-home"></i>        @break
+                                        @case('bundle')      <i class="fas fa-layer-group"></i> @break
+                                        @case('commercial')  <i class="fas fa-building"></i>    @break
+                                        @default             <i class="fas fa-file-alt"></i>
+                                    @endswitch
 
-                                    <span>{{ $quoteType->getLabel(session('locale', 'fr')) }}</span>
-                                    <i class="fas fa-arrow-right ms-auto small opacity-75"></i>
+                                    <span>
+                                        {{ $acceptLabel }}
+                                        <i class="fas fa-check" style="font-size:0.85em;"></i>,
+                                        {{ $quoteType->getLabel(session('locale', 'fr')) }}
+                                    </span>
                                 </button>
                             </form>
                         @endforeach
