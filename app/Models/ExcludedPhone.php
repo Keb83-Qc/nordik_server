@@ -39,10 +39,10 @@ class ExcludedPhone extends Model
     ];
 
     // ─── Labels lisibles des raisons ─────────────────────────────────────────
+    // Note : 'lnnte_official' retiré — ces numéros ont leur propre table (lnnte_numbers)
 
     public const REASONS = [
         'client_request' => '🚫 Demande du client',
-        'lnnte_official' => '📋 LNNTE officielle (CRTC)',
         'deceased'       => '🪦 Décédé',
         'competitor'     => '🏢 Concurrent',
         'do_not_disturb' => '🔕 Ne pas déranger',
@@ -98,7 +98,8 @@ class ExcludedPhone extends Model
     }
 
     /**
-     * Vérifie si un numéro est dans la liste d'exclusion active.
+     * Vérifie si un numéro est exclu, que ce soit dans la liste interne
+     * OU dans la liste LNNTE officielle du CRTC.
      *
      * @param  string $phone  Numéro en n'importe quel format
      * @return bool
@@ -111,13 +112,18 @@ class ExcludedPhone extends Model
             return false;
         }
 
-        return self::active()
-            ->where('phone_normalized', $normalized)
-            ->exists();
+        // 1. Vérifie la liste interne (active, non expirée)
+        if (self::active()->where('phone_normalized', $normalized)->exists()) {
+            return true;
+        }
+
+        // 2. Vérifie la liste LNNTE officielle (CRTC)
+        return LnnteNumber::where('phone_normalized', $normalized)->exists();
     }
 
     /**
-     * Retourne l'entrée d'exclusion pour un numéro, ou null si absent.
+     * Retourne l'entrée interne pour un numéro, ou null si absent.
+     * Ne cherche que dans la liste interne (pas la LNNTE officielle).
      */
     public static function findByPhone(string $phone): ?self
     {
@@ -126,6 +132,26 @@ class ExcludedPhone extends Model
         return self::active()
             ->where('phone_normalized', $normalized)
             ->first();
+    }
+
+    /**
+     * Retourne la source d'exclusion d'un numéro : 'internal', 'lnnte', ou null.
+     */
+    public static function exclusionSource(string $phone): ?string
+    {
+        $normalized = self::normalize($phone);
+
+        if (empty($normalized)) return null;
+
+        if (self::active()->where('phone_normalized', $normalized)->exists()) {
+            return 'internal';
+        }
+
+        if (LnnteNumber::where('phone_normalized', $normalized)->exists()) {
+            return 'lnnte';
+        }
+
+        return null;
     }
 
     // ─── Boot — normalisation automatique à la sauvegarde ────────────────────

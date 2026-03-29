@@ -81,10 +81,11 @@ class ListExcludedPhones extends ListRecords
                             '(ex: 4185551234) ou CSV avec numéro en première colonne.'
                         ),
 
-                    \Filament\Forms\Components\Textarea::make('notes')
-                        ->label('Notes (optionnel)')
-                        ->rows(2)
-                        ->placeholder('Ex: Import LNNTE — mars 2026 — Zone Québec'),
+                    \Filament\Forms\Components\TextInput::make('import_batch')
+                        ->label('Nom du lot')
+                        ->placeholder('Ex: 2026-03 CRTC Québec')
+                        ->default(fn () => 'Import ' . now()->format('Y-m') . ' CRTC')
+                        ->helperText('Identifiant pour retrouver cet import dans la liste LNNTE.'),
                 ])
                 ->action(function (array $data): void {
                     $uploadedFile = $data['lnnte_file'];
@@ -98,14 +99,13 @@ class ListExcludedPhones extends ListRecords
                     }
 
                     // Déplacer le fichier temporaire vers un emplacement permanent pour le Job
-                    $filename    = 'lnnte/import_' . now()->format('YmdHis') . '_' . auth()->id() . '.txt';
-                    $tmpPath     = $uploadedFile->getRealPath();
-                    Storage::put($filename, file_get_contents($tmpPath));
+                    $filename = 'lnnte/import_' . now()->format('YmdHis') . '_' . auth()->id() . '.txt';
+                    Storage::put($filename, file_get_contents($uploadedFile->getRealPath()));
 
                     // Dispatcher le job en arrière-plan
                     ImportLnnteFileJob::dispatch(
                         $filename,
-                        $data['notes'] ?? '',
+                        $data['import_batch'] ?? '',
                         auth()->user(),
                     );
 

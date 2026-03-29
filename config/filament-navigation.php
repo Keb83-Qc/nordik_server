@@ -92,6 +92,7 @@ return [
 
         // Conformité
         \App\Filament\Resources\ExcludedPhoneResource::class    => 1,
+        \App\Filament\Resources\LnnteNumberResource::class      => 2,
 
         // Gestion Clients
         \App\Filament\Resources\AbfCaseAdminResource::class     => 1,

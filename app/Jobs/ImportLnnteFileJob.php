@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\ExcludedPhone;
+use App\Models\LnnteNumber;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Illuminate\Bus\Queueable;
@@ -33,8 +33,8 @@ class ImportLnnteFileJob implements ShouldQueue
     public int $timeout = 3600; // 1 heure max
 
     public function __construct(
-        protected string $storagePath,  // chemin relatif dans storage/app/
-        protected string $notes,
+        protected string $storagePath,   // chemin relatif dans storage/app/
+        protected string $importBatch,   // ex: "2026-03 CRTC Québec"
         protected User   $user,
     ) {}
 
@@ -81,7 +81,7 @@ class ImportLnnteFileJob implements ShouldQueue
                 continue;
             }
 
-            $normalized = ExcludedPhone::normalize($line);
+            $normalized = LnnteNumber::normalize($line);
 
             if (empty($normalized)) {
                 $skipped++;
@@ -91,9 +91,7 @@ class ImportLnnteFileJob implements ShouldQueue
             $chunk[] = [
                 'phone'            => $line,
                 'phone_normalized' => $normalized,
-                'reason'           => 'lnnte_official',
-                'notes'            => $this->notes ?: null,
-                'added_by'         => $this->user->id,
+                'import_batch'     => $this->importBatch ?: null,
                 'created_at'       => $now,
                 'updated_at'       => $now,
             ];
@@ -120,9 +118,10 @@ class ImportLnnteFileJob implements ShouldQueue
         Storage::delete($this->storagePath);
 
         // Notification de fin
-        $body = "**{$added}** numéro(s) importé(s)" .
-                ($skipped > 0 ? ", **{$skipped}** ignoré(s) (doublons ou invalides)" : '') .
-                " depuis le fichier LNNTE officiel.";
+        $batch = $this->importBatch ? " (lot : {$this->importBatch})" : '';
+        $body  = "**{$added}** numéro(s) importé(s)" .
+                 ($skipped > 0 ? ", **{$skipped}** ignoré(s) (doublons ou invalides)" : '') .
+                 " dans la table LNNTE officielle{$batch}.";
 
         $this->notifyUser('success', '✅ Import LNNTE terminé', $body);
 
@@ -135,11 +134,11 @@ class ImportLnnteFileJob implements ShouldQueue
      */
     private function insertChunk(array $chunk): int
     {
-        $before = DB::table('excluded_phones')->count();
+        $before = DB::table('lnnte_numbers')->count();
 
-        DB::table('excluded_phones')->insertOrIgnore($chunk);
+        DB::table('lnnte_numbers')->insertOrIgnore($chunk);
 
-        $after = DB::table('excluded_phones')->count();
+        $after = DB::table('lnnte_numbers')->count();
 
         return max(0, $after - $before);
     }
