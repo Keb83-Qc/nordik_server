@@ -16,7 +16,7 @@ return [
             'label'     => 'Soumissions',
             'icon'      => 'heroicon-o-inbox-arrow-down',
             'sort'      => 2,
-            'collapsed' => false,
+            'collapsed' => true,
         ],
 
         // ─── CONFORMITÉ (LNNTE, réglementation) ──────────────────
