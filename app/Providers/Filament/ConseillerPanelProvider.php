@@ -45,9 +45,9 @@ class ConseillerPanelProvider extends PanelProvider
             ->renderHook('panels::head.end', fn(): string => $this->styles())
             ->renderHook('panels::body.end', fn(): string => $this->scripts())
 
-            // ✅ Découvrir les resources/pages/widgets “standard”
-            // (Tu pourras ensuite déplacer dans App\Filament\Conseiller\... si tu veux)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            // Le panel conseiller n'expose aucune resource admin.
+            // Les conseillers accèdent à ABF via /abf (panel dédié) et au reste via /admin (admins seulement).
+            ->resources([])
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->widgets([
                 \App\Filament\Widgets\WelcomeOverview::class,
