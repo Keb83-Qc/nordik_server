@@ -13,6 +13,12 @@ class LogViewer extends Page
 
     protected static string $view = 'filament.abf.pages.log-viewer';
 
+    // Réservé aux admins — ne doit pas être la page de secours pour les conseillers
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
+    }
+
     public function getViewData(): array
     {
         return ['entries' => $this->parseLog(200)];
