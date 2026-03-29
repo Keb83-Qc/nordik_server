@@ -19,11 +19,19 @@ return [
             'collapsed' => false,
         ],
 
+        // ─── CONFORMITÉ (LNNTE, réglementation) ──────────────────
+        'Conformité' => [
+            'label'     => 'Conformité',
+            'icon'      => 'heroicon-o-shield-check',
+            'sort'      => 3,
+            'collapsed' => true,
+        ],
+
         // ─── CLIENTS ─────────────────────────────────────────────
         'Gestion Clients' => [
             'label'     => 'Gestion Clients',
             'icon'      => 'heroicon-o-user-group',
-            'sort'      => 3,
+            'sort'      => 4,
             'collapsed' => true,
         ],
 
@@ -31,7 +39,7 @@ return [
         'Site Web' => [
             'label'     => 'Site Web',
             'icon'      => 'heroicon-o-globe-alt',
-            'sort'      => 4,
+            'sort'      => 5,
             'collapsed' => true,
         ],
 
@@ -39,7 +47,7 @@ return [
         'Marketing' => [
             'label'     => 'Marketing & Blog',
             'icon'      => 'heroicon-o-megaphone',
-            'sort'      => 5,
+            'sort'      => 6,
             'collapsed' => true,
         ],
 
@@ -47,7 +55,7 @@ return [
         'Gestion Conseillers' => [
             'label'     => 'Équipe & Conseillers',
             'icon'      => 'heroicon-o-users',
-            'sort'      => 6,
+            'sort'      => 7,
             'collapsed' => true,
         ],
 
@@ -55,7 +63,7 @@ return [
         'Configuration' => [
             'label'     => 'Administration Système',
             'icon'      => 'heroicon-o-cog-6-tooth',
-            'sort'      => 7,
+            'sort'      => 8,
             'collapsed' => true,
         ],
 
@@ -63,7 +71,7 @@ return [
         'GestionLangues' => [
             'label'     => 'Traductions',
             'icon'      => 'heroicon-o-language',
-            'sort'      => 8,
+            'sort'      => 9,
             'collapsed' => true,
         ],
     ],
@@ -81,6 +89,9 @@ return [
         \App\Filament\Resources\QuoteTypeResource::class        => 3,
         \App\Filament\Resources\ChatStepResource::class         => 4,
         \App\Filament\Pages\MailSettingsPage::class             => 5,
+
+        // Conformité
+        \App\Filament\Resources\ExcludedPhoneResource::class    => 1,
 
         // Gestion Clients
         \App\Filament\Resources\AbfCaseAdminResource::class     => 1,

@@ -27,7 +27,7 @@ class ExcludedPhoneResource extends Resource
 
     public static function getNavigationSort(): ?int
     {
-        return 1;
+        return config('filament-navigation.sort.' . static::class, 1);
     }
 
     // ─── Formulaire ───────────────────────────────────────────────────────────
