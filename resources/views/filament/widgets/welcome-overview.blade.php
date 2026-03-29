@@ -5,7 +5,12 @@
 
         // Defaults safe
         $unreadCount = 0;
-        $inboxUrl = \App\Filament\Resources\MessageResource::getUrl('index');
+        try {
+            $inboxUrl = \App\Filament\Resources\MessageResource::getUrl('index');
+        } catch (\Exception $e) {
+            // La resource Messages n'est pas enregistrée dans ce panel (ex: panel conseiller)
+            $inboxUrl = null;
+        }
 
         if ($user) {
         $unreadCount = \App\Models\Message::query()
@@ -61,6 +66,7 @@
                 </div>
 
                 {{-- Bouton Messagerie Dynamique --}}
+                @if($inboxUrl)
                 <div class="shrink-0 hidden sm:block">
                     <a href="{{ $inboxUrl }}"
                         class="group relative flex items-center gap-2 px-4 py-2 bg-[#c9a050] text-[#0E1030] rounded-lg text-sm font-bold shadow-md hover:bg-yellow-500 transition-all">
@@ -85,6 +91,7 @@
                         @endif
                     </a>
                 </div>
+                @endif
             </div>
         </div>
     </div>
