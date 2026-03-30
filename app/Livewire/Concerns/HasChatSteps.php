@@ -3,6 +3,7 @@
 namespace App\Livewire\Concerns;
 
 use App\Mail\NewSubmissionAdmin;
+use App\Mail\PartnerSubmissionMail;
 use App\Models\ChatStep;
 use App\Models\ExcludedPhone;
 use App\Models\Submission;
@@ -335,6 +336,9 @@ trait HasChatSteps
 
         $type = ucfirst($this->chatType());
 
+        // Recharge le portail pour avoir cc_email
+        $portal = $this->submission->portal;
+
         if (!empty($recipients)) {
             try {
                 Mail::to($recipients)->send(new NewSubmissionAdmin($this->submission));
@@ -344,6 +348,16 @@ trait HasChatSteps
             }
         } else {
             Log::warning("Aucun destinataire pour {$type} {$this->submission->id}");
+        }
+
+        // Email personnalisé partenaire — envoyé au cc_email du portail
+        if ($portal?->isPartner() && !empty($portal->cc_email)) {
+            try {
+                Mail::to($portal->cc_email)->send(new PartnerSubmissionMail($this->submission, $portal));
+                Log::info("Email partenaire {$type} {$this->submission->id} envoyé à : {$portal->cc_email}");
+            } catch (\Throwable $e) {
+                Log::error("Erreur email partenaire {$type} {$this->submission->id}: " . $e->getMessage());
+            }
         }
 
         session(['last_advisor_code' => $this->advisorCode]);

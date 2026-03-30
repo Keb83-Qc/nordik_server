@@ -74,5 +74,29 @@ $advisorPhone = $advisor && $advisor->phone ? $advisor->phone : null;
 
     @livewireScripts
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    (function () {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        function sendJsError(data) {
+            try {
+                fetch('/log-js-error', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify(data),
+                    keepalive: true,
+                });
+            } catch (_) {}
+        }
+        window.onerror = function (message, source, line, column, error) {
+            sendJsError({ type: 'js_error', message: String(message).slice(0, 300), source: String(source || '').slice(0, 300), line: line, column: column, stack: error?.stack ? String(error.stack).slice(0, 600) : '', url: window.location.href.slice(0, 300) });
+            return false;
+        };
+        window.addEventListener('unhandledrejection', function (event) {
+            var reason = event.reason;
+            var message = reason instanceof Error ? reason.message : String(reason);
+            sendJsError({ type: 'unhandled_promise', message: String(message).slice(0, 300), source: '', line: '', column: '', stack: reason instanceof Error && reason.stack ? String(reason.stack).slice(0, 600) : '', url: window.location.href.slice(0, 300) });
+        });
+    })();
+    </script>
 </body>
 </html>

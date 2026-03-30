@@ -95,6 +95,13 @@ class QuotePortalResource extends Resource
                         ->searchable()
                         ->nullable()
                         ->helperText('Si défini, toutes les soumissions de ce portail seront assignées à ce conseiller. Sinon, la rotation automatique s\'applique.'),
+
+                    Forms\Components\TextInput::make('cc_email')
+                        ->label('Email CC (copie des soumissions)')
+                        ->email()
+                        ->nullable()
+                        ->maxLength(255)
+                        ->helperText('Si renseigné, cet email recevra aussi chaque nouvelle soumission de ce portail (email partenaire personnalisé).'),
                 ]),
 
             // ─── Branding ─────────────────────────────────────────────────────

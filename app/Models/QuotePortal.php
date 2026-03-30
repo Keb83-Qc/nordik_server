@@ -27,6 +27,7 @@ class QuotePortal extends Model
         'name',
         'type',
         'advisor_code',
+        'cc_email',
         'logo_path',
         'primary_color',
         'secondary_color',
