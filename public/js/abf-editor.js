@@ -5,6 +5,19 @@
   ];
   let current = 0;
 
+  // ── Variables globales pour les sections ajoutées ──────────────
+  let _retraiteDepenses = [];
+  let _projets = [];
+  let _recomNotes = {};
+  let _rapportSelectedPhoto = null;
+  const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const _mgCoveragePresets = {
+    aucun:     { traitement:0,    equipement:0,    adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
+    base:      { traitement:5000, equipement:5000, adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
+    confort:   { traitement:5000, equipement:5000, adaptation:12000, vehicule:0,    transport:3000, 'aide-domicile':0,    'soins-professionnel':500,'medicaments-rec':200},
+    superieur: { traitement:5000, equipement:5000, adaptation:12000, vehicule:8000, transport:3000, 'aide-domicile':2000, 'soins-professionnel':800,'medicaments-rec':300},
+  };
+
   function syncConjointInfo() {
     if (!document.getElementById('conjoint')?.checked) return;
     // État civil : même valeur que le client
@@ -3601,13 +3614,6 @@
     mgCalc(role);
   }
 
-  const _mgCoveragePresets = {
-    aucun:     { traitement:0,    equipement:0,    adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
-    base:      { traitement:5000, equipement:5000, adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
-    confort:   { traitement:5000, equipement:5000, adaptation:12000, vehicule:0,    transport:3000, 'aide-domicile':0,    'soins-professionnel':500,'medicaments-rec':200},
-    superieur: { traitement:5000, equipement:5000, adaptation:12000, vehicule:8000, transport:3000, 'aide-domicile':2000, 'soins-professionnel':800,'medicaments-rec':300},
-  };
-
   function mgSetCoverage(role, level) {
     const k = role === 'client' ? 'c' : 'j';
     const preset = _mgCoveragePresets[level] || _mgCoveragePresets.aucun;
@@ -3706,8 +3712,6 @@
   /* ════════════════════════════════════════════════════════
      RETRAITE
   ════════════════════════════════════════════════════════ */
-  let _retraiteDepenses = [];
-
   function retraiteInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
 
@@ -3931,8 +3935,6 @@
   /* ════════════════════════════════════════════════════════
      PROJETS
   ════════════════════════════════════════════════════════ */
-  let _projets = [];
-
   function projetsAdd() {
     document.getElementById('projet-edit-id').value = '';
     document.getElementById('projet-description').value = '';
@@ -3996,8 +3998,6 @@
     document.getElementById('projet-delete-btn').style.display = 'inline-flex';
     document.getElementById('modal-projet').style.display = 'flex';
   }
-
-  const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 
   function projetsRender() {
     const empty   = document.getElementById('projets-empty');
@@ -4063,8 +4063,6 @@
   /* ════════════════════════════════════════════════════════
      RECOMMANDATIONS
   ════════════════════════════════════════════════════════ */
-  let _recomNotes = {};
-
   function recomInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
     const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite'];
@@ -4130,8 +4128,6 @@
     const checked = parent?.checked;
     childrenDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = !checked; });
   }
-
-  let _rapportSelectedPhoto = null;
 
   function rapportFilterPhotos(filter) {
     document.querySelectorAll('.rapport-photo-item').forEach(item => {
