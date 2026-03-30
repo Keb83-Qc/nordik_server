@@ -35,6 +35,10 @@
     if (id === 'fonds-urgence') { fuRenderActifs(); fuCalc(); }
     if (id === 'deces') decesInit();
     if (id === 'invalidite') invaliditeInit();
+    if (id === 'maladie-grave') mgInit();
+    if (id === 'retraite') retraiteInit();
+    if (id === 'recommandations') recomInit();
+    if (id === 'rapport') rapportInit();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
@@ -2927,6 +2931,51 @@
         dep_total: v('inval-dep-total'),
         av_list: typeof _invalAvList !== 'undefined' ? _invalAvList : [],
       },
+      maladieGrave: {
+        client: {
+          useDisability: document.querySelector('input[name="mg-use-disability-c"]:checked')?.value || 'non',
+          useEmergency:  document.querySelector('input[name="mg-use-emergency-c"]:checked')?.value  || 'non',
+          brutNet: (document.getElementById('mg-bn-net-c')?.classList.contains('active')) ? 'net' : 'brut',
+          rrPct:   v('mg-rr-pct-c'), rrDuree: v('mg-rr-duree-c'),
+          aidantType:    document.querySelector('input[name="mg-aidant-type-c"]:checked')?.value || 'aucun',
+          aidantMontant: v('mg-aidant-montant-c'), aidantDuree: v('mg-aidant-duree-c'),
+          coverage: document.querySelector('input[name="mg-coverage-c"]:checked')?.value || 'aucun',
+          depTraitement: v('mg-dep-traitement-c'),    depEquipement: v('mg-dep-equipement-c'),
+          depAdaptation: v('mg-dep-adaptation-c'),    depVehicule:   v('mg-dep-vehicule-c'),
+          depTransport:  v('mg-dep-transport-c'),     depAide:       v('mg-dep-aide-domicile-c'),
+          depSoins:      v('mg-dep-soins-professionnel-c'), depMeds: v('mg-dep-medicaments-rec-c'),
+        },
+        conjoint: {
+          useDisability: document.querySelector('input[name="mg-use-disability-j"]:checked')?.value || 'non',
+          useEmergency:  document.querySelector('input[name="mg-use-emergency-j"]:checked')?.value  || 'non',
+          brutNet: (document.getElementById('mg-bn-net-j')?.classList.contains('active')) ? 'net' : 'brut',
+          rrPct:   v('mg-rr-pct-j'), rrDuree: v('mg-rr-duree-j'),
+          aidantType:    document.querySelector('input[name="mg-aidant-type-j"]:checked')?.value || 'aucun',
+          aidantMontant: v('mg-aidant-montant-j'), aidantDuree: v('mg-aidant-duree-j'),
+          coverage: document.querySelector('input[name="mg-coverage-j"]:checked')?.value || 'aucun',
+          depTraitement: v('mg-dep-traitement-j'),    depEquipement: v('mg-dep-equipement-j'),
+          depAdaptation: v('mg-dep-adaptation-j'),    depVehicule:   v('mg-dep-vehicule-j'),
+          depTransport:  v('mg-dep-transport-j'),     depAide:       v('mg-dep-aide-domicile-j'),
+          depSoins:      v('mg-dep-soins-professionnel-j'), depMeds: v('mg-dep-medicaments-rec-j'),
+        },
+      },
+      retraite: {
+        ageClient:   v('retraite-age-client'),   typeClient:   v('retraite-type-client'),
+        ageConjoint: v('retraite-age-conjoint'), typeConjoint: v('retraite-type-conjoint'),
+        goalType:    document.querySelector('input[name="retraite-goal-type"]:checked')?.value || 'individuel',
+        profilAvantClient:    v('retraite-profil-avant-client'),
+        profilPendantClient:  v('retraite-profil-pendant-client'),
+        profilAvantConjoint:  v('retraite-profil-avant-conjoint'),
+        profilPendantConjoint:v('retraite-profil-pendant-conjoint'),
+        pctClient:   v('retraite-pct-client-0'), pctConjoint: v('retraite-pct-conjoint-0'),
+        saveSurplusClient:  document.querySelector('input[name="retraite-save-surplus-c"]:checked')?.value  || 'non',
+        saveSurplusConjoint:document.querySelector('input[name="retraite-save-surplus-j"]:checked')?.value || 'non',
+        depenses: typeof _retraiteDepenses !== 'undefined' ? _retraiteDepenses : [],
+      },
+      projets: typeof _projets !== 'undefined' ? _projets : [],
+      recommandations: {
+        notes: typeof _recomNotes !== 'undefined' ? _recomNotes : {},
+      },
       valeurs_defaut: {
         province: v('vd-province'), fu: radio('vd-fu'), fu_mois: v('vd-fu-mois'),
         funerailles: v('vd-funerailles'), deces_rr: radio('vd-deces-rr'),
@@ -3202,6 +3251,65 @@
     // Invalidité
     const inv = p.invalidite || {};
     sv('inval-dep-total', inv.dep_total);
+
+    // Maladie grave
+    const mg = p.maladieGrave || {};
+    ['client','conjoint'].forEach(role => {
+      const k = role === 'client' ? 'c' : 'j';
+      const d = mg[role] || {};
+      const setR = (name, val) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if(el) el.checked = true; };
+      setR(`mg-use-disability-${k}`, d.useDisability || 'non');
+      setR(`mg-use-emergency-${k}`,  d.useEmergency  || 'non');
+      setR(`mg-coverage-${k}`,       d.coverage      || 'aucun');
+      setR(`mg-aidant-type-${k}`,    d.aidantType    || 'aucun');
+      sv(`mg-rr-pct-${k}`,    d.rrPct   || '70');
+      sv(`mg-rr-duree-${k}`,  d.rrDuree || '12');
+      sv(`mg-aidant-montant-${k}`, d.aidantMontant || '');
+      sv(`mg-aidant-duree-${k}`,   d.aidantDuree  || '6');
+      const fields = ['traitement','equipement','adaptation','vehicule','transport','aide-domicile','soins-professionnel','medicaments-rec'];
+      const vals = [d.depTraitement,d.depEquipement,d.depAdaptation,d.depVehicule,d.depTransport,d.depAide,d.depSoins,d.depMeds];
+      fields.forEach((f,i) => { if(vals[i] !== undefined) sv(`mg-dep-${f}-${k}`, vals[i]); });
+      if (d.brutNet === 'net') {
+        document.getElementById(`mg-bn-brut-${k}`)?.classList.remove('active');
+        document.getElementById(`mg-bn-net-${k}`)?.classList.add('active');
+      }
+    });
+
+    // Retraite
+    const ret = p.retraite || {};
+    sv('retraite-age-client',   ret.ageClient   || '65');
+    sv('retraite-age-conjoint', ret.ageConjoint || '65');
+    if (ret.typeClient)   { const el = document.getElementById('retraite-type-client');   if(el) el.value = ret.typeClient; }
+    if (ret.typeConjoint) { const el = document.getElementById('retraite-type-conjoint'); if(el) el.value = ret.typeConjoint; }
+    if (ret.goalType) { const el = document.querySelector(`input[name="retraite-goal-type"][value="${ret.goalType}"]`); if(el) el.checked = true; }
+    sv('retraite-pct-client-0',   ret.pctClient   || '70');
+    sv('retraite-pct-conjoint-0', ret.pctConjoint || '70');
+    if (ret.saveSurplusClient)   { const el = document.querySelector(`input[name="retraite-save-surplus-c"][value="${ret.saveSurplusClient}"]`);   if(el) el.checked = true; }
+    if (ret.saveSurplusConjoint) { const el = document.querySelector(`input[name="retraite-save-surplus-j"][value="${ret.saveSurplusConjoint}"]`); if(el) el.checked = true; }
+    ['avant-client','pendant-client','avant-conjoint','pendant-conjoint'].forEach(k => {
+      const key = 'profil' + k.replace(/(^|-)(\w)/g,(_,s,c)=>c.toUpperCase());
+      const el = document.getElementById(`retraite-profil-${k}`);
+      if(el && ret[key]) el.value = ret[key];
+    });
+    if (Array.isArray(ret.depenses)) {
+      _retraiteDepenses = ret.depenses;
+      retraiteRenderDepenses();
+    }
+
+    // Projets
+    if (Array.isArray(p.projets)) {
+      _projets = p.projets;
+      projetsRender();
+    }
+
+    // Recommandations notes
+    if (p.recommandations?.notes) {
+      _recomNotes = p.recommandations.notes;
+      Object.entries(_recomNotes).forEach(([cat, text]) => {
+        const el = document.getElementById(`recom-notes-${cat}`);
+        if (el) el.value = text;
+      });
+    }
     if (typeof _invalAvList !== 'undefined' && Array.isArray(inv.av_list)) {
       _invalAvList = inv.av_list;
       if (typeof invalRenderAvList === 'function') invalRenderAvList();
@@ -3387,4 +3495,664 @@
 
   if (window.ABF_SAVE_URL) {
     initAutoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN);
+  }
+
+  /* ════════════════════════════════════════════════════════
+     MALADIE GRAVE
+  ════════════════════════════════════════════════════════ */
+  function mgInit() {
+    const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const tabs = document.getElementById('mg-person-tabs');
+    if (tabs) tabs.style.display = hasSpouse ? 'block' : 'none';
+
+    // Noms
+    const cPrenom = document.getElementById('client-prenom')?.value || 'le client';
+    const jPrenom = document.getElementById('conjoint-prenom')?.value || 'le conjoint';
+    ['c','j'].forEach((k, i) => {
+      const nom = i === 0 ? cPrenom : jPrenom;
+      const el = document.getElementById(`mg-rr-client-label-${k}`);
+      if (el) el.textContent = nom + ' vise';
+    });
+
+    // Revenu actuel
+    ['client','conjoint'].forEach((role, i) => {
+      const k = i === 0 ? 'c' : 'j';
+      const brutEl = document.querySelector(`input[name="mg-use-disability-${k}"]:checked`);
+      mgUpdateRevenu(role, k);
+    });
+
+    // Affichage aidant selon sélection
+    ['c','j'].forEach(k => {
+      const sel = document.querySelector(`input[name="mg-aidant-type-${k}"]:checked`)?.value;
+      const detail = document.getElementById(`mg-aidant-detail-${k}`);
+      if (detail) detail.style.display = (sel && sel !== 'aucun') ? 'block' : 'none';
+    });
+
+    mgCalc('client');
+    if (hasSpouse) mgCalc('conjoint');
+  }
+
+  function mgUpdateRevenu(role, k) {
+    const brutNet = document.getElementById(`mg-bn-net-${k}`)?.classList.contains('active') ? 'net' : 'brut';
+    let revenu = 0;
+    // Chercher le revenu dans les données saisies (revenu-epargne)
+    document.querySelectorAll('#revenu-list tr[data-form-json]').forEach(tr => {
+      try {
+        const d = JSON.parse(tr.dataset.formJson);
+        const owner = d.owner || d.proprietaire || '';
+        const isOwner = (role === 'client' && (owner === 'client' || owner === '')) ||
+                        (role === 'conjoint' && owner === 'conjoint');
+        if (isOwner) revenu += parseFloat(String(d.montant||0).replace(/\s/g,'').replace(',','.')) || 0;
+      } catch {}
+    });
+    const el = document.getElementById(`mg-revenu-actuel-${k}`);
+    if (el) {
+      const affiche = (brutNet === 'net') ? Math.round(revenu * 0.72) : revenu;
+      el.textContent = affiche > 0 ? fmtMoney(affiche / 12) + '/mois' : 'Non disponible';
+    }
+    return revenu;
+  }
+
+  function switchMgTab(role, btn) {
+    document.querySelectorAll('.deces-person-tab').forEach(b => {
+      if (b.id && b.id.startsWith('mg-tab-')) b.classList.remove('active');
+    });
+    btn.classList.add('active');
+    document.getElementById('mg-panel-client').style.display  = role === 'client'   ? '' : 'none';
+    document.getElementById('mg-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
+  }
+
+  function setMgBrutNet(role, val) {
+    const k = role === 'client' ? 'c' : 'j';
+    document.getElementById(`mg-bn-brut-${k}`)?.classList.toggle('active', val === 'brut');
+    document.getElementById(`mg-bn-net-${k}`)?.classList.toggle('active', val === 'net');
+    mgUpdateRevenu(role, k);
+    mgCalc(role);
+  }
+
+  const _mgCoveragePresets = {
+    aucun:     { traitement:0,    equipement:0,    adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
+    base:      { traitement:5000, equipement:5000, adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
+    confort:   { traitement:5000, equipement:5000, adaptation:12000, vehicule:0,    transport:3000, 'aide-domicile':0,    'soins-professionnel':500,'medicaments-rec':200},
+    superieur: { traitement:5000, equipement:5000, adaptation:12000, vehicule:8000, transport:3000, 'aide-domicile':2000, 'soins-professionnel':800,'medicaments-rec':300},
+  };
+
+  function mgSetCoverage(role, level) {
+    const k = role === 'client' ? 'c' : 'j';
+    const preset = _mgCoveragePresets[level] || _mgCoveragePresets.aucun;
+    Object.entries(preset).forEach(([field, val]) => {
+      const el = document.getElementById(`mg-dep-${field}-${k}`);
+      if (el) el.value = val > 0 ? val.toLocaleString('fr-CA') : '0';
+    });
+    mgCalc(role);
+  }
+
+  function mgCalc(role) {
+    const k = role === 'client' ? 'c' : 'j';
+    const brutNet = document.getElementById(`mg-bn-net-${k}`)?.classList.contains('active') ? 'net' : 'brut';
+
+    // Aidant detail visibility
+    const aidantType = document.querySelector(`input[name="mg-aidant-type-${k}"]:checked`)?.value || 'aucun';
+    const aidantDetail = document.getElementById(`mg-aidant-detail-${k}`);
+    if (aidantDetail) aidantDetail.style.display = aidantType !== 'aucun' ? 'block' : 'none';
+
+    const pct   = parseFloat(document.getElementById(`mg-rr-pct-${k}`)?.value || '70') / 100;
+    const duree = parseFloat(document.getElementById(`mg-rr-duree-${k}`)?.value || '12');
+
+    let revenuBrut = 0;
+    document.querySelectorAll('#revenu-list tr[data-form-json]').forEach(tr => {
+      try {
+        const d = JSON.parse(tr.dataset.formJson);
+        const owner = d.owner || '';
+        const isOwner = (role === 'client' && (owner === 'client' || owner === '')) ||
+                        (role === 'conjoint' && owner === 'conjoint');
+        if (isOwner) revenuBrut += parseFloat(String(d.montant||0).replace(/\s/g,'').replace(',','.')) || 0;
+      } catch {}
+    });
+    const revenuMensuel = (brutNet === 'net' ? revenuBrut * 0.72 : revenuBrut) / 12;
+    const montantCible  = revenuMensuel * pct;
+
+    const elMontant = document.getElementById(`mg-rr-montant-${k}`);
+    if (elMontant) elMontant.textContent = fmtMoney(montantCible) + '/mois';
+
+    // Total dépenses uniques
+    const fields = ['traitement','equipement','adaptation','vehicule','transport','aide-domicile'];
+    let totalUnique = 0;
+    fields.forEach(f => {
+      const el = document.getElementById(`mg-dep-${f}-${k}`);
+      totalUnique += parseFloat(String(el?.value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    });
+
+    // Total dépenses récurrentes (pour la durée)
+    const rec = ['soins-professionnel','medicaments-rec'];
+    let totalRec = 0;
+    rec.forEach(f => {
+      const el = document.getElementById(`mg-dep-${f}-${k}`);
+      totalRec += parseFloat(String(el?.value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    });
+    const totalDep = totalUnique + (totalRec * duree);
+
+    const elTotal = document.getElementById(`mg-dep-total-${k}`);
+    if (elTotal) elTotal.textContent = fmtMoney(totalDep);
+
+    const totalBesoin = (montantCible * duree) + totalDep;
+
+    // Aidant
+    let aidantCout = 0;
+    if (aidantType !== 'aucun') {
+      const aidantMontant = parseFloat(String(document.getElementById(`mg-aidant-montant-${k}`)?.value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+      const aidantDuree   = parseFloat(document.getElementById(`mg-aidant-duree-${k}`)?.value || '6');
+      aidantCout = aidantMontant * aidantDuree;
+    }
+
+    const grandTotal = totalBesoin + aidantCout;
+
+    // Résumé
+    const resumeEl = document.getElementById('mg-resume-body');
+    if (resumeEl && document.getElementById('mg-panel-' + role)?.style.display !== 'none') {
+      resumeEl.innerHTML = `
+        <div style="font-size:13px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Remplacement du revenu</span>
+            <strong>${fmtMoney(montantCible * duree)}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Dépenses supplémentaires</span>
+            <strong>${fmtMoney(totalDep)}</strong>
+          </div>
+          ${aidantCout > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Revenu de l'aidant</span>
+            <strong>${fmtMoney(aidantCout)}</strong>
+          </div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px">
+            <span style="font-weight:700;color:var(--navy)">Total estimé</span>
+            <strong style="color:var(--gold);font-size:15px">${fmtMoney(grandTotal)}</strong>
+          </div>
+        </div>`;
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     RETRAITE
+  ════════════════════════════════════════════════════════ */
+  let _retraiteDepenses = [];
+
+  function retraiteInit() {
+    const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+
+    const cPrenom = document.getElementById('client-prenom')?.value || 'le client';
+    const jPrenom = document.getElementById('conjoint-prenom')?.value || 'le conjoint';
+
+    // Noms dans les labels
+    const nom1 = document.getElementById('retraite-nom-client');
+    const nom2 = document.getElementById('retraite-nom-conjoint');
+    if (nom1) nom1.textContent = cPrenom;
+    if (nom2) nom2.textContent = jPrenom;
+
+    ['retraite-nom-inline-client','retraite-nom-inline-conjoint'].forEach((id,i) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = i === 0 ? cPrenom : jPrenom;
+    });
+
+    // Onglets couple
+    const rowConj = document.getElementById('retraite-row-conjoint');
+    if (rowConj) rowConj.style.display = hasSpouse ? 'grid' : 'none';
+
+    const tabs = document.getElementById('retraite-objectif-tabs');
+    if (tabs) tabs.style.display = hasSpouse ? 'block' : 'none';
+
+    const profilTabs = document.getElementById('retraite-profil-tabs');
+    if (profilTabs) profilTabs.style.display = hasSpouse ? 'block' : 'none';
+
+    const goalWrap = document.getElementById('retraite-goal-type-wrap');
+    if (goalWrap) goalWrap.style.display = hasSpouse ? 'flex' : 'none';
+
+    // Revenu net
+    const revenu = _retraiteGetRevenu('client');
+    const revenuConj = _retraiteGetRevenu('conjoint');
+    const rnc = document.getElementById('retraite-revenu-net-client');
+    const rnj = document.getElementById('retraite-revenu-net-conjoint');
+    if (rnc) rnc.textContent = fmtMoney(revenu * 0.72);
+    if (rnj) rnj.textContent = fmtMoney(revenuConj * 0.72);
+
+    retraiteRenderDepenses();
+    retraiteCalc();
+  }
+
+  function _retraiteGetRevenu(role) {
+    let total = 0;
+    document.querySelectorAll('#revenu-list tr[data-form-json]').forEach(tr => {
+      try {
+        const d = JSON.parse(tr.dataset.formJson);
+        const owner = d.owner || '';
+        const isOwner = (role === 'client' && (owner === 'client' || owner === '')) ||
+                        (role === 'conjoint' && owner === 'conjoint');
+        if (isOwner) total += parseFloat(String(d.montant||0).replace(/\s/g,'').replace(',','.')) || 0;
+      } catch {}
+    });
+    return total;
+  }
+
+  function switchRetraiteObjTab(role, btn) {
+    document.querySelectorAll('#retraite-objectif-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('retraite-obj-panel-client').style.display  = role === 'client'   ? '' : 'none';
+    document.getElementById('retraite-obj-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
+    retraiteCalc();
+  }
+
+  function switchRetraitProfileTab(role, btn) {
+    document.querySelectorAll('#retraite-profil-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('retraite-profil-panel-client').style.display  = role === 'client'   ? '' : 'none';
+    document.getElementById('retraite-profil-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
+  }
+
+  function retraiteAddPeriode(role) {
+    const container = document.getElementById(`retraite-periodes-${role}`);
+    if (!container) return;
+    const idx = container.querySelectorAll('.retraite-periode').length;
+    const nom = (role === 'client' ? document.getElementById('client-prenom')?.value : document.getElementById('conjoint-prenom')?.value) || role;
+    const div = document.createElement('div');
+    div.className = 'retraite-periode';
+    div.dataset.idx = idx;
+    div.style.cssText = 'padding:12px;background:#f8f9fd;border-radius:8px;margin-bottom:10px;position:relative';
+    div.innerHTML = `
+      <button onclick="this.parentElement.remove();retraiteCalc()"
+        style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px">×</button>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
+        <span>${nom} vise</span>
+        <input class="form-input" id="retraite-pct-${role}-${idx}" type="text" value="70" style="width:65px;text-align:center" oninput="retraiteCalc()"/>
+        <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-${role}-${idx}" value="pct" checked onchange="retraiteCalc()"/> %</label>
+        <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-${role}-${idx}" value="montant" onchange="retraiteCalc()"/> $</label>
+        <span>du revenu net actuel, de l'âge</span>
+        <input class="form-input" type="text" value="" placeholder="début" style="width:55px;text-align:center" oninput="retraiteCalc()"/>
+        <span>à</span>
+        <input class="form-input" type="text" value="" placeholder="fin" style="width:55px;text-align:center" oninput="retraiteCalc()"/>
+        <span>ans</span>
+      </div>`;
+    container.appendChild(div);
+  }
+
+  function retraiteAddDepense() {
+    document.getElementById('retraite-dep-desc').value = '';
+    document.getElementById('retraite-dep-montant').value = '';
+    document.getElementById('retraite-dep-debut').value = '';
+    document.getElementById('retraite-dep-fin').value = '';
+    document.getElementById('modal-retraite-depense').style.display = 'flex';
+    delete document.getElementById('modal-retraite-depense').dataset.editIdx;
+  }
+
+  function closeRetraiteDepenseModal() {
+    document.getElementById('modal-retraite-depense').style.display = 'none';
+  }
+
+  function saveRetraiteDepense() {
+    const desc    = document.getElementById('retraite-dep-desc').value.trim();
+    const montant = parseFloat(String(document.getElementById('retraite-dep-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const debut   = document.getElementById('retraite-dep-debut').value.trim();
+    const fin     = document.getElementById('retraite-dep-fin').value.trim();
+    if (!desc) { showToast('Veuillez saisir une description'); return; }
+    const obj = { desc, montant, debut, fin };
+    const modal = document.getElementById('modal-retraite-depense');
+    if (modal.dataset.editIdx !== undefined) {
+      _retraiteDepenses[parseInt(modal.dataset.editIdx)] = obj;
+    } else {
+      _retraiteDepenses.push(obj);
+    }
+    retraiteRenderDepenses();
+    closeRetraiteDepenseModal();
+    retraiteCalc();
+  }
+
+  function retraiteRenderDepenses() {
+    const list  = document.getElementById('retraite-depenses-list');
+    const empty = document.getElementById('retraite-depenses-empty');
+    if (!list) return;
+    if (!_retraiteDepenses.length) {
+      if (empty) empty.style.display = '';
+      list.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune dépense ajoutée.</p>';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    list.innerHTML = _retraiteDepenses.map((d, i) => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">
+        <div>
+          <div style="font-weight:600;color:var(--navy)">${d.desc}</div>
+          <div style="font-size:11px;color:var(--muted)">${d.debut||'retraite'} – ${d.fin||'décès'} ans</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <strong>${fmtMoney(d.montant)}/an</strong>
+          <button onclick="retraiteEditDepense(${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:12px;padding:2px 6px;border:1px solid var(--border);border-radius:4px">Modifier</button>
+          <button onclick="_retraiteDepenses.splice(${i},1);retraiteRenderDepenses();retraiteCalc()" style="background:none;border:none;cursor:pointer;color:#ef4444;font-size:16px;padding:0 4px">×</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function retraiteEditDepense(idx) {
+    const d = _retraiteDepenses[idx];
+    if (!d) return;
+    document.getElementById('retraite-dep-desc').value    = d.desc    || '';
+    document.getElementById('retraite-dep-montant').value = d.montant || '';
+    document.getElementById('retraite-dep-debut').value   = d.debut   || '';
+    document.getElementById('retraite-dep-fin').value     = d.fin     || '';
+    const modal = document.getElementById('modal-retraite-depense');
+    modal.dataset.editIdx = idx;
+    modal.style.display = 'flex';
+  }
+
+  function retraiteCalc() {
+    const ageC = parseFloat(document.getElementById('retraite-age-client')?.value  || '65');
+    const ageJ = parseFloat(document.getElementById('retraite-age-conjoint')?.value || '65');
+
+    // Date estimée
+    ['client','conjoint'].forEach((role, i) => {
+      const k = i === 0 ? 'c' : 'j';
+      const age = i === 0 ? ageC : ageJ;
+      const ddnAnnee = parseInt(document.getElementById(`${role === 'client' ? 'client' : 'conjoint'}-naissance-annee`)?.value || '0');
+      const dateEl  = document.getElementById(`retraite-date-${role}`);
+      if (dateEl && ddnAnnee > 0) {
+        const anneeRetraite = ddnAnnee + age;
+        dateEl.textContent = `${anneeRetraite}`;
+      }
+    });
+
+    // Résumé
+    const revenuC = _retraiteGetRevenu('client') * 0.72;
+    const pctC    = parseFloat(document.getElementById('retraite-pct-client-0')?.value || '70') / 100;
+    const cibleC  = revenuC * pctC;
+    const montantEl = document.getElementById('retraite-montant-client-0');
+    if (montantEl) montantEl.textContent = fmtMoney(cibleC);
+
+    const revenuJ = _retraiteGetRevenu('conjoint') * 0.72;
+    const pctJ    = parseFloat(document.getElementById('retraite-pct-conjoint-0')?.value || '70') / 100;
+    const cibleJ  = revenuJ * pctJ;
+    const montantJEl = document.getElementById('retraite-montant-conjoint-0');
+    if (montantJEl) montantJEl.textContent = fmtMoney(cibleJ);
+
+    const totalDep = _retraiteDepenses.reduce((s, d) => s + (d.montant || 0), 0);
+
+    const resumeEl = document.getElementById('retraite-resume-body');
+    if (resumeEl) {
+      const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+      resumeEl.innerHTML = `
+        <div style="font-size:13px">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Âge retraite ${document.getElementById('client-prenom')?.value||'client'}</span>
+            <strong>${ageC} ans</strong>
+          </div>
+          ${hasSpouse ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Âge retraite ${document.getElementById('conjoint-prenom')?.value||'conjoint'}</span>
+            <strong>${ageJ} ans</strong>
+          </div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Objectif annuel</span>
+            <strong>${fmtMoney(cibleC)}</strong>
+          </div>
+          ${totalDep > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Dépenses retraite</span>
+            <strong>${fmtMoney(totalDep)}/an</strong>
+          </div>` : ''}
+        </div>`;
+    }
+  }
+
+  /* ════════════════════════════════════════════════════════
+     PROJETS
+  ════════════════════════════════════════════════════════ */
+  let _projets = [];
+
+  function projetsAdd() {
+    document.getElementById('projet-edit-id').value = '';
+    document.getElementById('projet-description').value = '';
+    document.getElementById('projet-montant').value = '';
+    document.getElementById('projet-mois').value = '1';
+    document.getElementById('projet-annee').value = '';
+    document.getElementById('projet-notes').value = '';
+    document.getElementById('projet-celiapp').checked = false;
+    document.getElementById('modal-projet-title').textContent = 'Nouveau projet';
+    document.getElementById('projet-delete-btn').style.display = 'none';
+    document.getElementById('modal-projet').style.display = 'flex';
+  }
+
+  function closeProjetModal() {
+    document.getElementById('modal-projet').style.display = 'none';
+  }
+
+  function saveProjet() {
+    const desc    = document.getElementById('projet-description').value.trim();
+    const montant = parseFloat(String(document.getElementById('projet-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const mois    = parseInt(document.getElementById('projet-mois').value) || 1;
+    const annee   = document.getElementById('projet-annee').value.trim();
+    const notes   = document.getElementById('projet-notes').value.trim();
+    const celiapp = document.getElementById('projet-celiapp').checked;
+    if (!desc) { showToast('Veuillez saisir une description'); return; }
+
+    const id = document.getElementById('projet-edit-id').value;
+    const obj = { id: id || crypto.randomUUID(), desc, montant, mois, annee, notes, celiapp };
+
+    if (id) {
+      const idx = _projets.findIndex(p => p.id === id);
+      if (idx !== -1) _projets[idx] = obj;
+    } else {
+      _projets.push(obj);
+    }
+
+    projetsRender();
+    closeProjetModal();
+  }
+
+  function projetsDelete() {
+    const id = document.getElementById('projet-edit-id').value;
+    if (!id) return;
+    _projets = _projets.filter(p => p.id !== id);
+    projetsRender();
+    closeProjetModal();
+  }
+
+  function projetsEdit(id) {
+    const p = _projets.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('projet-edit-id').value = p.id;
+    document.getElementById('projet-description').value = p.desc || '';
+    document.getElementById('projet-montant').value     = p.montant || '';
+    document.getElementById('projet-mois').value        = p.mois || '1';
+    document.getElementById('projet-annee').value       = p.annee || '';
+    document.getElementById('projet-notes').value       = p.notes || '';
+    document.getElementById('projet-celiapp').checked   = !!p.celiapp;
+    document.getElementById('modal-projet-title').textContent = 'Modifier le projet';
+    document.getElementById('projet-delete-btn').style.display = 'inline-flex';
+    document.getElementById('modal-projet').style.display = 'flex';
+  }
+
+  const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+  function projetsRender() {
+    const empty   = document.getElementById('projets-empty');
+    const panels  = document.getElementById('projets-panels');
+    const tabsNav = document.getElementById('projets-tabs-nav');
+    if (!tabsNav || !panels) return;
+
+    if (!_projets.length) {
+      if (empty)  empty.style.display  = '';
+      if (panels) panels.style.display = 'none';
+      tabsNav.innerHTML = '';
+      return;
+    }
+
+    if (empty)  empty.style.display  = 'none';
+    if (panels) panels.style.display = '';
+
+    let activeId = _projets[0].id;
+
+    tabsNav.innerHTML = _projets.map((p, i) => `
+      <button
+        id="proj-tab-${p.id}"
+        class="deces-person-tab${i === 0 ? ' active' : ''}"
+        onclick="projetsShowPanel('${p.id}',this)"
+        style="white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis">
+        ${p.desc || 'Projet ' + (i+1)}
+      </button>`).join('');
+
+    panels.innerHTML = _projets.map((p, i) => `
+      <div id="proj-panel-${p.id}" style="${i > 0 ? 'display:none' : ''}">
+        <div class="card">
+          <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span>${p.desc}</span>
+            <button class="btn btn-secondary btn-sm" onclick="projetsEdit('${p.id}')">Modifier</button>
+          </div>
+          <div class="card-body">
+            ${p.celiapp ? '<div style="display:inline-block;font-size:11px;background:#dcfce7;color:#16a34a;border-radius:4px;padding:2px 8px;margin-bottom:10px;font-weight:600">✓ Admissible CELIAPP / RAP</div>' : ''}
+            <div style="font-size:13px">
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--muted)">Date prévue</span>
+                <strong>${_moisNoms[p.mois] || ''} ${p.annee || '—'}</strong>
+              </div>
+              <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+                <span style="color:var(--muted)">Montant estimé</span>
+                <strong>${fmtMoney(p.montant)}</strong>
+              </div>
+              ${p.notes ? `<div style="padding:8px 0;color:var(--muted);font-size:12px">${p.notes}</div>` : ''}
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function projetsShowPanel(id, btn) {
+    document.querySelectorAll('#projets-tabs-nav .deces-person-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    _projets.forEach(p => {
+      const el = document.getElementById(`proj-panel-${p.id}`);
+      if (el) el.style.display = p.id === id ? '' : 'none';
+    });
+  }
+
+  /* ════════════════════════════════════════════════════════
+     RECOMMANDATIONS
+  ════════════════════════════════════════════════════════ */
+  let _recomNotes = {};
+
+  function recomInit() {
+    const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite'];
+    cats.forEach(cat => {
+      const wrap = document.getElementById(`recom-person-wrap-${cat}`);
+      if (wrap) wrap.style.display = hasSpouse ? 'block' : 'none';
+    });
+    // Restaurer les notes sauvegardées
+    Object.entries(_recomNotes).forEach(([cat, text]) => {
+      const el = document.getElementById(`recom-notes-${cat}`);
+      if (el) el.value = text;
+    });
+  }
+
+  function switchRecomTab(cat, btn) {
+    document.querySelectorAll('.recom-tab').forEach(b => {
+      b.style.color        = 'var(--muted)';
+      b.style.borderBottom = '2px solid transparent';
+    });
+    btn.style.color        = 'var(--navy)';
+    btn.style.borderBottom = '2px solid var(--navy)';
+
+    const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite','conseils'];
+    cats.forEach(c => {
+      const el = document.getElementById(`recom-panel-${c}`);
+      if (el) el.style.display = c === cat ? '' : 'none';
+    });
+  }
+
+  function switchRecomPerson(cat, role, btn) {
+    document.querySelectorAll(`#recom-person-wrap-${cat} .toggle-btn`).forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    // Ici on pourrait mettre à jour les données affichées pour ce rôle
+  }
+
+  function recomSaveNotes(cat) {
+    const el = document.getElementById(`recom-notes-${cat}`);
+    if (el) _recomNotes[cat] = el.value;
+  }
+
+  /* ════════════════════════════════════════════════════════
+     RAPPORT
+  ════════════════════════════════════════════════════════ */
+  function rapportInit() {
+    // Nom client + conseiller
+    const nomEl = document.getElementById('rapport-client-nom');
+    if (nomEl) {
+      const prenom = document.getElementById('client-prenom')?.value || '';
+      const nom    = document.getElementById('client-nom')?.value    || '';
+      nomEl.textContent = [prenom, nom].filter(Boolean).join(' ') || '—';
+    }
+    const consEl = document.getElementById('rapport-conseiller-nom');
+    if (consEl) consEl.textContent = window.ABF_ADVISOR_NAME || '—';
+
+    rapportUpdateCompletude();
+  }
+
+  function rapportToggleSection(sectionId) {
+    // Pour les sections-parents, synchroniser l'état des sous-options
+    const childrenDiv = document.getElementById(`rapport-sec-${sectionId}-children`);
+    if (!childrenDiv) return;
+    const parent = document.getElementById(`rapport-sec-${sectionId}`);
+    const checked = parent?.checked;
+    childrenDiv.querySelectorAll('input[type="checkbox"]').forEach(cb => { cb.disabled = !checked; });
+  }
+
+  let _rapportSelectedPhoto = null;
+
+  function rapportFilterPhotos(filter) {
+    document.querySelectorAll('.rapport-photo-item').forEach(item => {
+      const cat = item.dataset.categorie || '';
+      item.style.display = (filter === 'Tous' || cat === filter) ? '' : 'none';
+    });
+    // Mettre à jour le bouton actif
+    document.querySelectorAll('#page-rapport .toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim() === filter);
+    });
+  }
+
+  function rapportSelectPhoto(el) {
+    // Désélectionner toutes
+    document.querySelectorAll('.rapport-photo-item').forEach(item => {
+      item.style.borderColor = 'var(--border)';
+      const check = item.querySelector('.rapport-photo-check');
+      if (check) check.style.display = 'none';
+    });
+    // Sélectionner celle cliquée
+    el.style.borderColor = 'var(--gold)';
+    const check = el.querySelector('.rapport-photo-check');
+    if (check) check.style.display = 'flex';
+    _rapportSelectedPhoto = el.dataset.file;
+  }
+
+  function rapportUpdateCompletude() {
+    const sections = [
+      { id: 'infos-perso',    label: 'Infos personnelles' },
+      { id: 'objectifs',      label: 'Objectifs' },
+      { id: 'actifs-passifs', label: 'Actifs & passifs' },
+      { id: 'deces',          label: 'Décès' },
+      { id: 'invalidite',     label: 'Invalidité' },
+      { id: 'retraite',       label: 'Retraite' },
+    ];
+    const done  = sections.filter(s => document.querySelector(`.nav-item[onclick*="'${s.id}'"]`)?.classList.contains('done'));
+    const total = sections.length;
+    const el    = document.getElementById('rapport-completude');
+    if (!el) return;
+    el.innerHTML = `
+      <div style="margin-bottom:8px;font-weight:600;color:var(--navy)">${done.length}/${total} sections complétées</div>
+      <div style="height:6px;background:#e9ecef;border-radius:3px;overflow:hidden;margin-bottom:10px">
+        <div style="height:100%;background:${done.length===total?'#22c55e':'#c9a050'};width:${Math.round(done.length/total*100)}%;transition:width .3s"></div>
+      </div>` +
+      sections.map(s => {
+        const isDone = document.querySelector(`.nav-item[onclick*="'${s.id}'"]`)?.classList.contains('done');
+        return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;color:${isDone?'#16a34a':'var(--muted)'}">
+          <span>${isDone ? '✓' : '○'}</span> ${s.label}
+        </div>`;
+      }).join('');
+  }
+
+  function rapportGenerer() {
+    showToast('Génération du rapport en cours…');
+    // À connecter à la route PDF Laravel
   }
