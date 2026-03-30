@@ -74,12 +74,16 @@ class AbfCase extends Model
     }
 
     /**
-     * URL propre : /conseiller/bilan/nom-prenom ou /conseiller/bilan/nouveau-{id}
+     * URL propre : /{advisorSlug}/liste-bilan/{record}
      */
     public function getEditorUrlAttribute(): string
     {
-        $identifier = $this->slug ?: 'nouveau-' . $this->id;
-        return route('abf.editor.show', ['record' => $identifier]);
+        if (! $this->relationLoaded('advisor') && $this->advisor_user_id) {
+            $this->load('advisor');
+        }
+        $advisorSlug = $this->advisor?->slug ?? auth()->user()?->slug ?? 'conseiller';
+        $identifier  = $this->slug ?: 'nouveau-' . $this->id;
+        return route('abf.editor.show', ['advisorSlug' => $advisorSlug, 'record' => $identifier]);
     }
 
     /**

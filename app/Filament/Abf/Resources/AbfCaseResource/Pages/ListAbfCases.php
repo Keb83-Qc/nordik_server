@@ -14,7 +14,7 @@ class ListAbfCases extends ListRecords
 
     public function mount(): void
     {
-        $this->redirect(route('abf.landing'));
+        $this->redirect(route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']));
     }
 
     protected function getHeaderActions(): array
@@ -23,7 +23,7 @@ class ListAbfCases extends ListRecords
             Actions\Action::make('new')
                 ->label('Nouveau dossier ABF')
                 ->icon('heroicon-o-plus')
-                ->url(route('abf.new')),
+                ->url(route('abf.new', ['advisorSlug' => auth()->user()->slug ?? 'conseiller'])),
         ];
     }
 }

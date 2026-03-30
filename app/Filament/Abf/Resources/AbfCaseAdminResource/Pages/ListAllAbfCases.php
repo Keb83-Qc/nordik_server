@@ -14,7 +14,7 @@ class ListAllAbfCases extends ListRecords
         parent::mount();
         // Rediriger les non-admins vers l'éditeur standalone
         if (! auth()->user()?->hasRoleByName(['admin', 'super_admin'])) {
-            $this->redirect(route('abf.landing'));
+            $this->redirect(route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']));
         }
     }
 

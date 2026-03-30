@@ -26,7 +26,7 @@ class AbfCaseResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->where('advisor_user_id', auth()->id());
+        return parent::getEloquentQuery()->with('advisor')->where('advisor_user_id', auth()->id());
     }
 
     public static function form(Form $form): Form
@@ -93,7 +93,7 @@ class AbfCaseResource extends Resource
                 Action::make('edit')
                     ->label('Ouvrir ABF')
                     ->icon('heroicon-o-pencil-square')
-                    ->url(fn($record) => route('abf.editor.show', $record))
+                    ->url(fn($record) => $record->editor_url)
                     ->openUrlInNewTab(),
                 Action::make('pdf')
                     ->label('Télécharger PDF')

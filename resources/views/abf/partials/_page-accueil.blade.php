@@ -62,7 +62,7 @@
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:4px">
               <div style="font-weight:700;font-size:0.95rem;color:#1a2340">{{ $ann->title }}</div>
               <button
-                onclick="markSeen({{ $ann->id }}, '{{ route('abf.announcement.seen', $ann->id) }}')"
+                onclick="markSeen({{ $ann->id }}, '{{ route('abf.announcement.seen', ['advisorSlug' => auth()->user()->slug ?? 'conseiller', 'id' => $ann->id]) }}')"
                 style="flex-shrink:0;background:#f0f4ff;border:1px solid #d0d8ee;color:#1a2340;font-size:0.75rem;font-weight:700;border-radius:20px;padding:3px 12px;cursor:pointer;white-space:nowrap;transition:background .2s"
                 onmouseover="this.style.background='#e0e8ff'" onmouseout="this.style.background='#f0f4ff'">
                 Vu ✓
@@ -154,8 +154,11 @@
                 $dateAbs  = $case->updated_at->locale('fr')->isoFormat('D MMM YYYY [à] H[h]mm');
               @endphp
               <li>
-                @php $caseIdentifier = $case->slug ?: 'nouveau-' . $case->id; @endphp
-                <a href="{{ route('abf.editor.show', ['record' => $caseIdentifier]) }}"
+                @php
+                  $caseIdentifier  = $case->slug ?: 'nouveau-' . $case->id;
+                  $caseAdvisorSlug = auth()->user()->slug ?? 'conseiller';
+                @endphp
+                <a href="{{ route('abf.editor.show', ['advisorSlug' => $caseAdvisorSlug, 'record' => $caseIdentifier]) }}"
                    style="display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 14px;border-radius:8px;background:#f4f6fb;color:#1a2340;text-decoration:none;transition:background .15s"
                    onmouseover="this.style.background='#e8ecf5'" onmouseout="this.style.background='#f4f6fb'">
                   <!-- Noms -->

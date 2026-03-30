@@ -1,3 +1,48 @@
+  // ── Gestionnaire d'erreurs JS → /log-js-error ─────────────────────
+  (function () {
+    function sendJsError(data) {
+      try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        fetch('/log-js-error', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+          body: JSON.stringify(data),
+          keepalive: true,
+        });
+      } catch (_) { /* silencieux */ }
+    }
+
+    window.onerror = function (message, source, line, column, error) {
+      // Filtrer les erreurs venant de scripts externes (extensions, etc.)
+      if (source && !source.includes(window.location.hostname) && !source.includes('abf-editor')) return false;
+      sendJsError({
+        type: 'js_error',
+        message: String(message).slice(0, 300),
+        source: String(source || '').slice(0, 300),
+        line: line,
+        column: column,
+        stack: error?.stack ? String(error.stack).slice(0, 600) : '',
+        url: window.location.href.slice(0, 300),
+      });
+      return false;
+    };
+
+    window.addEventListener('unhandledrejection', function (event) {
+      const reason = event.reason;
+      const message = reason instanceof Error ? reason.message : String(reason);
+      sendJsError({
+        type: 'unhandled_promise',
+        message: String(message).slice(0, 300),
+        source: '',
+        line: '',
+        column: '',
+        stack: reason instanceof Error && reason.stack ? String(reason.stack).slice(0, 600) : '',
+        url: window.location.href.slice(0, 300),
+      });
+    });
+  })();
+  // ──────────────────────────────────────────────────────────────────
+
   const pages = [
     'infos-perso','objectifs','actifs-passifs','revenu-epargne',
     'fonds-urgence','deces','invalidite','maladie-grave',
@@ -52,7 +97,27 @@
     if (id === 'retraite') retraiteInit();
     if (id === 'recommandations') recomInit();
     if (id === 'rapport') rapportInit();
+    // Swap bouton Suivant ↔ Terminer selon la page
+    const nextBtn = document.querySelector('.bottom-bar .btn-primary');
+    if (nextBtn) {
+      if (id === 'rapport') {
+        nextBtn.textContent = 'Terminer ✓';
+        nextBtn.setAttribute('onclick', 'terminer()');
+      } else {
+        nextBtn.textContent = 'Suivant →';
+        nextBtn.setAttribute('onclick', 'goNext()');
+      }
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function terminer() {
+    if (window.ABF_SAVE_URL) {
+      autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, false);
+    }
+    setTimeout(() => {
+      window.location.href = window.ABF_LANDING_URL || '/conseiller/bilan';
+    }, 900);
   }
 
   function validateCurrentPage() {
@@ -152,7 +217,7 @@
       goTo(pages[current + 1], navItems[current + 1]);
       // Sauvegarder APRÈS goTo() pour que current_page = la nouvelle page
       if (window.ABF_SAVE_URL) {
-        autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, true);
+        autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, false);
       }
     }
   }
@@ -2992,8 +3057,10 @@
         },
       },
       retraite: {
-        ageClient:   v('retraite-age-client'),   typeClient:   v('retraite-type-client'),
-        ageConjoint: v('retraite-age-conjoint'), typeConjoint: v('retraite-type-conjoint'),
+        ageClient:    v('retraite-age-client'),    typeClient:   v('retraite-type-client'),
+        anneeClient:  v('retraite-annee-client'),
+        ageConjoint:  v('retraite-age-conjoint'),  typeConjoint: v('retraite-type-conjoint'),
+        anneeConjoint:v('retraite-annee-conjoint'),
         goalType:    document.querySelector('input[name="retraite-goal-type"]:checked')?.value || 'individuel',
         profilAvantClient:    v('retraite-profil-avant-client'),
         profilPendantClient:  v('retraite-profil-pendant-client'),
@@ -3311,10 +3378,14 @@
 
     // Retraite
     const ret = p.retraite || {};
-    sv('retraite-age-client',   ret.ageClient   || '65');
-    sv('retraite-age-conjoint', ret.ageConjoint || '65');
+    sv('retraite-age-client',     ret.ageClient    || '65');
+    sv('retraite-annee-client',   ret.anneeClient);
+    sv('retraite-age-conjoint',   ret.ageConjoint  || '65');
+    sv('retraite-annee-conjoint', ret.anneeConjoint);
     if (ret.typeClient)   { const el = document.getElementById('retraite-type-client');   if(el) el.value = ret.typeClient; }
     if (ret.typeConjoint) { const el = document.getElementById('retraite-type-conjoint'); if(el) el.value = ret.typeConjoint; }
+    retraiteToggleType('client');
+    retraiteToggleType('conjoint');
     if (ret.goalType) { const el = document.querySelector(`input[name="retraite-goal-type"][value="${ret.goalType}"]`); if(el) el.checked = true; }
     sv('retraite-pct-client-0',   ret.pctClient   || '70');
     sv('retraite-pct-conjoint-0', ret.pctConjoint || '70');
@@ -3876,19 +3947,52 @@
     modal.style.display = 'flex';
   }
 
-  function retraiteCalc() {
-    const ageC = parseFloat(document.getElementById('retraite-age-client')?.value  || '65');
-    const ageJ = parseFloat(document.getElementById('retraite-age-conjoint')?.value || '65');
+  function retraiteToggleType(role) {
+    const type     = document.getElementById(`retraite-type-${role}`)?.value || 'age';
+    const ageEl    = document.getElementById(`retraite-age-${role}`);
+    const anneeEl  = document.getElementById(`retraite-annee-${role}`);
+    if (!ageEl || !anneeEl) return;
+    if (type === 'date') {
+      ageEl.style.display   = 'none';
+      anneeEl.style.display = '';
+    } else {
+      ageEl.style.display   = '';
+      anneeEl.style.display = 'none';
+    }
+  }
 
-    // Date estimée
+  function retraiteCalc() {
+    const typeC = document.getElementById('retraite-type-client')?.value   || 'age';
+    const typeJ = document.getElementById('retraite-type-conjoint')?.value || 'age';
+    const ddnC  = parseInt(document.getElementById('client-naissance-annee')?.value   || '0');
+    const ddnJ  = parseInt(document.getElementById('conjoint-naissance-annee')?.value || '0');
+
+    let ageC, ageJ;
+    if (typeC === 'date') {
+      const anneeC = parseFloat(document.getElementById('retraite-annee-client')?.value || '0');
+      ageC = (ddnC > 0 && anneeC > ddnC) ? anneeC - ddnC : 65;
+    } else {
+      ageC = parseFloat(document.getElementById('retraite-age-client')?.value || '65');
+    }
+    if (typeJ === 'date') {
+      const anneeJ = parseFloat(document.getElementById('retraite-annee-conjoint')?.value || '0');
+      ageJ = (ddnJ > 0 && anneeJ > ddnJ) ? anneeJ - ddnJ : 65;
+    } else {
+      ageJ = parseFloat(document.getElementById('retraite-age-conjoint')?.value || '65');
+    }
+
+    // Col 4 : si type=age → affiche l'année estimée ; si type=date → affiche l'âge calculé
     ['client','conjoint'].forEach((role, i) => {
-      const k = i === 0 ? 'c' : 'j';
-      const age = i === 0 ? ageC : ageJ;
-      const ddnAnnee = parseInt(document.getElementById(`${role === 'client' ? 'client' : 'conjoint'}-naissance-annee`)?.value || '0');
-      const dateEl  = document.getElementById(`retraite-date-${role}`);
-      if (dateEl && ddnAnnee > 0) {
-        const anneeRetraite = ddnAnnee + age;
-        dateEl.textContent = `${anneeRetraite}`;
+      const type  = i === 0 ? typeC : typeJ;
+      const age   = i === 0 ? ageC  : ageJ;
+      const ddn   = i === 0 ? ddnC  : ddnJ;
+      const dateEl = document.getElementById(`retraite-date-${role}`);
+      if (!dateEl) return;
+      if (type === 'age') {
+        dateEl.textContent = ddn > 0 ? `${ddn + Math.round(age)}` : '—';
+      } else {
+        const anneeVal = parseFloat(document.getElementById(`retraite-annee-${role}`)?.value || '0');
+        dateEl.textContent = anneeVal > 0 ? `${Math.round(age)} ans` : '—';
       }
     });
 
@@ -4159,8 +4263,11 @@
       { id: 'infos-perso',    label: 'Infos personnelles' },
       { id: 'objectifs',      label: 'Objectifs' },
       { id: 'actifs-passifs', label: 'Actifs & passifs' },
+      { id: 'revenu-epargne', label: 'Revenus & épargne' },
+      { id: 'fonds-urgence',  label: "Fonds d'urgence" },
       { id: 'deces',          label: 'Décès' },
       { id: 'invalidite',     label: 'Invalidité' },
+      { id: 'maladie-grave',  label: 'Maladie grave' },
       { id: 'retraite',       label: 'Retraite' },
     ];
     const done  = sections.filter(s => document.querySelector(`.nav-item[onclick*="'${s.id}'"]`)?.classList.contains('done'));

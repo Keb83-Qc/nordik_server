@@ -19,7 +19,7 @@
       Sauvegarder
     </button>
     @endif
-    <a href="{{ route('abf.landing') }}" style="background:none;border:1px solid rgba(170,179,204,.35);border-radius:6px;color:#aab3cc;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 10px;line-height:1;text-decoration:none" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(170,179,204,.35)';this.style.color='#aab3cc'">
+    <a href="{{ route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']) }}" style="background:none;border:1px solid rgba(170,179,204,.35);border-radius:6px;color:#aab3cc;cursor:pointer;display:flex;align-items:center;gap:6px;font-size:12px;padding:5px 10px;line-height:1;text-decoration:none" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(170,179,204,.35)';this.style.color='#aab3cc'">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
       Dossiers
     </a>

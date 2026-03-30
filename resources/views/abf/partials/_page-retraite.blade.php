@@ -24,24 +24,26 @@
           <!-- Ligne client -->
           <div style="display:grid;grid-template-columns:1fr 120px 60px 1fr;gap:8px;padding:12px 16px;align-items:center;border-bottom:1px solid var(--border)">
             <span id="retraite-nom-client" style="font-weight:600;font-size:13px;color:var(--navy)">Client</span>
-            <select class="form-select" id="retraite-type-client" style="font-size:12px;padding:5px 8px" onchange="retraiteCalc()">
+            <select class="form-select" id="retraite-type-client" style="font-size:12px;padding:5px 8px" onchange="retraiteToggleType('client');retraiteCalc()">
               <option value="age" selected>Âge</option>
               <option value="date">Date</option>
             </select>
-            <div class="input-sfx">
-              <input class="form-input" id="retraite-age-client" type="text" value="65" style="text-align:center;padding:5px 4px" oninput="retraiteCalc()"/>
+            <div>
+              <input class="form-input" id="retraite-age-client"   type="text"   value="65" style="text-align:center;padding:5px 4px;width:55px" oninput="retraiteCalc()"/>
+              <input class="form-input" id="retraite-annee-client" type="number" min="2025" max="2090" placeholder="Année" style="text-align:center;padding:5px 4px;width:75px;display:none" oninput="retraiteCalc()"/>
             </div>
             <span id="retraite-date-client" style="font-size:12px;color:var(--muted)">—</span>
           </div>
           <!-- Ligne conjoint (masquée si seul) -->
           <div id="retraite-row-conjoint" style="display:none;grid-template-columns:1fr 120px 60px 1fr;gap:8px;padding:12px 16px;align-items:center">
             <span id="retraite-nom-conjoint" style="font-weight:600;font-size:13px;color:var(--gold)">Conjoint</span>
-            <select class="form-select" id="retraite-type-conjoint" style="font-size:12px;padding:5px 8px" onchange="retraiteCalc()">
+            <select class="form-select" id="retraite-type-conjoint" style="font-size:12px;padding:5px 8px" onchange="retraiteToggleType('conjoint');retraiteCalc()">
               <option value="age" selected>Âge</option>
               <option value="date">Date</option>
             </select>
-            <div class="input-sfx">
-              <input class="form-input" id="retraite-age-conjoint" type="text" value="65" style="text-align:center;padding:5px 4px" oninput="retraiteCalc()"/>
+            <div>
+              <input class="form-input" id="retraite-age-conjoint"   type="text"   value="65" style="text-align:center;padding:5px 4px;width:55px" oninput="retraiteCalc()"/>
+              <input class="form-input" id="retraite-annee-conjoint" type="number" min="2025" max="2090" placeholder="Année" style="text-align:center;padding:5px 4px;width:75px;display:none" oninput="retraiteCalc()"/>
             </div>
             <span id="retraite-date-conjoint" style="font-size:12px;color:var(--muted)">—</span>
           </div>

@@ -38,14 +38,27 @@ Route::middleware(['auth'])->prefix('2fa')->name('2fa.')->group(function () {
     Route::post('/disable', [TwoFactorController::class, 'disable'])->name('disable');
 });
 
+// ── Routes ABF avec préfixe conseiller (prenom-nom/liste-bilan) ───────────────
+Route::middleware(['auth', '2fa'])->prefix('{advisorSlug}/liste-bilan')->group(function () {
+    Route::get('/',                              [AbfEditorController::class, 'landing'])->name('abf.landing');
+    Route::post('/nouveau',                      [AbfEditorController::class, 'createJson'])->name('abf.create.json');
+    Route::get('/creer',                         [AbfEditorController::class, 'create'])->name('abf.new');
+    Route::post('/parametres',                   [AbfEditorController::class, 'saveParams'])->name('abf.params.save');
+    Route::post('/nouveautes/{id}/vu',           [AbfEditorController::class, 'markAnnouncementSeen'])->name('abf.announcement.seen');
+    Route::get('/{record}',                      [AbfEditorController::class, 'show'])->name('abf.editor.show')->where('record', '.*');
+    Route::post('/{record}/sauvegarder',         [AbfEditorController::class, 'save'])->name('abf.editor.save')->where('record', '.*');
+});
+
+// ── Redirections depuis l'ancienne URL /conseiller/bilan ─────────────────────
 Route::middleware(['auth', '2fa'])->group(function () {
-    Route::get('/conseiller/bilan', [AbfEditorController::class, 'landing'])->name('abf.landing');
-    Route::post('/conseiller/bilan/nouveau', [AbfEditorController::class, 'createJson'])->name('abf.create.json');
-    Route::get('/conseiller/bilan/creer', [AbfEditorController::class, 'create'])->name('abf.new');
-    Route::post('/conseiller/bilan/parametres', [AbfEditorController::class, 'saveParams'])->name('abf.params.save');
-    Route::post('/conseiller/bilan/nouveautes/{id}/vu', [AbfEditorController::class, 'markAnnouncementSeen'])->name('abf.announcement.seen');
-    Route::get('/conseiller/bilan/{record}', [AbfEditorController::class, 'show'])->name('abf.editor.show')->where('record', '.*');
-    Route::post('/conseiller/bilan/{record}/sauvegarder', [AbfEditorController::class, 'save'])->name('abf.editor.save')->where('record', '.*');
+    Route::get('/conseiller/bilan', function () {
+        $slug = auth()->user()->slug ?? 'conseiller';
+        return redirect("/{$slug}/liste-bilan", 301);
+    });
+    Route::get('/conseiller/bilan/{record}', function (string $record) {
+        $slug = auth()->user()->slug ?? 'conseiller';
+        return redirect("/{$slug}/liste-bilan/{$record}", 301);
+    })->where('record', '.*');
 });
 
 /**

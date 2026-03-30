@@ -37,12 +37,14 @@ class AbfCaseCalculator
 
     private function progress(array $payload): array
     {
+        $donePagesArr = (array) ($payload['navigation']['done_pages'] ?? []);
+
         $checks = [
-            'dossier' => fn () => true,
-            'client' => fn () => $this->hasText($payload, 'client.prenom') && $this->hasText($payload, 'client.nom'),
-            'conjoint' => fn () => $this->spouseOk($payload),
-            'famille' => fn () => true,
-            'objectifs' => fn () => $this->hasAnyText($payload, [
+            'dossier'        => fn () => true,
+            'client'         => fn () => $this->hasText($payload, 'client.prenom') && $this->hasText($payload, 'client.nom'),
+            'conjoint'       => fn () => $this->spouseOk($payload),
+            'famille'        => fn () => true,
+            'objectifs'      => fn () => $this->hasAnyText($payload, [
                 'objectives_pdf.family',
                 'objectives_pdf.work',
                 'objectives_pdf.finances',
@@ -50,11 +52,14 @@ class AbfCaseCalculator
                 'objectives_pdf.retraite',
                 'objectives_pdf.priority_order',
             ]),
-            'actifs' => fn () => $this->repeaterItemsOk((array) ($payload['assets'] ?? []), ['type', 'value']),
-            'passifs' => fn () => $this->repeaterItemsOk((array) ($payload['liabilities'] ?? []), ['type', 'balance']),
-            'protections' => fn () => $this->protectionsSectionOk($payload),
-            'budget_deces' => fn () => $this->deathBudgetSectionOk($payload),
-            'resume' => fn () => true,
+            'actifs'         => fn () => count((array) ($payload['actifs'] ?? [])) > 0,
+            'passifs'        => fn () => true, // passifs optionnels (possible d'avoir aucune dette)
+            'revenu_epargne' => fn () => count((array) ($payload['revenus'] ?? [])) > 0,
+            'fonds_urgence'  => fn () => in_array('fonds-urgence', $donePagesArr),
+            'maladie_grave'  => fn () => in_array('maladie-grave', $donePagesArr),
+            'protections'    => fn () => $this->protectionsSectionOk($payload),
+            'budget_deces'   => fn () => $this->deathBudgetSectionOk($payload),
+            'resume'         => fn () => true,
         ];
 
         $done = [];

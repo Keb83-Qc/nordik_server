@@ -60,7 +60,7 @@ class CreateAbfCase extends BaseCreateRecord
 
     protected function getRedirectUrl(): string
     {
-        return route('abf.editor.show', $this->getRecord());
+        return $this->getRecord()->editor_url;
     }
 
     public function getExtraBodyAttributes(): array

@@ -17,7 +17,7 @@ class TwoFactorController extends Controller
 
         // Si déjà configuré et confirmé → rediriger
         if ($user->two_factor_secret && $user->two_factor_confirmed_at) {
-            return redirect()->intended(route('abf.landing'));
+            return redirect()->intended(route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']));
         }
 
         // Générer un secret temporaire en session s'il n'existe pas encore
@@ -64,7 +64,7 @@ class TwoFactorController extends Controller
         $request->session()->forget('2fa_pending_secret');
         $request->session()->put('2fa_verified', true);
 
-        return redirect()->intended(route('abf.landing'))
+        return redirect()->intended(route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']))
             ->with('success', '2FA activé avec succès sur votre compte.');
     }
 
@@ -103,7 +103,7 @@ class TwoFactorController extends Controller
 
         $request->session()->put('2fa_verified', true);
 
-        return redirect()->intended(route('abf.landing'));
+        return redirect()->intended(route('abf.landing', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']));
     }
 
     // ─── Disable : désactiver le 2FA pour l'utilisateur ──────────────────────

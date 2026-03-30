@@ -9,20 +9,22 @@
 
     {{-- ── Variables Laravel injectées pour le JS ─────────── --}}
     <script>
+        @php $advisorSlug = $advisorSlug ?? auth()->user()->slug ?? 'conseiller'; @endphp
         @if ($record)
             @php $recordIdentifier = $record->slug ?: 'nouveau-' . $record->id; @endphp
             window.ABF_RECORD_ID = {{ $record->id }};
-            window.ABF_SAVE_URL = '{{ route('abf.editor.save', ['record' => $recordIdentifier]) }}';
+            window.ABF_SAVE_URL = '{{ route('abf.editor.save', ['advisorSlug' => $advisorSlug, 'record' => $recordIdentifier]) }}';
             window.ABF_INITIAL_PAYLOAD = {!! json_encode($record->payload ?? []) !!};
         @else
             window.ABF_RECORD_ID = null;
             window.ABF_SAVE_URL = null;
-            window.ABF_CREATE_URL = '{{ route('abf.create.json') }}';
+            window.ABF_CREATE_URL = '{{ route('abf.create.json', ['advisorSlug' => $advisorSlug]) }}';
             window.ABF_INITIAL_PAYLOAD = null;
         @endif
         window.ABF_CSRF_TOKEN = '{{ csrf_token() }}';
         window.ABF_ADVISOR_NAME = '{{ auth()->user()->full_name ?? (auth()->user()->name ?? '') }}';
-        window.ABF_PARAMS_SAVE_URL = '{{ route('abf.params.save') }}';
+        window.ABF_LANDING_URL  = '{{ route('abf.landing', ['advisorSlug' => $advisorSlug]) }}';
+        window.ABF_PARAMS_SAVE_URL = '{{ route('abf.params.save', ['advisorSlug' => $advisorSlug]) }}';
 
         {{-- Paramètres système chargés depuis la base de données --}}
         window.ABF_PARAMS = {!! json_encode($abfParams ?? []) !!};

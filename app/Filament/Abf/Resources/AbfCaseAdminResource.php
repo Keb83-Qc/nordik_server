@@ -135,7 +135,7 @@ class AbfCaseAdminResource extends Resource
                 Tables\Actions\Action::make('open')
                     ->label('Ouvrir')
                     ->icon('heroicon-o-arrow-top-right-on-square')
-                    ->url(fn (AbfCase $record) => route('abf.editor.show', $record))
+                    ->url(fn (AbfCase $record) => $record->editor_url)
                     ->openUrlInNewTab(),
 
                 Tables\Actions\DeleteAction::make()

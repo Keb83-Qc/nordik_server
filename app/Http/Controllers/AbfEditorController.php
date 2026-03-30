@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AbfAnnouncement;
 use App\Models\AbfCase;
 use App\Models\AbfParameter;
+use App\Models\User;
 use App\Services\AbfCaseCalculator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,16 +13,18 @@ use Illuminate\Support\Facades\DB;
 
 class AbfEditorController extends Controller
 {
-    public function landing()
+    public function landing(string $advisorSlug)
     {
+        // Admin peut voir le landing d'un autre conseiller; sinon on vérifie le slug
+        $advisor = $this->resolveAdvisor($advisorSlug);
+
         try {
-            $recentCases = AbfCase::where('advisor_user_id', auth()->id())
+            $recentCases = AbfCase::where('advisor_user_id', $advisor->id)
                 ->orderByDesc('updated_at')
                 ->limit(10)
                 ->get(['id', 'slug', 'client_first_name', 'client_last_name', 'updated_at', 'status', 'results', 'payload']);
         } catch (\Throwable $e) {
-            // Colonnes manquantes (migration pas encore jouée) — fallback sans crash
-            $recentCases = AbfCase::where('advisor_user_id', auth()->id())
+            $recentCases = AbfCase::where('advisor_user_id', $advisor->id)
                 ->orderByDesc('updated_at')
                 ->limit(10)
                 ->get(['id', 'updated_at', 'status', 'results']);
@@ -30,7 +33,6 @@ class AbfEditorController extends Controller
         try {
             $abfParams = AbfParameter::allAsMap();
         } catch (\Throwable $e) {
-            // Table abf_parameters manquante (migration pas encore jouée)
             $abfParams = [];
         }
 
@@ -53,10 +55,11 @@ class AbfEditorController extends Controller
             'recentCases'   => $recentCases,
             'abfParams'     => $abfParams,
             'announcements' => $announcements,
+            'advisorSlug'   => $advisor->slug,
         ]);
     }
 
-    public function markAnnouncementSeen(int $id): JsonResponse
+    public function markAnnouncementSeen(string $advisorSlug, int $id): JsonResponse
     {
         try {
             DB::table('abf_announcement_reads')->updateOrInsert(
@@ -70,11 +73,13 @@ class AbfEditorController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function createJson()
+    public function createJson(string $advisorSlug)
     {
+        $advisorUser = $this->resolveAdvisor($advisorSlug);
+
         $record = AbfCase::create([
-            'advisor_user_id' => auth()->id(),
-            'advisor_code'    => auth()->user()?->advisor_code,
+            'advisor_user_id' => $advisorUser->id,
+            'advisor_code'    => $advisorUser->advisor_code,
             'payload'         => [],
             'results'         => [],
         ]);
@@ -84,27 +89,32 @@ class AbfEditorController extends Controller
         return response()->json([
             'ok'      => true,
             'id'      => $record->id,
-            'url'     => route('abf.editor.show', ['record' => $identifier]),
-            'save_url'=> route('abf.editor.save', ['record' => $identifier]),
+            'url'     => route('abf.editor.show', ['advisorSlug' => $advisorSlug, 'record' => $identifier]),
+            'save_url'=> route('abf.editor.save', ['advisorSlug' => $advisorSlug, 'record' => $identifier]),
         ]);
     }
 
-    public function create()
+    public function create(string $advisorSlug)
     {
+        $advisorUser = $this->resolveAdvisor($advisorSlug);
+
         $record = AbfCase::create([
-            'advisor_user_id' => auth()->id(),
-            'advisor_code'    => auth()->user()?->advisor_code,
+            'advisor_user_id' => $advisorUser->id,
+            'advisor_code'    => $advisorUser->advisor_code,
             'payload'         => [],
             'results'         => [],
         ]);
 
-        return redirect()->route('abf.editor.show', ['record' => 'nouveau-' . $record->id]);
+        return redirect()->route('abf.editor.show', [
+            'advisorSlug' => $advisorSlug,
+            'record'      => 'nouveau-' . $record->id,
+        ]);
     }
 
-    public function show(string $record)
+    public function show(string $advisorSlug, string $record)
     {
-        $abfCase = $this->resolveRecord($record);
-        abort_unless($abfCase->advisor_user_id === auth()->id(), 403);
+        $abfCase = $this->resolveRecord($record, $advisorSlug);
+        $this->authorizeCase($abfCase);
 
         try {
             $abfParams = AbfParameter::allAsMap();
@@ -113,15 +123,16 @@ class AbfEditorController extends Controller
         }
 
         return view('abf.editor', [
-            'record'    => $abfCase,
-            'abfParams' => $abfParams,
+            'record'      => $abfCase,
+            'abfParams'   => $abfParams,
+            'advisorSlug' => $advisorSlug,
         ]);
     }
 
-    public function save(Request $request, string $record)
+    public function save(Request $request, string $advisorSlug, string $record)
     {
-        $abfCase = $this->resolveRecord($record);
-        abort_unless($abfCase->advisor_user_id === auth()->id(), 403);
+        $abfCase = $this->resolveRecord($record, $advisorSlug);
+        $this->authorizeCase($abfCase);
 
         $payload = $request->input('payload', []);
 
@@ -153,26 +164,19 @@ class AbfEditorController extends Controller
             $abfCase->refresh();
         }
 
+        $caseIdentifier = $abfCase->slug ?: 'nouveau-' . $abfCase->id;
+
         return response()->json([
-            'ok'  => true,
-            'url' => $abfCase->slug
-                ? route('abf.editor.show', ['record' => $abfCase->slug])
-                : route('abf.editor.show', ['record' => 'nouveau-' . $abfCase->id]),
-            'save_url' => $abfCase->slug
-                ? route('abf.editor.save', ['record' => $abfCase->slug])
-                : route('abf.editor.save', ['record' => 'nouveau-' . $abfCase->id]),
+            'ok'      => true,
+            'url'     => route('abf.editor.show', ['advisorSlug' => $advisorSlug, 'record' => $caseIdentifier]),
+            'save_url'=> route('abf.editor.save', ['advisorSlug' => $advisorSlug, 'record' => $caseIdentifier]),
         ]);
     }
 
-    /**
-     * Enregistre les valeurs par défaut dans la table abf_parameters.
-     * Ces valeurs deviennent les nouvelles valeurs par défaut pour tous les nouveaux dossiers.
-     */
-    public function saveParams(Request $request)
+    public function saveParams(string $advisorSlug, Request $request)
     {
         $data = $request->input('params', []);
 
-        // Mapping groupe → clés autorisées
         $allowed = [
             'fonds_urgence' => ['type', 'mois'],
             'deces'         => ['funerailles', 'rr_pct', 'rr_type', 'salaire_type', 'frequence'],
@@ -197,15 +201,51 @@ class AbfEditorController extends Controller
 
     // ── Helpers ────────────────────────────────────────────────────────────
 
-    private function resolveRecord(string $identifier): AbfCase
+    /**
+     * Résout le conseiller depuis le slug de la route.
+     * Admin/super_admin peuvent accéder à n'importe quel slug.
+     */
+    private function resolveAdvisor(string $slug): User
+    {
+        $user = auth()->user();
+        if ($user->slug === $slug) {
+            return $user;
+        }
+        if ($user->hasRoleByName(['admin', 'super_admin'])) {
+            return User::where('slug', $slug)->firstOrFail();
+        }
+        abort(403);
+    }
+
+    /**
+     * Vérifie que l'utilisateur connecté peut accéder au dossier ABF.
+     */
+    private function authorizeCase(AbfCase $case): void
+    {
+        $user = auth()->user();
+        if ($case->advisor_user_id === $user->id) return;
+        if ($user->hasRoleByName(['admin', 'super_admin'])) return;
+        abort(403);
+    }
+
+    private function resolveRecord(string $identifier, string $advisorSlug = ''): AbfCase
     {
         if (preg_match('/^nouveau-(\d+)$/', $identifier, $m)) {
             return AbfCase::findOrFail($m[1]);
         }
 
-        return AbfCase::where('slug', $identifier)
-            ->where('advisor_user_id', auth()->id())
-            ->firstOrFail();
+        // Résolution par slug scopé au conseiller de la route
+        $query = AbfCase::where('slug', $identifier);
+        if ($advisorSlug) {
+            $advisor = User::where('slug', $advisorSlug)->first();
+            if ($advisor) {
+                $query->where('advisor_user_id', $advisor->id);
+            }
+        } else {
+            $query->where('advisor_user_id', auth()->id());
+        }
+
+        return $query->firstOrFail();
     }
 
     private function parseDob(array $payload): ?string
