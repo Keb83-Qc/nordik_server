@@ -15,6 +15,7 @@ class AbfCaseAdminResource extends Resource
 {
     protected static ?string $model = AbfCase::class;
 
+    protected static ?string $slug            = 'liste-bilans-conseiller';
     protected static ?string $navigationIcon  = 'heroicon-o-folder-open';
     protected static ?string $navigationLabel = 'Dossiers ABF';
     protected static ?string $modelLabel      = 'Dossier ABF';

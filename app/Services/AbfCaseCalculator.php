@@ -39,7 +39,7 @@ class AbfCaseCalculator
     {
         $checks = [
             'dossier' => fn () => true,
-            'client' => fn () => $this->hasText($payload, 'client.first_name') && $this->hasText($payload, 'client.last_name'),
+            'client' => fn () => $this->hasText($payload, 'client.prenom') && $this->hasText($payload, 'client.nom'),
             'conjoint' => fn () => $this->spouseOk($payload),
             'famille' => fn () => true,
             'objectifs' => fn () => $this->hasAnyText($payload, [

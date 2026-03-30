@@ -175,7 +175,7 @@
         <div class="card-body">
           <!-- Onglets personne -->
           <div id="retraite-profil-tabs" style="display:none;border-bottom:1px solid var(--border);margin:0 -20px 16px;padding:0 20px">
-            <button class="deces-person-tab active" onclick="switchRetrait ProfileTab('client',this)">CLIENT</button>
+            <button class="deces-person-tab active" onclick="switchRetraitProfileTab('client',this)">CLIENT</button>
             <button class="deces-person-tab"        onclick="switchRetraitProfileTab('conjoint',this)">CONJOINT</button>
           </div>
 

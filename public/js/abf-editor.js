@@ -93,6 +93,23 @@
     checkText('client-addr-ville');
     checkText('client-addr-postal');
 
+    // Cellulaire OU téléphone obligatoire (au moins un)
+    const clientCell = (document.getElementById('client-cellulaire')?.value || '').trim();
+    const clientTel  = (document.getElementById('client-telephone')?.value  || '').trim();
+    if (!clientCell && !clientTel) {
+      valid = false;
+      errors.push('client-cellulaire');
+      errors.push('client-telephone');
+      ['client-cellulaire', 'client-telephone'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('field-error');
+      });
+    } else {
+      ['client-cellulaire', 'client-telephone'].forEach(id => {
+        document.getElementById(id)?.classList.remove('field-error');
+      });
+    }
+
     // Conjoint (si plan conjoint)
     if (document.getElementById('conjoint')?.checked) {
       checkText('conjoint-prenom');
@@ -108,7 +125,7 @@
       checkText('conjoint-addr-postal');
     }
 
-    if (!valid) showToast('Veuillez remplir tous les champs obligatoires (*)');
+    if (!valid) showToast('Veuillez remplir tous les champs obligatoires — cellulaire ou téléphone requis');
     return valid;
   }
 
@@ -2906,6 +2923,7 @@
         addr_type_unite: v('client-addr-type-unite'), addr_numero: v('client-addr-numero'),
         addr_case: v('client-addr-case'), addr_ville: v('client-addr-ville'),
         addr_province: v('client-addr-province'), addr_postal: v('client-addr-postal'),
+        courriel: v('client-courriel'), cellulaire: v('client-cellulaire'), telephone: v('client-telephone'),
       },
       has_spouse: document.querySelector('input[name="plan"][value="conjoint"]')?.checked || false,
       conjoint: {
@@ -2917,6 +2935,7 @@
         addr_type_unite: v('conjoint-addr-type-unite'), addr_numero: v('conjoint-addr-numero'),
         addr_case: v('conjoint-addr-case'), addr_ville: v('conjoint-addr-ville'),
         addr_province: v('conjoint-addr-province'), addr_postal: v('conjoint-addr-postal'),
+        courriel: v('conjoint-courriel'), cellulaire: v('conjoint-cellulaire'), telephone: v('conjoint-telephone'),
       },
       enfants, revenus, actifs, passifs, legal,
       deces: {
@@ -3025,6 +3044,7 @@
     sv('client-addr-type-unite', c.addr_type_unite); sv('client-addr-numero', c.addr_numero);
     sv('client-addr-case', c.addr_case); sv('client-addr-ville', c.addr_ville);
     sv('client-addr-province', c.addr_province); sv('client-addr-postal', c.addr_postal);
+    sv('client-courriel', c.courriel); sv('client-cellulaire', c.cellulaire); sv('client-telephone', c.telephone);
     if (c.sexe) sr('sexe', c.sexe);
 
     // Conjoint
@@ -3037,6 +3057,7 @@
     sv('conjoint-addr-type-unite', j.addr_type_unite); sv('conjoint-addr-numero', j.addr_numero);
     sv('conjoint-addr-case', j.addr_case); sv('conjoint-addr-ville', j.addr_ville);
     sv('conjoint-addr-province', j.addr_province); sv('conjoint-addr-postal', j.addr_postal);
+    sv('conjoint-courriel', j.courriel); sv('conjoint-cellulaire', j.cellulaire); sv('conjoint-telephone', j.telephone);
     if (j.sexe) sr('co-sexe', j.sexe);
 
     // Enfants

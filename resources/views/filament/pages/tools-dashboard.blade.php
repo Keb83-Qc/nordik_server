@@ -22,7 +22,7 @@
                 </div>
 
                 @if($isAdmin)
-                <a href="/admin/tools"
+                <a href="/espace-conseiller/tools"
                     style="background-color: #111827 !important; color: #ffffff !important; border: 1px solid #111827 !important;"
                     class="inline-flex items-center px-4 py-2 text-sm font-bold rounded-lg shadow hover:opacity-90 transition">
                     <i class="fas fa-cog mr-2"></i>
@@ -48,7 +48,7 @@
 
                 <div class="divide-y divide-gray-100" style="background-color: #ffffff !important;">
 
-                    <a href="/admin/premium-calculator"
+                    <a href="/espace-conseiller/premium-calculator"
                         x-show="search === '' || 'calculateur de primes vip'.includes(search.toLowerCase())"
                         class="block p-5 transition group"
                         style="background-color: #fefce8 !important; border-left: 4px solid #facc15 !important;">
@@ -66,7 +66,7 @@
 
                             @if($isAdmin)
                             <object class="relative z-10">
-                                <a href="/admin/tool-premium-config" class="p-2 transition"
+                                <a href="/espace-conseiller/tool-premium-config" class="p-2 transition"
                                     style="color: #9ca3af !important;">
                                     <i class="fas fa-cog"></i>
                                 </a>

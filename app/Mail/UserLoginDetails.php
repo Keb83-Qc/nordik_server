@@ -42,7 +42,7 @@ class UserLoginDetails extends Mailable
                     <li><strong>Mot de passe temporaire :</strong> ' . $this->tempPassword . '</li>
                 </ul>
                 <p><em>Merci de changer ce mot de passe dès votre première connexion et de mettre à jour vos informations (photo, bio, téléphone, etc.).</em></p>
-                <p>Veuillez vous connecter ici : <a href="' . url('/admin') . '">Accéder à l\'espace conseiller</a></p>
+                <p>Veuillez vous connecter ici : <a href="' . url('/espace-conseiller') . '">Accéder à l\'espace conseiller</a></p>
                 <p><em>Merci de changer ce mot de passe dès votre première connexion.</em></p>
             ',
         );

@@ -61,7 +61,7 @@ class ConseillerPanelProvider extends PanelProvider
             ->navigationItems([
                 NavigationItem::make('Administration')
                     ->icon('heroicon-o-cog-6-tooth')
-                    ->url('/admin')
+                    ->url('/espace-conseiller')
                     ->group('Accès')
                     ->sort(900)
                     ->visible(function () {

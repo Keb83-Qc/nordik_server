@@ -134,12 +134,17 @@ class AbfEditorController extends Controller
         $calculator = app(AbfCaseCalculator::class);
         $results    = $calculator->calculate($payload);
 
+        $progressPct = $results['progress']['percent'] ?? 0;
+        $status = $progressPct >= 100 ? 'completed' : ($abfCase->status === 'signed' ? 'signed' : 'draft');
+
         $abfCase->update([
             'payload'           => $payload,
             'results'           => $results,
             'client_first_name' => $payload['client']['prenom'] ?? $abfCase->client_first_name,
             'client_last_name'  => $payload['client']['nom']    ?? $abfCase->client_last_name,
             'client_birth_date' => $this->parseDob($payload)    ?? $abfCase->client_birth_date,
+            'progress_percent'  => $progressPct,
+            'status'            => $status,
         ]);
 
         // Générer le slug si le nom vient d'être rempli et qu'on n'en a pas encore

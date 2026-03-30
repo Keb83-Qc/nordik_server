@@ -50,7 +50,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('espace-conseiller')
             ->login()
 
             // ✅ FULL SCREEN GLOBAL (toutes les pages Filament)
@@ -197,7 +197,7 @@ class AdminPanelProvider extends PanelProvider
 
     private function globalStyles(): string
     {
-        $docsUrl = url('/admin/wiki');                 // Wiki Filament
+        $docsUrl = url('/espace-conseiller/wiki');      // Wiki Filament
         $supportUrl = 'mailto:support@vipgpi.ca';      // Support
         $build = $this->resolveBuildVersion();         // build auto
 
@@ -731,7 +731,7 @@ HTML;
 
     private function globalScripts(): string
     {
-        $docsUrl = url('/admin/wiki');                 // Wiki Filament
+        $docsUrl = url('/espace-conseiller/wiki');      // Wiki Filament
         $supportUrl = 'mailto:support@vipgpi.ca';      // Support
         $build = $this->resolveBuildVersion();         // build auto
 
