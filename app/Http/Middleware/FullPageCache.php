@@ -36,6 +36,7 @@ class FullPageCache
     /** Préfixes d'URI exclus */
     private const EXCLUDED_PREFIXES = [
         '/admin',
+        '/espace-conseiller',
         '/abf',
         '/conseiller',
         '/livewire',

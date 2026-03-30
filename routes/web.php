@@ -186,12 +186,13 @@ Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2,5}'])
     ->middleware(['set-locale'])
     ->group(function () {
-        Route::get('/admin', fn(string $locale) => redirect('/admin', 302));
-        Route::get('/conseiller', fn(string $locale) => redirect('/admin', 302));
+        Route::get('/espace-conseiller', fn(string $locale) => redirect('/espace-conseiller', 302));
+        Route::get('/admin', fn(string $locale) => redirect('/espace-conseiller', 302));
+        Route::get('/conseiller', fn(string $locale) => redirect('/espace-conseiller', 302));
         Route::get('/abf', fn(string $locale) => redirect('/abf', 302));
 
-        Route::get('/admin', fn() => redirect('/admin'));
-        Route::get('/conseiller', fn() => redirect('/admin'));
+        Route::get('/admin', fn() => redirect('/espace-conseiller'));
+        Route::get('/conseiller', fn() => redirect('/espace-conseiller'));
         Route::get('/abf', fn() => redirect('/abf'));
 
         Route::get('/demande-acces', function (string $locale) {

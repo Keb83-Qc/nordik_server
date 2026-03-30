@@ -64,7 +64,7 @@ class AuthController extends Controller
         $locale = app()->getLocale();
 
         $target = $isAdmin
-            ? "/{$locale}/admin"
+            ? "/{$locale}/espace-conseiller"
             : ($isAbf ? "/{$locale}/abf" : "/{$locale}/conseiller");
 
         return redirect()->intended($target);
