@@ -66,6 +66,8 @@ class User extends Authenticatable implements HasName, FilamentUser
         'lead_weight',
         'leads_received_cycle',
         'last_lead_received_at',
+        'two_factor_secret',
+        'two_factor_confirmed_at',
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -79,7 +81,8 @@ class User extends Authenticatable implements HasName, FilamentUser
         'accepts_leads'         => 'boolean',
         'lead_weight'           => 'integer',
         'leads_received_cycle'  => 'integer',
-        'last_lead_received_at' => 'datetime',
+        'last_lead_received_at'  => 'datetime',
+        'two_factor_confirmed_at' => 'datetime',
     ];
 
     protected $appends = ['bio_fr', 'bio_en', 'image_url', 'full_name'];

@@ -19,6 +19,7 @@ use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\AbfPdfController;
 use App\Http\Controllers\AbfEditorController;
+use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ServicePublicController;
 use App\Models\Language;
 use App\Http\Controllers\AccessRequestController;
@@ -28,7 +29,16 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 /**
  * ABF Editor — standalone page (hors Filament)
  */
-Route::middleware(['auth'])->group(function () {
+// ─── 2FA ─────────────────────────────────────────────────────────────────────
+Route::middleware(['auth'])->prefix('2fa')->name('2fa.')->group(function () {
+    Route::get('/setup',    [TwoFactorController::class, 'setup'])->name('setup');
+    Route::post('/enable',  [TwoFactorController::class, 'enable'])->name('enable')->middleware('throttle:10,1');
+    Route::get('/verify',   [TwoFactorController::class, 'verify'])->name('verify');
+    Route::post('/check',   [TwoFactorController::class, 'check'])->name('check')->middleware('throttle:10,1');
+    Route::post('/disable', [TwoFactorController::class, 'disable'])->name('disable');
+});
+
+Route::middleware(['auth', '2fa'])->group(function () {
     Route::get('/conseiller/bilan', [AbfEditorController::class, 'landing'])->name('abf.landing');
     Route::post('/conseiller/bilan/nouveau', [AbfEditorController::class, 'createJson'])->name('abf.create.json');
     Route::get('/conseiller/bilan/creer', [AbfEditorController::class, 'create'])->name('abf.new');

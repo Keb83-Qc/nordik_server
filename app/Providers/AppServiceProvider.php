@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\URL;
 use App\Models\BlogPost;
 use App\Models\Employee;
 use App\Models\HomepageStat;
@@ -34,6 +35,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // Force HTTPS en production pour que les URLs générées soient sécurisées
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
+
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super_admin') ? true : null;
         });

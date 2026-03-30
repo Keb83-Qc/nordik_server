@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'set-locale' => \App\Http\Middleware\SetLocale::class,
              'setlocale'  => \App\Http\Middleware\SetLocale::class,
+            '2fa'        => \App\Http\Middleware\TwoFactorAuth::class,
         ]);
 
         // Applique les headers de sécurité + cache sur toutes les requêtes web
