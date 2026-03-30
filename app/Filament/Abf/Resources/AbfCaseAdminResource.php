@@ -7,9 +7,7 @@ use App\Models\AbfCase;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class AbfCaseAdminResource extends Resource
@@ -41,96 +39,30 @@ class AbfCaseAdminResource extends Resource
         return $table
             ->query(AbfCase::query()->with('advisor'))
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID')
-                    ->sortable()
-                    ->width('60px'),
-
-                TextColumn::make('advisor.name')
+                TextColumn::make('advisor.full_name')
                     ->label('Conseiller')
-                    ->searchable()
+                    ->searchable(['first_name', 'last_name'])
                     ->sortable(),
 
-                TextColumn::make('advisor_code')
-                    ->label('Code')
-                    ->fontFamily('mono')
-                    ->searchable(),
-
                 TextColumn::make('client_last_name')
-                    ->label('Nom')
+                    ->label('Nom client')
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(fn ($state) => strtoupper($state ?? '—')),
 
                 TextColumn::make('client_first_name')
-                    ->label('Prénom')
+                    ->label('Prénom client')
                     ->searchable()
                     ->sortable()
                     ->formatStateUsing(fn ($state) => $state ?? '—'),
-
-                TextColumn::make('client_birth_date')
-                    ->label('Date naissance')
-                    ->date('d/m/Y')
-                    ->sortable(),
-
-                TextColumn::make('status')
-                    ->label('Statut')
-                    ->badge()
-                    ->color(fn (string $state) => match ($state) {
-                        'draft'     => 'gray',
-                        'completed' => 'warning',
-                        'signed'    => 'success',
-                        default     => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state) => match ($state) {
-                        'draft'     => 'Brouillon',
-                        'completed' => 'Complété',
-                        'signed'    => 'Signé',
-                        default     => $state,
-                    }),
-
-                TextColumn::make('progress_percent')
-                    ->label('Progression')
-                    ->badge()
-                    ->color(fn ($state) => match (true) {
-                        $state === null   => 'gray',
-                        $state < 50       => 'danger',
-                        $state < 90       => 'warning',
-                        default           => 'success',
-                    })
-                    ->formatStateUsing(fn ($state) => $state !== null ? "{$state}%" : '—'),
 
                 TextColumn::make('updated_at')
                     ->label('Dernière modif.')
                     ->dateTime('d/m/Y H:i')
                     ->sortable(),
-
-                TextColumn::make('created_at')
-                    ->label('Créé le')
-                    ->dateTime('d/m/Y H:i')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('updated_at', 'desc')
-            ->filters([
-                SelectFilter::make('status')
-                    ->label('Statut')
-                    ->options([
-                        'draft'     => 'Brouillon',
-                        'completed' => 'Complété',
-                        'signed'    => 'Signé',
-                    ]),
-
-                SelectFilter::make('advisor_code')
-                    ->label('Code conseiller')
-                    ->options(
-                        AbfCase::query()
-                            ->distinct()
-                            ->orderBy('advisor_code')
-                            ->pluck('advisor_code', 'advisor_code')
-                            ->toArray()
-                    ),
-            ])
+            ->filters([])
             ->actions([
                 Tables\Actions\Action::make('open')
                     ->label('Ouvrir')
