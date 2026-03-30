@@ -13,9 +13,9 @@ use Illuminate\Support\Facades\DB;
 
 class AbfEditorController extends Controller
 {
-    public function landing(string $advisorSlug)
+    public function landing(string $advisorSlug = '')
     {
-        // Admin peut voir le landing d'un autre conseiller; sinon on vérifie le slug
+        $advisorSlug = $advisorSlug ?: (request()->route('advisorSlug') ?? auth()->user()?->slug ?? 'conseiller');
         $advisor = $this->resolveAdvisor($advisorSlug);
 
         try {
@@ -59,7 +59,7 @@ class AbfEditorController extends Controller
         ]);
     }
 
-    public function markAnnouncementSeen(string $advisorSlug, int $id): JsonResponse
+    public function markAnnouncementSeen(string $advisorSlug = '', int $id = 0): JsonResponse
     {
         try {
             DB::table('abf_announcement_reads')->updateOrInsert(
@@ -73,8 +73,9 @@ class AbfEditorController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    public function createJson(string $advisorSlug)
+    public function createJson(string $advisorSlug = '')
     {
+        $advisorSlug = $advisorSlug ?: (request()->route('advisorSlug') ?? auth()->user()?->slug ?? 'conseiller');
         $advisorUser = $this->resolveAdvisor($advisorSlug);
 
         $record = AbfCase::create([
@@ -94,8 +95,9 @@ class AbfEditorController extends Controller
         ]);
     }
 
-    public function create(string $advisorSlug)
+    public function create(string $advisorSlug = '')
     {
+        $advisorSlug = $advisorSlug ?: (request()->route('advisorSlug') ?? auth()->user()?->slug ?? 'conseiller');
         $advisorUser = $this->resolveAdvisor($advisorSlug);
 
         $record = AbfCase::create([
@@ -111,8 +113,13 @@ class AbfEditorController extends Controller
         ]);
     }
 
-    public function show(string $advisorSlug, string $record)
+    public function show(string $advisorSlug = '', string $record = '')
     {
+        // Compatibilité cache de routes : si advisorSlug absent, record = premier param
+        if ($record === '' && $advisorSlug !== '') {
+            $record      = $advisorSlug;
+            $advisorSlug = request()->route('advisorSlug') ?? auth()->user()?->slug ?? '';
+        }
         $abfCase = $this->resolveRecord($record, $advisorSlug);
         $this->authorizeCase($abfCase);
 
@@ -129,8 +136,12 @@ class AbfEditorController extends Controller
         ]);
     }
 
-    public function save(Request $request, string $advisorSlug, string $record)
+    public function save(Request $request, string $advisorSlug = '', string $record = '')
     {
+        if ($record === '' && $advisorSlug !== '') {
+            $record      = $advisorSlug;
+            $advisorSlug = request()->route('advisorSlug') ?? auth()->user()?->slug ?? '';
+        }
         $abfCase = $this->resolveRecord($record, $advisorSlug);
         $this->authorizeCase($abfCase);
 
@@ -173,7 +184,7 @@ class AbfEditorController extends Controller
         ]);
     }
 
-    public function saveParams(string $advisorSlug, Request $request)
+    public function saveParams(Request $request, string $advisorSlug = '')
     {
         $data = $request->input('params', []);
 
