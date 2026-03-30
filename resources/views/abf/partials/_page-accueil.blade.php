@@ -82,6 +82,83 @@
     </div>
   </div>
 
+  {{-- ─── Modal Intake (lien client) ──────────────────────────────────────── --}}
+  <div id="modal-intake" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.45);align-items:center;justify-content:center">
+    <div style="background:#fff;border-radius:16px;width:min(520px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid #e9ecf0;background:#1a2340">
+        <div style="display:flex;align-items:center;gap:10px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#e8b84b"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+          <span style="color:#fff;font-weight:700;font-size:1rem">Créer un lien client</span>
+        </div>
+        <button onclick="closeIntakeModal()" style="background:none;border:none;cursor:pointer;color:#aab;font-size:1.4rem;line-height:1">&times;</button>
+      </div>
+      <!-- Corps formulaire -->
+      <div id="intake-form-section" style="padding:24px 22px">
+        <p style="color:#555;font-size:14px;margin:0 0 18px">Renseignez optionnellement les infos du client. Un lien unique et un code d'accès seront générés. Si vous fournissez un courriel, l'invitation sera envoyée automatiquement.</p>
+        <div id="intake-error" style="display:none;background:#fff0f0;border:1px solid #fcc;border-radius:8px;padding:10px 14px;color:#c00;font-size:13px;margin-bottom:14px"></div>
+        <form id="intake-form" onsubmit="event.preventDefault();generateIntakeLink()">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:4px">Prénom</label>
+              <input id="intake-prenom" type="text" placeholder="Jean" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box">
+            </div>
+            <div>
+              <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:4px">Nom</label>
+              <input id="intake-nom" type="text" placeholder="Dupont" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box">
+            </div>
+          </div>
+          <div style="margin-bottom:12px">
+            <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:4px">Courriel du client <span style="color:#999;font-weight:400">(pour envoi auto de l'invitation)</span></label>
+            <input id="intake-email" type="email" placeholder="jean@exemple.com" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box">
+          </div>
+          <div style="margin-bottom:20px">
+            <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:4px">Langue du formulaire</label>
+            <select id="intake-locale" style="width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;box-sizing:border-box">
+              @foreach(\App\Models\Language::where('is_active',true)->orderBy('sort_order')->get() as $lang)
+                <option value="{{ $lang->code }}" {{ $lang->is_default ? 'selected' : '' }}>{{ $lang->name }}</option>
+              @endforeach
+            </select>
+          </div>
+          <button id="intake-submit-btn" type="submit" style="width:100%;background:#1a2340;color:#fff;border:2px solid #e8b84b;border-radius:8px;padding:10px;font-weight:700;font-size:14px;cursor:pointer;transition:background .2s">
+            Générer le lien
+          </button>
+        </form>
+      </div>
+      <!-- Résultat -->
+      <div id="intake-result" style="display:none;padding:24px 22px">
+        <div style="text-align:center;margin-bottom:16px">
+          <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#28a745,#20c997);display:flex;align-items:center;justify-content:center;margin:0 auto 10px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          </div>
+          <div style="font-weight:800;color:#1a2340;font-size:1rem">Lien généré avec succès !</div>
+        </div>
+        <div id="intake-email-sent" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;color:#166534;font-size:13px;margin-bottom:14px;text-align:center">
+          ✓ Invitation envoyée au client par courriel.
+        </div>
+        <!-- Lien -->
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:6px">Lien d'accès</label>
+          <div style="display:flex;align-items:center;gap:8px;background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:10px 12px">
+            <code id="intake-link-value" style="flex:1;font-size:12px;word-break:break-all;color:#333"></code>
+            <button data-copy="intake-link-value" onclick="copyIntakeField('intake-link-value')" style="flex-shrink:0;background:#1a2340;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-weight:700">Copier</button>
+          </div>
+        </div>
+        <!-- Code -->
+        <div style="margin-bottom:20px">
+          <label style="font-size:12px;font-weight:700;color:#666;display:block;margin-bottom:6px">Code d'accès <span style="color:#888;font-weight:400">(à envoyer au client séparément)</span></label>
+          <div style="display:flex;align-items:center;gap:8px;background:#fffbeb;border:2px solid #e8b84b;border-radius:8px;padding:12px 16px">
+            <code id="intake-code-value" style="flex:1;font-size:1.4rem;font-weight:900;letter-spacing:.25em;color:#1a2340;text-align:center"></code>
+            <button data-copy="intake-code-value" onclick="copyIntakeField('intake-code-value')" style="flex-shrink:0;background:#1a2340;color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;font-weight:700">Copier</button>
+          </div>
+        </div>
+        <button onclick="openIntakeModal()" style="width:100%;background:transparent;color:#1a2340;border:1px solid #d1d5db;border-radius:8px;padding:9px;font-size:13px;cursor:pointer;font-weight:600">
+          + Générer un autre lien
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Header iA -->
   <div class="ia-topbar">
     <img src="{{ asset('assets/vip-logo.png') }}" class="ia-logo" alt="VIP GPI"/>
@@ -89,6 +166,10 @@
       <button class="ia-btn-secondary" onclick="openConfigModal('profil')">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94s-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         Configuration
+      </button>
+      <button class="ia-btn-secondary" onclick="openIntakeModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+        Lien client
       </button>
       @php $annCount = ($announcements ?? collect())->count(); @endphp
       <button class="ia-btn-primary {{ $annCount ? 'btn-has-news' : '' }}" onclick="openNouveautes()" style="position:relative">
@@ -221,6 +302,70 @@ function markSeen(id, url) {
         el.remove();
         updateBadge();
     }, 350);
+}
+
+// ─── Intake Modal ────────────────────────────────────────────────────────────
+
+function openIntakeModal() {
+  document.getElementById('modal-intake').style.display = 'flex';
+  document.getElementById('intake-result').style.display = 'none';
+  document.getElementById('intake-form-section').style.display = '';
+  document.getElementById('intake-error').style.display = 'none';
+  document.getElementById('intake-form').reset();
+}
+
+function closeIntakeModal() {
+  document.getElementById('modal-intake').style.display = 'none';
+}
+
+async function generateIntakeLink() {
+  const btn     = document.getElementById('intake-submit-btn');
+  const errEl   = document.getElementById('intake-error');
+  errEl.style.display = 'none';
+
+  const payload = {
+    client_first_name: document.getElementById('intake-prenom').value.trim(),
+    client_last_name:  document.getElementById('intake-nom').value.trim(),
+    client_email:      document.getElementById('intake-email').value.trim(),
+    locale:            document.getElementById('intake-locale').value,
+    _token:            document.querySelector('meta[name=csrf-token]')?.content || window.ABF_CSRF_TOKEN,
+  };
+
+  btn.disabled    = true;
+  btn.textContent = '…';
+
+  try {
+    const res = await fetch('{{ route('intake.create', ['advisorSlug' => auth()->user()->slug ?? 'conseiller']) }}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': payload._token },
+      body: JSON.stringify(payload),
+    });
+
+    if (!res.ok) throw new Error('Erreur serveur');
+
+    const data = await res.json();
+
+    document.getElementById('intake-link-value').textContent  = data.url;
+    document.getElementById('intake-code-value').textContent  = data.access_code;
+    document.getElementById('intake-email-sent').style.display = data.email_sent ? '' : 'none';
+    document.getElementById('intake-form-section').style.display = 'none';
+    document.getElementById('intake-result').style.display = '';
+
+  } catch (e) {
+    errEl.textContent = 'Erreur lors de la génération. Veuillez réessayer.';
+    errEl.style.display = '';
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Générer le lien';
+  }
+}
+
+function copyIntakeField(id) {
+  const text = document.getElementById(id)?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector(`[data-copy="${id}"]`);
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓'; setTimeout(() => btn.textContent = orig, 2000); }
+  });
 }
 
 function updateBadge() {

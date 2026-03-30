@@ -23,6 +23,7 @@ use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ServicePublicController;
 use App\Models\Language;
 use App\Http\Controllers\AccessRequestController;
+use App\Http\Controllers\IntakeController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
@@ -48,6 +49,18 @@ Route::middleware(['auth', '2fa'])->prefix('{advisorSlug}/liste-bilan')->group(f
     Route::get('/{record}',                      [AbfEditorController::class, 'show'])->name('abf.editor.show')->where('record', '.*');
     Route::post('/{record}/sauvegarder',         [AbfEditorController::class, 'save'])->name('abf.editor.save')->where('record', '.*');
 });
+
+// ── Formulaire d'intake client (public, sans auth) ────────────────────────────
+Route::prefix('{advisorSlug}/intake')->name('intake.')->group(function () {
+    Route::get('/{token}',        [IntakeController::class, 'show'])->name('show');
+    Route::post('/{token}/verify',[IntakeController::class, 'verify'])->name('verify');
+    Route::get('/{token}/merci',  [IntakeController::class, 'merci'])->name('merci');
+});
+
+// ── Génération d'un lien intake (auth conseiller) ─────────────────────────────
+Route::middleware(['auth', '2fa'])
+    ->post('/{advisorSlug}/intake/create', [IntakeController::class, 'create'])
+    ->name('intake.create');
 
 // ── Redirections depuis l'ancienne URL /conseiller/bilan ─────────────────────
 Route::middleware(['auth', '2fa'])->group(function () {
