@@ -3314,13 +3314,13 @@
     });
     if (Array.isArray(ret.depenses)) {
       _retraiteDepenses = ret.depenses;
-      retraiteRenderDepenses();
+      try { retraiteRenderDepenses(); } catch(e) { console.warn('retraiteRenderDepenses error', e); }
     }
 
     // Projets
     if (Array.isArray(p.projets)) {
       _projets = p.projets;
-      projetsRender();
+      try { projetsRender(); } catch(e) { console.warn('projetsRender error', e); }
     }
 
     // Recommandations notes
@@ -3394,6 +3394,16 @@
   function initAutoSave(recordId, saveUrl, csrfToken) {
     setInterval(() => autoSave(recordId, saveUrl, csrfToken, true), 30000);
     window.addEventListener('beforeunload', () => autoSave(recordId, saveUrl, csrfToken, true));
+  }
+
+  function manualSave() {
+    if (!window.ABF_SAVE_URL) return;
+    const btn = document.getElementById('btn-manual-save');
+    if (btn) { btn.disabled = true; btn.textContent = 'Sauvegarde…'; }
+    autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, false);
+    setTimeout(() => {
+      if (btn) { btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor"><path d="M17 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7l-4-4zm-5 16a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm3-10H5V5h10v4z"/></svg> Sauvegarder'; }
+    }, 1500);
   }
 
   /**
@@ -3950,7 +3960,8 @@
     if (!desc) { showToast('Veuillez saisir une description'); return; }
 
     const id = document.getElementById('projet-edit-id').value;
-    const obj = { id: id || crypto.randomUUID(), desc, montant, mois, annee, notes, celiapp };
+    const uid = id || (Date.now().toString(36) + Math.random().toString(36).slice(2));
+    const obj = { id: uid, desc, montant, mois, annee, notes, celiapp };
 
     if (id) {
       const idx = _projets.findIndex(p => p.id === id);

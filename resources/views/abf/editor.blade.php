@@ -64,7 +64,7 @@
     </div>{{-- .layout --}}
 
     {{-- ── JavaScript ──────────────────────────────────────── --}}
-    <script src="{{ asset('js/abf-editor.js') }}"></script>
+    <script src="{{ asset('js/abf-editor.js') }}?v={{ filemtime(public_path('js/abf-editor.js')) }}"></script>
 </body>
 
 </html>
