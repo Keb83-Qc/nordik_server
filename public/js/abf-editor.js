@@ -52,6 +52,16 @@
 
   // ── Variables globales pour les sections ajoutées ──────────────
   let _retraiteDepenses = [];
+  let _retraiteRegimesPublics = {
+    client:  [ { id:'rrq', label:'RRQ / RPC',              montant:0, frequence:'mensuel', indexe:true, debut:65 },
+               { id:'sv',  label:'Sécurité de vieillesse', montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
+    conjoint:[ { id:'rrq', label:'RRQ / RPC',              montant:0, frequence:'mensuel', indexe:true, debut:65 },
+               { id:'sv',  label:'Sécurité de vieillesse', montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
+  };
+  let _retraiteRpd      = []; // { id, role, nom, montant, frequence, indexe, debut, notes }
+  let _retraiteRetraits = []; // { id, role, type, desc, montant, frequence, debut, fin }
+  let _retraiteActifs   = []; // { id, type, desc, valeur, stratAvant, stratPendant, ordre }
+  let _retraiteResumePerson = 'client'; // sidebar toggle
   let _projets = [];
   let _recomNotes = {}; // legacy compat
   let _recomItems = { deces:[], invalidite:[], 'maladie-grave':[], 'fonds-urgence':[], retraite:[], conseils:[] };
@@ -3517,7 +3527,11 @@
         pctClient:   v('retraite-pct-client-0'), pctConjoint: v('retraite-pct-conjoint-0'),
         saveSurplusClient:  document.querySelector('input[name="retraite-save-surplus-c"]:checked')?.value  || 'non',
         saveSurplusConjoint:document.querySelector('input[name="retraite-save-surplus-j"]:checked')?.value || 'non',
-        depenses: typeof _retraiteDepenses !== 'undefined' ? _retraiteDepenses : [],
+        depenses:       typeof _retraiteDepenses       !== 'undefined' ? _retraiteDepenses       : [],
+        regimesPublics: typeof _retraiteRegimesPublics !== 'undefined' ? _retraiteRegimesPublics : {},
+        rpd:            typeof _retraiteRpd            !== 'undefined' ? _retraiteRpd            : [],
+        retraits:       typeof _retraiteRetraits       !== 'undefined' ? _retraiteRetraits       : [],
+        actifs:         typeof _retraiteActifs         !== 'undefined' ? _retraiteActifs         : [],
       },
       projets: typeof _projets !== 'undefined' ? _projets : [],
       recommandations: {
@@ -3877,6 +3891,14 @@
       _retraiteDepenses = ret.depenses;
       try { retraiteRenderDepenses(); } catch(e) { console.warn('retraiteRenderDepenses error', e); }
     }
+    if (ret.regimesPublics && typeof ret.regimesPublics === 'object') {
+      if (Array.isArray(ret.regimesPublics.client))  _retraiteRegimesPublics.client  = ret.regimesPublics.client;
+      if (Array.isArray(ret.regimesPublics.conjoint)) _retraiteRegimesPublics.conjoint = ret.regimesPublics.conjoint;
+      try { retraiteRenderRegPub('client'); retraiteRenderRegPub('conjoint'); } catch(e) {}
+    }
+    if (Array.isArray(ret.rpd))     { _retraiteRpd     = ret.rpd;     try { retraiteRenderRpd('client'); retraiteRenderRpd('conjoint'); } catch(e) {} }
+    if (Array.isArray(ret.retraits)){ _retraiteRetraits = ret.retraits; try { retraiteRenderRetraits('client'); retraiteRenderRetraits('conjoint'); } catch(e) {} }
+    if (Array.isArray(ret.actifs))  { _retraiteActifs   = ret.actifs;  try { retraiteRenderActifs(); } catch(e) {} }
 
     // Projets
     if (Array.isArray(p.projets)) {
@@ -4465,8 +4487,56 @@
     if (rnc) rnc.textContent = fmtMoney(revenu * 0.72);
     if (rnj) rnj.textContent = fmtMoney(revenuConj * 0.72);
 
+    // Tabs régimes publics (statiques dans le HTML, juste montrer/cacher + renommer)
+    const regPubTabs = document.getElementById('retraite-regpub-tabs');
+    if (regPubTabs) {
+      regPubTabs.style.display = hasSpouse ? 'flex' : 'none';
+      const tabC = document.getElementById('retraite-regpub-tab-client');
+      const tabJ = document.getElementById('retraite-regpub-tab-conjoint');
+      if (tabC) tabC.textContent = cPrenom.toUpperCase();
+      if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
+    }
+
+    // Résumé sidebar toggle
+    const tog = document.getElementById('retraite-resume-toggle');
+    if (tog) tog.style.display = hasSpouse ? 'flex' : 'none';
+
+    // Mettre à jour label boutons conjoint
+    const btnJ = document.getElementById('retraite-resume-btn-j');
+    if (btnJ) btnJ.textContent = jPrenom;
+    const btnC = document.getElementById('retraite-resume-btn-c');
+    if (btnC) btnC.textContent = cPrenom;
+
+    // Tabs RPD et Retraits (rendus dynamiquement si couple)
+    retraiteRenderPersonTabs('retraite-rpd-tabs', 'retraite-rpd-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRpdTab');
+    retraiteRenderPersonTabs('retraite-retraits-tabs', 'retraite-retraits-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRetraitsTab');
+
+    // Init render des nouvelles sections
+    retraiteRenderRegPub('client');
+    retraiteRenderRegPub('conjoint');
+    retraiteRenderRpd('client');
+    retraiteRenderRpd('conjoint');
+    retraiteRenderRetraits('client');
+    retraiteRenderRetraits('conjoint');
+    retraiteRenderActifs();
+
     retraiteRenderDepenses();
     retraiteCalc();
+  }
+
+  function retraiteRenderPersonTabs(tabsId, panelPrefix, hasSpouse, cPrenom, jPrenom, switchFn) {
+    const el = document.getElementById(tabsId);
+    if (!el) return;
+    if (!hasSpouse) {
+      el.innerHTML = '';
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'flex';
+    el.innerHTML = `
+      <button class="deces-person-tab active" onclick="${switchFn}('client',this)">${cPrenom}</button>
+      <button class="deces-person-tab"        onclick="${switchFn}('conjoint',this)">${jPrenom}</button>
+    `;
   }
 
   function _retraiteGetRevenu(role) {
@@ -4655,50 +4725,451 @@
 
     const totalDep = _retraiteDepenses.reduce((s, d) => s + (d.montant || 0), 0);
 
+    // Helper: somme annuelle d'une liste de régimes/retraits pour un rôle
+    const _toAnnual = (item) => {
+      const m = parseFloat(String(item.montant||0).replace(/\s/g,'').replace(',','.')) || 0;
+      return item.frequence === 'mensuel' ? m * 12 : m;
+    };
+    const _sumForRole = (arr, role) => arr.filter(x => x.role === role).reduce((s,x) => s + _toAnnual(x), 0);
+
+    // Disponibles annuels
+    const regPubC = (_retraiteRegimesPublics.client  || []).reduce((s,r) => s + _toAnnual(r), 0);
+    const regPubJ = (_retraiteRegimesPublics.conjoint || []).reduce((s,r) => s + _toAnnual(r), 0);
+    const rpdC    = _sumForRole(_retraiteRpd,     'client');
+    const rpdJ    = _sumForRole(_retraiteRpd,     'conjoint');
+    const retrC   = _sumForRole(_retraiteRetraits, 'client');
+    const retrJ   = _sumForRole(_retraiteRetraits, 'conjoint');
+    const disponiblesC = regPubC + rpdC + retrC;
+    const disponiblesJ = regPubJ + rpdJ + retrJ;
+
+    // Besoins et manque
+    const besoinsC = cibleC + totalDep;
+    const besoinsJ = cibleJ;
+    const manqueC  = Math.max(0, besoinsC - disponiblesC);
+    const manqueJ  = Math.max(0, besoinsJ - disponiblesJ);
+    const pctCovC  = besoinsC > 0 ? Math.min(100, Math.round(disponiblesC / besoinsC * 100)) : 0;
+    const pctCovJ  = besoinsJ > 0 ? Math.min(100, Math.round(disponiblesJ / besoinsJ * 100)) : 0;
+
+    // Déficit total (besoins × années restantes jusqu'à espérance de vie)
+    const LIFE_EXP = 90;
+    const anneesC = Math.max(0, LIFE_EXP - ageC);
+    const anneesJ = Math.max(0, LIFE_EXP - ageJ);
+    const deficitC = manqueC * anneesC;
+    const deficitJ = manqueJ * anneesJ;
+
+    // Sidebar
     const resumeEl = document.getElementById('retraite-resume-body');
     if (resumeEl) {
       const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
-      resumeEl.innerHTML = `
-        <div style="font-size:13px">
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Âge retraite ${document.getElementById('client-prenom')?.value||'client'}</span>
-            <strong>${ageC} ans</strong>
-          </div>
-          ${hasSpouse ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Âge retraite ${document.getElementById('conjoint-prenom')?.value||'conjoint'}</span>
-            <strong>${ageJ} ans</strong>
-          </div>` : ''}
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Objectif annuel</span>
-            <strong>${fmtMoney(cibleC)}</strong>
-          </div>
-          ${totalDep > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Dépenses retraite</span>
-            <strong>${fmtMoney(totalDep)}/an</strong>
-          </div>` : ''}
+      const p = _retraiteResumePerson;
+      const role    = (!hasSpouse) ? 'client' : p;
+      const cPrenom = document.getElementById('client-prenom')?.value  || 'Client';
+      const jPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint';
+      const nom     = role === 'client' ? cPrenom : jPrenom;
+      const ageR    = role === 'client' ? ageC : ageJ;
+      const besoins = role === 'client' ? besoinsC : besoinsJ;
+      const dispos  = role === 'client' ? disponiblesC : disponiblesJ;
+      const manque  = role === 'client' ? manqueC : manqueJ;
+      const deficit = role === 'client' ? deficitC : deficitJ;
+      const pctCov  = role === 'client' ? pctCovC : pctCovJ;
+      const barColor = pctCov >= 90 ? '#22c55e' : pctCov >= 60 ? '#f59e0b' : '#ef4444';
+
+      const row = (label, val, bold=false, color='') =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--muted)">${label}</span>
+          <strong style="font-size:13px;${color?'color:'+color:''}">${val}</strong>
         </div>`;
+
+      resumeEl.innerHTML = `<div style="padding:14px">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Couverture — ${nom}</span>
+            <span style="font-size:15px;font-weight:800;color:var(--navy)">${pctCov}%</span>
+          </div>
+          <div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden">
+            <div style="height:100%;background:${barColor};border-radius:4px;width:${pctCov}%;transition:width .4s ease"></div>
+          </div>
+        </div>
+        <div style="font-size:13px">
+          ${row('Âge de la retraite', ageR + ' ans')}
+          ${row('Besoins annuels',     fmtMoney(besoins))}
+          ${row('Montants disponibles', fmtMoney(dispos), false, disponiblesC > 0 ? '#16a34a' : '')}
+          ${row('Manque à gagner',      fmtMoney(manque), true, manque > 0 ? '#ef4444' : '#16a34a')}
+          ${row('Déficit total estimé', fmtMoney(deficit), true, deficit > 0 ? '#ef4444' : '#16a34a')}
+        </div>
+        ${hasSpouse ? `<p style="font-size:11px;color:var(--muted);margin:8px 0 0;text-align:center">Utilisez les boutons ci-dessus pour voir l'autre personne</p>` : ''}
+      </div>`;
     }
 
     // ── Recommandations Retraite ──
     const hasSpouseRet = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
-    const cibleCAnnuel = cibleC + totalDep;
+    const disponiblesRowsC = [];
+    if (regPubC > 0) disponiblesRowsC.push({ label: 'Régimes publics', value: fmtMoney(regPubC) + '/an' });
+    if (rpdC > 0)    disponiblesRowsC.push({ label: 'Régimes PD',      value: fmtMoney(rpdC) + '/an' });
+    if (retrC > 0)   disponiblesRowsC.push({ label: 'Retraits planifiés', value: fmtMoney(retrC) + '/an' });
     recomUpdatePanel('retraite',
       {
-        pct: 0,
+        pct: pctCovC,
         besoinsRows: [
           { label: 'Objectif annuel',    value: fmtMoney(cibleC) },
           ...(totalDep > 0 ? [{ label: 'Dépenses retraite', value: fmtMoney(totalDep) + '/an' }] : []),
         ],
-        disponibleRows: [],
-        manque: cibleCAnnuel,
+        disponibleRows: disponiblesRowsC,
+        manque: manqueC,
       },
       hasSpouseRet ? {
-        pct: 0,
+        pct: pctCovJ,
         besoinsRows: [{ label: 'Objectif annuel', value: fmtMoney(cibleJ) }],
         disponibleRows: [],
-        manque: cibleJ,
+        manque: manqueJ,
       } : null
     );
+  }
+
+  function retraiteResumeSwitchPerson(role) {
+    _retraiteResumePerson = role;
+    const btnC = document.getElementById('retraite-resume-btn-c');
+    const btnJ = document.getElementById('retraite-resume-btn-j');
+    if (btnC) { btnC.style.background = role === 'client' ? 'var(--navy)' : 'none'; btnC.style.color = role === 'client' ? 'white' : 'var(--muted)'; btnC.style.border = role === 'client' ? 'none' : '1px solid var(--border)'; }
+    if (btnJ) { btnJ.style.background = role === 'conjoint' ? 'var(--navy)' : 'none'; btnJ.style.color = role === 'conjoint' ? 'white' : 'var(--muted)'; btnJ.style.border = role === 'conjoint' ? 'none' : '1px solid var(--border)'; }
+    retraiteCalc();
+  }
+
+  // ── Régimes publics ───────────────────────────────────────────────────
+
+  function retraiteRenderRegPub(role) {
+    const el = document.getElementById(`retraite-regpub-table-${role}`);
+    if (!el) return;
+    const list = _retraiteRegimesPublics[role] || [];
+    if (!list.length) { el.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucun régime.</p>'; return; }
+    const hdr = `<div style="display:grid;grid-template-columns:1fr 110px 90px 60px 60px 36px;gap:6px;padding:7px 16px;background:#f8f9fd;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)"><span>Régime</span><span>Montant</span><span>Fréquence</span><span>Indexé</span><span>Début</span><span></span></div>`;
+    const rows = list.map((r, i) => `
+      <div style="display:grid;grid-template-columns:1fr 110px 90px 60px 60px 36px;gap:6px;padding:10px 16px;align-items:center;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="font-weight:600;color:var(--navy)">${r.label}</span>
+        <span>${r.montant > 0 ? fmtMoney(r.montant) : '<span style="color:var(--muted)">—</span>'}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuel' : 'Annuel'}</span>
+        <span style="font-size:12px">${r.indexe ? '✓' : '—'}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.debut || '65'} ans</span>
+        <button onclick="openRetraiteRegPubModal('${role}',${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">${iconEdit}</button>
+      </div>`).join('');
+    el.innerHTML = hdr + rows;
+  }
+
+  function switchRetraiteRegPubTab(role, btn) {
+    document.querySelectorAll('#retraite-regpub-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    ['client','conjoint'].forEach(r => {
+      const p = document.getElementById(`retraite-regpub-panel-${r}`);
+      if (p) p.style.display = r === role ? '' : 'none';
+    });
+  }
+
+  function openRetraiteRegPubModal(role, idx) {
+    const r = (_retraiteRegimesPublics[role] || [])[idx];
+    if (!r) return;
+    document.getElementById('retraite-regpub-modal-title').textContent = r.label;
+    document.getElementById('retraite-regpub-role').value = role;
+    document.getElementById('retraite-regpub-idx').value  = idx;
+    const montantEl = document.getElementById('retraite-regpub-montant');
+    const freqEl    = document.getElementById('retraite-regpub-frequence');
+    const debutEl   = document.getElementById('retraite-regpub-debut');
+    if (montantEl) montantEl.value = r.montant || '';
+    if (freqEl)    freqEl.value    = r.frequence || 'mensuel';
+    if (debutEl)   debutEl.value   = r.debut || '65';
+    const idx2 = r.indexe !== false ? 'oui' : 'non';
+    const radEl = document.querySelector(`input[name="retraite-regpub-indexe"][value="${idx2}"]`);
+    if (radEl) radEl.checked = true;
+    document.getElementById('modal-retraite-regpub').style.display = 'flex';
+  }
+
+  function closeRetraiteRegPubModal() {
+    document.getElementById('modal-retraite-regpub').style.display = 'none';
+  }
+
+  function saveRetraiteRegPub() {
+    const role    = document.getElementById('retraite-regpub-role').value;
+    const idx     = parseInt(document.getElementById('retraite-regpub-idx').value);
+    const montant = parseFloat(String(document.getElementById('retraite-regpub-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const freq    = document.getElementById('retraite-regpub-frequence').value;
+    const debut   = document.getElementById('retraite-regpub-debut').value.trim() || '65';
+    const indexe  = document.querySelector('input[name="retraite-regpub-indexe"]:checked')?.value !== 'non';
+    if (!_retraiteRegimesPublics[role]) return;
+    const existing = _retraiteRegimesPublics[role][idx];
+    if (!existing) return;
+    _retraiteRegimesPublics[role][idx] = { ...existing, montant, frequence: freq, debut, indexe };
+    retraiteRenderRegPub(role);
+    closeRetraiteRegPubModal();
+    retraiteCalc();
+  }
+
+  // ── RPD ───────────────────────────────────────────────────────────────
+
+  let _retraiteRpdCurrentRole = 'client';
+
+  function switchRetraiteRpdTab(role, btn) {
+    _retraiteRpdCurrentRole = role;
+    document.querySelectorAll('#retraite-rpd-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    ['client','conjoint'].forEach(r => {
+      const p = document.getElementById(`retraite-rpd-panel-${r}`);
+      if (p) p.style.display = r === role ? '' : 'none';
+    });
+  }
+
+  function retraiteRenderRpd(role) {
+    const el = document.getElementById(`retraite-rpd-list-${role}`);
+    if (!el) return;
+    const list = _retraiteRpd.filter(x => x.role === role);
+    if (!list.length) { el.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucun régime enregistré.</p>'; return; }
+    const cols = '1fr 110px 90px 60px 60px 64px';
+    const hdr  = `<div style="display:grid;grid-template-columns:${cols};gap:6px;padding:7px 16px;background:#f8f9fd;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)"><span>Régime</span><span>Rente</span><span>Fréquence</span><span>Indexé</span><span>Début</span><span></span></div>`;
+    el.innerHTML = hdr + list.map(r => `
+      <div style="display:grid;grid-template-columns:${cols};gap:6px;padding:10px 16px;align-items:center;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="font-weight:600;color:var(--navy)">${r.nom||'—'}</span>
+        <span>${fmtMoney(r.montant||0)}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuel' : 'Annuel'}</span>
+        <span style="font-size:12px">${r.indexe ? '✓' : '—'}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.debut||'65'} ans</span>
+        <div style="display:flex;gap:4px">
+          <button onclick="openRetraiteRpdModal('${role}','${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">${iconEdit}</button>
+          <button onclick="deleteRetraiteRpdById('${r.id}')"           style="background:none;border:none;cursor:pointer;color:#ef4444;padding:4px">${iconDel}</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function openRetraiteRpdModal(role, id) {
+    const existing = id ? _retraiteRpd.find(x => x.id === id) : null;
+    document.getElementById('retraite-rpd-modal-title').textContent = existing ? 'Modifier le régime' : 'Nouveau régime';
+    document.getElementById('retraite-rpd-edit-id').value = existing ? existing.id : '';
+    document.getElementById('retraite-rpd-nom').value       = existing?.nom       || '';
+    document.getElementById('retraite-rpd-role').value      = role || _retraiteRpdCurrentRole;
+    document.getElementById('retraite-rpd-montant').value   = existing?.montant   || '';
+    document.getElementById('retraite-rpd-frequence').value = existing?.frequence || 'annuel';
+    document.getElementById('retraite-rpd-debut').value     = existing?.debut     || '';
+    document.getElementById('retraite-rpd-notes').value     = existing?.notes     || '';
+    const idxR = (existing?.indexe !== false) ? 'oui' : 'non';
+    const radEl = document.querySelector(`input[name="retraite-rpd-indexe"][value="${idxR}"]`);
+    if (radEl) radEl.checked = true;
+    const delBtn = document.getElementById('retraite-rpd-delete-btn');
+    if (delBtn) delBtn.style.display = existing ? '' : 'none';
+    document.getElementById('modal-retraite-rpd').style.display = 'flex';
+  }
+
+  function closeRetraiteRpdModal() {
+    document.getElementById('modal-retraite-rpd').style.display = 'none';
+  }
+
+  function saveRetraiteRpd() {
+    const nom     = document.getElementById('retraite-rpd-nom').value.trim();
+    if (!nom) { showToast('Veuillez entrer un nom de régime'); return; }
+    const role    = document.getElementById('retraite-rpd-role').value;
+    const montant = parseFloat(String(document.getElementById('retraite-rpd-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const freq    = document.getElementById('retraite-rpd-frequence').value;
+    const debut   = document.getElementById('retraite-rpd-debut').value.trim();
+    const notes   = document.getElementById('retraite-rpd-notes').value.trim();
+    const indexe  = document.querySelector('input[name="retraite-rpd-indexe"]:checked')?.value !== 'non';
+    const editId  = document.getElementById('retraite-rpd-edit-id').value;
+    const obj = { id: editId || (Date.now().toString(36)+Math.random().toString(36).slice(2)), role, nom, montant, frequence: freq, debut, indexe, notes };
+    if (editId) { const i = _retraiteRpd.findIndex(x => x.id === editId); if (i !== -1) _retraiteRpd[i] = obj; else _retraiteRpd.push(obj); }
+    else _retraiteRpd.push(obj);
+    retraiteRenderRpd('client'); retraiteRenderRpd('conjoint');
+    closeRetraiteRpdModal(); retraiteCalc();
+  }
+
+  function deleteRetraiteRpd() {
+    const id = document.getElementById('retraite-rpd-edit-id').value;
+    if (id) deleteRetraiteRpdById(id);
+    closeRetraiteRpdModal();
+  }
+
+  function deleteRetraiteRpdById(id) {
+    _retraiteRpd = _retraiteRpd.filter(x => x.id !== id);
+    retraiteRenderRpd('client'); retraiteRenderRpd('conjoint'); retraiteCalc();
+  }
+
+  // ── Retraits planifiés ────────────────────────────────────────────────
+
+  let _retraiteRetraitsCurrentRole = 'client';
+
+  function toggleRetraitsMenu(e) {
+    e.stopPropagation();
+    const m = document.getElementById('retraite-retraits-menu');
+    if (!m) return;
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    const close = () => { m.style.display = 'none'; document.removeEventListener('click', close); };
+    if (m.style.display === 'block') setTimeout(() => document.addEventListener('click', close), 0);
+  }
+
+  function switchRetraiteRetraitsTab(role, btn) {
+    _retraiteRetraitsCurrentRole = role;
+    document.querySelectorAll('#retraite-retraits-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    ['client','conjoint'].forEach(r => {
+      const p = document.getElementById(`retraite-retraits-panel-${r}`);
+      if (p) p.style.display = r === role ? '' : 'none';
+    });
+  }
+
+  function retraiteRenderRetraits(role) {
+    const el = document.getElementById(`retraite-retraits-list-${role}`);
+    if (!el) return;
+    const list = _retraiteRetraits.filter(x => x.role === role);
+    if (!list.length) { el.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucun retrait planifié.</p>'; return; }
+    const hdr = `<div style="display:grid;grid-template-columns:90px 1fr 110px 90px 100px 64px;gap:6px;padding:7px 16px;background:#f8f9fd;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)"><span>Type</span><span>Description</span><span>Montant</span><span>Fréquence</span><span>Âge</span><span></span></div>`;
+    el.innerHTML = hdr + list.map(r => `
+      <div style="display:grid;grid-template-columns:90px 1fr 110px 90px 100px 64px;gap:6px;padding:10px 16px;align-items:center;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="font-size:11px;font-weight:700;padding:2px 7px;border-radius:10px;background:#eef2ff;color:var(--navy);white-space:nowrap">${r.type||'—'}</span>
+        <span style="color:var(--text)">${r.desc||'—'}</span>
+        <span>${fmtMoney(r.montant||0)}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuel' : 'Annuel'}</span>
+        <span style="font-size:12px;color:var(--muted)">${r.debut||'retraite'} – ${r.fin||'décès'}</span>
+        <div style="display:flex;gap:4px">
+          <button onclick="openRetraiteRetraitModal('${r.type||''}','${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">${iconEdit}</button>
+          <button onclick="deleteRetraiteRetraitById('${r.id}')"                style="background:none;border:none;cursor:pointer;color:#ef4444;padding:4px">${iconDel}</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function openRetraiteRetraitModal(type, id) {
+    const existing = id ? _retraiteRetraits.find(x => x.id === id) : null;
+    document.getElementById('retraite-retrait-modal-title').textContent = existing ? 'Modifier le retrait' : 'Nouveau retrait';
+    document.getElementById('retraite-retrait-edit-id').value = existing ? existing.id : '';
+    const typeEl = document.getElementById('retraite-retrait-type');
+    if (typeEl) typeEl.value = existing?.type || type || 'REER';
+    document.getElementById('retraite-retrait-role').value      = existing?.role      || _retraiteRetraitsCurrentRole;
+    document.getElementById('retraite-retrait-desc').value      = existing?.desc      || '';
+    document.getElementById('retraite-retrait-montant').value   = existing?.montant   || '';
+    document.getElementById('retraite-retrait-frequence').value = existing?.frequence || 'annuel';
+    document.getElementById('retraite-retrait-debut').value     = existing?.debut     || '';
+    document.getElementById('retraite-retrait-fin').value       = existing?.fin       || '';
+    const delBtn = document.getElementById('retraite-retrait-delete-btn');
+    if (delBtn) delBtn.style.display = existing ? '' : 'none';
+    document.getElementById('modal-retraite-retrait').style.display = 'flex';
+  }
+
+  function closeRetraiteRetraitModal() {
+    document.getElementById('modal-retraite-retrait').style.display = 'none';
+  }
+
+  function saveRetraiteRetrait() {
+    const role    = document.getElementById('retraite-retrait-role').value;
+    const type    = document.getElementById('retraite-retrait-type').value;
+    const desc    = document.getElementById('retraite-retrait-desc').value.trim();
+    const montant = parseFloat(String(document.getElementById('retraite-retrait-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const freq    = document.getElementById('retraite-retrait-frequence').value;
+    const debut   = document.getElementById('retraite-retrait-debut').value.trim();
+    const fin     = document.getElementById('retraite-retrait-fin').value.trim();
+    const editId  = document.getElementById('retraite-retrait-edit-id').value;
+    const obj = { id: editId || (Date.now().toString(36)+Math.random().toString(36).slice(2)), role, type, desc, montant, frequence: freq, debut, fin };
+    if (editId) { const i = _retraiteRetraits.findIndex(x => x.id === editId); if (i !== -1) _retraiteRetraits[i] = obj; else _retraiteRetraits.push(obj); }
+    else _retraiteRetraits.push(obj);
+    retraiteRenderRetraits('client'); retraiteRenderRetraits('conjoint');
+    closeRetraiteRetraitModal(); retraiteCalc();
+  }
+
+  function deleteRetraiteRetrait() {
+    const id = document.getElementById('retraite-retrait-edit-id').value;
+    if (id) deleteRetraiteRetraitById(id);
+    closeRetraiteRetraitModal();
+  }
+
+  function deleteRetraiteRetraitById(id) {
+    _retraiteRetraits = _retraiteRetraits.filter(x => x.id !== id);
+    retraiteRenderRetraits('client'); retraiteRenderRetraits('conjoint'); retraiteCalc();
+  }
+
+  // ── Actifs alloués ────────────────────────────────────────────────────
+
+  let _retraiteDragId = null;
+
+  function retraiteRenderActifs() {
+    const el = document.getElementById('retraite-actifs-list');
+    if (!el) return;
+    if (!_retraiteActifs.length) {
+      el.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucun actif alloué. Cliquez "+ Ajouter un actif" pour commencer.</p>';
+      return;
+    }
+    const sorted = [..._retraiteActifs].sort((a,b) => (a.ordre||0) - (b.ordre||0));
+    const hdr = `<div style="display:grid;grid-template-columns:32px 36px 90px 1fr 120px 120px 64px;gap:6px;padding:7px 16px;background:#f8f9fd;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)"><span></span><span>#</span><span>Type</span><span>Description</span><span>Avant retraite</span><span>Pendant retraite</span><span></span></div>`;
+    el.innerHTML = hdr + sorted.map((a, i) => `
+      <div draggable="true" data-actif-id="${a.id}"
+           ondragstart="retraiteActifDragStart(event,'${a.id}')"
+           ondragover="retraiteActifDragOver(event)"
+           ondrop="retraiteActifDrop(event,'${a.id}')"
+           ondragend="retraiteActifDragEnd(event)"
+           style="display:grid;grid-template-columns:32px 36px 90px 1fr 120px 120px 64px;gap:6px;padding:10px 16px;align-items:center;border-bottom:1px solid var(--border);font-size:13px;cursor:grab;user-select:none">
+        <span style="color:var(--muted);cursor:grab;font-size:16px;line-height:1">⠿</span>
+        <span style="font-size:12px;color:var(--muted);font-weight:700">${i+1}</span>
+        <span style="font-size:11px;font-weight:700;padding:2px 6px;border-radius:10px;background:#eef2ff;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.type||'—'}</span>
+        <div>
+          <div style="font-weight:600">${a.desc||'—'}</div>
+          ${a.valeur ? '<div style="font-size:11px;color:var(--muted)">'+fmtMoney(a.valeur)+'</div>' : ''}
+        </div>
+        <span style="font-size:12px;color:var(--muted);text-transform:capitalize">${a.stratAvant||'équilibré'}</span>
+        <span style="font-size:12px;color:var(--muted);text-transform:capitalize">${a.stratPendant||'prudent'}</span>
+        <div style="display:flex;gap:4px">
+          <button onclick="openRetraiteActifModal('${a.id}')" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">${iconEdit}</button>
+          <button onclick="deleteRetraiteActifById('${a.id}')" style="background:none;border:none;cursor:pointer;color:#ef4444;padding:4px">${iconDel}</button>
+        </div>
+      </div>`).join('');
+  }
+
+  function retraiteActifDragStart(e, id) { _retraiteDragId = id; e.currentTarget.style.opacity = '0.5'; }
+  function retraiteActifDragEnd(e)        { e.currentTarget.style.opacity = '1'; _retraiteDragId = null; }
+  function retraiteActifDragOver(e)       { e.preventDefault(); }
+  function retraiteActifDrop(e, targetId) {
+    e.preventDefault();
+    if (!_retraiteDragId || _retraiteDragId === targetId) return;
+    const fromIdx = _retraiteActifs.findIndex(x => x.id === _retraiteDragId);
+    const toIdx   = _retraiteActifs.findIndex(x => x.id === targetId);
+    if (fromIdx === -1 || toIdx === -1) return;
+    const item = _retraiteActifs.splice(fromIdx, 1)[0];
+    _retraiteActifs.splice(toIdx, 0, item);
+    _retraiteActifs.forEach((x, i) => { x.ordre = i; });
+    retraiteRenderActifs();
+  }
+
+  function openRetraiteActifModal(id) {
+    const existing = id ? _retraiteActifs.find(x => x.id === id) : null;
+    document.getElementById('retraite-actif-modal-title').textContent = existing ? 'Modifier l\'actif' : 'Nouvel actif';
+    document.getElementById('retraite-actif-edit-id').value    = existing?.id         || '';
+    document.getElementById('retraite-actif-type').value       = existing?.type       || 'REER';
+    document.getElementById('retraite-actif-valeur').value     = existing?.valeur     || '';
+    document.getElementById('retraite-actif-desc').value       = existing?.desc       || '';
+    document.getElementById('retraite-actif-strat-avant').value   = existing?.stratAvant   || 'equilibre';
+    document.getElementById('retraite-actif-strat-pendant').value = existing?.stratPendant || 'prudent';
+    const delBtn = document.getElementById('retraite-actif-delete-btn');
+    if (delBtn) delBtn.style.display = existing ? '' : 'none';
+    document.getElementById('modal-retraite-actif').style.display = 'flex';
+  }
+
+  function closeRetraiteActifModal() {
+    document.getElementById('modal-retraite-actif').style.display = 'none';
+  }
+
+  function saveRetraiteActif() {
+    const type       = document.getElementById('retraite-actif-type').value;
+    const valeur     = parseFloat(String(document.getElementById('retraite-actif-valeur').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
+    const desc       = document.getElementById('retraite-actif-desc').value.trim();
+    const stratAvant   = document.getElementById('retraite-actif-strat-avant').value;
+    const stratPendant = document.getElementById('retraite-actif-strat-pendant').value;
+    const editId     = document.getElementById('retraite-actif-edit-id').value;
+    const obj = { id: editId || (Date.now().toString(36)+Math.random().toString(36).slice(2)), type, valeur, desc, stratAvant, stratPendant, ordre: editId ? (_retraiteActifs.find(x=>x.id===editId)?.ordre??_retraiteActifs.length) : _retraiteActifs.length };
+    if (editId) { const i = _retraiteActifs.findIndex(x => x.id === editId); if (i !== -1) _retraiteActifs[i] = obj; else _retraiteActifs.push(obj); }
+    else _retraiteActifs.push(obj);
+    retraiteRenderActifs();
+    closeRetraiteActifModal();
+  }
+
+  function deleteRetraiteActif() {
+    const id = document.getElementById('retraite-actif-edit-id').value;
+    if (id) deleteRetraiteActifById(id);
+    closeRetraiteActifModal();
+  }
+
+  function deleteRetraiteActifById(id) {
+    _retraiteActifs = _retraiteActifs.filter(x => x.id !== id);
+    retraiteRenderActifs();
   }
 
   /* ════════════════════════════════════════════════════════
