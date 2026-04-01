@@ -3005,8 +3005,8 @@
   function openInvalAvEditModal(idx) {
     const av = _invalAvList[idx];
     if (!av) return;
+    openInvalAvModal(); // resets _invalAvEditIdx to -1, must re-set after
     _invalAvEditIdx = idx;
-    openInvalAvModal();
     // Type + owner
     document.getElementById('inval-av-type').value = av.type || '';
     invalTypeChange();
