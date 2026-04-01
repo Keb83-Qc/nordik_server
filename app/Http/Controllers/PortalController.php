@@ -7,18 +7,11 @@ use App\Models\User;
 use App\Services\LeadDispatcher;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PortalController extends Controller
 {
-    // ─── Types supportés → nom du composant Livewire ─────────────────────────
-    private const TYPE_MAP = [
-        'auto'       => 'quote-auto-chat',
-        'habitation' => 'quote-home-chat',
-        'bundle'     => 'quote-bundle-chat',
-    ];
-
-    // ─── 1. Page de consentement du portail ───────────────────────────────────
     public function consent(string $locale, string $portalSlug): View
     {
         $this->applyLocale($locale);
@@ -29,13 +22,11 @@ class PortalController extends Controller
 
         $activeTypes = $portal->activeQuoteTypes()->get();
 
-        // Réinitialise le consentement à chaque visite
         session(['has_consented' => false, 'portal_slug' => $portalSlug]);
 
         return view('quote.portal-consent', compact('portal', 'activeTypes', 'locale'));
     }
 
-    // ─── 2. Acceptation du consentement ──────────────────────────────────────
     public function accept(Request $request, string $locale, string $portalSlug): RedirectResponse
     {
         $this->applyLocale($locale);
@@ -44,14 +35,10 @@ class PortalController extends Controller
             ->where('is_active', true)
             ->firstOrFail();
 
-        // Assigner un conseiller :
-        // - Si le portail a un conseiller fixe → on l'utilise directement
-        // - Sinon → rotation automatique (LeadDispatcher)
         if ($portal->advisor_code) {
             $advisor      = User::where('advisor_code', $portal->advisor_code)->first();
             $assignedType = 'fixed';
 
-            // Fallback si le conseiller fixe n'existe plus
             if (! $advisor) {
                 $advisor      = app(LeadDispatcher::class)->assignAdvisor();
                 $assignedType = 'roundrobin';
@@ -62,20 +49,21 @@ class PortalController extends Controller
         }
 
         session([
-            'has_consented'        => true,
-            'portal_slug'          => $portalSlug,
-            'portal_id'            => $portal->id,
+            'has_consented'         => true,
+            'portal_slug'           => $portalSlug,
+            'portal_id'             => $portal->id,
             'advisor_assigned_type' => $assignedType,
-            'current_advisor_code' => $advisor?->advisor_code,
+            'current_advisor_code'  => $advisor?->advisor_code,
         ]);
 
-        $typeSlug = $request->input('quote_type', 'auto');
+        $typeSlug = (string) $request->input('quote_type', '');
 
-        // Vérifier que le type demandé est actif pour ce portail
         $validSlugs = $portal->activeQuoteTypes()->pluck('slug')->toArray();
         if (! in_array($typeSlug, $validSlugs, true)) {
-            $typeSlug = $validSlugs[0] ?? 'auto';
+            $typeSlug = $validSlugs[0] ?? '';
         }
+
+        abort_if($typeSlug === '', 404);
 
         return redirect()->route('portal.quote.chat', [
             'locale'     => $locale,
@@ -84,7 +72,6 @@ class PortalController extends Controller
         ]);
     }
 
-    // ─── 3. Page de chat (auto / habitation / bundle) ─────────────────────────
     public function chat(string $locale, string $portalSlug, string $typeSlug): View
     {
         abort_unless(session('has_consented') === true, 403);
@@ -92,12 +79,22 @@ class PortalController extends Controller
         $this->applyLocale($locale);
 
         $portal    = QuotePortal::where('slug', $portalSlug)->firstOrFail();
-        $component = self::TYPE_MAP[$typeSlug] ?? 'quote-auto-chat';
+        $component = $this->resolveComponent($typeSlug);
 
         return view('quote.portal-chat', compact('portal', 'component', 'typeSlug'));
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    private function resolveComponent(string $typeSlug): string
+    {
+        $class = 'App\\Livewire\\Quote' . Str::studly($typeSlug) . 'Chat';
+
+        if (! class_exists($class)) {
+            return 'quote-commercial-chat';
+        }
+
+        return Str::of(class_basename($class))->kebab()->toString();
+    }
+
     private function applyLocale(string $locale): void
     {
         $supported = ['fr', 'en', 'es', 'ht'];

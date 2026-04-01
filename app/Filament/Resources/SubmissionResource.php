@@ -15,6 +15,8 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Notifications\Notification;
 use App\Services\SubmissionMailer;
+use App\Models\QuoteType;
+use Illuminate\Support\Str;
 
 class SubmissionResource extends Resource
 {
@@ -67,16 +69,50 @@ class SubmissionResource extends Resource
     /** Identifiants déjà affichés dans les sections hardcodées (+ champs internes préfixés _) */
     private const KNOWN_FIELDS = [
         '_phone_excluded',
-        'first_name','last_name','email','phone','age','profession','existing_products',
-        'best_contact_time','gender','phone_is_cell','marital_status','employment_status',
-        'education_level','industry','has_ia_products',
-        'vehicle_year','year','vehicle_brand_name','brand','brand_id',
-        'vehicle_model_name','model','model_id','usage','km_annuel','renewal_date',
-        'address','license_number',
-        'occupancy','property_type','hab_renewal_date','living_there','years_at_address',
-        'units_in_building','contents_amount','electric_baseboard','supp_heating',
-        'years_insured','years_with_insurer','current_insurer',
-        'consent_profile','consent_marketing','marketing_email','consent_credit',
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'age',
+        'profession',
+        'existing_products',
+        'best_contact_time',
+        'gender',
+        'phone_is_cell',
+        'marital_status',
+        'employment_status',
+        'education_level',
+        'industry',
+        'has_ia_products',
+        'vehicle_year',
+        'year',
+        'vehicle_brand_name',
+        'brand',
+        'brand_id',
+        'vehicle_model_name',
+        'model',
+        'model_id',
+        'usage',
+        'km_annuel',
+        'renewal_date',
+        'address',
+        'license_number',
+        'occupancy',
+        'property_type',
+        'hab_renewal_date',
+        'living_there',
+        'years_at_address',
+        'units_in_building',
+        'contents_amount',
+        'electric_baseboard',
+        'supp_heating',
+        'years_insured',
+        'years_with_insurer',
+        'current_insurer',
+        'consent_profile',
+        'consent_marketing',
+        'marketing_email',
+        'consent_credit',
     ];
 
     /**
@@ -94,36 +130,45 @@ class SubmissionResource extends Resource
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get()
-            ->filter(fn($step) =>
+            ->filter(
+                fn($step) =>
                 !in_array($step->identifier, self::KNOWN_FIELDS, true)
-                && isset($data[$step->identifier])
-                && $data[$step->identifier] !== ''
+                    && isset($data[$step->identifier])
+                    && $data[$step->identifier] !== ''
             );
     }
 
-    private static function typeLabel(?string $type): string
+    private static function typeLabel(?string $type, ?Submission $record = null): string
     {
-        return match ($type) {
-            'auto' => 'Auto',
-            'habitation' => 'Habitation',
-            'bundle' => 'Bundle',
-            default => $type ?: '-',
-        };
+        $locale = app()->getLocale();
+        $labelFromRelation = $record?->quoteType?->getLabel($locale);
+        if (!empty($labelFromRelation)) {
+            return $labelFromRelation;
+        }
+
+        if (!empty($type)) {
+            $labelFromDb = QuoteType::where('slug', $type)->value('label');
+            if (is_array($labelFromDb) && !empty($labelFromDb)) {
+                return $labelFromDb[$locale] ?? $labelFromDb['fr'] ?? Str::headline($type);
+            }
+            return Str::headline($type);
+        }
+
+        return '-';
     }
 
-    private static function typeColor(?string $type): string
+    private static function typeColor(?string $type, ?Submission $record = null): string
     {
-        return match ($type) {
-            'auto' => 'primary',
-            'habitation' => 'success',
-            'bundle' => 'warning',
-            default => 'gray',
-        };
+        return $record?->quoteType?->color
+            ?? QuoteType::where('slug', $type)->value('color')
+            ?? 'gray';
     }
+
+
 
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery()->whereIn('type', ['auto', 'habitation', 'bundle']);
+        $query = parent::getEloquentQuery();
 
         $user = auth()->user();
 
@@ -145,7 +190,7 @@ class SubmissionResource extends Resource
             Forms\Components\Placeholder::make('lnnte_warning')
                 ->label('')
                 ->columnSpanFull()
-                ->visible(fn (?Submission $record): bool => (bool) $record?->is_phone_excluded)
+                ->visible(fn(?Submission $record): bool => (bool) $record?->is_phone_excluded)
                 ->content(function (?Submission $record): HtmlString {
                     if (! $record?->is_phone_excluded) return new HtmlString('');
 
@@ -160,12 +205,12 @@ class SubmissionResource extends Resource
 
                     return new HtmlString(
                         '<div style="background:#fff3cd;border:2px solid #ffc107;border-radius:10px;padding:14px 18px;margin-bottom:8px;">' .
-                        '<div style="font-size:15px;font-weight:800;color:#7a4f00;margin-bottom:4px;">⚠️ Numéro exclu — LNNTE interne</div>' .
-                        '<div style="font-size:13px;color:#664d03;line-height:1.6;">' .
-                        'Le numéro <strong>' . e($phone) . '</strong> est dans votre liste d\'exclusion.<br>' .
-                        '<strong>Ne pas contacter par téléphone</strong> sauf consentement explicite.<br>' .
-                        '<span>Raison : ' . e($reason) . '</span>' . $notes .
-                        '</div></div>'
+                            '<div style="font-size:15px;font-weight:800;color:#7a4f00;margin-bottom:4px;">⚠️ Numéro exclu — LNNTE interne</div>' .
+                            '<div style="font-size:13px;color:#664d03;line-height:1.6;">' .
+                            'Le numéro <strong>' . e($phone) . '</strong> est dans votre liste d\'exclusion.<br>' .
+                            '<strong>Ne pas contacter par téléphone</strong> sauf consentement explicite.<br>' .
+                            '<span>Raison : ' . e($reason) . '</span>' . $notes .
+                            '</div></div>'
                     );
                 }),
 
@@ -180,7 +225,7 @@ class SubmissionResource extends Resource
                     $client = trim($first . ' ' . $last);
                     if ($client === '') $client = 'Client';
 
-                    $type = self::typeLabel($record->type);
+                    $type = self::typeLabel($record->type, $record);
 
                     return new HtmlString(
                         '<div class="text-center border-b border-[#c9a050] pb-3 mb-6">' .
@@ -544,7 +589,8 @@ class SubmissionResource extends Resource
             // ── Champs additionnels (steps Filament non hardcodés) ───────────────
             Forms\Components\Section::make('Champs additionnels')
                 ->compact()
-                ->visible(fn(?Submission $record): bool =>
+                ->visible(
+                    fn(?Submission $record): bool =>
                     $record !== null && self::extraSteps($record)->isNotEmpty()
                 )
                 ->schema([
@@ -600,7 +646,7 @@ class SubmissionResource extends Resource
 
                             return new HtmlString(
                                 '<strong>' . e($portal->name) . '</strong> — ' . $type .
-                                '<br><span class="text-sm text-gray-500">' . $assign . '</span>'
+                                    '<br><span class="text-sm text-gray-500">' . $assign . '</span>'
                             );
                         }),
                 ])
@@ -622,8 +668,8 @@ class SubmissionResource extends Resource
                     ->label('Type')
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn($state) => self::typeLabel($state))
-                    ->color(fn($state) => self::typeColor($state)),
+                    ->formatStateUsing(fn($state, Submission $record) => self::typeLabel($state, $record))
+                    ->color(fn($state, Submission $record) => self::typeColor($state, $record)),
 
                 Tables\Columns\IconColumn::make('is_phone_excluded')
                     ->label('LNNTE')
@@ -632,7 +678,8 @@ class SubmissionResource extends Resource
                     ->falseIcon('heroicon-o-phone')
                     ->trueColor('danger')
                     ->falseColor('success')
-                    ->tooltip(fn (Submission $record): string =>
+                    ->tooltip(
+                        fn(Submission $record): string =>
                         $record->is_phone_excluded
                             ? '⚠️ Numéro dans la liste d\'exclusion LNNTE interne'
                             : 'Numéro libre'
@@ -673,10 +720,12 @@ class SubmissionResource extends Resource
                 Tables\Columns\TextColumn::make('portal.name')
                     ->label('Portail')
                     ->badge()
-                    ->color(fn (Submission $record): string =>
+                    ->color(
+                        fn(Submission $record): string =>
                         $record->portal?->isPartner() ? 'info' : 'gray'
                     )
-                    ->formatStateUsing(fn ($state, Submission $record): string =>
+                    ->formatStateUsing(
+                        fn($state, Submission $record): string =>
                         $record->portal
                             ? ($record->portal->isPartner() ? '🤝 ' : '🏢 ') . $state
                             : '—'
@@ -722,7 +771,10 @@ class SubmissionResource extends Resource
                 Tables\Filters\SelectFilter::make('advisor_code')
                     ->label('Conseiller')
                     ->options(
-                        fn() => \Illuminate\Support\Facades\Cache::remember('filter_advisor_codes', 300, fn() =>
+                        fn() => \Illuminate\Support\Facades\Cache::remember(
+                            'filter_advisor_codes',
+                            300,
+                            fn() =>
                             User::query()
                                 ->whereNotNull('advisor_code')
                                 ->orderBy('first_name')

@@ -17,6 +17,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\PortalController;
+use App\Http\Controllers\QuoteController;
 use App\Http\Controllers\AbfPdfController;
 use App\Http\Controllers\AbfEditorController;
 use App\Http\Controllers\TwoFactorController;
@@ -53,7 +54,7 @@ Route::middleware(['auth', '2fa'])->prefix('{advisorSlug}/liste-bilan')->group(f
 // ── Formulaire d'intake client (public, sans auth) ────────────────────────────
 Route::prefix('{advisorSlug}/intake')->name('intake.')->group(function () {
     Route::get('/{token}',        [IntakeController::class, 'show'])->name('show');
-    Route::post('/{token}/verify',[IntakeController::class, 'verify'])->name('verify');
+    Route::post('/{token}/verify', [IntakeController::class, 'verify'])->name('verify');
     Route::get('/{token}/merci',  [IntakeController::class, 'merci'])->name('merci');
 });
 
@@ -297,20 +298,8 @@ Route::prefix('{locale}')
         );
 
         Route::middleware(['throttle:60,1'])->group(function () {
-            Route::get('/quote/auto', function () {
-                abort_unless(session('has_consented') === true, 403);
-                return view('quote.auto');
-            })->name('quote.auto');
-
-            Route::get('/quote/habitation', function () {
-                abort_unless(session('has_consented') === true, 403);
-                return view('quote.home');
-            })->name('quote.habitation');
-
-            Route::get('/quote/bundle', function () {
-                abort_unless(session('has_consented') === true, 403);
-                return view('quote.bundle');
-            })->name('quote.bundle');
+            Route::get('/quote/{typeSlug}', [QuoteController::class, 'chat'])
+                ->name('quote.chat');
         });
 
         Route::get('/quote/success', function () {
@@ -318,19 +307,21 @@ Route::prefix('{locale}')
         })->name('quote.success');
 
         // ─── Portails partenaires (/p/{slug}/quote) ──────────────────────────
-        Route::get('/p/{portalSlug}/quote',
+        Route::get(
+            '/p/{portalSlug}/quote',
             [PortalController::class, 'consent']
         )->name('portal.consent');
 
-        Route::post('/p/{portalSlug}/quote/accept',
+        Route::post(
+            '/p/{portalSlug}/quote/accept',
             [PortalController::class, 'accept']
         )->name('portal.accept');
 
         Route::middleware(['throttle:60,1'])->group(function () {
-            Route::get('/p/{portalSlug}/quote/{typeSlug}',
+            Route::get(
+                '/p/{portalSlug}/quote/{typeSlug}',
                 [PortalController::class, 'chat']
-            )->name('portal.quote.chat')
-             ->where('typeSlug', 'auto|habitation|bundle|commercial');
+            )->name('portal.quote.chat');
         });
 
         // ABF PDF

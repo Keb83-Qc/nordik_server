@@ -171,7 +171,13 @@
       "Bash(dir \"D:\\\\vipgpi__net\\\\vendor\")",
       "Bash(cmd.exe /c \"dir D:\\\\vipgpi__net\\\\vendor 2>&1\")",
       "Bash(echo \"exit: $?\")",
-      "Bash(php -r \"require ''''vendor/autoload.php'''';\")"
+      "Bash(php -r \"require ''''vendor/autoload.php'''';\")",
+      "Bash(composer install:*)",
+      "Bash(php -r \"echo PHP_VERSION;\")",
+      "Bash(php -r \"copy\\(''''https://getcomposer.org/installer'''', ''''/tmp/composer-setup.php''''\\);\")",
+      "Bash(php /tmp/composer-setup.php --install-dir=/tmp --filename=composer)",
+      "Bash(php \"C:\\\\Users\\\\Claude - VIP\\\\AppData\\\\Local\\\\Temp\\\\composer\" install --no-interaction --no-dev)",
+      "Bash(find D:vipgpi_canordik_server -maxdepth 1 -name .env*)"
     ]
   }
 }

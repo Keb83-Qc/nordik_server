@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\QuoteType;
 use App\Models\User;
 
 class ConsentController extends Controller
@@ -10,20 +11,17 @@ class ConsentController extends Controller
     // --- 1. CHANGER LA LANGUE ---
     public function switchLanguage($locale, $advisorCode = null)
     {
-        // Valider les langues acceptées (fr, en, ht = Haïtien/Créole)
         if (in_array($locale, ['fr', 'en', 'ht', 'es'], true)) {
             session(['locale' => $locale]);
             app()->setLocale($locale);
         }
 
-        // Rediriger vers la page de consentement avec le code conseiller
         return redirect()->route('consent.show', ['locale' => $locale, 'code' => $advisorCode]);
     }
 
-    // --- 2. AFFICHER LA PAGE (FUSIONNÉE) ---
+    // --- 2. AFFICHER LA PAGE ---
     public function show(string $locale, ?string $advisorCode = null)
     {
-        // Appliquer la langue depuis l'URL
         if (in_array($locale, ['fr', 'en', 'ht', 'es'], true)) {
             session(['locale' => $locale]);
             app()->setLocale($locale);
@@ -33,15 +31,12 @@ class ConsentController extends Controller
             app()->setLocale($locale);
         }
 
-        // Recherche du conseiller via le code
         $advisor = User::where('advisor_code', $advisorCode)->first();
 
-        // Si introuvable, fallback sur le premier super_admin
         if (! $advisor) {
             $advisor = User::where('role_id', 1)->orderBy('id')->first();
         }
 
-        // Aucun admin trouvé : page 404 propre
         abort_if(! $advisor, 404);
 
         session([
@@ -52,7 +47,9 @@ class ConsentController extends Controller
         $advisorName  = $advisor->first_name . ' ' . $advisor->last_name;
         $advisorPhone = $advisor->phone ?? '1-888-123-4567';
 
-        return view('consentement', compact('advisor', 'advisorName', 'advisorPhone'));
+        $availableTypes = QuoteType::active()->get();
+
+        return view('consentement', compact('advisor', 'advisorName', 'advisorPhone', 'availableTypes'));
     }
 
     // --- 3. ACCEPTER LE CONSENTEMENT ---
@@ -65,13 +62,17 @@ class ConsentController extends Controller
 
         session(['has_consented' => true]);
 
-        $nextRoute = $request->input('next_route');
+        $typeSlug = (string) $request->input('quote_type', '');
 
-        $allowed = ['quote.auto', 'quote.habitation', 'quote.bundle']; // commercial plus tard
-        if (in_array($nextRoute, $allowed, true)) {
-            return redirect()->route($nextRoute, ['locale' => $locale]);
+        $exists = QuoteType::active()
+            ->where('slug', $typeSlug)
+            ->exists();
+
+        if ($exists) {
+            return redirect()->route('quote.chat', ['locale' => $locale, 'typeSlug' => $typeSlug]);
         }
 
-        return redirect()->route('quote.auto', ['locale' => $locale]);
+        $fallbackSlug = QuoteType::active()->value('slug') ?? 'auto';
+        return redirect()->route('quote.chat', ['locale' => $locale, 'typeSlug' => $fallbackSlug]);
     }
 }

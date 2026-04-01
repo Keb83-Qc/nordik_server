@@ -218,13 +218,15 @@
 
                 <div class="text-center mb-4">
                     <div class="logo-wrap">
-                        <img class="logo-img" src="{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI">
+                        <img class="logo-img" src="{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}"
+                            alt="VIP GPI">
                     </div>
                 </div>
 
                 {{-- Bouton Langue (Haut Droite) --}}
                 <div class="text-end mb-3">
-                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#languageModal">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3"
+                        data-bs-toggle="modal" data-bs-target="#languageModal">
                         <i class="fas fa-globe me-1"></i>
                         {{ strtoupper(session('locale', 'fr')) }}
                     </button>
@@ -232,12 +234,12 @@
 
                 <div class="privacy-card">
                     <div class="header-section">
-                        @if($advisor)
-                        <div class="advisor-badge">
-                            <i class="fas fa-user-tie me-2"></i>
-                            {{ __('consentement.advisor_label') }}
-                            <strong>{{ $advisor->first_name }} {{ $advisor->last_name }}</strong>
-                        </div>
+                        @if ($advisor)
+                            <div class="advisor-badge">
+                                <i class="fas fa-user-tie me-2"></i>
+                                {{ __('consentement.advisor_label') }}
+                                <strong>{{ $advisor->first_name }} {{ $advisor->last_name }}</strong>
+                            </div>
                         @endif
 
                         <h2 class="fw-bold mb-3">{{ __('consentement.main_title') }}</h2>
@@ -301,39 +303,23 @@
                             </div>
 
                             <div class="d-flex gap-2 justify-content-center flex-wrap">
-
-                                {{-- Auto --}}
-                                <form action="{{ route('consent.accept', ['locale' => app()->getLocale()]) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="next_route" value="quote.auto">
-                                    <button type="submit" class="btn btn-premium rounded-pill shadow">
-                                        <i class="fas fa-car me-2"></i> {{ __('consentement.accept_only_btn') }}
-                                        <i class="fas fa-check ms-2"></i>, {{ __('consentement.start_auto_btn') }}
-                                    </button>
-                                </form>
-
-                                {{-- Habitation --}}
-                                <form action="{{ route('consent.accept', ['locale' => app()->getLocale()]) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="next_route" value="quote.habitation">
-                                    <button type="submit" class="btn btn-premium rounded-pill shadow">
-                                        <i class="fas fa-home me-2"></i> {{ __('consentement.accept_only_btn') }}
-                                        <i class="fas fa-check ms-2"></i>, {{ __('consentement.start_home_btn') }}
-                                    </button>
-                                </form>
-
-                                {{-- Auto + Habitation (bundle) --}}
-                                <form action="{{ route('consent.accept', ['locale' => app()->getLocale()]) }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="next_route" value="quote.bundle">
-                                    <button type="submit" class="btn btn-primary rounded-pill shadow">
-                                        <i class="fas fa-layer-group me-2"></i>
-                                        {{ __('consentement.accept_only_btn') }}
-                                        <i class="fas fa-check ms-2"></i>,
-                                        {{ __('consentement.start_auto_home_btn') }}
-                                    </button>
-                                </form>
-
+                                @forelse(($availableTypes ?? collect()) as $quoteType)
+                                    <form action="{{ route('consent.accept', ['locale' => app()->getLocale()]) }}"
+                                        method="POST">
+                                        @csrf
+                                        <input type="hidden" name="quote_type" value="{{ $quoteType->slug }}">
+                                        <button type="submit" class="btn btn-premium rounded-pill shadow">
+                                            <i class="fas fa-file-signature me-2"></i>
+                                            {{ __('consentement.accept_only_btn') }}
+                                            <i class="fas fa-check ms-2"></i>,
+                                            {{ $quoteType->getLabel(app()->getLocale()) }}
+                                        </button>
+                                    </form>
+                                @empty
+                                    <div class="text-muted small">
+                                        Aucun type de soumission actif pour le moment.
+                                    </div>
+                                @endforelse
                             </div>
 
                             <div class="mt-3">
@@ -352,7 +338,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="languageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="languageModalLabel" aria-hidden="true">
+    <div class="modal fade" id="languageModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="languageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -368,25 +355,29 @@
 
                     <div class="row g-4 justify-content-center">
                         <div class="col-md-4 col-sm-6">
-                            <a href="{{ route('consent.language', ['locale' => 'fr', 'code' => $advisor->advisor_code ?? null]) }}" class="lang-btn">
+                            <a href="{{ route('consent.language', ['locale' => 'fr', 'code' => $advisor->advisor_code ?? null]) }}"
+                                class="lang-btn">
                                 <span class="lang-flag">🇫🇷</span>
                                 <span class="lang-name">Français</span>
                             </a>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <a href="{{ route('consent.language', ['locale' => 'en', 'code' => $advisor->advisor_code ?? null]) }}" class="lang-btn">
+                            <a href="{{ route('consent.language', ['locale' => 'en', 'code' => $advisor->advisor_code ?? null]) }}"
+                                class="lang-btn">
                                 <span class="lang-flag">🇨🇦</span>
                                 <span class="lang-name">English</span>
                             </a>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <a href="{{ route('consent.language', ['locale' => 'ht', 'code' => $advisor->advisor_code ?? null]) }}" class="lang-btn">
+                            <a href="{{ route('consent.language', ['locale' => 'ht', 'code' => $advisor->advisor_code ?? null]) }}"
+                                class="lang-btn">
                                 <span class="lang-flag">🇭🇹</span>
                                 <span class="lang-name">Kreyòl</span>
                             </a>
                         </div>
                         <div class="col-md-4 col-sm-6">
-                            <a href="{{ route('consent.language', ['locale' => 'es', 'code' => $advisor->advisor_code ?? null]) }}" class="lang-btn">
+                            <a href="{{ route('consent.language', ['locale' => 'es', 'code' => $advisor->advisor_code ?? null]) }}"
+                                class="lang-btn">
                                 <span class="lang-flag">🇪🇸</span>
                                 <span class="lang-name">Español</span>
                             </a>
