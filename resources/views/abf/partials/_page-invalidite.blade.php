@@ -33,13 +33,52 @@
           <!-- Autres sources de revenu -->
           <div class="card" style="margin-bottom:16px">
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">Autres sources de revenu</div>
-            <div class="card-body">
-              <div id="inval-autres-revenus-rows"></div>
+            <!-- Onglets client / conjoint -->
+            <div style="display:flex;border-bottom:1px solid var(--border)">
+              <button id="inval-autres-tab-c" class="deces-person-tab active inval-autres-tab" onclick="invalAutresTab('c')">
+                <span id="inval-autres-tab-label-c">Client</span>
+              </button>
+              <button id="inval-autres-tab-j" class="deces-person-tab inval-autres-tab" onclick="invalAutresTab('j')" style="display:none">
+                <span id="inval-autres-tab-label-j">Conjoint(e)</span>
+              </button>
+            </div>
+            <!-- Panel client -->
+            <div id="inval-autres-panel-c" class="card-body">
+              <div class="form-group">
+                <label class="form-label">
+                  Revenus mensuels
+                  <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
+                    <i class="abf-tooltip-icon">i</i>
+                    <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
+                  </span>
+                </label>
+                <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-client" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
+              </div>
               <div class="form-group" style="margin-bottom:0">
                 <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
                 <div style="display:flex;gap:8px;margin-top:4px">
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae" value="oui" onchange="invaliditeCalc()"/> Oui</label>
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="oui" onchange="invaliditeCalc()"/> Oui</label>
+                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+                </div>
+              </div>
+            </div>
+            <!-- Panel conjoint -->
+            <div id="inval-autres-panel-j" class="card-body" style="display:none">
+              <div class="form-group">
+                <label class="form-label">
+                  Revenus mensuels
+                  <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
+                    <i class="abf-tooltip-icon">i</i>
+                    <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
+                  </span>
+                </label>
+                <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-conjoint" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
+                <div style="display:flex;gap:8px;margin-top:4px">
+                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="oui" onchange="invaliditeCalc()"/> Oui</label>
+                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="non" checked onchange="invaliditeCalc()"/> Non</label>
                 </div>
               </div>
             </div>
@@ -71,12 +110,41 @@
           <!-- Dépenses courantes -->
           <div id="inval-dep-section" class="card" style="margin-bottom:16px;display:none">
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">Dépenses courantes mensuelles</div>
-            <div class="card-body">
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Total des dépenses mensuelles</label>
-                <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-dep-total" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$/mois</span></div>
+            <!-- Entêtes colonnes -->
+            <div id="inval-dep-header" style="display:grid;grid-template-columns:2fr 1fr 1fr;padding:8px 16px;background:var(--bg-light,#f8f9fa);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">
+              <div>Description</div>
+              <div id="inval-dep-hdr-c" style="text-align:right">Client</div>
+              <div id="inval-dep-hdr-j" style="text-align:right">Conjoint(e)</div>
+            </div>
+            @php
+              $depRows = [
+                ['hypotheque',   'Hypothèque',             null],
+                ['dettes',       'Remboursement de dettes', null],
+                ['loyer',        'Loyer',                   null],
+                ['epargne',      'Épargne',                 null],
+                ['subsistance',  'Frais de subsistance',    "Ces frais incluent des dépenses telles que l'épicerie, les frais de garde ou de scolarité des enfants, les taxes municipales et scolaires, les services publics, le téléphone, les soins médicaux ou dentaires, le transport, etc."],
+                ['autres',       'Autres dépenses',         null],
+              ];
+            @endphp
+            @foreach($depRows as [$key, $label, $tooltip])
+            <div class="inval-dep-row" style="display:grid;grid-template-columns:2fr 1fr 1fr;align-items:center;padding:8px 16px;border-bottom:1px solid var(--border)">
+              <div style="font-size:13px">
+                {{ $label }}
+                @if($tooltip)
+                <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
+                  <i class="abf-tooltip-icon">i</i>
+                  <span class="abf-tooltip-box">{{ $tooltip }}</span>
+                </span>
+                @endif
+              </div>
+              <div style="display:flex;justify-content:flex-end">
+                <div class="input-sfx" style="max-width:130px"><input class="form-input" id="inval-dep-{{ $key }}-c" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
+              </div>
+              <div class="inval-dep-j-col" style="display:flex;justify-content:flex-end">
+                <div class="input-sfx" style="max-width:130px"><input class="form-input" id="inval-dep-{{ $key }}-j" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
               </div>
             </div>
+            @endforeach
           </div>
 
           <!-- Informations supplémentaires -->

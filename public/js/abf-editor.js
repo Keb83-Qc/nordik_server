@@ -2775,21 +2775,25 @@
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
     const isNet = document.querySelector('input[name="inval-rr-brutnnet"]:checked')?.value === 'net';
 
-    // Autres revenus rows
-    const autresRows = document.getElementById('inval-autres-revenus-rows');
-    if (autresRows) {
-      let html = `<div class="form-group" id="inval-rev-client-row">
-        <label class="form-label">Revenus mensuels de ${clientPrenom}</label>
-        <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-client" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$/mois</span></div>
-      </div>`;
-      if (isCouple) {
-        html += `<div class="form-group" id="inval-rev-conjoint-row">
-          <label class="form-label">Revenus mensuels de ${conjointPrenom}</label>
-          <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-conjoint" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$/mois</span></div>
-        </div>`;
-      }
-      autresRows.innerHTML = html;
-    }
+    // Autres sources — onglets noms + visibilité conjoint
+    const tabLabelC = document.getElementById('inval-autres-tab-label-c');
+    const tabLabelJ = document.getElementById('inval-autres-tab-label-j');
+    const tabBtnJ   = document.getElementById('inval-autres-tab-j');
+    if (tabLabelC) tabLabelC.textContent = clientPrenom.toUpperCase();
+    if (tabLabelJ) tabLabelJ.textContent = conjointPrenom.toUpperCase();
+    if (tabBtnJ)   tabBtnJ.style.display = isCouple ? '' : 'none';
+
+    // Dépenses courantes — entêtes colonnes + visibilité colonne conjoint
+    const hdrC = document.getElementById('inval-dep-hdr-c');
+    const hdrJ = document.getElementById('inval-dep-hdr-j');
+    if (hdrC) hdrC.textContent = clientPrenom.toUpperCase();
+    if (hdrJ) hdrJ.textContent = conjointPrenom.toUpperCase();
+    const depHeader = document.getElementById('inval-dep-header');
+    document.querySelectorAll('.inval-dep-j-col').forEach(el => { el.style.display = isCouple ? '' : 'none'; });
+    document.querySelectorAll('.inval-dep-row').forEach(el => {
+      el.style.gridTemplateColumns = isCouple ? '2fr 1fr 1fr' : '2fr 1fr';
+    });
+    if (depHeader) depHeader.style.gridTemplateColumns = isCouple ? '2fr 1fr 1fr' : '2fr 1fr';
 
     // Remplacement du revenu body
     const rrBody = document.getElementById('inval-rr-body');
@@ -2893,6 +2897,13 @@
     invaliditeCalc();
   }
 
+  function invalAutresTab(sfx) {
+    document.querySelectorAll('.inval-autres-tab').forEach(b => b.classList.remove('active'));
+    document.getElementById('inval-autres-tab-' + sfx)?.classList.add('active');
+    document.getElementById('inval-autres-panel-c').style.display = sfx === 'c' ? '' : 'none';
+    document.getElementById('inval-autres-panel-j').style.display = sfx === 'j' ? '' : 'none';
+  }
+
   function toggleInvalInfo() {
     const body = document.getElementById('inval-info-body');
     const chevron = document.getElementById('inval-info-chevron');
@@ -2925,8 +2936,9 @@
         if (elJ) elJ.textContent = fmtMoney(besoinConjoint);
       }
     } else {
-      const dep = parseFloat(document.getElementById('inval-dep-total')?.value?.replace(/\s/g,'').replace(',','.')) || 0;
-      besoinClient = dep;
+      const depKeys = ['hypotheque','dettes','loyer','epargne','subsistance','autres'];
+      besoinClient = depKeys.reduce((s, k) => s + (parseFloat(document.getElementById(`inval-dep-${k}-c`)?.value?.replace(/\s/g,'').replace(',','.')) || 0), 0);
+      if (isCouple) besoinConjoint = depKeys.reduce((s, k) => s + (parseFloat(document.getElementById(`inval-dep-${k}-j`)?.value?.replace(/\s/g,'').replace(',','.')) || 0), 0);
     }
 
     // Couverture existante par propriétaire
@@ -3274,7 +3286,14 @@
         deps_client: decesDeps, deps_conjoint: decesDepsConj, av: decesAv,
       },
       invalidite: {
-        dep_total: v('inval-dep-total'),
+        autres_rev_c: v('inval-rev-client'),   autres_rev_j: v('inval-rev-conjoint'),
+        ae_c: radio('inval-ae-c'),             ae_j: radio('inval-ae-j'),
+        dep_hypotheque_c: v('inval-dep-hypotheque-c'), dep_hypotheque_j: v('inval-dep-hypotheque-j'),
+        dep_dettes_c:     v('inval-dep-dettes-c'),     dep_dettes_j:     v('inval-dep-dettes-j'),
+        dep_loyer_c:      v('inval-dep-loyer-c'),      dep_loyer_j:      v('inval-dep-loyer-j'),
+        dep_epargne_c:    v('inval-dep-epargne-c'),    dep_epargne_j:    v('inval-dep-epargne-j'),
+        dep_subsistance_c:v('inval-dep-subsistance-c'),dep_subsistance_j:v('inval-dep-subsistance-j'),
+        dep_autres_c:     v('inval-dep-autres-c'),     dep_autres_j:     v('inval-dep-autres-j'),
         av_list: typeof _invalAvList !== 'undefined' ? _invalAvList : [],
       },
       maladieGrave: {
@@ -3601,7 +3620,16 @@
 
     // Invalidité
     const inv = p.invalidite || {};
-    sv('inval-dep-total', inv.dep_total);
+    sv('inval-rev-client',  inv.autres_rev_c || '');
+    sv('inval-rev-conjoint', inv.autres_rev_j || '');
+    const setR = (name, val) => { const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if(el) el.checked = true; };
+    setR('inval-ae-c', inv.ae_c || 'non');
+    setR('inval-ae-j', inv.ae_j || 'non');
+    const depKeys = ['hypotheque','dettes','loyer','epargne','subsistance','autres'];
+    depKeys.forEach(k => {
+      sv(`inval-dep-${k}-c`, inv[`dep_${k}_c`] || '');
+      sv(`inval-dep-${k}-j`, inv[`dep_${k}_j`] || '');
+    });
 
     // Maladie grave
     const mg = p.maladieGrave || {};
