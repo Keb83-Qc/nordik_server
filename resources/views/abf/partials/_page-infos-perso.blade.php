@@ -507,7 +507,7 @@
                 </div>
               </div>
             </div>
-            <!-- Relation / À la charge -->
+            <!-- Relation(s) -->
             <div class="row">
               <div class="col form-group">
                 <label class="form-label" id="enf-relation-label">Relation avec le client</label>
@@ -523,12 +523,30 @@
                   <option value="exspouse">Ex-conjoint(e)</option>
                 </select>
               </div>
+              <div class="col form-group" id="enf-relation-conjoint-col" style="display:none">
+                <label class="form-label" id="enf-relation-conjoint-label">Relation avec le conjoint</label>
+                <select class="form-select" id="enf-relation-conjoint">
+                  <option value="">Sélectionnez…</option>
+                  <option value="child">Enfant</option>
+                  <option value="dependent">Autre</option>
+                  <option value="fathermother">Père-Mère</option>
+                  <option value="grandparent">Grand-parent</option>
+                  <option value="grandchild">Petit-enfant</option>
+                  <option value="sibling">Frère-Sœur</option>
+                  <option value="otherrelative">Parenté</option>
+                  <option value="exspouse">Ex-conjoint(e)</option>
+                </select>
+              </div>
+            </div>
+            <!-- À la charge de -->
+            <div class="row">
               <div class="col form-group">
                 <label class="form-label">À la charge de</label>
                 <select class="form-select" id="enf-charge">
                   <option value="">Sélectionnez…</option>
                 </select>
               </div>
+              <div class="col"></div>
             </div>
           </div>
           <!-- Modal footer -->

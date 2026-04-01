@@ -250,13 +250,20 @@
   function openEnfantModal(editEl) {
     _editingEnfantEl = editEl || null;
     const clientPrenom = getClientPrenom();
-    // Update label
+    const conjointPrenom = getConjointPrenom();
+    // Update relation labels
     document.getElementById('enf-relation-label').textContent = 'Relation avec ' + clientPrenom;
+    const conjointCol = document.getElementById('enf-relation-conjoint-col');
+    if (conjointPrenom) {
+      document.getElementById('enf-relation-conjoint-label').textContent = 'Relation avec ' + conjointPrenom;
+      conjointCol.style.display = '';
+    } else {
+      conjointCol.style.display = 'none';
+    }
     // Populate À la charge de
     const chargeSelect = document.getElementById('enf-charge');
     chargeSelect.innerHTML = '<option value="">Sélectionnez…</option>';
     chargeSelect.innerHTML += '<option value="client">' + clientPrenom + '</option>';
-    const conjointPrenom = getConjointPrenom();
     if (conjointPrenom) {
       chargeSelect.innerHTML += '<option value="conjoint">' + conjointPrenom + '</option>';
       chargeSelect.innerHTML += '<option value="both">' + clientPrenom + ' et ' + conjointPrenom + '</option>';
@@ -265,14 +272,15 @@
 
     // Pre-fill if editing
     if (editEl) {
-      document.getElementById('enf-prenom').value   = editEl.dataset.enfPrenom   || '';
-      document.getElementById('enf-nom').value      = editEl.dataset.enfNom      || '';
-      document.getElementById('enf-sexe').value     = editEl.dataset.enfSexe     || '';
-      document.getElementById('enf-jour').value     = editEl.dataset.enfJour     || '';
-      document.getElementById('enf-mois').value     = editEl.dataset.enfMois     || '';
-      document.getElementById('enf-annee').value    = editEl.dataset.enfAnnee    || '';
-      document.getElementById('enf-relation').value = editEl.dataset.enfRelation || '';
-      document.getElementById('enf-charge').value   = editEl.dataset.charge      || '';
+      document.getElementById('enf-prenom').value            = editEl.dataset.enfPrenom          || '';
+      document.getElementById('enf-nom').value               = editEl.dataset.enfNom             || '';
+      document.getElementById('enf-sexe').value              = editEl.dataset.enfSexe            || '';
+      document.getElementById('enf-jour').value              = editEl.dataset.enfJour            || '';
+      document.getElementById('enf-mois').value              = editEl.dataset.enfMois            || '';
+      document.getElementById('enf-annee').value             = editEl.dataset.enfAnnee           || '';
+      document.getElementById('enf-relation').value          = editEl.dataset.enfRelation        || '';
+      document.getElementById('enf-relation-conjoint').value = editEl.dataset.enfRelationConjoint || '';
+      document.getElementById('enf-charge').value            = editEl.dataset.charge             || '';
       document.getElementById('enf-submit').textContent = 'Mettre à jour';
     } else {
       document.getElementById('enf-submit').textContent = 'Enregistrer';
@@ -286,7 +294,7 @@
     document.getElementById('modal-enfant').classList.remove('open');
     document.getElementById('enf-submit').textContent = 'Enregistrer';
     // Reset fields
-    ['enf-prenom','enf-nom','enf-sexe','enf-jour','enf-mois','enf-annee','enf-relation','enf-charge']
+    ['enf-prenom','enf-nom','enf-sexe','enf-jour','enf-mois','enf-annee','enf-relation','enf-relation-conjoint','enf-charge']
       .forEach(id => { const el = document.getElementById(id); if(el) el.value = ''; });
   }
   function _buildEnfantItemHTML(nomComplet, relLabel, ddn, sexeLabel, chargeLabel) {
@@ -313,8 +321,9 @@
     const jour     = document.getElementById('enf-jour').value;
     const mois     = document.getElementById('enf-mois');
     const annee    = document.getElementById('enf-annee').value;
-    const relation = document.getElementById('enf-relation');
-    const charge   = document.getElementById('enf-charge');
+    const relation         = document.getElementById('enf-relation');
+    const relationConjoint = document.getElementById('enf-relation-conjoint');
+    const charge           = document.getElementById('enf-charge');
 
     const nomComplet  = [prenom, nom].filter(Boolean).join(' ');
     const moisText    = mois.options[mois.selectedIndex]?.text;
@@ -332,8 +341,9 @@
       _editingEnfantEl.dataset.enfJour     = jour;
       _editingEnfantEl.dataset.enfMois     = mois.value;
       _editingEnfantEl.dataset.enfAnnee    = annee;
-      _editingEnfantEl.dataset.enfRelation = relation.value;
-      _editingEnfantEl.dataset.charge      = chargeVal;
+      _editingEnfantEl.dataset.enfRelation         = relation.value;
+      _editingEnfantEl.dataset.enfRelationConjoint = relationConjoint.value;
+      _editingEnfantEl.dataset.charge              = chargeVal;
       _editingEnfantEl.innerHTML = _buildEnfantItemHTML(nomComplet, relLabel, ddn, sexeLabel, chargeLabel);
       closeEnfantModal();
       return;
@@ -352,7 +362,8 @@
     item.dataset.enfJour     = jour;
     item.dataset.enfMois     = mois.value;
     item.dataset.enfAnnee    = annee;
-    item.dataset.enfRelation = relation.value;
+    item.dataset.enfRelation         = relation.value;
+    item.dataset.enfRelationConjoint = relationConjoint.value;
     item.innerHTML = _buildEnfantItemHTML(nomComplet, relLabel, ddn, sexeLabel, chargeLabel);
     list.appendChild(item);
     closeEnfantModal();
@@ -2998,7 +3009,7 @@
         prenom: el.dataset.enfPrenom || '', nom: el.dataset.enfNom || '',
         sexe: el.dataset.enfSexe || '', jour: el.dataset.enfJour || '',
         mois: el.dataset.enfMois || '', annee: el.dataset.enfAnnee || '',
-        relation: el.dataset.enfRelation || '', charge: el.dataset.charge || '',
+        relation: el.dataset.enfRelation || '', relation_conjoint: el.dataset.enfRelationConjoint || '', charge: el.dataset.charge || '',
       });
     });
 
@@ -3211,7 +3222,7 @@
         item.dataset.charge = d.charge || ''; item.dataset.enfPrenom = d.prenom || '';
         item.dataset.enfNom = d.nom || ''; item.dataset.enfSexe = d.sexe || '';
         item.dataset.enfJour = d.jour || ''; item.dataset.enfMois = d.mois || '';
-        item.dataset.enfAnnee = d.annee || ''; item.dataset.enfRelation = d.relation || '';
+        item.dataset.enfAnnee = d.annee || ''; item.dataset.enfRelation = d.relation || ''; item.dataset.enfRelationConjoint = d.relation_conjoint || '';
         item.innerHTML = _buildEnfantItemHTML(
           [d.prenom, d.nom].filter(Boolean).join(' '),
           REL[d.relation] || d.relation || '—',
