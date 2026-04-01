@@ -16,12 +16,17 @@
 
           <!-- Assurance invalidité -->
           <div class="card" style="margin-bottom:16px">
-            <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">
               Assurance invalidité
-              <button class="btn btn-primary btn-sm" onclick="openInvalAvModal()">+ Ajouter</button>
             </div>
-            <div class="card-body" id="inval-av-list" style="padding:0">
+            <div id="inval-av-list" style="padding:0">
               <p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance invalidité enregistrée.</p>
+            </div>
+            <div style="padding:10px 16px;border-top:1px solid var(--border)">
+              <button class="btn btn-primary btn-sm" onclick="openInvalAvModal()">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="14" height="14" style="vertical-align:middle;margin-right:4px;fill:currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
+                Ajouter
+              </button>
             </div>
           </div>
 

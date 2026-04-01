@@ -2750,6 +2750,7 @@
 
   /* ── INVALIDITÉ ─────────────────────────────────────── */
   let _invalAvList = [];
+  let _invalAvEditIdx = -1;
 
   function invalRrPanelHtml(owner, prenom, isNet) {
     const revMensuel = getRevenusByOwner(owner, isNet).total / 12;
@@ -2975,20 +2976,75 @@
       list.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance invalidité enregistrée.</p>';
       return;
     }
-    list.innerHTML = _invalAvList.map((av, i) => {
-      const titre = [av.typeTx, av.assureurTx].filter(Boolean).join(' – ') || av.desc || 'Assurance invalidité';
-      return `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px${av.exclure ? ';opacity:.5' : ''}">
-        <div>
-          <div style="font-weight:600">${titre}</div>
-          <div style="color:var(--muted);font-size:12px">${av.ownerTx}${av.exclure ? ' · <em>exclu</em>' : ''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px">
-          <span style="font-weight:700;color:var(--navy)">${fmtMoney(av.montant)}/mois</span>
-          <button onclick="_invalAvList.splice(${i},1);invalRenderAvList();invaliditeCalc()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1">×</button>
+    const iconEdit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+    const iconDel  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="m6,19.008q0,0.82 0.586,1.406t1.406,0.586l8.016,0q0.82,0 1.406,-0.586t0.586,-1.406l0,-12l-12,0l0,12zm9.492,-15l-0.984,-1.008l-5.016,0l-0.984,1.008l-3.516,0l0,1.992l14.016,0l0,-1.992l-3.516,0z"/></svg>`;
+    const cols = 'grid-template-columns:1.2fr 1fr 1fr 1fr 72px';
+    const hdrStyle = `display:grid;${cols};padding:8px 16px;background:var(--bg-light,#f8f9fa);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em`;
+    const header = `<div style="${hdrStyle}">
+      <div>Type</div><div>Assuré</div>
+      <div style="text-align:right">Montant</div>
+      <div style="text-align:right">Prime annuelle</div>
+      <div></div>
+    </div>`;
+    const rows = _invalAvList.map((av, i) => {
+      const opacity = av.exclure ? ';opacity:.45' : '';
+      return `<div style="display:grid;${cols};align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px${opacity}">
+        <div style="font-weight:600">${av.typeTx || av.type || '—'}</div>
+        <div style="color:var(--muted)">${av.ownerTx || '—'}</div>
+        <div style="text-align:right;font-weight:600;color:var(--navy)">${fmtMoney(av.montant)}</div>
+        <div style="text-align:right;color:var(--muted)">${fmtMoney(av.prime)}</div>
+        <div style="display:flex;gap:4px;justify-content:flex-end">
+          <button onclick="openInvalAvEditModal(${i})" title="Modifier" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--muted)'">${iconEdit}</button>
+          <button onclick="_invalAvList.splice(${i},1);invalRenderAvList();invaliditeCalc()" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex" onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='var(--muted)'">${iconDel}</button>
         </div>
       </div>`;
     }).join('');
+    list.innerHTML = header + rows;
+  }
+
+  function openInvalAvEditModal(idx) {
+    const av = _invalAvList[idx];
+    if (!av) return;
+    _invalAvEditIdx = idx;
+    openInvalAvModal();
+    // Type + owner
+    document.getElementById('inval-av-type').value = av.type || '';
+    invalTypeChange();
+    const propEl = document.getElementById('inval-av-proprietaire');
+    if (propEl) propEl.value = av.owner || '';
+    // Champs communs
+    document.getElementById('inval-av-montant').value = av.montant > 0 ? av.montant : '';
+    document.getElementById('inval-av-prime').value = av.prime > 0 ? av.prime : '';
+    document.getElementById('inval-av-assureur').value = av.assureur || '';
+    document.getElementById('inval-av-date').value = av.date || '';
+    const imposableRadio = document.querySelector(`input[name="inval-av-imposable"][value="${av.imposable || 'non'}"]`);
+    if (imposableRadio) imposableRadio.checked = true;
+    document.getElementById('inval-av-carence-val').value = av.carenceVal || '';
+    document.getElementById('inval-av-carence-unit').value = av.carenceUnit || '';
+    document.getElementById('inval-av-couverture-unit').value = av.couvertureUnit || '';
+    document.getElementById('inval-av-couverture-val').value = av.couvertureVal || '';
+    invalCouvertureUnitChange();
+    document.getElementById('inval-av-exclure').checked = av.exclure || false;
+    document.getElementById('inval-av-notes').value = av.notes || '';
+    // Champs collectifs
+    if (av.type === 'collective') {
+      const appR = document.querySelector(`input[name="inval-av-approche"][value="${av.approche || 'pct'}"]`);
+      if (appR) appR.checked = true;
+      invalApprocheChange();
+      if (av.approche === 'montant') {
+        document.getElementById('inval-av-montant-coll').value = av.montant > 0 ? av.montant : '';
+      } else {
+        document.getElementById('inval-av-prestation-niveau').value = av.prestationNiveau || '';
+        document.getElementById('inval-av-revenu-assurable').value = av.revenuAssurable > 0 ? av.revenuAssurable : '';
+        document.getElementById('inval-av-pct0').value = av.pct0 > 0 ? av.pct0 : '';
+        document.getElementById('inval-av-amt0').value = av.amt0 > 0 ? av.amt0 : '';
+        document.getElementById('inval-av-pct1').value = av.pct1 > 0 ? av.pct1 : '';
+        document.getElementById('inval-av-amt1').value = av.amt1 > 0 ? av.amt1 : '';
+        document.getElementById('inval-av-pct2').value = av.pct2 > 0 ? av.pct2 : '';
+        document.getElementById('inval-av-prestation-max').value = av.prestationMax > 0 ? av.prestationMax : '';
+        invalNiveauChange();
+      }
+    }
   }
 
   function invalCouvertureUnitChange() {
@@ -3004,6 +3060,7 @@
   }
 
   function openInvalAvModal() {
+    _invalAvEditIdx = -1;
     apFillBienProprietaire('inval-av-proprietaire');
     document.getElementById('inval-av-type').value = '';
     document.getElementById('inval-av-montant').value = '';
@@ -3093,7 +3150,13 @@
       }
       if (prestationMax > 0) effectifMontant = Math.min(effectifMontant, prestationMax);
     }
-    _invalAvList.push({ type, typeTx, montant: effectifMontant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx, approche, prestationNiveau, prestationNiveauTx, revenuAssurable, pct0, amt0, pct1, amt1, pct2, prestationMax });
+    const item = { type, typeTx, montant: effectifMontant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx, approche, prestationNiveau, prestationNiveauTx, revenuAssurable, pct0, amt0, pct1, amt1, pct2, prestationMax };
+    if (_invalAvEditIdx >= 0) {
+      _invalAvList[_invalAvEditIdx] = item;
+      _invalAvEditIdx = -1;
+    } else {
+      _invalAvList.push(item);
+    }
     invalRenderAvList();
     closeInvalAvModal();
     invaliditeCalc();
