@@ -2488,19 +2488,18 @@
     const dispo = (isFamilial && isCouple) ? getRevenusByOwner(survivorOwner, isNet, false).total : 0;
     const autres    = parseFloat((document.getElementById(`deces-autres-revenus-${sfx}`)?.value  || '0').replace(/\s/g,'').replace(',','.')) || 0;
     const disponible = dispo + autres;
-    // Revenu annuel manquant = revenu visé moins revenus disponibles, minimum 0
-    const manquantAnnuel = Math.max(0, revenuVise - disponible);
+    // Revenu annuel manquant = revenu visé pour 1 an
+    const manquantAnnuel = revenuVise;
     const duree = parseFloat(document.getElementById(`deces-rr-duree-${sfx}`)?.value || '10') || 10;
     const taux  = parseFloat((document.getElementById(`deces-rr-taux-${sfx}`)?.value || '3.70').replace(',','.')) / 100 || 0;
     const inflation = parseFloat((document.getElementById('vd-inflation')?.value || '2,10').replace(',','.')) / 100 || 0;
-    // Capital nécessaire = PV d'une rente croissante (inflation) au taux de rendement
+    // Capital nécessaire = A1 * ((1 - ((1+inf)/(1+R))^A2) / (1 - ((1+inf)/(1+R))))
+    const ratio = (1 + inflation) / (1 + taux);
     let pv;
-    if (Math.abs(taux - inflation) < 0.0001) {
-      // r ≈ g : cas limite
-      pv = manquantAnnuel * duree / (1 + taux);
+    if (Math.abs(ratio - 1) < 0.0001) {
+      pv = manquantAnnuel * duree;
     } else {
-      // Formule générale (fonctionne aussi quand taux=0 et inflation>0)
-      pv = manquantAnnuel * (1 - Math.pow((1 + inflation) / (1 + taux), duree)) / (taux - inflation);
+      pv = manquantAnnuel * (1 - Math.pow(ratio, duree)) / (1 - ratio);
     }
     const m = document.getElementById(`deces-rr-manquant-${sfx}`);
     const p = document.getElementById(`deces-rr-projete-${sfx}`);
