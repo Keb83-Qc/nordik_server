@@ -2075,18 +2075,7 @@
     btn.classList.add('active');
     document.getElementById('deces-rr-panel-c').style.display = sfx === 'c' ? '' : 'none';
     document.getElementById('deces-rr-panel-j').style.display = sfx === 'j' ? '' : 'none';
-    // Refresh panel-j's "Revenu du conjoint" from profile when switching to it
-    if (sfx === 'j') {
-      const dispoJ = document.getElementById('deces-revenu-dispo-j');
-      if (dispoJ) {
-        let total = 0;
-        document.querySelectorAll('#revenu-list tr[data-revenu-annuel]').forEach(tr => {
-          total += parseFloat(tr.dataset.revenuAnnuel) || 0;
-        });
-        dispoJ.value = total > 0 ? total.toLocaleString('fr-CA') : '0';
-        decesCalc();
-      }
-    }
+    decesCalc();
   }
 
   function decesInit() {
