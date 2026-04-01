@@ -95,8 +95,9 @@ return [
         \App\Filament\Resources\LnnteNumberResource::class      => 2,
 
         // Gestion Clients
-        \App\Filament\Resources\AbfCaseAdminResource::class     => 1,
-        \App\Filament\Resources\AbfAnnouncementResource::class  => 2,
+        \App\Filament\Resources\AbfCaseAdminResource::class        => 1,
+        \App\Filament\Resources\AbfAnnouncementResource::class     => 2,
+        \App\Filament\Resources\AbfRecommendationResource::class   => 3,
 
         // Site Web
         \App\Filament\Resources\MenuItemResource::class              => 1,

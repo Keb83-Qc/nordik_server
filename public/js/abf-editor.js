@@ -56,18 +56,32 @@
   let _recomNotes = {}; // legacy compat
   let _recomItems = { deces:[], invalidite:[], 'maladie-grave':[], 'fonds-urgence':[], retraite:[], conseils:[] };
   let _recomPanelData = {}; // { [cat]: { client:{pct,besoinsRows,disponibleRows,manque}, conjoint:{...} } }
-  const _CONSEILS_DEFAULTS = [
-    { key:'rrq',           title:'Régime des rentes du Québec (RRQ)', text:"Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec (RRQ) afin d'en maximiser les prestations selon votre situation personnelle et financière.", checked:false, expanded:false },
-    { key:'compte-conj',   title:'Compte conjoint',                   text:"L'ouverture d'un compte conjoint peut simplifier la gestion des finances familiales et faciliter l'accès aux fonds en cas de décès de l'un des conjoints.", checked:false, expanded:false },
-    { key:'auto-hab',      title:'Assurance auto et habitation',      text:"Il serait judicieux de réviser vos assurances auto et habitation afin de vous assurer que vos protections correspondent à votre situation actuelle et d'optimiser vos primes.", checked:false, expanded:false },
-    { key:'budget',        title:'Budget',                            text:"La mise en place d'un budget mensuel détaillé vous permettra de mieux contrôler vos dépenses, d'identifier les postes d'optimisation et d'atteindre vos objectifs financiers plus rapidement.", checked:false, expanded:false },
-    { key:'comptable',     title:'Comptable',                         text:"Je vous recommande de consulter un comptable afin d'optimiser votre déclaration de revenus et de mettre en place des stratégies fiscales adaptées à votre situation.", checked:false, expanded:false },
-    { key:'testament',     title:'Testament',                         text:"Je vous encourage à procéder à la rédaction de votre testament, idéalement devant notaire, afin d'éliminer les frais de vérification et de diminuer les risques de contestation. Un testament à jour garantit que vos volontés seront respectées et que vos proches seront protégés.", checked:false, expanded:false },
-    { key:'mandat',        title:'Mandat de protection',              text:"Le mandat de protection (mandat en cas d'inaptitude) est un document dans lequel vous pouvez désigner vous-même la personne de confiance qui prendra soin de votre personne et administrera vos biens si vous devenez inapte. Il est fortement recommandé de le rédiger devant notaire.", checked:false, expanded:false },
-    { key:'personnes-res', title:'Personnes-ressources',              text:"Il est conseillé de procéder à la nomination de deux personnes-ressources à contacter en cas d'urgence. Ces personnes auront accès à vos informations importantes et pourront agir en votre nom dans les situations critiques.", checked:false, expanded:false },
-    { key:'taux-hypo',     title:'Taux hypothécaires',                text:"Il serait opportun d'analyser votre situation hypothécaire actuelle afin de déterminer si un refinancement ou une renégociation de votre taux pourrait vous faire réaliser des économies substantielles.", checked:false, expanded:false },
-    { key:'beneficiaires', title:'Bénéficiaires',                     text:"Il est important de vérifier et mettre à jour les désignations de bénéficiaires sur vos contrats d'assurance vie et vos régimes d'épargne-retraite afin de vous assurer que les sommes seront versées aux personnes de votre choix.", checked:false, expanded:false },
-  ];
+  // _CONSEILS_DEFAULTS : chargés depuis la DB (window.ABF_RECOM_DEFAULTS) ou fallback statique
+  const _CONSEILS_DEFAULTS = (() => {
+    const db = window.ABF_RECOM_DEFAULTS?.conseils;
+    if (db && db.length) {
+      return db.map(r => ({
+        key:      r.key || ('rec-' + r.id),
+        title:    r.title || r.text.substring(0, 60),
+        text:     r.text,
+        checked:  r.checked_by_default || false,
+        expanded: false,
+      }));
+    }
+    // Fallback statique (si DB non disponible)
+    return [
+      { key:'rrq',           title:'Régime des rentes du Québec (RRQ)', text:"Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec (RRQ) afin d'en maximiser les prestations selon votre situation personnelle et financière.", checked:false, expanded:false },
+      { key:'compte-conj',   title:'Compte conjoint',                   text:"L'ouverture d'un compte conjoint peut simplifier la gestion des finances familiales et faciliter l'accès aux fonds en cas de décès de l'un des conjoints.", checked:false, expanded:false },
+      { key:'auto-hab',      title:'Assurance auto et habitation',      text:"Il serait judicieux de réviser vos assurances auto et habitation afin de vous assurer que vos protections correspondent à votre situation actuelle et d'optimiser vos primes.", checked:false, expanded:false },
+      { key:'budget',        title:'Budget',                            text:"La mise en place d'un budget mensuel détaillé vous permettra de mieux contrôler vos dépenses, d'identifier les postes d'optimisation et d'atteindre vos objectifs financiers plus rapidement.", checked:false, expanded:false },
+      { key:'comptable',     title:'Comptable',                         text:"Je vous recommande de consulter un comptable afin d'optimiser votre déclaration de revenus et de mettre en place des stratégies fiscales adaptées à votre situation.", checked:false, expanded:false },
+      { key:'testament',     title:'Testament',                         text:"Je vous encourage à procéder à la rédaction de votre testament, idéalement devant notaire, afin d'éliminer les frais de vérification et de diminuer les risques de contestation.", checked:false, expanded:false },
+      { key:'mandat',        title:'Mandat de protection',              text:"Le mandat de protection (mandat en cas d'inaptitude) est un document dans lequel vous pouvez désigner vous-même la personne de confiance qui prendra soin de votre personne et administrera vos biens si vous devenez inapte.", checked:false, expanded:false },
+      { key:'personnes-res', title:'Personnes-ressources',              text:"Il est conseillé de procéder à la nomination de deux personnes-ressources à contacter en cas d'urgence.", checked:false, expanded:false },
+      { key:'taux-hypo',     title:'Taux hypothécaires',                text:"Il serait opportun d'analyser votre situation hypothécaire actuelle afin de déterminer si un refinancement ou une renégociation de votre taux pourrait vous faire réaliser des économies substantielles.", checked:false, expanded:false },
+      { key:'beneficiaires', title:'Bénéficiaires',                     text:"Il est important de vérifier et mettre à jour les désignations de bénéficiaires sur vos contrats d'assurance vie et vos régimes d'épargne-retraite.", checked:false, expanded:false },
+    ];
+  })();
   let _conseils = null; // null = non initialisé, sera copié depuis _CONSEILS_DEFAULTS au premier usage
   let _rapportSelectedPhoto = null;
   const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
@@ -4818,44 +4832,63 @@
   /* ════════════════════════════════════════════════════════
      RECOMMANDATIONS
   ════════════════════════════════════════════════════════ */
-  const _RECOM_TEMPLATES = {
-    deces: {
-      personalized:            '',
-      temporaryLifeInsurance:  "Il serait important d'avoir votre protection d'assurance vie temporaire afin de laisser la liquidité nécessaire à vos survivants, leur permettant de rembourser vos dettes et leur assurant un revenu adéquat pour maintenir leur niveau de vie.",
-      permanentLifeInsurance:  "Une base d'assurance vie permanente devrait être ajoutée à votre protection temporaire afin de laisser un montant en héritage et d'assumer vos derniers frais.",
-      mortgageInsurance:       "Il serait important de réviser votre assurance prêt hypothécaire afin de vous assurer que la protection en place correspond à votre situation actuelle.",
-      childrenLifeInsurance:   "Souscrire une assurance vie pour vos enfants dès maintenant permet de garantir leur assurabilité future à des conditions avantageuses.",
-      reviewExistingContracts: "Vos contrats d'assurance existants devraient être révisés afin de vous assurer que les protections en place correspondent toujours à vos besoins actuels.",
-      acceleratedPayments:     "Il serait avantageux de prévoir des paiements accélérés pour votre assurance afin de réduire la durée des obligations financières.",
-    },
-    invalidite: {
-      personalized:        '',
-      disabilityInsurance: "Il est important d'avoir une protection d'assurance invalidité adéquate pour maintenir votre niveau de vie en cas d'incapacité à travailler.",
-      reviewCollective:    "Votre couverture d'invalidité collective devrait être revue afin de s'assurer qu'elle répond adéquatement à vos besoins actuels.",
-      supplemental:        "Une assurance invalidité complémentaire serait recommandée pour combler l'écart entre votre couverture actuelle et vos besoins réels.",
-    },
-    'maladie-grave': {
-      personalized:    '',
-      criticalIllness: "Il serait important de souscrire une assurance maladie grave afin de disposer d'un capital lors d'un diagnostic d'une maladie grave couverte.",
-      returnOfPremium: "L'ajout de l'avenant de remboursement de primes permettrait de récupérer les primes versées si aucune réclamation n'est effectuée.",
-    },
-    'fonds-urgence': {
-      personalized:       '',
-      buildFund:          "Il est recommandé de constituer un fonds d'urgence représentant entre 3 et 6 mois de dépenses courantes afin de faire face à des imprévus sans recourir à l'endettement.",
-      highInterestSavings:"Placer votre fonds d'urgence dans un compte épargne à intérêt élevé permet de conserver la liquidité tout en optimisant le rendement de cette réserve.",
-    },
-    retraite: {
-      personalized: '',
-      reer: "Il serait avantageux de maximiser vos cotisations au REER afin de réduire votre revenu imposable et d'accumuler un capital pour la retraite.",
-      celi: "Le CELI constitue un excellent véhicule d'épargne-retraite puisque les revenus de placement qui y sont générés ne sont pas imposables.",
-      rrq:  "Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec afin d'en maximiser les prestations.",
-    },
-    conseils: {
-      personalized:  '',
-      estateReview:  "Il serait important de revoir votre plan successoral afin de s'assurer que vos actifs seront transmis selon vos volontés et de façon fiscalement avantageuse.",
-      taxPlanning:   "Une stratégie de planification fiscale personnalisée permettrait d'optimiser votre situation financière globale et de minimiser votre charge fiscale.",
-    },
-  };
+  // _RECOM_TEMPLATES : chargés depuis la DB (window.ABF_RECOM_DEFAULTS) ou fallback statique
+  const _RECOM_TEMPLATES = (() => {
+    const db = window.ABF_RECOM_DEFAULTS;
+    const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite','conseils'];
+    // Si DB disponible, construire les templates depuis les données DB
+    if (db && cats.some(c => db[c]?.length)) {
+      const result = {};
+      cats.forEach(cat => {
+        result[cat] = { personalized: '' };
+        (db[cat] || []).forEach(r => {
+          if (r.key && r.key !== 'personalized') {
+            result[cat][r.key] = r.text;
+          }
+        });
+      });
+      return result;
+    }
+    // Fallback statique
+    return {
+      deces: {
+        personalized:            '',
+        temporaryLifeInsurance:  "Il serait important d'avoir votre protection d'assurance vie temporaire afin de laisser la liquidité nécessaire à vos survivants, leur permettant de rembourser vos dettes et leur assurant un revenu adéquat pour maintenir leur niveau de vie.",
+        permanentLifeInsurance:  "Une base d'assurance vie permanente devrait être ajoutée à votre protection temporaire afin de laisser un montant en héritage et d'assumer vos derniers frais.",
+        mortgageInsurance:       "Il serait important de réviser votre assurance prêt hypothécaire afin de vous assurer que la protection en place correspond à votre situation actuelle.",
+        childrenLifeInsurance:   "Souscrire une assurance vie pour vos enfants dès maintenant permet de garantir leur assurabilité future à des conditions avantageuses.",
+        reviewExistingContracts: "Vos contrats d'assurance existants devraient être révisés afin de vous assurer que les protections en place correspondent toujours à vos besoins actuels.",
+        acceleratedPayments:     "Il serait avantageux de prévoir des paiements accélérés pour votre assurance afin de réduire la durée des obligations financières.",
+      },
+      invalidite: {
+        personalized:        '',
+        disabilityInsurance: "Il est important d'avoir une protection d'assurance invalidité adéquate pour maintenir votre niveau de vie en cas d'incapacité à travailler.",
+        reviewCollective:    "Votre couverture d'invalidité collective devrait être revue afin de s'assurer qu'elle répond adéquatement à vos besoins actuels.",
+        supplemental:        "Une assurance invalidité complémentaire serait recommandée pour combler l'écart entre votre couverture actuelle et vos besoins réels.",
+      },
+      'maladie-grave': {
+        personalized:    '',
+        criticalIllness: "Il serait important de souscrire une assurance maladie grave afin de disposer d'un capital lors d'un diagnostic d'une maladie grave couverte.",
+        returnOfPremium: "L'ajout de l'avenant de remboursement de primes permettrait de récupérer les primes versées si aucune réclamation n'est effectuée.",
+      },
+      'fonds-urgence': {
+        personalized:        '',
+        buildFund:           "Il est recommandé de constituer un fonds d'urgence représentant entre 3 et 6 mois de dépenses courantes afin de faire face à des imprévus sans recourir à l'endettement.",
+        highInterestSavings: "Placer votre fonds d'urgence dans un compte épargne à intérêt élevé permet de conserver la liquidité tout en optimisant le rendement de cette réserve.",
+      },
+      retraite: {
+        personalized: '',
+        reer: "Il serait avantageux de maximiser vos cotisations au REER afin de réduire votre revenu imposable et d'accumuler un capital pour la retraite.",
+        celi: "Le CELI constitue un excellent véhicule d'épargne-retraite puisque les revenus de placement qui y sont générés ne sont pas imposables.",
+        rrq:  "Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec afin d'en maximiser les prestations.",
+      },
+      conseils: {
+        personalized: '',
+        estateReview: "Il serait important de revoir votre plan successoral afin de s'assurer que vos actifs seront transmis selon vos volontés et de façon fiscalement avantageuse.",
+        taxPlanning:  "Une stratégie de planification fiscale personnalisée permettrait d'optimiser votre situation financière globale et de minimiser votre charge fiscale.",
+      },
+    };
+  })();
 
   function recomInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;

@@ -1,42 +1,26 @@
 <!-- ── PAGE: Recommandations ── -->
 @php
+// Options depuis la base de données (injectées par le contrôleur) avec fallback statique
+$_dbOpts = $abfRecommendations ?? [];
+$_fallbackOpts = [
+  'deces'         => [['key'=>'temporaryLifeInsurance','label'=>'Souscrire une assurance vie temporaire'],['key'=>'permanentLifeInsurance','label'=>'Souscrire une assurance vie permanente'],['key'=>'mortgageInsurance','label'=>"Réviser l'assurance prêt hypothécaire"],['key'=>'childrenLifeInsurance','label'=>'Souscrire une assurance vie pour enfants'],['key'=>'reviewExistingContracts','label'=>"Réviser les contrats d'assurance existants"],['key'=>'acceleratedPayments','label'=>"Prévoir des paiements d'assurance accélérés"]],
+  'invalidite'    => [['key'=>'disabilityInsurance','label'=>"Souscrire une assurance invalidité"],['key'=>'reviewCollective','label'=>"Réviser la couverture collective"],['key'=>'supplemental','label'=>"Ajouter une protection complémentaire"]],
+  'maladie-grave' => [['key'=>'criticalIllness','label'=>"Souscrire une assurance maladie grave"],['key'=>'returnOfPremium','label'=>"Ajouter le remboursement de primes"]],
+  'fonds-urgence' => [['key'=>'buildFund','label'=>"Constituer un fonds d'urgence"],['key'=>'highInterestSavings','label'=>"Compte épargne à intérêt élevé"]],
+  'retraite'      => [['key'=>'reer','label'=>"Cotiser au REER"],['key'=>'celi','label'=>"Cotiser au CELI"],['key'=>'rrq','label'=>"Optimiser la rente RRQ/RPC"]],
+  'conseils'      => [['key'=>'estateReview','label'=>"Révision du plan successoral"],['key'=>'taxPlanning','label'=>"Planification fiscale"]],
+];
+$_opts = fn(string $cat) => array_merge(
+    [['key'=>'personalized','label'=>'Recommandation personnalisée']],
+    !empty($_dbOpts[$cat]) ? $_dbOpts[$cat] : ($_fallbackOpts[$cat] ?? [])
+);
 $recomCats = [
-  ['id'=>'deces',        'label'=>'Décès',        'hasTime'=>true,  'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'temporaryLifeInsurance',   'label'=>'Souscrire une assurance vie temporaire'],
-    ['key'=>'permanentLifeInsurance',   'label'=>'Souscrire une assurance vie permanente'],
-    ['key'=>'mortgageInsurance',        'label'=>"Réviser l'assurance prêt hypothécaire"],
-    ['key'=>'childrenLifeInsurance',    'label'=>'Souscrire une assurance vie pour enfants'],
-    ['key'=>'reviewExistingContracts',  'label'=>"Réviser les contrats d'assurance existants"],
-    ['key'=>'acceleratedPayments',      'label'=>"Prévoir des paiements d'assurance accélérés"],
-  ]],
-  ['id'=>'invalidite',   'label'=>'Invalidité',   'hasTime'=>false, 'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'disabilityInsurance',      'label'=>"Souscrire une assurance invalidité"],
-    ['key'=>'reviewCollective',         'label'=>"Réviser la couverture collective"],
-    ['key'=>'supplemental',             'label'=>"Ajouter une protection complémentaire"],
-  ]],
-  ['id'=>'maladie-grave','label'=>'Maladie grave','hasTime'=>false, 'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'criticalIllness',          'label'=>"Souscrire une assurance maladie grave"],
-    ['key'=>'returnOfPremium',          'label'=>"Ajouter le remboursement de primes"],
-  ]],
-  ['id'=>'fonds-urgence','label'=>'Fonds urgence','hasTime'=>false, 'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'buildFund',                'label'=>"Constituer un fonds d'urgence"],
-    ['key'=>'highInterestSavings',      'label'=>"Compte épargne à intérêt élevé"],
-  ]],
-  ['id'=>'retraite',     'label'=>'Retraite',     'hasTime'=>false, 'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'reer',                     'label'=>"Cotiser au REER"],
-    ['key'=>'celi',                     'label'=>"Cotiser au CELI"],
-    ['key'=>'rrq',                      'label'=>"Optimiser la rente RRQ/RPC"],
-  ]],
-  ['id'=>'conseils',     'label'=>'Conseils',     'hasTime'=>false, 'options'=>[
-    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
-    ['key'=>'estateReview',             'label'=>"Révision du plan successoral"],
-    ['key'=>'taxPlanning',              'label'=>"Planification fiscale"],
-  ]],
+  ['id'=>'deces',        'label'=>'Décès',         'hasTime'=>true,  'options'=>$_opts('deces')],
+  ['id'=>'invalidite',   'label'=>'Invalidité',    'hasTime'=>false, 'options'=>$_opts('invalidite')],
+  ['id'=>'maladie-grave','label'=>'Maladie grave', 'hasTime'=>false, 'options'=>$_opts('maladie-grave')],
+  ['id'=>'fonds-urgence','label'=>"Fonds urgence", 'hasTime'=>false, 'options'=>$_opts('fonds-urgence')],
+  ['id'=>'retraite',     'label'=>'Retraite',      'hasTime'=>false, 'options'=>$_opts('retraite')],
+  ['id'=>'conseils',     'label'=>'Conseils',      'hasTime'=>false, 'options'=>$_opts('conseils')],
 ];
 @endphp
 

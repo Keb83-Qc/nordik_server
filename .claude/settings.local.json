@@ -177,7 +177,13 @@
       "Bash(php -r \"copy\\(''''https://getcomposer.org/installer'''', ''''/tmp/composer-setup.php''''\\);\")",
       "Bash(php /tmp/composer-setup.php --install-dir=/tmp --filename=composer)",
       "Bash(php \"C:\\\\Users\\\\Claude - VIP\\\\AppData\\\\Local\\\\Temp\\\\composer\" install --no-interaction --no-dev)",
-      "Bash(find D:vipgpi_canordik_server -maxdepth 1 -name .env*)"
+      "Bash(find D:vipgpi_canordik_server -maxdepth 1 -name .env*)",
+      "Bash(grep -E \"Schema::create|table\\\\\\(\" \"D:/vipgpi_ca/nordik_server/database/migrations/\"*.php)",
+      "Bash(dir \"D:\\\\vipgpi_ca\\\\nordik_server\\\\database\\\\migrations\" /B /O:N)",
+      "Bash(findstr /V \"^$\")",
+      "Bash(dir D:vipgpi_canordik_serverdatabasemigrations /B /O:N)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"DONE EXIT:$?\")"
     ]
   }
 }

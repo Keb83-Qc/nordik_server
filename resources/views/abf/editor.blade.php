@@ -30,6 +30,9 @@
 
         {{-- Paramètres système chargés depuis la base de données --}}
         window.ABF_PARAMS = {!! json_encode($abfParams ?? []) !!};
+
+        {{-- Recommandations ABF chargées depuis la base de données --}}
+        window.ABF_RECOM_DEFAULTS = {!! json_encode($abfRecomJs ?? []) !!};
     </script>
 
     {{-- ── Feuille de style ────────────────────────────────── --}}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AbfAnnouncement;
 use App\Models\AbfCase;
 use App\Models\AbfParameter;
+use App\Models\AbfRecommendation;
 use App\Models\User;
 use App\Services\AbfCaseCalculator;
 use Illuminate\Http\JsonResponse;
@@ -51,11 +52,13 @@ class AbfEditorController extends Controller
         }
 
         return view('abf.editor', [
-            'record'        => null,
-            'recentCases'   => $recentCases,
-            'abfParams'     => $abfParams,
-            'announcements' => $announcements,
-            'advisorSlug'   => $advisor->slug,
+            'record'             => null,
+            'recentCases'        => $recentCases,
+            'abfParams'          => $abfParams,
+            'announcements'      => $announcements,
+            'advisorSlug'        => $advisor->slug,
+            'abfRecommendations' => AbfRecommendation::dropdownOptions(),
+            'abfRecomJs'         => AbfRecommendation::forJs(),
         ]);
     }
 
@@ -130,9 +133,11 @@ class AbfEditorController extends Controller
         }
 
         return view('abf.editor', [
-            'record'      => $abfCase,
-            'abfParams'   => $abfParams,
-            'advisorSlug' => $advisorSlug,
+            'record'             => $abfCase,
+            'abfParams'          => $abfParams,
+            'advisorSlug'        => $advisorSlug,
+            'abfRecommendations' => AbfRecommendation::dropdownOptions(),
+            'abfRecomJs'         => AbfRecommendation::forJs(),
         ]);
     }
 
