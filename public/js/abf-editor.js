@@ -53,10 +53,10 @@
   // ── Variables globales pour les sections ajoutées ──────────────
   let _retraiteDepenses = [];
   let _retraiteRegimesPublics = {
-    client:  [ { id:'rrq', label:'RRQ / RPC',              montant:0, frequence:'mensuel', indexe:true, debut:65 },
-               { id:'sv',  label:'Sécurité de vieillesse', montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
-    conjoint:[ { id:'rrq', label:'RRQ / RPC',              montant:0, frequence:'mensuel', indexe:true, debut:65 },
-               { id:'sv',  label:'Sécurité de vieillesse', montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
+    client:  [ { id:'rrq', label:'Régime de rentes du Québec (RRQ)', montant:0, frequence:'mensuel', indexe:true, debut:65 },
+               { id:'sv',  label:'Sécurité de la vieillesse (SV)',   montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
+    conjoint:[ { id:'rrq', label:'Régime de rentes du Québec (RRQ)', montant:0, frequence:'mensuel', indexe:true, debut:65 },
+               { id:'sv',  label:'Sécurité de la vieillesse (SV)',   montant:0, frequence:'mensuel', indexe:true, debut:65 } ],
   };
   let _retraiteRpd      = []; // { id, role, nom, montant, frequence, indexe, debut, notes }
   let _retraiteRetraits = []; // { id, role, type, desc, montant, frequence, debut, fin }
@@ -3519,7 +3519,9 @@
         anneeClient:  v('retraite-annee-client'),
         ageConjoint:  v('retraite-age-conjoint'),  typeConjoint: v('retraite-type-conjoint'),
         anneeConjoint:v('retraite-annee-conjoint'),
-        goalType:    document.querySelector('input[name="retraite-goal-type"]:checked')?.value || 'individuel',
+        goalType:    document.querySelector('input[name="retraite-goal-type"]:checked')?.value    || 'individuel',
+        targetType:  document.querySelector('input[name="retraite-target-type"]:checked')?.value  || 'pct',
+        frequency:   document.querySelector('input[name="retraite-goal-frequency"]:checked')?.value || 'annuel',
         profilAvantClient:    v('retraite-profil-avant-client'),
         profilPendantClient:  v('retraite-profil-pendant-client'),
         profilAvantConjoint:  v('retraite-profil-avant-conjoint'),
@@ -3877,7 +3879,9 @@
     if (ret.typeConjoint) { const el = document.getElementById('retraite-type-conjoint'); if(el) el.value = ret.typeConjoint; }
     retraiteToggleType('client');
     retraiteToggleType('conjoint');
-    if (ret.goalType) { const el = document.querySelector(`input[name="retraite-goal-type"][value="${ret.goalType}"]`); if(el) el.checked = true; }
+    if (ret.goalType)   { const el = document.querySelector(`input[name="retraite-goal-type"][value="${ret.goalType}"]`);     if(el) el.checked = true; }
+    if (ret.targetType) { const el = document.querySelector(`input[name="retraite-target-type"][value="${ret.targetType}"]`); if(el) el.checked = true; }
+    if (ret.frequency)  { const el = document.querySelector(`input[name="retraite-goal-frequency"][value="${ret.frequency}"]`);if(el) el.checked = true; }
     sv('retraite-pct-client-0',   ret.pctClient   || '70');
     sv('retraite-pct-conjoint-0', ret.pctConjoint || '70');
     if (ret.saveSurplusClient)   { const el = document.querySelector(`input[name="retraite-save-surplus-c"][value="${ret.saveSurplusClient}"]`);   if(el) el.checked = true; }
@@ -4497,15 +4501,11 @@
       if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
     }
 
-    // Résumé sidebar toggle
-    const tog = document.getElementById('retraite-resume-toggle');
-    if (tog) tog.style.display = hasSpouse ? 'flex' : 'none';
-
-    // Mettre à jour label boutons conjoint
-    const btnJ = document.getElementById('retraite-resume-btn-j');
-    if (btnJ) btnJ.textContent = jPrenom;
-    const btnC = document.getElementById('retraite-resume-btn-c');
-    if (btnC) btnC.textContent = cPrenom;
+    // Onglets Objectif : noms réels
+    const objTabC = document.getElementById('retraite-obj-tab-client');
+    const objTabJ = document.getElementById('retraite-obj-tab-conjoint');
+    if (objTabC) objTabC.textContent = cPrenom.toUpperCase();
+    if (objTabJ) objTabJ.textContent = jPrenom.toUpperCase();
 
     // Tabs RPD et Retraits (rendus dynamiquement si couple)
     retraiteRenderPersonTabs('retraite-rpd-tabs', 'retraite-rpd-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRpdTab');
@@ -4553,6 +4553,17 @@
     return total;
   }
 
+  // Met à jour tous les libellés d'unité quand % ↔ $ change, puis recalcule
+  function retraiteCalcUpdateUnits() {
+    const tt = document.querySelector('input[name="retraite-target-type"]:checked')?.value || 'pct';
+    const unitTxtPct = `% du revenu net actuel jusqu'au décès.`;
+    const unitTxtMnt = `$ comme objectif de retraite jusqu'au décès.`;
+    document.querySelectorAll('[id^="retraite-unit-"]').forEach(el => {
+      el.textContent = tt === 'pct' ? unitTxtPct : unitTxtMnt;
+    });
+    retraiteCalc();
+  }
+
   function switchRetraiteObjTab(role, btn) {
     document.querySelectorAll('#retraite-objectif-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
@@ -4577,19 +4588,20 @@
     div.className = 'retraite-periode';
     div.dataset.idx = idx;
     div.style.cssText = 'padding:12px;background:#f8f9fd;border-radius:8px;margin-bottom:10px;position:relative';
+    const ttCurrent = document.querySelector('input[name="retraite-target-type"]:checked')?.value || 'pct';
+    const unitTxt   = ttCurrent === 'pct' ? `% du revenu net actuel de l'âge` : `$ comme objectif de l'âge`;
     div.innerHTML = `
       <button onclick="this.parentElement.remove();retraiteCalc()"
         style="position:absolute;top:8px;right:8px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0 4px">×</button>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
-        <span>${nom} vise</span>
+        <span style="font-weight:600">${nom}</span>
+        <span style="color:var(--muted)">vise</span>
         <input class="form-input" id="retraite-pct-${role}-${idx}" type="text" value="70" style="width:65px;text-align:center" oninput="retraiteCalc()"/>
-        <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-${role}-${idx}" value="pct" checked onchange="retraiteCalc()"/> %</label>
-        <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-${role}-${idx}" value="montant" onchange="retraiteCalc()"/> $</label>
-        <span>du revenu net actuel, de l'âge</span>
+        <span id="retraite-unit-${role}-${idx}" style="font-size:12px;color:var(--muted)">${unitTxt}</span>
         <input class="form-input" type="text" value="" placeholder="début" style="width:55px;text-align:center" oninput="retraiteCalc()"/>
-        <span>à</span>
+        <span style="color:var(--muted)">à</span>
         <input class="form-input" type="text" value="" placeholder="fin" style="width:55px;text-align:center" oninput="retraiteCalc()"/>
-        <span>ans</span>
+        <span style="color:var(--muted)">ans.</span>
       </div>`;
     container.appendChild(div);
   }
@@ -4710,18 +4722,46 @@
       }
     });
 
-    // Résumé
-    const revenuC = _retraiteGetRevenu('client') * 0.72;
-    const pctC    = parseFloat(document.getElementById('retraite-pct-client-0')?.value || '70') / 100;
-    const cibleC  = revenuC * pctC;
-    const montantEl = document.getElementById('retraite-montant-client-0');
-    if (montantEl) montantEl.textContent = fmtMoney(cibleC);
+    // Paramètres globaux objectif
+    const targetType = document.querySelector('input[name="retraite-target-type"]:checked')?.value  || 'pct';
+    const frequency  = document.querySelector('input[name="retraite-goal-frequency"]:checked')?.value || 'annuel';
+    const isMonthly  = frequency === 'mensuel';
+    const freqLabel  = isMonthly ? 'mensuel' : 'annuel';
+    const freqSuffix = isMonthly ? '/mois' : '/an';
+    // Mettre à jour les libellés de fréquence dans la vue
+    document.querySelectorAll('.retraite-freq-label').forEach(el => { el.textContent = freqLabel; });
 
+    // Calcul cibles
+    const revenuC = _retraiteGetRevenu('client') * 0.72;
     const revenuJ = _retraiteGetRevenu('conjoint') * 0.72;
-    const pctJ    = parseFloat(document.getElementById('retraite-pct-conjoint-0')?.value || '70') / 100;
-    const cibleJ  = revenuJ * pctJ;
+    let cibleCAnnuel, cibleJAnnuel;
+    if (targetType === 'pct') {
+      const pctC = parseFloat(document.getElementById('retraite-pct-client-0')?.value   || '70') / 100;
+      const pctJ = parseFloat(document.getElementById('retraite-pct-conjoint-0')?.value || '70') / 100;
+      cibleCAnnuel = revenuC * pctC;
+      cibleJAnnuel = revenuJ * pctJ;
+    } else {
+      const rawC = parseFloat(String(document.getElementById('retraite-pct-client-0')?.value   || '0').replace(/\s/g,'').replace(',','.')) || 0;
+      const rawJ = parseFloat(String(document.getElementById('retraite-pct-conjoint-0')?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+      cibleCAnnuel = isMonthly ? rawC * 12 : rawC;
+      cibleJAnnuel = isMonthly ? rawJ * 12 : rawJ;
+    }
+    const cibleC = isMonthly ? cibleCAnnuel / 12 : cibleCAnnuel;
+    const cibleJ = isMonthly ? cibleJAnnuel / 12 : cibleJAnnuel;
+
+    // Unité label dans la période (ex: "% du revenu net actuel jusqu'au décès." ou "$ comme objectif de retraite.")
+    const unitTextPct = `% du revenu net actuel jusqu'au décès.`;
+    const unitTextMnt = `$ comme objectif de retraite jusqu'au décès.`;
+    ['client','conjoint'].forEach(role => {
+      const unitEl = document.getElementById(`retraite-unit-${role}-0`);
+      if (unitEl) unitEl.textContent = targetType === 'pct' ? unitTextPct : unitTextMnt;
+    });
+
+    // "Ce qui correspond à"
+    const montantEl  = document.getElementById('retraite-montant-client-0');
     const montantJEl = document.getElementById('retraite-montant-conjoint-0');
-    if (montantJEl) montantJEl.textContent = fmtMoney(cibleJ);
+    if (montantEl)  montantEl.textContent  = fmtMoney(cibleC) + freqSuffix;
+    if (montantJEl) montantJEl.textContent = fmtMoney(cibleJ) + freqSuffix;
 
     const totalDep = _retraiteDepenses.reduce((s, d) => s + (d.montant || 0), 0);
 
@@ -4757,48 +4797,40 @@
     const deficitC = manqueC * anneesC;
     const deficitJ = manqueJ * anneesJ;
 
-    // Sidebar
+    // Sidebar — client en haut, conjoint en bas
     const resumeEl = document.getElementById('retraite-resume-body');
     if (resumeEl) {
       const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
-      const p = _retraiteResumePerson;
-      const role    = (!hasSpouse) ? 'client' : p;
       const cPrenom = document.getElementById('client-prenom')?.value  || 'Client';
       const jPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint';
-      const nom     = role === 'client' ? cPrenom : jPrenom;
-      const ageR    = role === 'client' ? ageC : ageJ;
-      const besoins = role === 'client' ? besoinsC : besoinsJ;
-      const dispos  = role === 'client' ? disponiblesC : disponiblesJ;
-      const manque  = role === 'client' ? manqueC : manqueJ;
-      const deficit = role === 'client' ? deficitC : deficitJ;
-      const pctCov  = role === 'client' ? pctCovC : pctCovJ;
-      const barColor = pctCov >= 90 ? '#22c55e' : pctCov >= 60 ? '#f59e0b' : '#ef4444';
 
-      const row = (label, val, bold=false, color='') =>
-        `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)">
+      const row = (label, val, color = '') =>
+        `<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0">
           <span style="font-size:12px;color:var(--muted)">${label}</span>
-          <strong style="font-size:13px;${color?'color:'+color:''}">${val}</strong>
+          <strong style="font-size:12px;${color ? 'color:'+color : 'color:var(--navy)'}">${val}</strong>
         </div>`;
 
-      resumeEl.innerHTML = `<div style="padding:14px">
-        <div style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)">Couverture — ${nom}</span>
-            <span style="font-size:15px;font-weight:800;color:var(--navy)">${pctCov}%</span>
+      const personBlock = (nom, age, besoins, dispos, manque, deficit, pctCov, nameColor, separator) => {
+        const barColor = pctCov >= 90 ? '#22c55e' : pctCov >= 60 ? '#f59e0b' : '#ef4444';
+        return `<div style="padding:14px ${separator ? ';border-bottom:2px solid var(--border)' : ''}">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:13px;font-weight:700;color:${nameColor}">${nom}</span>
+            <span style="font-size:14px;font-weight:800;color:${barColor}">${pctCov}%</span>
           </div>
-          <div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden">
+          <div style="height:6px;background:#e9ecef;border-radius:4px;overflow:hidden;margin-bottom:10px">
             <div style="height:100%;background:${barColor};border-radius:4px;width:${pctCov}%;transition:width .4s ease"></div>
           </div>
-        </div>
-        <div style="font-size:13px">
-          ${row('Âge de la retraite', ageR + ' ans')}
-          ${row('Besoins annuels',     fmtMoney(besoins))}
-          ${row('Montants disponibles', fmtMoney(dispos), false, disponiblesC > 0 ? '#16a34a' : '')}
-          ${row('Manque à gagner',      fmtMoney(manque), true, manque > 0 ? '#ef4444' : '#16a34a')}
-          ${row('Déficit total estimé', fmtMoney(deficit), true, deficit > 0 ? '#ef4444' : '#16a34a')}
-        </div>
-        ${hasSpouse ? `<p style="font-size:11px;color:var(--muted);margin:8px 0 0;text-align:center">Utilisez les boutons ci-dessus pour voir l'autre personne</p>` : ''}
-      </div>`;
+          ${row('Âge de la retraite', age + ' ans')}
+          ${row('Besoins annuels', fmtMoney(besoins))}
+          ${row('Montants disponibles', fmtMoney(dispos), dispos > 0 ? '#16a34a' : '')}
+          ${row('Manque à gagner', fmtMoney(manque), manque > 0 ? '#ef4444' : '#16a34a')}
+          ${row('Déficit total estimé', fmtMoney(deficit), deficit > 0 ? '#ef4444' : '#16a34a')}
+        </div>`;
+      };
+
+      resumeEl.innerHTML =
+        personBlock(cPrenom, ageC, besoinsC, disponiblesC, manqueC, deficitC, pctCovC, 'var(--navy)', hasSpouse) +
+        (hasSpouse ? personBlock(jPrenom, ageJ, besoinsJ, disponiblesJ, manqueJ, deficitJ, pctCovJ, 'var(--gold)', false) : '');
     }
 
     // ── Recommandations Retraite ──
@@ -4841,18 +4873,34 @@
     const el = document.getElementById(`retraite-regpub-table-${role}`);
     if (!el) return;
     const list = _retraiteRegimesPublics[role] || [];
-    if (!list.length) { el.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucun régime.</p>'; return; }
-    const hdr = `<div style="display:grid;grid-template-columns:1fr 110px 90px 60px 60px 36px;gap:6px;padding:7px 16px;background:#f8f9fd;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border)"><span>Régime</span><span>Montant</span><span>Fréquence</span><span>Indexé</span><span>Début</span><span></span></div>`;
-    const rows = list.map((r, i) => `
-      <div style="display:grid;grid-template-columns:1fr 110px 90px 60px 60px 36px;gap:6px;padding:10px 16px;align-items:center;border-bottom:1px solid var(--border);font-size:13px">
-        <span style="font-weight:600;color:var(--navy)">${r.label}</span>
-        <span>${r.montant > 0 ? fmtMoney(r.montant) : '<span style="color:var(--muted)">—</span>'}</span>
-        <span style="font-size:12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuel' : 'Annuel'}</span>
-        <span style="font-size:12px">${r.indexe ? '✓' : '—'}</span>
-        <span style="font-size:12px;color:var(--muted)">${r.debut || '65'} ans</span>
-        <button onclick="openRetraiteRegPubModal('${role}',${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px">${iconEdit}</button>
-      </div>`).join('');
-    el.innerHTML = hdr + rows;
+    const inflation = (window.ABF_PARAMS?.hypotheses?.inflation ?? 2.10).toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const FULL_LABELS = { rrq: 'Régime de rentes du Québec (RRQ)', sv: 'Sécurité de la vieillesse (SV)' };
+    el.innerHTML = `
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="background:#f8f9fd;border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Type</th>
+            <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Revenu</th>
+            <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Fréquence</th>
+            <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Indexation</th>
+            <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Début</th>
+            <th style="padding:8px 12px 8px 4px;width:36px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.map((r, i) => `
+          <tr style="border-bottom:1px solid var(--border)">
+            <td style="padding:11px 16px;color:var(--text)">${FULL_LABELS[r.id] || r.label || r.id}</td>
+            <td style="padding:11px 12px;text-align:right;font-weight:600;color:var(--navy)">${r.montant > 0 ? fmtMoney(r.montant) + ' $' : '<span style="color:var(--muted);font-weight:400">0 $</span>'}</td>
+            <td style="padding:11px 12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuelle' : 'Annuelle'}</td>
+            <td style="padding:11px 12px;text-align:right;color:var(--muted)">${r.indexe ? inflation + '\u00a0%' : '—'}</td>
+            <td style="padding:11px 12px;color:var(--muted)">${r.debut || '65'} ans</td>
+            <td style="padding:11px 4px 11px 4px">
+              <button onclick="openRetraiteRegPubModal('${role}',${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;align-items:center">${iconEdit}</button>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
   }
 
   function switchRetraiteRegPubTab(role, btn) {

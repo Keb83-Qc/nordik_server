@@ -47,15 +47,41 @@
 
       <!-- ── 2. Objectif de retraite ───────────────────────────────── -->
       <div class="card" style="margin-bottom:16px">
-        <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <span>Objectif de retraite</span>
-          <div id="retraite-goal-type-wrap" style="display:none;gap:4px">
-            <label class="fu-radio-pill" style="padding:4px 10px;font-size:11px"><input type="radio" name="retraite-goal-type" value="familial"   onchange="retraiteCalc()"/> Familial</label>
-            <label class="fu-radio-pill" style="padding:4px 10px;font-size:11px"><input type="radio" name="retraite-goal-type" value="individuel" checked onchange="retraiteCalc()"/> Individuel</label>
-            <label class="fu-radio-pill" style="padding:4px 10px;font-size:11px"><input type="radio" name="retraite-goal-type" value="aucun"      onchange="retraiteCalc()"/> Aucun</label>
-          </div>
+        <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">
+          Objectif
         </div>
         <div class="card-body">
+
+          <!-- Ligne de contrôles globaux -->
+          <div style="display:flex;gap:28px;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap;align-items:flex-start">
+            <!-- Type objectif (couple uniquement) -->
+            <div id="retraite-goal-type-wrap" style="display:none">
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Type</div>
+              <div style="display:flex;gap:4px">
+                <label class="fu-radio-pill" style="padding:5px 12px;font-size:12px"><input type="radio" name="retraite-goal-type" value="familial"   onchange="retraiteCalc()"/> Familial</label>
+                <label class="fu-radio-pill" style="padding:5px 12px;font-size:12px"><input type="radio" name="retraite-goal-type" value="individuel" checked onchange="retraiteCalc()"/> Individuel</label>
+                <label class="fu-radio-pill" style="padding:5px 12px;font-size:12px"><input type="radio" name="retraite-goal-type" value="aucun"      onchange="retraiteCalc()"/> Aucun</label>
+              </div>
+            </div>
+            <!-- Cible % ou $ -->
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Cible</div>
+              <div style="display:flex;gap:4px">
+                <label class="fu-radio-pill" style="padding:5px 14px;font-size:12px"><input type="radio" name="retraite-target-type" value="pct"     checked onchange="retraiteCalcUpdateUnits()"/> %</label>
+                <label class="fu-radio-pill" style="padding:5px 14px;font-size:12px"><input type="radio" name="retraite-target-type" value="montant"         onchange="retraiteCalcUpdateUnits()"/> $</label>
+              </div>
+            </div>
+            <!-- Fréquence -->
+            <div>
+              <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Fréquence</div>
+              <div style="display:flex;gap:4px">
+                <label class="fu-radio-pill" style="padding:5px 12px;font-size:12px"><input type="radio" name="retraite-goal-frequency" value="annuel"  checked onchange="retraiteCalc()"/> Annuel</label>
+                <label class="fu-radio-pill" style="padding:5px 12px;font-size:12px"><input type="radio" name="retraite-goal-frequency" value="mensuel"        onchange="retraiteCalc()"/> Mensuel</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Onglets personne (couple uniquement) -->
           <div id="retraite-objectif-tabs" style="display:none;border-bottom:1px solid var(--border);margin:0 -20px 16px;padding:0 20px">
             <button class="deces-person-tab active" id="retraite-obj-tab-client"   onclick="switchRetraiteObjTab('client',this)">CLIENT</button>
             <button class="deces-person-tab"        id="retraite-obj-tab-conjoint" onclick="switchRetraiteObjTab('conjoint',this)">CONJOINT</button>
@@ -63,21 +89,19 @@
 
           <!-- Panel client -->
           <div id="retraite-obj-panel-client">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
-              Revenu annuel net actuel : <strong id="retraite-revenu-net-client">—</strong>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+              Revenu <span class="retraite-freq-label">annuel</span> net actuel : <strong id="retraite-revenu-net-client">—</strong>
             </div>
             <div id="retraite-periodes-client">
-              <div class="retraite-periode" data-idx="0" style="padding:12px;background:#f8f9fd;border-radius:8px;margin-bottom:10px">
+              <div class="retraite-periode" data-idx="0" style="padding:12px 14px;background:#f8f9fd;border-radius:8px;margin-bottom:10px">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
-                  <span id="retraite-nom-inline-client">Le client</span>
-                  <span>vise</span>
+                  <span id="retraite-nom-inline-client" style="font-weight:600">Le client</span>
+                  <span style="color:var(--muted)">vise</span>
                   <input class="form-input" id="retraite-pct-client-0" type="text" value="70" style="width:65px;text-align:center" oninput="retraiteCalc()"/>
-                  <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-client-0" value="pct" checked onchange="retraiteCalc()"/> %</label>
-                  <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-client-0" value="montant" onchange="retraiteCalc()"/> $</label>
-                  <span>du revenu net actuel</span>
+                  <span id="retraite-unit-client-0" style="font-size:12px;color:var(--muted)">% du revenu net actuel jusqu'au décès.</span>
                 </div>
-                <div style="font-size:12px;color:var(--muted);margin-top:6px">
-                  Ce qui correspond à <strong id="retraite-montant-client-0">—</strong>/an — jusqu'au décès
+                <div style="font-size:12px;color:var(--muted);margin-top:5px;padding-left:2px">
+                  Ce qui correspond à <strong id="retraite-montant-client-0" style="color:var(--navy)">—</strong>.
                 </div>
               </div>
             </div>
@@ -87,7 +111,7 @@
             </button>
             <div class="form-group" style="margin-bottom:0">
               <label class="form-label" style="display:flex;align-items:center;gap:6px">
-                Épargner automatiquement les surplus?
+                Désirez-vous épargner automatiquement les revenus qui excèdent les dépenses?
                 <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">Si les revenus dépassent les dépenses planifiées, l'excédent est automatiquement ajouté à l'épargne projetée.</span></span>
               </label>
               <div style="display:flex;gap:8px;margin-top:6px">
@@ -99,21 +123,19 @@
 
           <!-- Panel conjoint -->
           <div id="retraite-obj-panel-conjoint" style="display:none">
-            <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
-              Revenu annuel net actuel : <strong id="retraite-revenu-net-conjoint">—</strong>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
+              Revenu <span class="retraite-freq-label">annuel</span> net actuel : <strong id="retraite-revenu-net-conjoint">—</strong>
             </div>
             <div id="retraite-periodes-conjoint">
-              <div class="retraite-periode" data-idx="0" style="padding:12px;background:#f8f9fd;border-radius:8px;margin-bottom:10px">
+              <div class="retraite-periode" data-idx="0" style="padding:12px 14px;background:#f8f9fd;border-radius:8px;margin-bottom:10px">
                 <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px">
-                  <span id="retraite-nom-inline-conjoint">Le conjoint</span>
-                  <span>vise</span>
+                  <span id="retraite-nom-inline-conjoint" style="font-weight:600">Le conjoint</span>
+                  <span style="color:var(--muted)">vise</span>
                   <input class="form-input" id="retraite-pct-conjoint-0" type="text" value="70" style="width:65px;text-align:center" oninput="retraiteCalc()"/>
-                  <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-conjoint-0" value="pct" checked onchange="retraiteCalc()"/> %</label>
-                  <label class="fu-radio-pill" style="padding:4px 8px;font-size:11px"><input type="radio" name="retraite-target-type-conjoint-0" value="montant" onchange="retraiteCalc()"/> $</label>
-                  <span>du revenu net actuel</span>
+                  <span id="retraite-unit-conjoint-0" style="font-size:12px;color:var(--muted)">% du revenu net actuel jusqu'au décès.</span>
                 </div>
-                <div style="font-size:12px;color:var(--muted);margin-top:6px">
-                  Ce qui correspond à <strong id="retraite-montant-conjoint-0">—</strong>/an — jusqu'au décès
+                <div style="font-size:12px;color:var(--muted);margin-top:5px;padding-left:2px">
+                  Ce qui correspond à <strong id="retraite-montant-conjoint-0" style="color:var(--navy)">—</strong>.
                 </div>
               </div>
             </div>
@@ -122,7 +144,7 @@
               Ajouter une période
             </button>
             <div class="form-group" style="margin-bottom:0">
-              <label class="form-label">Épargner automatiquement les surplus?</label>
+              <label class="form-label">Désirez-vous épargner automatiquement les revenus qui excèdent les dépenses?</label>
               <div style="display:flex;gap:8px;margin-top:6px">
                 <label class="fu-radio-pill"><input type="radio" name="retraite-save-surplus-j" value="oui" onchange="retraiteCalc()"/> Oui</label>
                 <label class="fu-radio-pill"><input type="radio" name="retraite-save-surplus-j" value="non" checked onchange="retraiteCalc()"/> Non</label>
@@ -294,12 +316,8 @@
     <!-- ══ Sidebar sticky ═════════════════════════════════════════════ -->
     <div style="width:300px;flex-shrink:0;position:sticky;top:80px">
       <div class="card">
-        <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <span>Résumé — Retraite</span>
-          <div id="retraite-resume-toggle" style="display:none;gap:4px">
-            <button id="retraite-resume-btn-c" onclick="retraiteResumeSwitchPerson('client')"   style="font-size:11px;padding:3px 8px;border-radius:4px;cursor:pointer;border:none;background:var(--navy);color:white">Client</button>
-            <button id="retraite-resume-btn-j" onclick="retraiteResumeSwitchPerson('conjoint')" style="font-size:11px;padding:3px 8px;border-radius:4px;cursor:pointer;border:1px solid var(--border);background:none;color:var(--muted)">Conjoint</button>
-          </div>
+        <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">
+          Résumé — Retraite
         </div>
         <div id="retraite-resume-body" style="padding:0">
           <div style="padding:16px 14px;font-size:13px;color:var(--muted)">Complétez les informations pour voir le résumé.</div>
