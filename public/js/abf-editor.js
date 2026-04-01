@@ -2772,7 +2772,7 @@
     const isCouple = document.getElementById('conjoint')?.checked;
     const clientPrenom = document.getElementById('client-prenom')?.value || 'Client';
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
-    const isNet = document.getElementById('inval-bn-net')?.classList.contains('active');
+    const isNet = document.querySelector('input[name="inval-rr-brutnnet"]:checked')?.value === 'net';
 
     // Autres revenus rows
     const autresRows = document.getElementById('inval-autres-revenus-rows');
@@ -2809,9 +2809,18 @@
   }
 
   function setInvalBrutNet(val) {
-    document.getElementById('inval-bn-brut').classList.toggle('active', val === 'brut');
-    document.getElementById('inval-bn-net').classList.toggle('active', val === 'net');
+    const radio = document.querySelector(`input[name="inval-rr-brutnnet"][value="${val}"]`);
+    if (radio) radio.checked = true;
     invaliditeInit();
+  }
+
+  function invalTypeChange() {
+    const type = document.getElementById('inval-av-type')?.value || '';
+    const isColl = type === 'collective';
+    const indiv = document.getElementById('inval-av-individuelle-fields');
+    const coll  = document.getElementById('inval-av-collective-fields');
+    if (indiv) indiv.style.display = isColl ? 'none' : '';
+    if (coll)  coll.style.display  = isColl ? '' : 'none';
   }
 
   function invaliditeApproche() {
@@ -2834,7 +2843,7 @@
     const clientPrenom = document.getElementById('client-prenom')?.value || 'Client';
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
     const approche = document.querySelector('input[name="inval-approche"]:checked')?.value || 'remplacement';
-    const isNet = document.getElementById('inval-bn-net')?.classList.contains('active');
+    const isNet = document.querySelector('input[name="inval-rr-brutnnet"]:checked')?.value === 'net';
 
     let besoinClient = 0, besoinConjoint = 0;
 
@@ -2946,6 +2955,14 @@
     document.getElementById('inval-av-couverture-unit').value = '';
     document.getElementById('inval-av-couverture-val').value = '';
     invalCouvertureUnitChange();
+    // Collective-specific fields
+    const pctApproche = document.querySelector('input[name="inval-av-approche"][value="pct"]');
+    if (pctApproche) pctApproche.checked = true;
+    document.getElementById('inval-av-prestation-niveau').value = '';
+    document.getElementById('inval-av-revenu-assurable').value = '';
+    document.getElementById('inval-av-prestation-pct').value = '';
+    document.getElementById('inval-av-prestation-max').value = '';
+    invalTypeChange();
     document.getElementById('inval-av-exclure').checked = false;
     document.getElementById('inval-av-notes').value = '';
     document.getElementById('modal-inval-av').style.display = 'flex';
@@ -2976,7 +2993,21 @@
     const prop = document.getElementById('inval-av-proprietaire');
     const owner = prop.value || 'client';
     const ownerTx = prop.options[prop.selectedIndex]?.text || owner;
-    _invalAvList.push({ type, typeTx, montant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx });
+    // Collective-specific fields
+    const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
+    const prestationNiveauEl = document.getElementById('inval-av-prestation-niveau');
+    const prestationNiveau = prestationNiveauEl.value;
+    const prestationNiveauTx = prestationNiveauEl.options[prestationNiveauEl.selectedIndex]?.text || '';
+    const revenuAssurable = parseFloat((document.getElementById('inval-av-revenu-assurable').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const prestationPct = parseFloat((document.getElementById('inval-av-prestation-pct').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const prestationMax = parseFloat((document.getElementById('inval-av-prestation-max').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    // Prestation mensuelle effective pour les calculs
+    let effectifMontant = montant;
+    if (type === 'collective' && approche === 'pct' && revenuAssurable > 0) {
+      effectifMontant = revenuAssurable / 12 * prestationPct / 100;
+      if (prestationMax > 0) effectifMontant = Math.min(effectifMontant, prestationMax);
+    }
+    _invalAvList.push({ type, typeTx, montant: effectifMontant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx, approche, prestationNiveau, prestationNiveauTx, revenuAssurable, prestationPct, prestationMax });
     invalRenderAvList();
     closeInvalAvModal();
     invaliditeCalc();

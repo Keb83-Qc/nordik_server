@@ -2,9 +2,9 @@
   $_inv        = $abfParams['invalidite'] ?? [];
   // DB stocke 'incomeReplacement'/'expensesCoverage' → on mappe vers les valeurs du formulaire
   $_invType    = ['incomeReplacement' => 'remplacement', 'expensesCoverage' => 'depenses'][$_inv['type'] ?? 'incomeReplacement'] ?? 'remplacement';
-  $_invBrutNet = $_inv['salaire_type'] ?? 'gross';
+  // DB stocke 'gross'/'net' → on mappe vers 'brut'/'net'
+  $_invBrutNet = ['gross' => 'brut', 'net' => 'net'][$_inv['salaire_type'] ?? 'gross'] ?? 'brut';
   $_invCk      = fn($v, $f) => $f === $v ? 'checked' : '';
-  $_invBtnActive = fn($v) => ($_invBrutNet === $v) ? 'active' : '';
 @endphp
     <div id="page-invalidite" class="page">
       <div class="page-title">Invalidité</div>
@@ -56,8 +56,8 @@
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
               <span>Remplacement du revenu en cas d'invalidité</span>
               <div style="display:flex;gap:2px">
-                <button id="inval-bn-brut" class="toggle-btn {{ $_invBtnActive('gross') }}" onclick="setInvalBrutNet('brut')">Brut</button>
-                <button id="inval-bn-net" class="toggle-btn {{ $_invBtnActive('net') }}" onclick="setInvalBrutNet('net')">Net</button>
+                <label class="fu-radio-pill"><input type="radio" name="inval-rr-brutnnet" value="brut" {{ $_invCk('brut', $_invBrutNet) }} onchange="invaliditeInit()"/> Brut</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-rr-brutnnet" value="net" {{ $_invCk('net', $_invBrutNet) }} onchange="invaliditeInit()"/> Net</label>
               </div>
             </div>
             <div class="card-body" id="inval-rr-body"></div>
@@ -157,7 +157,7 @@
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Type</label>
-              <select class="form-select" id="inval-av-type">
+              <select class="form-select" id="inval-av-type" onchange="invalTypeChange()">
                 <option value="">Sélectionnez…</option>
                 <option value="individuelle">Individuelle</option>
                 <option value="collective">Collective</option>
@@ -168,19 +168,52 @@
               <select class="form-select" id="inval-av-proprietaire"><option value="">Sélectionnez…</option></select>
             </div>
           </div>
-          <!-- Prestation mensuelle + Prime annuelle -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <!-- Individuelle : Prestation mensuelle -->
+          <div id="inval-av-individuelle-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Prestation mensuelle</label>
               <div class="input-sfx"><input class="form-input" id="inval-av-montant" type="text" placeholder="0"/><span class="sfx">$</span></div>
             </div>
+            <div></div>
+          </div>
+          <!-- Collective : Approche + Prestation dropdown + Revenu assurable + formule -->
+          <div id="inval-av-collective-fields" style="display:none">
+            <div class="form-group">
+              <label class="form-label">Approche de calcul</label>
+              <div style="display:flex;gap:8px;margin-top:4px">
+                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="pct" checked/> %</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="montant"/> $</label>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="form-group">
+                <label class="form-label">Prestation mensuelle</label>
+                <select class="form-select" id="inval-av-prestation-niveau">
+                  <option value="">Sélectionnez…</option>
+                  <option value="first">Un niveau</option>
+                  <option value="second">Deux niveaux</option>
+                  <option value="third">Trois niveaux</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Revenu annuel assurable</label>
+                <div class="input-sfx"><input class="form-input" id="inval-av-revenu-assurable" type="text" placeholder="0"/><span class="sfx">$</span></div>
+              </div>
+            </div>
+            <div class="form-group">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;background:#f8f9fd;border-radius:8px;padding:10px 14px">
+                <div class="input-sfx" style="max-width:80px"><input class="form-input" id="inval-av-prestation-pct" type="text" placeholder="0"/><span class="sfx">%</span></div>
+                <span style="color:var(--text)">du revenu mensuel assurable. Maximum</span>
+                <div class="input-sfx" style="max-width:110px"><input class="form-input" id="inval-av-prestation-max" type="text" placeholder="0"/><span class="sfx">$</span></div>
+              </div>
+            </div>
+          </div>
+          <!-- Prime annuelle + Assureur (toujours affichés) -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Prime annuelle</label>
               <div class="input-sfx"><input class="form-input" id="inval-av-prime" type="text" placeholder="0"/><span class="sfx">$</span></div>
             </div>
-          </div>
-          <!-- Assureur + Date d'émission -->
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Assureur</label>
               <select class="form-select" id="inval-av-assureur">
@@ -215,10 +248,14 @@
                 <option value="other">Autre</option>
               </select>
             </div>
+          </div>
+          <!-- Date d'émission -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
             <div class="form-group">
               <label class="form-label">Date d'émission</label>
               <input class="form-input" id="inval-av-date" type="text" placeholder="AAAA-MM-JJ"/>
             </div>
+            <div></div>
           </div>
           <!-- Imposable -->
           <div class="form-group">
