@@ -10,7 +10,7 @@
           <div class="row">
             <div class="col form-group">
               <label class="form-label required">Prénom</label>
-              <input class="form-input" id="client-prenom" type="text" value="" placeholder="Prénom"/>
+              <input class="form-input" id="client-prenom" type="text" value="" placeholder="Prénom" oninput="updateConjointLienLabel()"/>
             </div>
             <div class="col form-group">
               <label class="form-label required">Nom</label>
@@ -226,6 +226,22 @@
                 <label class="form-label required">Nom</label>
                 <input class="form-input" id="conjoint-nom" type="text" placeholder="Nom de famille"/>
               </div>
+            </div>
+            <!-- Relation avec le client principal -->
+            <div class="row">
+              <div class="col form-group">
+                <label class="form-label" id="conjoint-lien-label">Relation avec le client</label>
+                <select class="form-select" id="conjoint-lien">
+                  <option value="">Sélectionnez…</option>
+                  <option value="marie">Marié(e)</option>
+                  <option value="conjointdefait">Conjoint(e) de fait</option>
+                  <option value="unioncivile">Union civile</option>
+                  <option value="exconjoint">Ex-conjoint(e)</option>
+                  <option value="separe">Séparé(e)</option>
+                  <option value="partenaire">Partenaire</option>
+                </select>
+              </div>
+              <div class="col"></div>
             </div>
             <!-- Date de naissance / Sexe -->
             <div class="row">

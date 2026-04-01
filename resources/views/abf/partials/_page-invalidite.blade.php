@@ -147,23 +147,125 @@
 
     <!-- Modal: Assurance invalidité -->
     <div id="modal-inval-av" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(14,16,48,.45);align-items:center;justify-content:center">
-      <div style="background:white;border-radius:12px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;margin:20px">
-        <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+      <div style="background:white;border-radius:12px;width:100%;max-width:640px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;margin:20px;max-height:90vh;overflow-y:auto">
+        <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1">
           <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Assurance invalidité</h4>
           <button onclick="closeInvalAvModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
         </div>
         <div style="padding:20px 24px">
-          <div class="form-group">
-            <label class="form-label">Description</label>
-            <input class="form-input" id="inval-av-desc" type="text" placeholder="ex. Police individuelle"/>
+          <!-- Type + Assuré -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="form-group">
+              <label class="form-label">Type</label>
+              <select class="form-select" id="inval-av-type">
+                <option value="">Sélectionnez…</option>
+                <option value="individuelle">Individuelle</option>
+                <option value="collective">Collective</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Assuré</label>
+              <select class="form-select" id="inval-av-proprietaire"><option value="">Sélectionnez…</option></select>
+            </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Montant mensuel</label>
-            <div class="input-sfx"><input class="form-input" id="inval-av-montant" type="text" placeholder="0"/><span class="sfx">$/mois</span></div>
+          <!-- Prestation mensuelle + Prime annuelle -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="form-group">
+              <label class="form-label">Prestation mensuelle</label>
+              <div class="input-sfx"><input class="form-input" id="inval-av-montant" type="text" placeholder="0"/><span class="sfx">$</span></div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Prime annuelle</label>
+              <div class="input-sfx"><input class="form-input" id="inval-av-prime" type="text" placeholder="0"/><span class="sfx">$</span></div>
+            </div>
           </div>
+          <!-- Assureur + Date d'émission -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="form-group">
+              <label class="form-label">Assureur</label>
+              <select class="form-select" id="inval-av-assureur">
+                <option value="">Sélectionnez…</option>
+                <option value="assomptionlife">Assomption vie</option>
+                <option value="laurantianbank">Banque Laurentienne</option>
+                <option value="nationalbank">Banque Nationale</option>
+                <option value="beneva">Beneva</option>
+                <option value="bmoinsurance">BMO Assurance</option>
+                <option value="canadalife">Canada Vie (Great West, London Life)</option>
+                <option value="chevaliersdecolomb">Chevaliers de Colomb</option>
+                <option value="cibc">CIBC</option>
+                <option value="desjardins">Desjardins Assurances</option>
+                <option value="empirelife">Empire Vie</option>
+                <option value="sunlife">Financière Sun Life</option>
+                <option value="foresters">Foresters</option>
+                <option value="humania">Humania</option>
+                <option value="iagroupefinancier">iA Groupe financier</option>
+                <option value="excellence">iA Groupe financier (anciennement L'Excellence)</option>
+                <option value="ivari">Ivari</option>
+                <option value="lacapitale">La Capitale</option>
+                <option value="bluecross">La Croix Bleue</option>
+                <option value="manulife">Manuvie (Standard Life, First National)</option>
+                <option value="medicconstruction">Médic Construction</option>
+                <option value="primerica">Primerica</option>
+                <option value="rbcinsurance">RBC Assurances</option>
+                <option value="ssqinsurance">SSQ Assurance</option>
+                <option value="tangerine">Tangerine</option>
+                <option value="td">TD</option>
+                <option value="transamerica">Transamerica</option>
+                <option value="unionvie">Union Vie</option>
+                <option value="other">Autre</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date d'émission</label>
+              <input class="form-input" id="inval-av-date" type="text" placeholder="AAAA-MM-JJ"/>
+            </div>
+          </div>
+          <!-- Imposable -->
+          <div class="form-group">
+            <label class="form-label">Cette prestation est-elle imposable?</label>
+            <div style="display:flex;gap:8px;margin-top:4px">
+              <label class="fu-radio-pill"><input type="radio" name="inval-av-imposable" value="oui"/> Oui</label>
+              <label class="fu-radio-pill"><input type="radio" name="inval-av-imposable" value="non" checked/> Non</label>
+            </div>
+          </div>
+          <!-- Délai de carence + Durée de couverture -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="form-group">
+              <label class="form-label">Délai de carence</label>
+              <div style="display:flex;gap:8px">
+                <input class="form-input" id="inval-av-carence-val" type="text" placeholder="0" style="max-width:80px"/>
+                <select class="form-select" id="inval-av-carence-unit">
+                  <option value="">Sélectionnez…</option>
+                  <option value="day">Jours</option>
+                  <option value="week">Semaines</option>
+                  <option value="month">Mois</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Durée de couverture</label>
+              <div style="display:flex;gap:8px">
+                <select class="form-select" id="inval-av-couverture-unit">
+                  <option value="">Sélectionnez…</option>
+                  <option value="week">Nombre de semaines</option>
+                  <option value="year">Nombre d'années</option>
+                  <option value="maxage">Âge maximum</option>
+                </select>
+                <input class="form-input" id="inval-av-couverture-val" type="text" placeholder="0" style="max-width:70px"/>
+              </div>
+            </div>
+          </div>
+          <!-- Exclure de l'analyse -->
+          <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+              <input type="checkbox" id="inval-av-exclure"/>
+              <span>Exclure de l'analyse invalidité</span>
+            </label>
+          </div>
+          <!-- Notes -->
           <div class="form-group" style="margin-bottom:0">
-            <label class="form-label">Propriétaire</label>
-            <select class="form-select" id="inval-av-proprietaire"><option value="">Sélectionnez…</option></select>
+            <label class="form-label">Notes</label>
+            <textarea class="form-input" id="inval-av-notes" rows="3" style="resize:vertical"></textarea>
           </div>
         </div>
         <div style="padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:#f8f9fd">

@@ -2556,9 +2556,33 @@
     decesCalc();
   }
 
+  function fillDecesAvOwner() {
+    const sel = document.getElementById('deces-av-owner');
+    if (!sel) return;
+    const cn = getClientPrenom(), cj = getConjointPrenom();
+    sel.innerHTML = '<option value="">Sélectionnez…</option>';
+    sel.innerHTML += `<option value="client">${cn}</option>`;
+    if (cj) {
+      sel.innerHTML += `<option value="conjoint">${cj}</option>`;
+      sel.innerHTML += `<option value="both">${cn} et ${cj}</option>`;
+      document.querySelectorAll('#enfants-list .enfant-item').forEach(el => {
+        const prenom = el.dataset.enfPrenom || '';
+        const nom = el.dataset.enfNom || '';
+        const name = [prenom, nom].filter(Boolean).join(' ');
+        if (name) sel.innerHTML += `<option value="enfant-${prenom.toLowerCase()}">${name}</option>`;
+      });
+    }
+  }
+
+  function updateConjointLienLabel() {
+    const label = document.getElementById('conjoint-lien-label');
+    if (label) label.textContent = 'Relation avec ' + getClientPrenom();
+  }
+
   function openDecesAvModal() {
+    fillDecesAvOwner();
     // Reset
-    ['deces-av-type','deces-av-owner','deces-av-assureur'].forEach(id => {
+    ['deces-av-type','deces-av-assureur'].forEach(id => {
       const el = document.getElementById(id); if(el) el.value = '';
     });
     ['deces-av-montant','deces-av-prime','deces-av-date','deces-av-notes'].forEach(id => {
@@ -2837,6 +2861,7 @@
     // Couverture existante par propriétaire
     let couvertureClient = 0, couvertureConjoint = 0;
     _invalAvList.forEach(av => {
+      if (av.exclure) return;
       if (av.owner === 'client' || av.owner === 'both') couvertureClient += av.montant;
       if (av.owner === 'conjoint' || av.owner === 'both') couvertureConjoint += av.montant;
     });
@@ -2880,34 +2905,66 @@
       list.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance invalidité enregistrée.</p>';
       return;
     }
-    list.innerHTML = _invalAvList.map((av, i) => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px">
+    list.innerHTML = _invalAvList.map((av, i) => {
+      const titre = [av.typeTx, av.assureurTx].filter(Boolean).join(' – ') || av.desc || 'Assurance invalidité';
+      return `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px${av.exclure ? ';opacity:.5' : ''}">
         <div>
-          <div style="font-weight:600">${av.desc}</div>
-          <div style="color:var(--muted);font-size:12px">${av.ownerTx}</div>
+          <div style="font-weight:600">${titre}</div>
+          <div style="color:var(--muted);font-size:12px">${av.ownerTx}${av.exclure ? ' · <em>exclu</em>' : ''}</div>
         </div>
         <div style="display:flex;align-items:center;gap:12px">
           <span style="font-weight:700;color:var(--navy)">${fmtMoney(av.montant)}/mois</span>
           <button onclick="_invalAvList.splice(${i},1);invalRenderAvList();invaliditeCalc()" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:18px;padding:0;line-height:1">×</button>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   }
 
   function openInvalAvModal() {
     apFillBienProprietaire('inval-av-proprietaire');
-    document.getElementById('inval-av-desc').value = '';
+    document.getElementById('inval-av-type').value = '';
     document.getElementById('inval-av-montant').value = '';
+    document.getElementById('inval-av-prime').value = '';
+    document.getElementById('inval-av-assureur').value = '';
+    document.getElementById('inval-av-date').value = '';
+    const noRadio = document.querySelector('input[name="inval-av-imposable"][value="non"]');
+    if (noRadio) noRadio.checked = true;
+    document.getElementById('inval-av-carence-val').value = '';
+    document.getElementById('inval-av-carence-unit').value = '';
+    document.getElementById('inval-av-couverture-unit').value = '';
+    document.getElementById('inval-av-couverture-val').value = '';
+    document.getElementById('inval-av-exclure').checked = false;
+    document.getElementById('inval-av-notes').value = '';
     document.getElementById('modal-inval-av').style.display = 'flex';
-    setTimeout(() => document.getElementById('inval-av-desc').focus(), 50);
+    setTimeout(() => document.getElementById('inval-av-type').focus(), 50);
   }
   function closeInvalAvModal() { document.getElementById('modal-inval-av').style.display = 'none'; }
   function saveInvalAv() {
-    const desc = document.getElementById('inval-av-desc').value.trim() || 'Assurance invalidité';
+    const typeEl = document.getElementById('inval-av-type');
+    const type = typeEl.value;
+    const typeTx = typeEl.options[typeEl.selectedIndex]?.text || '';
     const montant = parseFloat(document.getElementById('inval-av-montant').value.replace(/\s/g,'').replace(',','.')) || 0;
+    const prime = parseFloat(document.getElementById('inval-av-prime').value.replace(/\s/g,'').replace(',','.')) || 0;
+    const assureurEl = document.getElementById('inval-av-assureur');
+    const assureur = assureurEl.value;
+    const assureurTx = assureurEl.options[assureurEl.selectedIndex]?.text || '';
+    const date = document.getElementById('inval-av-date').value.trim();
+    const imposable = document.querySelector('input[name="inval-av-imposable"]:checked')?.value || 'non';
+    const carenceVal = document.getElementById('inval-av-carence-val').value.trim();
+    const carenceUnitEl = document.getElementById('inval-av-carence-unit');
+    const carenceUnit = carenceUnitEl.value;
+    const carenceUnitTx = carenceUnitEl.options[carenceUnitEl.selectedIndex]?.text || '';
+    const couvertureUnitEl = document.getElementById('inval-av-couverture-unit');
+    const couvertureUnit = couvertureUnitEl.value;
+    const couvertureUnitTx = couvertureUnitEl.options[couvertureUnitEl.selectedIndex]?.text || '';
+    const couvertureVal = document.getElementById('inval-av-couverture-val').value.trim();
+    const exclure = document.getElementById('inval-av-exclure').checked;
+    const notes = document.getElementById('inval-av-notes').value.trim();
     const prop = document.getElementById('inval-av-proprietaire');
     const owner = prop.value || 'client';
     const ownerTx = prop.options[prop.selectedIndex]?.text || owner;
-    _invalAvList.push({ desc, montant, owner, ownerTx });
+    _invalAvList.push({ type, typeTx, montant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx });
     invalRenderAvList();
     closeInvalAvModal();
     invaliditeCalc();
@@ -3005,7 +3062,7 @@
       },
       has_spouse: document.querySelector('input[name="plan"][value="conjoint"]')?.checked || false,
       conjoint: {
-        prenom: v('conjoint-prenom'), nom: v('conjoint-nom'), sexe: radio('co-sexe'),
+        prenom: v('conjoint-prenom'), nom: v('conjoint-nom'), lien: v('conjoint-lien'), sexe: radio('co-sexe'),
         ddn_jour: v('conjoint-ddn-jour'), ddn_mois: v('conjoint-ddn-mois'),
         ddn_annee: v('conjoint-naissance-annee'), etat_civil: v('conjoint-etat-civil'),
         province: v('conjoint-province'), canada_depuis: v('conjoint-canada-depuis'),
@@ -3129,7 +3186,8 @@
 
     // Conjoint
     const j = p.conjoint || {};
-    sv('conjoint-prenom', j.prenom); sv('conjoint-nom', j.nom);
+    sv('conjoint-prenom', j.prenom); sv('conjoint-nom', j.nom); sv('conjoint-lien', j.lien);
+    updateConjointLienLabel();
     sv('conjoint-ddn-jour', j.ddn_jour); sv('conjoint-ddn-mois', j.ddn_mois);
     sv('conjoint-naissance-annee', j.ddn_annee); sv('conjoint-etat-civil', j.etat_civil);
     sv('conjoint-province', j.province); sv('conjoint-canada-depuis', j.canada_depuis);
