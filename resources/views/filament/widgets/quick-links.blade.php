@@ -23,28 +23,28 @@
             $links = [
                 [
                     'label' => 'Équipe',
-                    'href' => '/admin/users',
+                    'href' => '/espace-conseiller/users',
                     'icon' => 'users',
                     'color' => 'text-blue-400',
                     'roles' => ['admin', 'super_admin'],
                 ],
                 [
                     'label' => 'Blog',
-                    'href' => '/admin/blog-posts',
+                    'href' => '/espace-conseiller/blog-posts',
                     'icon' => 'document-text',
                     'color' => 'text-purple-400',
                     'roles' => ['marketing', 'admin', 'super_admin'],
                 ],
                 [
                     'label' => 'Procédures',
-                    'href' => '/admin/wiki-articles', // ✅ ton lien
+                    'href' => '/espace-conseiller/wiki-articles', // ✅ ton lien
                     'icon' => 'document-check',
                     'color' => 'text-sky-400',
                     'roles' => ['conseiller', 'admin', 'super_admin', 'marketing'],
                 ],
                 [
                     'label' => 'Soumission Auto',
-                    'href' => '/admin/submissions', // ✅ ton lien
+                    'href' => '/espace-conseiller/submissions', // ✅ ton lien
                     'icon' => 'truck',
                     'color' => 'text-lime-400',
                     'roles' => ['conseiller', 'admin', 'super_admin'],
