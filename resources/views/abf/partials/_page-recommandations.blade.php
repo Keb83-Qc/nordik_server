@@ -1,106 +1,178 @@
 <!-- ── PAGE: Recommandations ── -->
+@php
+$recomCats = [
+  ['id'=>'deces',        'label'=>'Décès',        'hasTime'=>true,  'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'temporaryLifeInsurance',   'label'=>'Souscrire une assurance vie temporaire'],
+    ['key'=>'permanentLifeInsurance',   'label'=>'Souscrire une assurance vie permanente'],
+    ['key'=>'mortgageInsurance',        'label'=>"Réviser l'assurance prêt hypothécaire"],
+    ['key'=>'childrenLifeInsurance',    'label'=>'Souscrire une assurance vie pour enfants'],
+    ['key'=>'reviewExistingContracts',  'label'=>"Réviser les contrats d'assurance existants"],
+    ['key'=>'acceleratedPayments',      'label'=>"Prévoir des paiements d'assurance accélérés"],
+  ]],
+  ['id'=>'invalidite',   'label'=>'Invalidité',   'hasTime'=>false, 'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'disabilityInsurance',      'label'=>"Souscrire une assurance invalidité"],
+    ['key'=>'reviewCollective',         'label'=>"Réviser la couverture collective"],
+    ['key'=>'supplemental',             'label'=>"Ajouter une protection complémentaire"],
+  ]],
+  ['id'=>'maladie-grave','label'=>'Maladie grave','hasTime'=>false, 'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'criticalIllness',          'label'=>"Souscrire une assurance maladie grave"],
+    ['key'=>'returnOfPremium',          'label'=>"Ajouter le remboursement de primes"],
+  ]],
+  ['id'=>'fonds-urgence','label'=>'Fonds urgence','hasTime'=>false, 'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'buildFund',                'label'=>"Constituer un fonds d'urgence"],
+    ['key'=>'highInterestSavings',      'label'=>"Compte épargne à intérêt élevé"],
+  ]],
+  ['id'=>'retraite',     'label'=>'Retraite',     'hasTime'=>false, 'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'reer',                     'label'=>"Cotiser au REER"],
+    ['key'=>'celi',                     'label'=>"Cotiser au CELI"],
+    ['key'=>'rrq',                      'label'=>"Optimiser la rente RRQ/RPC"],
+  ]],
+  ['id'=>'conseils',     'label'=>'Conseils',     'hasTime'=>false, 'options'=>[
+    ['key'=>'personalized',             'label'=>'Recommandation personnalisée'],
+    ['key'=>'estateReview',             'label'=>"Révision du plan successoral"],
+    ['key'=>'taxPlanning',              'label'=>"Planification fiscale"],
+  ]],
+];
+@endphp
+
 <div id="page-recommandations" class="page">
   <div class="page-title">Recommandations</div>
-  <div class="page-subtitle">Synthèse des besoins et recommandations par catégorie</div>
 
   <!-- Onglets catégories -->
   <div style="display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:20px;overflow-x:auto">
-    @foreach([
-      ['id'=>'deces',        'label'=>'Décès',        'icon'=>'heroicon-heart'],
-      ['id'=>'invalidite',   'label'=>'Invalidité',   'icon'=>''],
-      ['id'=>'maladie-grave','label'=>'Maladie grave','icon'=>''],
-      ['id'=>'fonds-urgence','label'=>'Fonds urgence','icon'=>''],
-      ['id'=>'retraite',     'label'=>'Retraite',     'icon'=>''],
-      ['id'=>'conseils',     'label'=>'Conseils',     'icon'=>''],
-    ] as $i => $cat)
+    @foreach($recomCats as $i => $cat)
     <button
       class="recom-tab{{ $i === 0 ? ' active' : '' }}"
       id="recom-tab-{{ $cat['id'] }}"
       onclick="switchRecomTab('{{ $cat['id'] }}',this)"
-      style="padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:600;color:{{ $i===0 ? 'var(--navy)' : 'var(--muted)' }};border-bottom:{{ $i===0 ? '2px solid var(--navy)' : '2px solid transparent' }};margin-bottom:-2px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0">
-      {{ $cat['label'] }}
-      <span id="recom-pct-{{ $cat['id'] }}" style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#f0f3fa;color:var(--muted)">—</span>
+      style="padding:10px 16px;border:none;background:none;cursor:pointer;border-bottom:{{ $i===0 ? '2px solid var(--navy)' : '2px solid transparent' }};margin-bottom:-2px;flex-shrink:0;text-align:center;transition:all .15s">
+      <div style="font-size:13px;font-weight:600;color:{{ $i===0 ? 'var(--navy)' : 'var(--muted)' }};margin-bottom:4px">{{ $cat['label'] }}</div>
+      <div style="display:flex;gap:4px;justify-content:center;flex-wrap:wrap">
+        <span id="recom-pct-c-{{ $cat['id'] }}" style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#f0f3fa;color:var(--muted)">—</span>
+        <span id="recom-pct-j-{{ $cat['id'] }}" style="font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;background:#f0f3fa;color:var(--muted);display:none">—</span>
+      </div>
     </button>
     @endforeach
   </div>
 
   <!-- Panels par catégorie -->
-  @foreach(['deces','invalidite','maladie-grave','fonds-urgence','retraite','conseils'] as $i => $cat)
-  <div id="recom-panel-{{ $cat }}" style="{{ $i > 0 ? 'display:none' : '' }}">
+  @foreach($recomCats as $i => $cat)
+  <div id="recom-panel-{{ $cat['id'] }}" style="{{ $i > 0 ? 'display:none' : '' }}">
 
-    @if($cat !== 'conseils')
-    <!-- Sélecteur client / conjoint (si couple) -->
-    <div id="recom-person-wrap-{{ $cat }}" style="display:none;margin-bottom:16px">
+    @if($cat['id'] !== 'conseils')
+    <!-- Contrôles : personne + horizon -->
+    <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <div id="recom-person-wrap-{{ $cat['id'] }}" style="display:none">
+        <div style="display:flex;gap:6px">
+          <label class="fu-radio-pill">
+            <input type="radio" name="recom-person-{{ $cat['id'] }}" value="client" checked onchange="switchRecomPerson('{{ $cat['id'] }}','client',this)"/>
+            <span id="recom-person-label-c-{{ $cat['id'] }}">Client</span>
+          </label>
+          <label class="fu-radio-pill">
+            <input type="radio" name="recom-person-{{ $cat['id'] }}" value="conjoint" onchange="switchRecomPerson('{{ $cat['id'] }}','conjoint',this)"/>
+            <span id="recom-person-label-j-{{ $cat['id'] }}">Conjoint(e)</span>
+          </label>
+        </div>
+      </div>
+      @if($cat['hasTime'])
       <div style="display:flex;gap:6px">
-        <button class="toggle-btn active" id="recom-person-btn-client-{{ $cat }}"   onclick="switchRecomPerson('{{ $cat }}','client',this)">Client</button>
-        <button class="toggle-btn"        id="recom-person-btn-conjoint-{{ $cat }}" onclick="switchRecomPerson('{{ $cat }}','conjoint',this)">Conjoint</button>
+        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="today" checked onchange="switchRecomTab('{{ $cat['id'] }}',document.getElementById('recom-tab-{{ $cat['id'] }}'))"/> Aujourd'hui</label>
+        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="lifetime"/> À l'espérance de vie</label>
       </div>
+      @endif
     </div>
 
-    <!-- Barre de couverture -->
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-body" style="padding:16px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <span style="font-size:13px;font-weight:700;color:var(--navy)">Taux de couverture</span>
-          <strong id="recom-coverage-pct-{{ $cat }}" style="font-size:18px;font-weight:800;color:var(--navy)">—</strong>
+    <!-- 2 colonnes : résumé | recommandations -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+      <!-- Colonne gauche : situation actuelle -->
+      <div>
+        <!-- Barre de couverture -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-body" style="padding:14px 16px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+              <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Situation actuelle</span>
+              <strong id="recom-coverage-pct-{{ $cat['id'] }}" style="font-size:16px;font-weight:800;color:var(--navy)">—</strong>
+            </div>
+            <div style="height:8px;background:#e9ecef;border-radius:4px;overflow:hidden">
+              <div id="recom-coverage-bar-{{ $cat['id'] }}" style="height:100%;background:var(--navy);border-radius:4px;width:0%;transition:width .4s ease"></div>
+            </div>
+          </div>
         </div>
-        <div style="height:10px;background:#e9ecef;border-radius:5px;overflow:hidden">
-          <div id="recom-coverage-bar-{{ $cat }}" style="height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:5px;width:0%;transition:width .4s ease"></div>
+        <!-- Besoins -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-header" style="font-weight:700;font-size:11px;padding:8px 14px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Besoins</div>
+          <div id="recom-besoins-{{ $cat['id'] }}" style="padding:10px 14px;font-size:13px">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">—</div>
+          </div>
         </div>
-        <div style="display:flex;justify-content:space-between;margin-top:4px">
-          <span style="font-size:11px;color:var(--muted)">0%</span>
-          <span id="recom-coverage-status-{{ $cat }}" style="font-size:11px;font-weight:600;color:var(--muted)">—</span>
-          <span style="font-size:11px;color:var(--muted)">100%+</span>
+        <!-- Montants disponibles -->
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-header" style="font-weight:700;font-size:11px;padding:8px 14px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Montants disponibles</div>
+          <div id="recom-disponible-{{ $cat['id'] }}" style="padding:10px 14px;font-size:13px">
+            <div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">—</div>
+          </div>
+        </div>
+        <!-- Manque à gagner -->
+        <div class="card">
+          <div class="card-body" style="padding:12px 16px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:13px;font-weight:700;color:var(--navy)">Manque à gagner</span>
+            <strong id="recom-manque-{{ $cat['id'] }}" style="font-size:16px;font-weight:800;color:#ef4444">—</strong>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Synthèse -->
-    <div style="display:flex;gap:16px;margin-bottom:16px">
-
-      <!-- Besoins -->
-      <div class="card" style="flex:1">
-        <div class="card-header" style="font-weight:700;font-size:12px;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase">Besoins</div>
-        <div id="recom-besoins-{{ $cat }}" style="padding:10px 14px;font-size:13px">
-          <div style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0">—</div>
+      <!-- Colonne droite : recommandations -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <h6 style="margin:0;font-size:14px;font-weight:700;color:var(--navy)">Recommandations</h6>
+          <!-- Dropdown Ajouter -->
+          <div class="recom-add-dropdown" id="recom-add-wrap-{{ $cat['id'] }}" style="position:relative">
+            <button class="btn btn-primary btn-sm" onclick="recomToggleMenu('{{ $cat['id'] }}',event)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="13" height="13" style="vertical-align:middle;margin-right:4px;fill:currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
+              Ajouter
+            </button>
+            <div id="recom-add-menu-{{ $cat['id'] }}" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:200;min-width:280px;overflow:hidden">
+              @foreach($cat['options'] as $opt)
+              <button onclick="recomAddItem('{{ $cat['id'] }}','{{ $opt['key'] }}');recomCloseMenu('{{ $cat['id'] }}')" style="display:block;width:100%;text-align:left;padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">{{ $opt['label'] }}</button>
+              @endforeach
+            </div>
+          </div>
+        </div>
+        <!-- Liste d'items -->
+        <div id="recom-items-{{ $cat['id'] }}">
+          <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0">Aucune recommandation. Cliquez Ajouter pour commencer.</div>
         </div>
       </div>
 
-      <!-- Disponible -->
-      <div class="card" style="flex:1">
-        <div class="card-header" style="font-weight:700;font-size:12px;padding:10px 14px;border-bottom:1px solid var(--border);color:var(--muted);text-transform:uppercase">Montants disponibles</div>
-        <div id="recom-disponible-{{ $cat }}" style="padding:10px 14px;font-size:13px">
-          <div style="color:var(--muted);font-size:12px;text-align:center;padding:12px 0">—</div>
+    </div><!-- /grid -->
+    @else
+    <!-- Conseils : pleine largeur -->
+    <div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <h6 style="margin:0;font-size:14px;font-weight:700;color:var(--navy)">Conseils généraux</h6>
+        <div class="recom-add-dropdown" id="recom-add-wrap-{{ $cat['id'] }}" style="position:relative">
+          <button class="btn btn-primary btn-sm" onclick="recomToggleMenu('{{ $cat['id'] }}',event)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="13" height="13" style="vertical-align:middle;margin-right:4px;fill:currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
+            Ajouter
+          </button>
+          <div id="recom-add-menu-{{ $cat['id'] }}" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:200;min-width:280px;overflow:hidden">
+            @foreach($cat['options'] as $opt)
+            <button onclick="recomAddItem('{{ $cat['id'] }}','{{ $opt['key'] }}');recomCloseMenu('{{ $cat['id'] }}')" style="display:block;width:100%;text-align:left;padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">{{ $opt['label'] }}</button>
+            @endforeach
+          </div>
         </div>
       </div>
-
-    </div>
-
-    <!-- Manque à gagner -->
-    <div id="recom-manque-wrap-{{ $cat }}" class="card" style="margin-bottom:16px">
-      <div class="card-body" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:13px;font-weight:700;color:var(--navy)">Manque à gagner</span>
-        <strong id="recom-manque-{{ $cat }}" style="font-size:16px;font-weight:800;color:#ef4444">—</strong>
+      <div id="recom-items-{{ $cat['id'] }}">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0">Aucun conseil. Cliquez Ajouter pour commencer.</div>
       </div>
     </div>
     @endif
-
-    <!-- Notes / recommandations conseiller -->
-    <div class="card" style="margin-bottom:16px">
-      <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">
-        @if($cat === 'conseils') Conseils généraux @else Recommandations du conseiller @endif
-        <span style="font-weight:400;color:var(--muted);font-size:12px;margin-left:4px">(facultatif — apparaîtra dans le rapport)</span>
-      </div>
-      <div class="card-body">
-        <textarea
-          class="form-input"
-          id="recom-notes-{{ $cat }}"
-          rows="5"
-          style="resize:vertical;font-size:13px"
-          placeholder="@if($cat==='conseils')Ajoutez ici des conseils généraux ou des observations pour votre client…@else Ajoutez ici vos recommandations spécifiques pour ce besoin…@endif"
-          oninput="recomSaveNotes('{{ $cat }}')"></textarea>
-      </div>
-    </div>
 
   </div><!-- /recom-panel -->
   @endforeach

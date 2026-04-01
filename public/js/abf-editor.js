@@ -53,7 +53,8 @@
   // ── Variables globales pour les sections ajoutées ──────────────
   let _retraiteDepenses = [];
   let _projets = [];
-  let _recomNotes = {};
+  let _recomNotes = {}; // legacy compat
+  let _recomItems = { deces:[], invalidite:[], 'maladie-grave':[], 'fonds-urgence':[], retraite:[], conseils:[] };
   let _rapportSelectedPhoto = null;
   const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   const _mgCoveragePresets = {
@@ -1190,6 +1191,10 @@
 
   function fmtMoney(n) {
     return n.toLocaleString('fr-CA', { maximumFractionDigits: 0 }) + ' $';
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
   }
 
   function updateEpargneSection() {
@@ -3341,7 +3346,8 @@
       },
       projets: typeof _projets !== 'undefined' ? _projets : [],
       recommandations: {
-        notes: typeof _recomNotes !== 'undefined' ? _recomNotes : {},
+        items: typeof _recomItems !== 'undefined' ? _recomItems : {},
+        notes: typeof _recomNotes !== 'undefined' ? _recomNotes : {}, // legacy
       },
       valeurs_defaut: {
         province: v('vd-province'), fu: radio('vd-fu'), fu_mois: v('vd-fu-mois'),
@@ -3685,14 +3691,19 @@
       try { projetsRender(); } catch(e) { console.warn('projetsRender error', e); }
     }
 
-    // Recommandations notes
-    if (p.recommandations?.notes) {
+    // Recommandations
+    if (p.recommandations?.items) {
+      _recomItems = p.recommandations.items;
+    } else if (p.recommandations?.notes) {
+      // Migration depuis legacy notes (string → items)
       _recomNotes = p.recommandations.notes;
       Object.entries(_recomNotes).forEach(([cat, text]) => {
-        const el = document.getElementById(`recom-notes-${cat}`);
-        if (el) el.value = text;
+        if (text && (!_recomItems[cat] || _recomItems[cat].length === 0)) {
+          _recomItems[cat] = [{ text }];
+        }
       });
     }
+    Object.keys(_recomItems).forEach(cat => recomRenderItems(cat));
     if (typeof _invalAvList !== 'undefined' && Array.isArray(inv.av_list)) {
       _invalAvList = inv.av_list;
       if (typeof invalRenderAvList === 'function') invalRenderAvList();
@@ -4445,28 +4456,154 @@
   /* ════════════════════════════════════════════════════════
      RECOMMANDATIONS
   ════════════════════════════════════════════════════════ */
+  const _RECOM_TEMPLATES = {
+    deces: {
+      personalized:            '',
+      temporaryLifeInsurance:  "Il serait important d'avoir votre protection d'assurance vie temporaire afin de laisser la liquidité nécessaire à vos survivants, leur permettant de rembourser vos dettes et leur assurant un revenu adéquat pour maintenir leur niveau de vie.",
+      permanentLifeInsurance:  "Une base d'assurance vie permanente devrait être ajoutée à votre protection temporaire afin de laisser un montant en héritage et d'assumer vos derniers frais.",
+      mortgageInsurance:       "Il serait important de réviser votre assurance prêt hypothécaire afin de vous assurer que la protection en place correspond à votre situation actuelle.",
+      childrenLifeInsurance:   "Souscrire une assurance vie pour vos enfants dès maintenant permet de garantir leur assurabilité future à des conditions avantageuses.",
+      reviewExistingContracts: "Vos contrats d'assurance existants devraient être révisés afin de vous assurer que les protections en place correspondent toujours à vos besoins actuels.",
+      acceleratedPayments:     "Il serait avantageux de prévoir des paiements accélérés pour votre assurance afin de réduire la durée des obligations financières.",
+    },
+    invalidite: {
+      personalized:        '',
+      disabilityInsurance: "Il est important d'avoir une protection d'assurance invalidité adéquate pour maintenir votre niveau de vie en cas d'incapacité à travailler.",
+      reviewCollective:    "Votre couverture d'invalidité collective devrait être revue afin de s'assurer qu'elle répond adéquatement à vos besoins actuels.",
+      supplemental:        "Une assurance invalidité complémentaire serait recommandée pour combler l'écart entre votre couverture actuelle et vos besoins réels.",
+    },
+    'maladie-grave': {
+      personalized:    '',
+      criticalIllness: "Il serait important de souscrire une assurance maladie grave afin de disposer d'un capital lors d'un diagnostic d'une maladie grave couverte.",
+      returnOfPremium: "L'ajout de l'avenant de remboursement de primes permettrait de récupérer les primes versées si aucune réclamation n'est effectuée.",
+    },
+    'fonds-urgence': {
+      personalized:       '',
+      buildFund:          "Il est recommandé de constituer un fonds d'urgence représentant entre 3 et 6 mois de dépenses courantes afin de faire face à des imprévus sans recourir à l'endettement.",
+      highInterestSavings:"Placer votre fonds d'urgence dans un compte épargne à intérêt élevé permet de conserver la liquidité tout en optimisant le rendement de cette réserve.",
+    },
+    retraite: {
+      personalized: '',
+      reer: "Il serait avantageux de maximiser vos cotisations au REER afin de réduire votre revenu imposable et d'accumuler un capital pour la retraite.",
+      celi: "Le CELI constitue un excellent véhicule d'épargne-retraite puisque les revenus de placement qui y sont générés ne sont pas imposables.",
+      rrq:  "Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec afin d'en maximiser les prestations.",
+    },
+    conseils: {
+      personalized:  '',
+      estateReview:  "Il serait important de revoir votre plan successoral afin de s'assurer que vos actifs seront transmis selon vos volontés et de façon fiscalement avantageuse.",
+      taxPlanning:   "Une stratégie de planification fiscale personnalisée permettrait d'optimiser votre situation financière globale et de minimiser votre charge fiscale.",
+    },
+  };
+
   function recomInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const clientPrenom   = document.getElementById('client-prenom')?.value   || 'Client';
+    const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
     const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite'];
     cats.forEach(cat => {
       const wrap = document.getElementById(`recom-person-wrap-${cat}`);
-      if (wrap) wrap.style.display = hasSpouse ? 'block' : 'none';
+      if (wrap) wrap.style.display = hasSpouse ? 'flex' : 'none';
+      // Mettre à jour les noms dans les labels personne
+      const lblC = document.getElementById(`recom-person-label-c-${cat}`);
+      const lblJ = document.getElementById(`recom-person-label-j-${cat}`);
+      const pctJ = document.getElementById(`recom-pct-j-${cat}`);
+      if (lblC) lblC.textContent = clientPrenom.toUpperCase();
+      if (lblJ) lblJ.textContent = conjointPrenom.toUpperCase();
+      if (pctJ) pctJ.style.display = hasSpouse ? '' : 'none';
     });
-    // Restaurer les notes sauvegardées
+    // Rendre les items déjà sauvegardés
+    Object.keys(_recomItems).forEach(cat => recomRenderItems(cat));
+    // Migration legacy: si _recomNotes a du contenu et _recomItems est vide
     Object.entries(_recomNotes).forEach(([cat, text]) => {
-      const el = document.getElementById(`recom-notes-${cat}`);
-      if (el) el.value = text;
+      if (text && (!_recomItems[cat] || _recomItems[cat].length === 0)) {
+        _recomItems[cat] = [{ text }];
+        recomRenderItems(cat);
+      }
     });
+    // Fermer les menus au clic extérieur
+    document.addEventListener('click', e => {
+      if (!e.target.closest('.recom-add-dropdown')) {
+        document.querySelectorAll('[id^="recom-add-menu-"]').forEach(m => m.style.display = 'none');
+      }
+    }, { once: false });
+  }
+
+  function recomAddItem(cat, templateKey) {
+    const text = (_RECOM_TEMPLATES[cat]?.[templateKey]) ?? '';
+    if (!_recomItems[cat]) _recomItems[cat] = [];
+    _recomItems[cat].push({ text });
+    recomRenderItems(cat);
+  }
+
+  function recomRemoveItem(cat, idx) {
+    if (_recomItems[cat]) _recomItems[cat].splice(idx, 1);
+    recomRenderItems(cat);
+  }
+
+  function recomItemChange(cat, idx) {
+    const ta = document.getElementById(`recom-ta-${cat}-${idx}`);
+    const ct = document.getElementById(`recom-ct-${cat}-${idx}`);
+    if (!ta) return;
+    const val = ta.value;
+    if (_recomItems[cat]) _recomItems[cat][idx] = { text: val };
+    if (ct) {
+      const len = val.length;
+      ct.textContent = `${len} / 2000`;
+      ct.style.color = len > 1800 ? (len >= 2000 ? '#ef4444' : '#f59e0b') : '#22c55e';
+    }
+  }
+
+  function recomRenderItems(cat) {
+    const container = document.getElementById(`recom-items-${cat}`);
+    if (!container) return;
+    const items = _recomItems[cat] || [];
+    if (!items.length) {
+      container.innerHTML = `<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0">${cat === 'conseils' ? 'Aucun conseil.' : 'Aucune recommandation.'} Cliquez Ajouter pour commencer.</div>`;
+      return;
+    }
+    const iconDel = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="16" height="16" fill="currentColor"><path d="m6,19.008q0,0.82 0.586,1.406t1.406,0.586l8.016,0q0.82,0 1.406,-0.586t0.586,-1.406l0,-12l-12,0l0,12zm9.492,-15l-0.984,-1.008l-5.016,0l-0.984,1.008l-3.516,0l0,1.992l14.016,0l0,-1.992l-3.516,0z"/></svg>`;
+    container.innerHTML = items.map((item, i) => {
+      const len = (item.text || '').length;
+      const ctColor = len > 1800 ? (len >= 2000 ? '#ef4444' : '#f59e0b') : '#22c55e';
+      return `<div style="margin-bottom:12px">
+        <div style="position:relative">
+          <textarea id="recom-ta-${cat}-${i}" oninput="recomItemChange('${cat}',${i})"
+            style="width:100%;min-height:80px;padding:10px 36px 10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;resize:vertical;font-family:inherit;color:var(--text)"
+            maxlength="2000">${escHtml(item.text || '')}</textarea>
+          <button onclick="recomRemoveItem('${cat}',${i})" title="Supprimer"
+            style="position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex"
+            onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='var(--muted)'">${iconDel}</button>
+        </div>
+        <div id="recom-ct-${cat}-${i}" style="font-size:11px;text-align:right;margin-top:2px;color:${ctColor}">${len} / 2000</div>
+      </div>`;
+    }).join('');
+  }
+
+  function recomToggleMenu(cat, e) {
+    if (e) e.stopPropagation();
+    const menu = document.getElementById(`recom-add-menu-${cat}`);
+    if (!menu) return;
+    const isOpen = menu.style.display !== 'none';
+    // Fermer tous
+    document.querySelectorAll('[id^="recom-add-menu-"]').forEach(m => m.style.display = 'none');
+    if (!isOpen) menu.style.display = '';
+  }
+
+  function recomCloseMenu(cat) {
+    const menu = document.getElementById(`recom-add-menu-${cat}`);
+    if (menu) menu.style.display = 'none';
   }
 
   function switchRecomTab(cat, btn) {
     document.querySelectorAll('.recom-tab').forEach(b => {
-      b.style.color        = 'var(--muted)';
       b.style.borderBottom = '2px solid transparent';
+      b.querySelector('div')?.style && (b.querySelector('div').style.color = 'var(--muted)');
     });
-    btn.style.color        = 'var(--navy)';
-    btn.style.borderBottom = '2px solid var(--navy)';
-
+    if (btn) {
+      btn.style.borderBottom = '2px solid var(--navy)';
+      const div = btn.querySelector('div');
+      if (div) div.style.color = 'var(--navy)';
+    }
     const cats = ['deces','invalidite','maladie-grave','fonds-urgence','retraite','conseils'];
     cats.forEach(c => {
       const el = document.getElementById(`recom-panel-${c}`);
@@ -4475,15 +4612,23 @@
   }
 
   function switchRecomPerson(cat, role, btn) {
-    document.querySelectorAll(`#recom-person-wrap-${cat} .toggle-btn`).forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    // Ici on pourrait mettre à jour les données affichées pour ce rôle
+    // Mettre à jour les données affichées selon la personne sélectionnée
   }
 
-  function recomSaveNotes(cat) {
-    const el = document.getElementById(`recom-notes-${cat}`);
-    if (el) _recomNotes[cat] = el.value;
+  function recomUpdateCoverage(cat, pctC, pctJ) {
+    // pctC, pctJ = 0-100+ (nombres)
+    const bar = document.getElementById(`recom-coverage-bar-${cat}`);
+    const pctEl = document.getElementById(`recom-coverage-pct-${cat}`);
+    const tabC = document.getElementById(`recom-pct-c-${cat}`);
+    const tabJ = document.getElementById(`recom-pct-j-${cat}`);
+    const clamp = v => Math.max(0, Math.min(100, v || 0));
+    if (bar)   bar.style.width = clamp(pctC) + '%';
+    if (pctEl) pctEl.textContent = Math.round(pctC || 0) + ' %';
+    if (tabC)  tabC.textContent  = Math.round(pctC || 0) + '\u00a0%';
+    if (tabJ && pctJ !== undefined) tabJ.textContent = Math.round(pctJ || 0) + '\u00a0%';
   }
+
+  function recomSaveNotes(cat) { /* legacy no-op */ }
 
   /* ════════════════════════════════════════════════════════
      RAPPORT
