@@ -188,7 +188,7 @@
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="form-group">
                 <label class="form-label">Prestation mensuelle</label>
-                <select class="form-select" id="inval-av-prestation-niveau">
+                <select class="form-select" id="inval-av-prestation-niveau" onchange="invalNiveauChange()">
                   <option value="">Sélectionnez…</option>
                   <option value="first">Un niveau</option>
                   <option value="second">Deux niveaux</option>
@@ -200,10 +200,32 @@
                 <div class="input-sfx"><input class="form-input" id="inval-av-revenu-assurable" type="text" placeholder="0"/><span class="sfx">$</span></div>
               </div>
             </div>
-            <div class="form-group">
-              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;background:#f8f9fd;border-radius:8px;padding:10px 14px">
-                <div class="input-sfx" style="max-width:80px"><input class="form-input" id="inval-av-prestation-pct" type="text" placeholder="0"/><span class="sfx">%</span></div>
-                <span style="color:var(--text)">du revenu mensuel assurable. Maximum</span>
+            <!-- Formule dynamique selon le niveau -->
+            <div class="form-group" id="inval-av-formule-container" style="background:#f8f9fd;border-radius:8px;padding:10px 14px;font-size:13px;display:flex;flex-direction:column;gap:6px">
+              <!-- Ligne 1 — toujours visible -->
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <div class="input-sfx" style="max-width:70px"><input class="form-input" id="inval-av-pct0" type="text" placeholder="0"/><span class="sfx">%</span></div>
+                <span id="inval-niv-txt1-simple" style="color:var(--text)">du revenu mensuel assurable.</span>
+                <span id="inval-niv-txt1-premiers" style="display:none;color:var(--text)">des premiers</span>
+                <div class="input-sfx" id="inval-niv-amt0-wrap" style="display:none;max-width:100px"><input class="form-input" id="inval-av-amt0" type="text" placeholder="0"/><span class="sfx">$</span></div>
+                <span id="inval-niv-txt1-durevenu" style="display:none;color:var(--text)">du revenu mensuel assurable</span>
+              </div>
+              <!-- Ligne 2 — Deux et Trois niveaux -->
+              <div id="inval-niv-row2" style="display:none;align-items:center;gap:6px;flex-wrap:wrap">
+                <div class="input-sfx" style="max-width:70px"><input class="form-input" id="inval-av-pct1" type="text" placeholder="0"/><span class="sfx">%</span></div>
+                <span id="inval-niv-txt2-exced" style="color:var(--text)">de l'excédent.</span>
+                <span id="inval-niv-txt2-des" style="display:none;color:var(--text)">des</span>
+                <div class="input-sfx" id="inval-niv-amt1-wrap" style="display:none;max-width:100px"><input class="form-input" id="inval-av-amt1" type="text" placeholder="0"/><span class="sfx">$</span></div>
+                <span id="inval-niv-txt2-suivants" style="display:none;color:var(--text)">suivants</span>
+              </div>
+              <!-- Ligne 3 — Trois niveaux seulement -->
+              <div id="inval-niv-row3" style="display:none;align-items:center;gap:6px;flex-wrap:wrap">
+                <div class="input-sfx" style="max-width:70px"><input class="form-input" id="inval-av-pct2" type="text" placeholder="0"/><span class="sfx">%</span></div>
+                <span style="color:var(--text)">de l'excédent.</span>
+              </div>
+              <!-- Maximum — toujours visible -->
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                <span style="color:var(--text)">Maximum</span>
                 <div class="input-sfx" style="max-width:110px"><input class="form-input" id="inval-av-prestation-max" type="text" placeholder="0"/><span class="sfx">$</span></div>
               </div>
             </div>

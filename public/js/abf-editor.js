@@ -2823,6 +2823,39 @@
     if (coll)  coll.style.display  = isColl ? '' : 'none';
   }
 
+  function invalNiveauChange() {
+    const niveau = document.getElementById('inval-av-prestation-niveau')?.value || '';
+    const show = (id, flex) => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = flex ? 'flex' : '';
+    };
+    const hide = id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; };
+
+    if (niveau === 'second') {
+      // [pct0]% des premiers [amt0]$ du revenu mensuel assurable
+      // [pct1]% de l'excédent. Maximum [max]$
+      hide('inval-niv-txt1-simple');
+      show('inval-niv-txt1-premiers'); show('inval-niv-amt0-wrap'); show('inval-niv-txt1-durevenu');
+      show('inval-niv-row2', true);
+      show('inval-niv-txt2-exced'); hide('inval-niv-txt2-des'); hide('inval-niv-amt1-wrap'); hide('inval-niv-txt2-suivants');
+      hide('inval-niv-row3');
+    } else if (niveau === 'third') {
+      // [pct0]% des premiers [amt0]$ du revenu mensuel assurable
+      // [pct1]% des [amt1]$ suivants
+      // [pct2]% de l'excédent. Maximum [max]$
+      hide('inval-niv-txt1-simple');
+      show('inval-niv-txt1-premiers'); show('inval-niv-amt0-wrap'); show('inval-niv-txt1-durevenu');
+      show('inval-niv-row2', true);
+      hide('inval-niv-txt2-exced'); show('inval-niv-txt2-des'); show('inval-niv-amt1-wrap'); show('inval-niv-txt2-suivants');
+      show('inval-niv-row3', true);
+    } else {
+      // first or empty: [pct0]% du revenu mensuel assurable. Maximum [max]$
+      show('inval-niv-txt1-simple');
+      hide('inval-niv-txt1-premiers'); hide('inval-niv-amt0-wrap'); hide('inval-niv-txt1-durevenu');
+      hide('inval-niv-row2'); hide('inval-niv-row3');
+    }
+  }
+
   function invaliditeApproche() {
     const v = document.querySelector('input[name="inval-approche"]:checked')?.value;
     document.getElementById('inval-rr-section').style.display = v === 'remplacement' ? '' : 'none';
@@ -2960,8 +2993,13 @@
     if (pctApproche) pctApproche.checked = true;
     document.getElementById('inval-av-prestation-niveau').value = '';
     document.getElementById('inval-av-revenu-assurable').value = '';
-    document.getElementById('inval-av-prestation-pct').value = '';
+    document.getElementById('inval-av-pct0').value = '';
+    document.getElementById('inval-av-amt0').value = '';
+    document.getElementById('inval-av-pct1').value = '';
+    document.getElementById('inval-av-amt1').value = '';
+    document.getElementById('inval-av-pct2').value = '';
     document.getElementById('inval-av-prestation-max').value = '';
+    invalNiveauChange();
     invalTypeChange();
     document.getElementById('inval-av-exclure').checked = false;
     document.getElementById('inval-av-notes').value = '';
@@ -2999,15 +3037,28 @@
     const prestationNiveau = prestationNiveauEl.value;
     const prestationNiveauTx = prestationNiveauEl.options[prestationNiveauEl.selectedIndex]?.text || '';
     const revenuAssurable = parseFloat((document.getElementById('inval-av-revenu-assurable').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
-    const prestationPct = parseFloat((document.getElementById('inval-av-prestation-pct').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const pct0 = parseFloat((document.getElementById('inval-av-pct0').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const amt0 = parseFloat((document.getElementById('inval-av-amt0').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const pct1 = parseFloat((document.getElementById('inval-av-pct1').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const amt1 = parseFloat((document.getElementById('inval-av-amt1').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const pct2 = parseFloat((document.getElementById('inval-av-pct2').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
     const prestationMax = parseFloat((document.getElementById('inval-av-prestation-max').value || '0').replace(/\s/g,'').replace(',','.')) || 0;
-    // Prestation mensuelle effective pour les calculs
+    // Prestation mensuelle effective pour les calculs (revenu mensuel assurable = revenuAssurable / 12)
     let effectifMontant = montant;
     if (type === 'collective' && approche === 'pct' && revenuAssurable > 0) {
-      effectifMontant = revenuAssurable / 12 * prestationPct / 100;
+      const revMensuel = revenuAssurable / 12;
+      if (prestationNiveau === 'first') {
+        effectifMontant = revMensuel * pct0 / 100;
+      } else if (prestationNiveau === 'second') {
+        effectifMontant = Math.min(revMensuel, amt0) * pct0 / 100 + Math.max(0, revMensuel - amt0) * pct1 / 100;
+      } else if (prestationNiveau === 'third') {
+        effectifMontant = Math.min(revMensuel, amt0) * pct0 / 100
+          + Math.max(0, Math.min(revMensuel - amt0, amt1)) * pct1 / 100
+          + Math.max(0, revMensuel - amt0 - amt1) * pct2 / 100;
+      }
       if (prestationMax > 0) effectifMontant = Math.min(effectifMontant, prestationMax);
     }
-    _invalAvList.push({ type, typeTx, montant: effectifMontant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx, approche, prestationNiveau, prestationNiveauTx, revenuAssurable, prestationPct, prestationMax });
+    _invalAvList.push({ type, typeTx, montant: effectifMontant, prime, assureur, assureurTx, date, imposable, carenceVal, carenceUnit, carenceUnitTx, couvertureUnit, couvertureUnitTx, couvertureVal, exclure, notes, owner, ownerTx, approche, prestationNiveau, prestationNiveauTx, revenuAssurable, pct0, amt0, pct1, amt1, pct2, prestationMax });
     invalRenderAvList();
     closeInvalAvModal();
     invaliditeCalc();
