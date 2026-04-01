@@ -111,7 +111,17 @@ trait HasChatSteps
             }
         }
 
-        // Nouvel utilisateur — calcule la première étape
+        // Nouvel utilisateur — crée une soumission anonyme immédiatement pour le tracking
+        // du funnel (abandon avant l'email visible, métriques de conversion réelles).
+        // La soumission sera enrichie progressivement via persist().
+        $this->submission = Submission::create([
+            'type'         => $this->chatType(),
+            'advisor_code' => $this->advisorCode,
+            'portal_id'    => session('portal_id'),
+            'data'         => $this->data,
+        ]);
+        session([$this->sessionKey() => $this->submission->id]);
+
         $this->calculateStep();
     }
 
@@ -328,6 +338,15 @@ trait HasChatSteps
             return;
         }
 
+        // Fix #3 — Idempotence : si l'email a déjà été envoyé (double-clic, refresh),
+        // on redirige directement sans renvoyer.
+        if ($this->submission->mail_sent_at !== null) {
+            Log::info("finalize(): email déjà envoyé pour submission {$this->submission->id} — skip.");
+            session(['last_advisor_code' => $this->advisorCode]);
+            session()->forget([$this->sessionKey(), 'current_advisor_code']);
+            return redirect()->route('quote.success', ['locale' => app()->getLocale()]);
+        }
+
         $recipients = array_filter([
             config('mail.submission_broker_to') ?: config('mail.from.address'),
             User::where('advisor_code', $this->advisorCode)->value('email'),
@@ -359,6 +378,9 @@ trait HasChatSteps
                 Log::error("Erreur email partenaire {$type} {$this->submission->id}: " . $e->getMessage());
             }
         }
+
+        // Marque la soumission comme finalisée (idempotence)
+        $this->submission->update(['mail_sent_at' => now()]);
 
         session(['last_advisor_code' => $this->advisorCode]);
 
