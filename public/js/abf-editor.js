@@ -2281,6 +2281,17 @@
   function decesRenderActifs() {
     const body = document.getElementById('deces-actifs-body');
     if (!body) return;
+
+    // Sauvegarder l'état courant des checkboxes avant re-render
+    body.querySelectorAll('.deces-actif-chk-c').forEach((chk, i) => {
+      if (!_decesActifsState[i]) _decesActifsState[i] = {};
+      _decesActifsState[i].c = chk.checked;
+    });
+    body.querySelectorAll('.deces-actif-chk-j').forEach((chk, i) => {
+      if (!_decesActifsState[i]) _decesActifsState[i] = {};
+      _decesActifsState[i].j = chk.checked;
+    });
+
     const isCouple = document.getElementById('conjoint')?.checked;
     const clientPrenom = document.getElementById('client-prenom')?.value || 'Client';
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
@@ -2309,31 +2320,61 @@
             </tr>
           </thead>
           <tbody>`;
-      items.forEach(it => {
+      items.forEach((it, i) => {
+        const sc = _decesActifsState[i]?.c ?? false;
+        const sj = _decesActifsState[i]?.j ?? false;
         html += `<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:8px 12px">${it.nom}</td>
           <td style="padding:8px 12px;color:var(--muted)">${propLabel(it.owner)}</td>
           <td style="padding:8px 12px;text-align:right;font-weight:600">${fmtMoney(it.valeur)}</td>
-          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-actif-chk-c" data-valeur="${it.valeur}" onchange="decesCalc()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
-          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-actif-chk-j" data-valeur="${it.valeur}" onchange="decesCalc()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
+          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-actif-chk-c" data-valeur="${it.valeur}" onchange="decesActifsSaveAndCalc()" ${sc ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
+          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-actif-chk-j" data-valeur="${it.valeur}" onchange="decesActifsSaveAndCalc()" ${sj ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
         </tr>`;
       });
       html += '</tbody></table></div>';
       body.innerHTML = html;
     } else {
-      body.innerHTML = items.map(it =>
-        `<div class="fu-actif-row">
-          <input type="checkbox" class="fu-actif-check deces-actif-chk-c" data-valeur="${it.valeur}" onchange="decesCalc()"/>
+      body.innerHTML = items.map((it, i) => {
+        const sc = _decesActifsState[i]?.c ?? false;
+        return `<div class="fu-actif-row">
+          <input type="checkbox" class="fu-actif-check deces-actif-chk-c" data-valeur="${it.valeur}" onchange="decesActifsSaveAndCalc()" ${sc ? 'checked' : ''}/>
           <label class="fu-actif-name">${it.nom}</label>
           <span class="fu-actif-valeur">${fmtMoney(it.valeur)}</span>
-        </div>`
-      ).join('');
+        </div>`;
+      }).join('');
     }
+  }
+
+  function decesActifsSaveAndCalc() {
+    // Persister l'état immédiatement puis recalculer
+    const body = document.getElementById('deces-actifs-body');
+    if (body) {
+      body.querySelectorAll('.deces-actif-chk-c').forEach((chk, i) => {
+        if (!_decesActifsState[i]) _decesActifsState[i] = {};
+        _decesActifsState[i].c = chk.checked;
+      });
+      body.querySelectorAll('.deces-actif-chk-j').forEach((chk, i) => {
+        if (!_decesActifsState[i]) _decesActifsState[i] = {};
+        _decesActifsState[i].j = chk.checked;
+      });
+    }
+    decesCalc();
   }
 
   function decesRenderPassifs() {
     const body = document.getElementById('deces-passifs-body');
     if (!body) return;
+
+    // Sauvegarder l'état courant des checkboxes avant re-render
+    body.querySelectorAll('.deces-passif-chk-c').forEach((chk, i) => {
+      if (!_decesPassifsState[i]) _decesPassifsState[i] = {};
+      _decesPassifsState[i].c = chk.checked;
+    });
+    body.querySelectorAll('.deces-passif-chk-j').forEach((chk, i) => {
+      if (!_decesPassifsState[i]) _decesPassifsState[i] = {};
+      _decesPassifsState[i].j = chk.checked;
+    });
+
     const isCouple = document.getElementById('conjoint')?.checked;
     const clientPrenom = document.getElementById('client-prenom')?.value || 'Client';
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
@@ -2366,26 +2407,45 @@
             </tr>
           </thead>
           <tbody>`;
-      items.forEach(it => {
+      items.forEach((it, i) => {
+        // Passifs : défaut checked=true, sauf si l'état sauvegardé dit false
+        const sc = _decesPassifsState[i]?.c ?? true;
+        const sj = _decesPassifsState[i]?.j ?? true;
         html += `<tr style="border-bottom:1px solid var(--border)">
           <td style="padding:8px 12px">${it.nom}</td>
           <td style="padding:8px 12px;color:var(--muted)">${propLabel(it.owner)}</td>
           <td style="padding:8px 12px;text-align:right;font-weight:600">${fmtMoney(it.valeur)}</td>
-          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-passif-chk-c" data-valeur="${it.valeur}" onchange="decesCalc()" checked style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
-          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-passif-chk-j" data-valeur="${it.valeur}" onchange="decesCalc()" checked style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
+          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-passif-chk-c" data-valeur="${it.valeur}" onchange="decesPassifsSaveAndCalc()" ${sc ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
+          <td style="padding:8px 12px;text-align:center"><input type="checkbox" class="deces-passif-chk-j" data-valeur="${it.valeur}" onchange="decesPassifsSaveAndCalc()" ${sj ? 'checked' : ''} style="width:16px;height:16px;cursor:pointer;accent-color:var(--navy)"/></td>
         </tr>`;
       });
       html += '</tbody></table></div>';
       body.innerHTML = html;
     } else {
-      body.innerHTML = items.map(it =>
-        `<div class="fu-actif-row">
-          <input type="checkbox" class="fu-actif-check deces-passif-chk-c" data-valeur="${it.valeur}" onchange="decesCalc()" checked/>
+      body.innerHTML = items.map((it, i) => {
+        const sc = _decesPassifsState[i]?.c ?? true;
+        return `<div class="fu-actif-row">
+          <input type="checkbox" class="fu-actif-check deces-passif-chk-c" data-valeur="${it.valeur}" onchange="decesPassifsSaveAndCalc()" ${sc ? 'checked' : ''}/>
           <label class="fu-actif-name">${it.nom}</label>
           <span class="fu-actif-valeur">${fmtMoney(it.valeur)}</span>
-        </div>`
-      ).join('');
+        </div>`;
+      }).join('');
     }
+  }
+
+  function decesPassifsSaveAndCalc() {
+    const body = document.getElementById('deces-passifs-body');
+    if (body) {
+      body.querySelectorAll('.deces-passif-chk-c').forEach((chk, i) => {
+        if (!_decesPassifsState[i]) _decesPassifsState[i] = {};
+        _decesPassifsState[i].c = chk.checked;
+      });
+      body.querySelectorAll('.deces-passif-chk-j').forEach((chk, i) => {
+        if (!_decesPassifsState[i]) _decesPassifsState[i] = {};
+        _decesPassifsState[i].j = chk.checked;
+      });
+    }
+    decesCalc();
   }
 
   function getRevenusByOwner(owner, isNet, excludeEmploi = false) {
@@ -2815,9 +2875,19 @@
     }
   });
 
+  /* ── DÉCÈS : état des checkboxes actifs/passifs ─────────── */
+  // Clé = index de l'item (ordre stable depuis #actifs-list / #passifs-list)
+  // Valeur = { c: bool, j: bool }
+  let _decesActifsState  = {}; // actifs liquidables : défaut unchecked
+  let _decesPassifsState = {}; // passifs à rembourser : défaut checked
+
   /* ── INVALIDITÉ ─────────────────────────────────────── */
-  let _invalAvList = [];
+  let _invalAvList    = [];
   let _invalAvEditIdx = -1;
+
+  /* ── MALADIE GRAVE (AV) ──────────────────────────────── */
+  let _mgAvList    = [];
+  let _mgAvEditIdx = -1;
 
   function invalRrPanelHtml(owner, prenom, isNet) {
     const revMensuel = getRevenusByOwner(owner, isNet).total / 12;
@@ -3375,6 +3445,8 @@
         rr_duree_c: v('deces-rr-duree-c'), rr_duree_j: v('deces-rr-duree-j'),
         rr_taux_c: v('deces-rr-taux-c'), rr_taux_j: v('deces-rr-taux-j'),
         deps_client: decesDeps, deps_conjoint: decesDepsConj, av: decesAv,
+        actifs_state:  _decesActifsState,
+        passifs_state: _decesPassifsState,
       },
       invalidite: {
         autres_rev_c: v('inval-rev-client'),   autres_rev_j: v('inval-rev-conjoint'),
@@ -3636,6 +3708,9 @@
     sv('deces-rr-pct-c', dd.rr_pct_c); sv('deces-rr-pct-j', dd.rr_pct_j);
     sv('deces-rr-duree-c', dd.rr_duree_c); sv('deces-rr-duree-j', dd.rr_duree_j);
     sv('deces-rr-taux-c', dd.rr_taux_c); sv('deces-rr-taux-j', dd.rr_taux_j);
+    // Décès — état des checkboxes actifs/passifs
+    if (dd.actifs_state  && typeof dd.actifs_state  === 'object') _decesActifsState  = dd.actifs_state;
+    if (dd.passifs_state && typeof dd.passifs_state === 'object') _decesPassifsState = dd.passifs_state;
 
     // Décès — dépenses
     ['client', 'conjoint'].forEach(who => {
@@ -4027,9 +4102,6 @@
   /* ════════════════════════════════════════════════════════
      MALADIE GRAVE
   ════════════════════════════════════════════════════════ */
-  let _mgAvList    = [];
-  let _mgAvEditIdx = -1;
-
   function mgRenderAvList() {
     const list = document.getElementById('mg-av-list');
     if (!list) return;
@@ -4060,16 +4132,21 @@
 
   function openMgAvModal() {
     _mgAvEditIdx = -1;
-    apFillBienProprietaire('mg-av-proprietaire');
-    document.getElementById('mg-av-type').value      = '';
-    document.getElementById('mg-av-montant').value   = '';
-    document.getElementById('mg-av-prime').value     = '';
-    document.getElementById('mg-av-assureur').value  = '';
-    document.getElementById('mg-av-date').value      = '';
-    document.getElementById('mg-av-exclure').checked = false;
-    document.getElementById('mg-av-notes').value     = '';
     const m = document.getElementById('modal-mg-av');
-    if (m) { m.style.display = 'flex'; }
+    if (!m) { console.error('modal-mg-av introuvable'); return; }
+    // Remplir le dropdown propriétaire (avec protection null)
+    const selProp = document.getElementById('mg-av-proprietaire');
+    if (selProp) apFillBienProprietaire('mg-av-proprietaire');
+    const setV = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+    setV('mg-av-type', '');
+    setV('mg-av-montant', '');
+    setV('mg-av-prime', '');
+    setV('mg-av-assureur', '');
+    setV('mg-av-date', '');
+    const exclEl = document.getElementById('mg-av-exclure');
+    if (exclEl) exclEl.checked = false;
+    setV('mg-av-notes', '');
+    m.style.display = 'flex';
   }
 
   function openMgAvEditModal(idx) {
