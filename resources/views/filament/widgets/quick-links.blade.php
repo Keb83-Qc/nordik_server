@@ -22,6 +22,13 @@
 
             $links = [
                 [
+                    'label' => 'Logs Système',
+                    'href' => '/espace-conseiller/system-logs',
+                    'icon' => 'document-text',
+                    'color' => 'text-red-400',
+                    'roles' => ['super_admin'],
+                ],
+                [
                     'label' => 'Équipe',
                     'href' => '/espace-conseiller/users',
                     'icon' => 'users',
@@ -47,7 +54,7 @@
                     'href' => '/espace-conseiller/submissions', // ✅ ton lien
                     'icon' => 'truck',
                     'color' => 'text-lime-400',
-                    'roles' => ['conseiller', 'admin', 'super_admin'],
+                    'roles' => ['conseiller', 'admin', 'super_admin', 'marketing'],
                 ],
                 [
                     'label' => 'Bilan Financier',
@@ -55,7 +62,7 @@
                     'icon' => 'arrow-top-right-on-square',
                     'color' => 'text-amber-400',
                     'new_tab' => true,
-                    'roles' => ['conseiller', 'admin', 'super_admin'],
+                    'roles' => ['conseiller', 'admin', 'super_admin', 'marketing'],
                 ],
                 [
                     'label' => 'Site Web',
