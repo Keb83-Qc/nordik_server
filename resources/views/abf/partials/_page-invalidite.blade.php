@@ -185,7 +185,8 @@
                 <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="montant" onchange="invalApprocheChange()"/> $</label>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <!-- Approche % : Prestation niveau dropdown + Revenu assurable -->
+            <div id="inval-av-coll-pct-fields" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
               <div class="form-group">
                 <label class="form-label">Prestation mensuelle</label>
                 <select class="form-select" id="inval-av-prestation-niveau" onchange="invalNiveauChange()">
@@ -200,7 +201,7 @@
                 <div class="input-sfx"><input class="form-input" id="inval-av-revenu-assurable" type="text" placeholder="0"/><span class="sfx">$</span></div>
               </div>
             </div>
-            <!-- Formule dynamique selon le niveau -->
+            <!-- Formule dynamique selon le niveau (% seulement) -->
             <div class="form-group" id="inval-av-formule-container" style="background:#f8f9fd;border-radius:8px;padding:10px 14px;font-size:13px;display:flex;flex-direction:column;gap:6px">
               <!-- Ligne 1 — toujours visible -->
               <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
@@ -228,6 +229,14 @@
                 <span style="color:var(--text)">Maximum</span>
                 <div class="input-sfx" style="max-width:110px"><input class="form-input" id="inval-av-prestation-max" type="text" placeholder="0"/><span class="sfx">$</span></div>
               </div>
+            </div>
+            <!-- Approche $ : Prestation mensuelle saisie directe -->
+            <div id="inval-av-coll-montant-fields" style="display:none;grid-template-columns:1fr 1fr;gap:16px">
+              <div class="form-group">
+                <label class="form-label">Prestation mensuelle</label>
+                <div class="input-sfx"><input class="form-input" id="inval-av-montant-coll" type="text" placeholder="0"/><span class="sfx">$</span></div>
+              </div>
+              <div></div>
             </div>
           </div>
           <!-- Prime annuelle + Assureur (toujours affichés) -->

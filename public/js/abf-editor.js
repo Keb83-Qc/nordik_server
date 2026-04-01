@@ -2826,9 +2826,14 @@
 
   function invalApprocheChange() {
     const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
-    const wrap = document.getElementById('inval-av-revenu-assurable-wrap');
-    if (wrap) wrap.style.display = approche === 'montant' ? 'none' : '';
-    if (approche === 'pct') invalAutoFillRevenuAssurable();
+    const isPct = approche === 'pct';
+    const pctFields       = document.getElementById('inval-av-coll-pct-fields');
+    const formulaContainer = document.getElementById('inval-av-formule-container');
+    const montantFields   = document.getElementById('inval-av-coll-montant-fields');
+    if (pctFields)        pctFields.style.display        = isPct ? 'grid' : 'none';
+    if (formulaContainer) formulaContainer.style.display  = isPct ? ''     : 'none';
+    if (montantFields)    montantFields.style.display     = isPct ? 'none' : 'grid';
+    if (isPct) invalAutoFillRevenuAssurable();
   }
 
   function invalAutoFillRevenuAssurable() {
@@ -3023,6 +3028,7 @@
     document.getElementById('inval-av-amt1').value = '';
     document.getElementById('inval-av-pct2').value = '';
     document.getElementById('inval-av-prestation-max').value = '';
+    document.getElementById('inval-av-montant-coll').value = '';
     invalNiveauChange();
     invalTypeChange();
     invalApprocheChange();
@@ -3036,7 +3042,12 @@
     const typeEl = document.getElementById('inval-av-type');
     const type = typeEl.value;
     const typeTx = typeEl.options[typeEl.selectedIndex]?.text || '';
-    const montant = parseFloat(document.getElementById('inval-av-montant').value.replace(/\s/g,'').replace(',','.')) || 0;
+    // Collective approche détermine la source du montant de prestation
+    const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
+    const montantRaw = (type === 'collective' && approche === 'montant')
+      ? (document.getElementById('inval-av-montant-coll')?.value || '0')
+      : (document.getElementById('inval-av-montant')?.value || '0');
+    const montant = parseFloat(montantRaw.replace(/\s/g,'').replace(',','.')) || 0;
     const prime = parseFloat(document.getElementById('inval-av-prime').value.replace(/\s/g,'').replace(',','.')) || 0;
     const assureurEl = document.getElementById('inval-av-assureur');
     const assureur = assureurEl.value;
@@ -3056,8 +3067,7 @@
     const prop = document.getElementById('inval-av-proprietaire');
     const owner = prop.value || 'client';
     const ownerTx = prop.options[prop.selectedIndex]?.text || owner;
-    // Collective-specific fields
-    const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
+    // Collective-specific fields (approche already read above)
     const prestationNiveauEl = document.getElementById('inval-av-prestation-niveau');
     const prestationNiveau = prestationNiveauEl.value;
     const prestationNiveauTx = prestationNiveauEl.options[prestationNiveauEl.selectedIndex]?.text || '';
