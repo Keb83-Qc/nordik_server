@@ -10,7 +10,7 @@
 
                 if ($permission) {
                     return $user->can($permission);
-                }s
+                }
 
                 if (!empty($roles)) {
                     // ton hasRoleByName() attend une string => any()
@@ -23,28 +23,28 @@
             $links = [
                 [
                     'label' => 'Équipe',
-                    'href' => '/espace-conseiller/users',
+                    'href' => '/admin/users',
                     'icon' => 'users',
                     'color' => 'text-blue-400',
                     'roles' => ['admin', 'super_admin'],
                 ],
                 [
                     'label' => 'Blog',
-                    'href' => '/espace-conseiller/blog-posts',
+                    'href' => '/admin/blog-posts',
                     'icon' => 'document-text',
                     'color' => 'text-purple-400',
                     'roles' => ['marketing', 'admin', 'super_admin'],
                 ],
                 [
                     'label' => 'Procédures',
-                    'href' => '/espace-conseiller/wiki-articles', // ✅ ton lien
+                    'href' => '/admin/wiki-articles', // ✅ ton lien
                     'icon' => 'document-check',
                     'color' => 'text-sky-400',
                     'roles' => ['conseiller', 'admin', 'super_admin', 'marketing'],
                 ],
                 [
                     'label' => 'Soumission Auto',
-                    'href' => '/espace-conseiller/submissions', // ✅ ton lien
+                    'href' => '/admin/submissions', // ✅ ton lien
                     'icon' => 'truck',
                     'color' => 'text-lime-400',
                     'roles' => ['conseiller', 'admin', 'super_admin'],
