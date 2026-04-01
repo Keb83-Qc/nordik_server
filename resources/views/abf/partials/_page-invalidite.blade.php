@@ -165,7 +165,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Assuré</label>
-              <select class="form-select" id="inval-av-proprietaire"><option value="">Sélectionnez…</option></select>
+              <select class="form-select" id="inval-av-proprietaire" onchange="invalOwnerChange()"><option value="">Sélectionnez…</option></select>
             </div>
           </div>
           <!-- Individuelle : Prestation mensuelle -->
@@ -181,8 +181,8 @@
             <div class="form-group">
               <label class="form-label">Approche de calcul</label>
               <div style="display:flex;gap:8px;margin-top:4px">
-                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="pct" checked/> %</label>
-                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="montant"/> $</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="pct" checked onchange="invalApprocheChange()"/> %</label>
+                <label class="fu-radio-pill"><input type="radio" name="inval-av-approche" value="montant" onchange="invalApprocheChange()"/> $</label>
               </div>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -195,7 +195,7 @@
                   <option value="third">Trois niveaux</option>
                 </select>
               </div>
-              <div class="form-group">
+              <div class="form-group" id="inval-av-revenu-assurable-wrap">
                 <label class="form-label">Revenu annuel assurable</label>
                 <div class="input-sfx"><input class="form-input" id="inval-av-revenu-assurable" type="text" placeholder="0"/><span class="sfx">$</span></div>
               </div>

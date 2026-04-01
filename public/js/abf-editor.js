@@ -2821,6 +2821,30 @@
     const coll  = document.getElementById('inval-av-collective-fields');
     if (indiv) indiv.style.display = isColl ? 'none' : '';
     if (coll)  coll.style.display  = isColl ? '' : 'none';
+    if (isColl) invalApprocheChange();
+  }
+
+  function invalApprocheChange() {
+    const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
+    const wrap = document.getElementById('inval-av-revenu-assurable-wrap');
+    if (wrap) wrap.style.display = approche === 'montant' ? 'none' : '';
+    if (approche === 'pct') invalAutoFillRevenuAssurable();
+  }
+
+  function invalAutoFillRevenuAssurable() {
+    const approche = document.querySelector('input[name="inval-av-approche"]:checked')?.value || 'pct';
+    if (approche !== 'pct') return;
+    const type = document.getElementById('inval-av-type')?.value || '';
+    if (type !== 'collective') return;
+    const owner = document.getElementById('inval-av-proprietaire')?.value || '';
+    if (!owner) return;
+    const data = getRevenusByOwner(owner, false); // false = brut
+    const el = document.getElementById('inval-av-revenu-assurable');
+    if (el && data && data.total > 0) el.value = data.total.toLocaleString('fr-CA');
+  }
+
+  function invalOwnerChange() {
+    invalAutoFillRevenuAssurable();
   }
 
   function invalNiveauChange() {
@@ -3001,6 +3025,7 @@
     document.getElementById('inval-av-prestation-max').value = '';
     invalNiveauChange();
     invalTypeChange();
+    invalApprocheChange();
     document.getElementById('inval-av-exclure').checked = false;
     document.getElementById('inval-av-notes').value = '';
     document.getElementById('modal-inval-av').style.display = 'flex';
