@@ -12,6 +12,20 @@
     <!-- Colonne principale -->
     <div style="flex:1;min-width:0">
 
+      <!-- Assurance maladie grave existante -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span>Assurance maladie grave</span>
+          <button class="btn btn-primary btn-sm" onclick="openMgAvModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" style="vertical-align:middle;margin-right:4px;fill:currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            Ajouter
+          </button>
+        </div>
+        <div id="mg-av-list" style="padding:0">
+          <p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance maladie grave enregistrée.</p>
+        </div>
+      </div>
+
       <!-- Onglets client / conjoint -->
       <div id="mg-person-tabs" style="display:none;border-bottom:1px solid var(--border);margin-bottom:16px">
         <button class="deces-person-tab active" id="mg-tab-client" onclick="switchMgTab('client',this)">CLIENT</button>
@@ -346,3 +360,104 @@
 
   </div>
 </div><!-- /page-maladie-grave -->
+
+<!-- Modal: Assurance maladie grave -->
+<div id="modal-mg-av" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(14,16,48,.45);align-items:center;justify-content:center">
+  <div style="background:white;border-radius:12px;width:100%;max-width:600px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;margin:20px;max-height:90vh;overflow-y:auto">
+    <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1">
+      <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Assurance maladie grave</h4>
+      <button onclick="closeMgAvModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
+    </div>
+    <div style="padding:20px 24px">
+
+      <!-- Type + Assuré -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-select" id="mg-av-type">
+            <option value="">Sélectionnez…</option>
+            <option value="individuelle">Individuelle</option>
+            <option value="collective">Collective</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Assuré</label>
+          <select class="form-select" id="mg-av-proprietaire"><option value="">Sélectionnez…</option></select>
+        </div>
+      </div>
+
+      <!-- Montant assuré + Prime annuelle -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Montant assuré</label>
+          <div class="input-sfx"><input class="form-input" id="mg-av-montant" type="text" placeholder="0"/><span class="sfx">$</span></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Prime annuelle</label>
+          <div class="input-sfx"><input class="form-input" id="mg-av-prime" type="text" placeholder="0"/><span class="sfx">$</span></div>
+        </div>
+      </div>
+
+      <!-- Assureur + Date d'émission -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+          <label class="form-label">Assureur</label>
+          <select class="form-select" id="mg-av-assureur">
+            <option value="">Sélectionnez…</option>
+            <option value="assomptionlife">Assomption vie</option>
+            <option value="laurantianbank">Banque Laurentienne</option>
+            <option value="nationalbank">Banque Nationale</option>
+            <option value="beneva">Beneva</option>
+            <option value="bmoinsurance">BMO Assurance</option>
+            <option value="canadalife">Canada Vie (Great West, London Life)</option>
+            <option value="chevaliersdecolomb">Chevaliers de Colomb</option>
+            <option value="cibc">CIBC</option>
+            <option value="desjardins">Desjardins Assurances</option>
+            <option value="empirelife">Empire Vie</option>
+            <option value="sunlife">Financière Sun Life</option>
+            <option value="foresters">Foresters</option>
+            <option value="humania">Humania</option>
+            <option value="iagroupefinancier">iA Groupe financier</option>
+            <option value="excellence">iA Groupe financier (anciennement L'Excellence)</option>
+            <option value="ivari">Ivari</option>
+            <option value="lacapitale">La Capitale</option>
+            <option value="bluecross">La Croix Bleue</option>
+            <option value="manulife">Manuvie (Standard Life, First National)</option>
+            <option value="medicconstruction">Médic Construction</option>
+            <option value="primerica">Primerica</option>
+            <option value="rbcinsurance">RBC Assurances</option>
+            <option value="ssqinsurance">SSQ Assurance</option>
+            <option value="tangerine">Tangerine</option>
+            <option value="td">TD</option>
+            <option value="transamerica">Transamerica</option>
+            <option value="unionvie">Union Vie</option>
+            <option value="other">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date d'émission</label>
+          <input class="form-input" id="mg-av-date" type="text" placeholder="AAAA-MM-JJ"/>
+        </div>
+      </div>
+
+      <!-- Exclure -->
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px">
+          <input type="checkbox" id="mg-av-exclure"/>
+          <span>Exclure de l'analyse maladie grave</span>
+        </label>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group" style="margin-bottom:0">
+        <label class="form-label">Notes</label>
+        <textarea class="form-input" id="mg-av-notes" rows="3" style="resize:vertical"></textarea>
+      </div>
+
+    </div>
+    <div style="padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:#f8f9fd">
+      <button class="btn btn-secondary" onclick="closeMgAvModal()">Annuler</button>
+      <button class="btn btn-primary" onclick="saveMgAv()">Enregistrer</button>
+    </div>
+  </div>
+</div>

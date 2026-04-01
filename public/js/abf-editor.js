@@ -3388,6 +3388,7 @@
         av_list: typeof _invalAvList !== 'undefined' ? _invalAvList : [],
       },
       maladieGrave: {
+        av_list: typeof _mgAvList !== 'undefined' ? _mgAvList : [],
         client: {
           useDisability: document.querySelector('input[name="mg-use-disability-c"]:checked')?.value || 'non',
           useEmergency:  document.querySelector('input[name="mg-use-emergency-c"]:checked')?.value  || 'non',
@@ -3736,6 +3737,10 @@
 
     // Maladie grave
     const mg = p.maladieGrave || {};
+    if (typeof _mgAvList !== 'undefined' && Array.isArray(mg.av_list)) {
+      _mgAvList = mg.av_list;
+      if (typeof mgRenderAvList === 'function') mgRenderAvList();
+    }
     ['client','conjoint'].forEach(role => {
       const k = role === 'client' ? 'c' : 'j';
       const d = mg[role] || {};
@@ -4022,6 +4027,110 @@
   /* ════════════════════════════════════════════════════════
      MALADIE GRAVE
   ════════════════════════════════════════════════════════ */
+  let _mgAvList    = [];
+  let _mgAvEditIdx = -1;
+
+  function mgRenderAvList() {
+    const list = document.getElementById('mg-av-list');
+    if (!list) return;
+    if (!_mgAvList.length) {
+      list.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance maladie grave enregistrée.</p>';
+      return;
+    }
+    const cols = 'grid-template-columns:1fr 1fr 1fr 1fr auto';
+    list.innerHTML = `<div style="display:grid;${cols};padding:8px 16px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">
+      <div>Type</div><div>Assuré</div><div style="text-align:right">Montant assuré</div><div style="text-align:right">Prime annuelle</div>
+      <div></div>
+    </div>`;
+    const rows = _mgAvList.map((av, i) => {
+      const opacity = av.exclure ? ';opacity:.45' : '';
+      return `<div style="display:grid;${cols};align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:13px${opacity}">
+        <div>${av.typeTx || av.type || '—'}</div>
+        <div style="color:var(--muted)">${av.ownerTx || av.owner || '—'}</div>
+        <div style="text-align:right;font-weight:600">${fmtMoney(av.montant)}</div>
+        <div style="text-align:right;color:var(--muted)">${fmtMoney(av.prime)}</div>
+        <div style="display:flex;gap:4px;justify-content:flex-end">
+          <button onclick="openMgAvEditModal(${i})" title="Modifier" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--muted)'">${iconEdit}</button>
+          <button onclick="_mgAvList.splice(${i},1);mgRenderAvList();mgCalc('client');mgCalc('conjoint')" title="Supprimer" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex" onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='var(--muted)'">${iconDel}</button>
+        </div>
+      </div>`;
+    }).join('');
+    list.innerHTML += rows;
+  }
+
+  function openMgAvModal() {
+    _mgAvEditIdx = -1;
+    apFillBienProprietaire('mg-av-proprietaire');
+    document.getElementById('mg-av-type').value      = '';
+    document.getElementById('mg-av-montant').value   = '';
+    document.getElementById('mg-av-prime').value     = '';
+    document.getElementById('mg-av-assureur').value  = '';
+    document.getElementById('mg-av-date').value      = '';
+    document.getElementById('mg-av-exclure').checked = false;
+    document.getElementById('mg-av-notes').value     = '';
+    const m = document.getElementById('modal-mg-av');
+    if (m) { m.style.display = 'flex'; }
+  }
+
+  function openMgAvEditModal(idx) {
+    const av = _mgAvList[idx];
+    if (!av) return;
+    openMgAvModal();
+    _mgAvEditIdx = idx;
+    document.getElementById('mg-av-type').value      = av.type     || '';
+    document.getElementById('mg-av-montant').value   = av.montant  ? String(av.montant) : '';
+    document.getElementById('mg-av-prime').value     = av.prime    ? String(av.prime)   : '';
+    document.getElementById('mg-av-assureur').value  = av.assureur || '';
+    document.getElementById('mg-av-date').value      = av.date     || '';
+    document.getElementById('mg-av-exclure').checked = !!av.exclure;
+    document.getElementById('mg-av-notes').value     = av.notes    || '';
+    // Set owner
+    const sel = document.getElementById('mg-av-proprietaire');
+    if (sel && av.owner) sel.value = av.owner;
+  }
+
+  function closeMgAvModal() {
+    const m = document.getElementById('modal-mg-av');
+    if (m) m.style.display = 'none';
+  }
+
+  function saveMgAv() {
+    const typeEl      = document.getElementById('mg-av-type');
+    const ownerEl     = document.getElementById('mg-av-proprietaire');
+    const montantEl   = document.getElementById('mg-av-montant');
+    const primeEl     = document.getElementById('mg-av-prime');
+    const assureurEl  = document.getElementById('mg-av-assureur');
+    const dateEl      = document.getElementById('mg-av-date');
+    const exclureEl   = document.getElementById('mg-av-exclure');
+    const notesEl     = document.getElementById('mg-av-notes');
+
+    const type     = typeEl?.value     || '';
+    const typeTx   = typeEl?.options[typeEl.selectedIndex]?.text || type;
+    const owner    = ownerEl?.value    || '';
+    const ownerTx  = ownerEl?.options[ownerEl.selectedIndex]?.text || owner;
+    const montant  = parseFloat(String(montantEl?.value || '0').replace(/\s/g, '').replace(',', '.')) || 0;
+    const prime    = parseFloat(String(primeEl?.value   || '0').replace(/\s/g, '').replace(',', '.')) || 0;
+    const assureur = assureurEl?.value || '';
+    const assureurTx = assureurEl?.options[assureurEl.selectedIndex]?.text || assureur;
+    const date     = dateEl?.value     || '';
+    const exclure  = exclureEl?.checked || false;
+    const notes    = notesEl?.value    || '';
+
+    const item = { type, typeTx, owner, ownerTx, montant, prime, assureur, assureurTx, date, exclure, notes };
+
+    if (_mgAvEditIdx >= 0) {
+      _mgAvList[_mgAvEditIdx] = item;
+      _mgAvEditIdx = -1;
+    } else {
+      _mgAvList.push(item);
+    }
+    mgRenderAvList();
+    closeMgAvModal();
+    mgCalc('client');
+    const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    if (hasSpouse) mgCalc('conjoint');
+  }
+
   function mgInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
     const tabs = document.getElementById('mg-person-tabs');
@@ -4050,6 +4159,7 @@
       if (detail) detail.style.display = (sel && sel !== 'aucun') ? 'block' : 'none';
     });
 
+    mgRenderAvList();
     mgCalc('client');
     if (hasSpouse) mgCalc('conjoint');
   }
@@ -4162,7 +4272,17 @@
 
     const grandTotal = totalBesoin + aidantCout;
 
-    // Résumé
+    // ── Couverture assurance maladie grave existante ──
+    let couvertureMg = 0;
+    _mgAvList.forEach(av => {
+      if (av.exclure) return;
+      if (av.owner === role || av.owner === 'both') couvertureMg += av.montant || 0;
+    });
+
+    const manqueMg = Math.max(0, grandTotal - couvertureMg);
+    const pctCouv  = grandTotal > 0 ? Math.min(100, Math.round(couvertureMg / grandTotal * 100)) : 0;
+
+    // ── Résumé (mise à jour avec couverture) ──
     const resumeEl = document.getElementById('mg-resume-body');
     if (resumeEl && document.getElementById('mg-panel-' + role)?.style.display !== 'none') {
       resumeEl.innerHTML = `
@@ -4179,23 +4299,33 @@
             <span style="color:var(--muted)">Revenu de l'aidant</span>
             <strong>${fmtMoney(aidantCout)}</strong>
           </div>` : ''}
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Total estimé</span>
+            <strong style="color:var(--gold)">${fmtMoney(grandTotal)}</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
+            <span style="color:var(--muted)">Assurance MG</span>
+            <strong style="color:var(--navy)">${fmtMoney(couvertureMg)}</strong>
+          </div>
           <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px">
-            <span style="font-weight:700;color:var(--navy)">Total estimé</span>
-            <strong style="color:var(--gold);font-size:15px">${fmtMoney(grandTotal)}</strong>
+            <span style="font-weight:700;color:var(--navy)">Manque à gagner</span>
+            <strong style="color:${manqueMg > 0 ? '#ef4444' : '#22c55e'};font-size:15px">${fmtMoney(manqueMg)}</strong>
           </div>
         </div>`;
     }
 
     // ── Recommandations Maladie grave ──
     const mgPanelData = {
-      pct: 0,
+      pct: pctCouv,
       besoinsRows: [
         { label: 'Remplacement du revenu',   value: fmtMoney(montantCible * duree) },
         { label: 'Dépenses supplémentaires', value: fmtMoney(totalDep) },
         ...(aidantCout > 0 ? [{ label: "Revenu de l'aidant", value: fmtMoney(aidantCout) }] : []),
       ],
-      disponibleRows: [],
-      manque: grandTotal,
+      disponibleRows: [
+        { label: 'Assurance maladie grave', value: fmtMoney(couvertureMg) },
+      ],
+      manque: manqueMg,
     };
     if (role === 'client')   recomUpdatePanel('maladie-grave', mgPanelData, undefined);
     else                     recomUpdatePanel('maladie-grave', undefined, mgPanelData);
