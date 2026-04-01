@@ -2920,6 +2920,18 @@
     }).join('');
   }
 
+  function invalCouvertureUnitChange() {
+    const unit = document.getElementById('inval-av-couverture-unit')?.value || '';
+    const jusqua = document.getElementById('inval-av-couverture-jusqua');
+    const suffix = document.getElementById('inval-av-couverture-suffix');
+    if (jusqua) jusqua.style.display = unit === 'maxage' ? '' : 'none';
+    if (suffix) {
+      if (unit === 'week')   suffix.textContent = 'semaines';
+      else if (unit === 'year' || unit === 'maxage') suffix.textContent = 'ans';
+      else suffix.textContent = '';
+    }
+  }
+
   function openInvalAvModal() {
     apFillBienProprietaire('inval-av-proprietaire');
     document.getElementById('inval-av-type').value = '';
@@ -2933,6 +2945,7 @@
     document.getElementById('inval-av-carence-unit').value = '';
     document.getElementById('inval-av-couverture-unit').value = '';
     document.getElementById('inval-av-couverture-val').value = '';
+    invalCouvertureUnitChange();
     document.getElementById('inval-av-exclure').checked = false;
     document.getElementById('inval-av-notes').value = '';
     document.getElementById('modal-inval-av').style.display = 'flex';

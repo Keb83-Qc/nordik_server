@@ -244,14 +244,16 @@
             </div>
             <div class="form-group">
               <label class="form-label">Durée de couverture</label>
-              <div style="display:flex;gap:8px">
-                <select class="form-select" id="inval-av-couverture-unit">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <select class="form-select" id="inval-av-couverture-unit" style="flex:1;min-width:150px" onchange="invalCouvertureUnitChange()">
                   <option value="">Sélectionnez…</option>
                   <option value="week">Nombre de semaines</option>
                   <option value="year">Nombre d'années</option>
                   <option value="maxage">Âge maximum</option>
                 </select>
+                <span id="inval-av-couverture-jusqua" style="display:none;font-size:13px;color:var(--text);white-space:nowrap">jusqu'à</span>
                 <input class="form-input" id="inval-av-couverture-val" type="text" placeholder="0" style="max-width:70px"/>
+                <span id="inval-av-couverture-suffix" style="font-size:13px;color:var(--muted);white-space:nowrap"></span>
               </div>
             </div>
           </div>
