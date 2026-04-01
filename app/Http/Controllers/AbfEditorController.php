@@ -181,6 +181,7 @@ class AbfEditorController extends Controller
             'ok'      => true,
             'url'     => route('abf.editor.show', ['advisorSlug' => $advisorSlug, 'record' => $caseIdentifier]),
             'save_url'=> route('abf.editor.save', ['advisorSlug' => $advisorSlug, 'record' => $caseIdentifier]),
+            'pdf_url' => route('abf.pdf', ['locale' => app()->getLocale(), 'abfCase' => $abfCase->id]),
         ]);
     }
 

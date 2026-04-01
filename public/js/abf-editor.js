@@ -55,6 +55,20 @@
   let _projets = [];
   let _recomNotes = {}; // legacy compat
   let _recomItems = { deces:[], invalidite:[], 'maladie-grave':[], 'fonds-urgence':[], retraite:[], conseils:[] };
+  let _recomPanelData = {}; // { [cat]: { client:{pct,besoinsRows,disponibleRows,manque}, conjoint:{...} } }
+  const _CONSEILS_DEFAULTS = [
+    { key:'rrq',           title:'Régime des rentes du Québec (RRQ)', text:"Il serait important d'analyser le moment optimal pour commencer à recevoir votre rente du Régime de rentes du Québec (RRQ) afin d'en maximiser les prestations selon votre situation personnelle et financière.", checked:false, expanded:false },
+    { key:'compte-conj',   title:'Compte conjoint',                   text:"L'ouverture d'un compte conjoint peut simplifier la gestion des finances familiales et faciliter l'accès aux fonds en cas de décès de l'un des conjoints.", checked:false, expanded:false },
+    { key:'auto-hab',      title:'Assurance auto et habitation',      text:"Il serait judicieux de réviser vos assurances auto et habitation afin de vous assurer que vos protections correspondent à votre situation actuelle et d'optimiser vos primes.", checked:false, expanded:false },
+    { key:'budget',        title:'Budget',                            text:"La mise en place d'un budget mensuel détaillé vous permettra de mieux contrôler vos dépenses, d'identifier les postes d'optimisation et d'atteindre vos objectifs financiers plus rapidement.", checked:false, expanded:false },
+    { key:'comptable',     title:'Comptable',                         text:"Je vous recommande de consulter un comptable afin d'optimiser votre déclaration de revenus et de mettre en place des stratégies fiscales adaptées à votre situation.", checked:false, expanded:false },
+    { key:'testament',     title:'Testament',                         text:"Je vous encourage à procéder à la rédaction de votre testament, idéalement devant notaire, afin d'éliminer les frais de vérification et de diminuer les risques de contestation. Un testament à jour garantit que vos volontés seront respectées et que vos proches seront protégés.", checked:false, expanded:false },
+    { key:'mandat',        title:'Mandat de protection',              text:"Le mandat de protection (mandat en cas d'inaptitude) est un document dans lequel vous pouvez désigner vous-même la personne de confiance qui prendra soin de votre personne et administrera vos biens si vous devenez inapte. Il est fortement recommandé de le rédiger devant notaire.", checked:false, expanded:false },
+    { key:'personnes-res', title:'Personnes-ressources',              text:"Il est conseillé de procéder à la nomination de deux personnes-ressources à contacter en cas d'urgence. Ces personnes auront accès à vos informations importantes et pourront agir en votre nom dans les situations critiques.", checked:false, expanded:false },
+    { key:'taux-hypo',     title:'Taux hypothécaires',                text:"Il serait opportun d'analyser votre situation hypothécaire actuelle afin de déterminer si un refinancement ou une renégociation de votre taux pourrait vous faire réaliser des économies substantielles.", checked:false, expanded:false },
+    { key:'beneficiaires', title:'Bénéficiaires',                     text:"Il est important de vérifier et mettre à jour les désignations de bénéficiaires sur vos contrats d'assurance vie et vos régimes d'épargne-retraite afin de vous assurer que les sommes seront versées aux personnes de votre choix.", checked:false, expanded:false },
+  ];
+  let _conseils = null; // null = non initialisé, sera copié depuis _CONSEILS_DEFAULTS au premier usage
   let _rapportSelectedPhoto = null;
   const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
   const _mgCoveragePresets = {
@@ -2050,6 +2064,20 @@
     const pctEl = el('fu-r-pct'), barEl = el('fu-r-bar');
     if (pctEl) pctEl.textContent = pct + ' %';
     if (barEl) { barEl.style.width = pct + '%'; barEl.style.background = barColor; }
+
+    // ── Recommandations Fonds urgence ──
+    recomUpdatePanel('fonds-urgence',
+      {
+        pct,
+        besoinsRows: [{ label: 'Objectif fonds urgence', value: fmtMoney(objectif) }],
+        disponibleRows: [
+          { label: 'Actifs alloués',  value: fmtMoney(actifsTotal) },
+          ...(marge > 0 ? [{ label: 'Marge de crédit', value: fmtMoney(marge) }] : []),
+        ],
+        manque: Math.max(0, -ecart),
+      },
+      null
+    );
   }
 
   /* ── DÉCÈS ── */
@@ -2709,6 +2737,40 @@
       ? [{name: clientPrenom, besoins: besoinC, disponibles: dispoC}, {name: conjointPrenom, besoins: besoinJ, disponibles: dispoJ}]
       : [{name: clientPrenom, besoins: besoinC, disponibles: dispoC}];
     decesRenderResume(sections);
+
+    // ── Recommandations Décès ──
+    const pctCDeces = besoinC > 0 ? Math.round(Math.min(100, dispoC / besoinC * 100)) : (dispoC > 0 ? 100 : 0);
+    const pctJDeces = besoinJ > 0 ? Math.round(Math.min(100, dispoJ / besoinJ * 100)) : (dispoJ > 0 ? 100 : 0);
+    recomUpdatePanel('deces',
+      {
+        pct: pctCDeces,
+        besoinsRows: [
+          { label: 'Capital remplacement revenu', value: fmtMoney(rrCapC) },
+          { label: 'Passifs à rembourser',        value: fmtMoney(passifsTotalC) },
+          { label: 'Dépenses ponctuelles',         value: fmtMoney(depTotalC) },
+        ],
+        disponibleRows: [
+          { label: 'Assurance vie',       value: fmtMoney(avClient) },
+          { label: 'Actifs liquidables',  value: fmtMoney(actifsTotalC) },
+          { label: 'Prestations RRQ',     value: fmtMoney(rrqClient) },
+        ],
+        manque: Math.max(0, besoinC - dispoC),
+      },
+      isCouple ? {
+        pct: pctJDeces,
+        besoinsRows: [
+          { label: 'Capital remplacement revenu', value: fmtMoney(rrCapJ) },
+          { label: 'Passifs à rembourser',        value: fmtMoney(passifsTotalJ) },
+          { label: 'Dépenses ponctuelles',         value: fmtMoney(depTotalJ) },
+        ],
+        disponibleRows: [
+          { label: 'Assurance vie',       value: fmtMoney(avConjoint) },
+          { label: 'Actifs liquidables',  value: fmtMoney(actifsTotalJ) },
+          { label: 'Prestations RRQ',     value: fmtMoney(rrqConjoint) },
+        ],
+        manque: Math.max(0, besoinJ - dispoJ),
+      } : null
+    );
   }
 
   function decesRenderResume(sections) {
@@ -2984,6 +3046,30 @@
       html += sectionHtml(conjointPrenom, besoinConjoint, couvertureConjoint, autresConj, ecartConj);
     }
     resume.innerHTML = html;
+
+    // ── Recommandations Invalidité ──
+    const invalPctC = besoinClient   > 0 ? Math.round(Math.min(100, (couvertureClient  + autresClient) / besoinClient   * 100)) : 0;
+    const invalPctJ = besoinConjoint > 0 ? Math.round(Math.min(100, (couvertureConjoint+ autresConj)   / besoinConjoint * 100)) : 0;
+    recomUpdatePanel('invalidite',
+      {
+        pct: invalPctC,
+        besoinsRows:    [{ label: 'Besoin mensuel estimé', value: fmtMoney(besoinClient) + '/mois' }],
+        disponibleRows: [
+          { label: 'Couverture existante', value: fmtMoney(couvertureClient) + '/mois' },
+          { label: 'Autres revenus',       value: fmtMoney(autresClient)     + '/mois' },
+        ],
+        manque: Math.max(0, ecartClient),
+      },
+      isCouple ? {
+        pct: invalPctJ,
+        besoinsRows:    [{ label: 'Besoin mensuel estimé', value: fmtMoney(besoinConjoint) + '/mois' }],
+        disponibleRows: [
+          { label: 'Couverture existante', value: fmtMoney(couvertureConjoint) + '/mois' },
+          { label: 'Autres revenus',       value: fmtMoney(autresConj)         + '/mois' },
+        ],
+        manque: Math.max(0, ecartConj),
+      } : null
+    );
   }
 
   function invalRenderAvList() {
@@ -3346,8 +3432,9 @@
       },
       projets: typeof _projets !== 'undefined' ? _projets : [],
       recommandations: {
-        items: typeof _recomItems !== 'undefined' ? _recomItems : {},
-        notes: typeof _recomNotes !== 'undefined' ? _recomNotes : {}, // legacy
+        items:    typeof _recomItems !== 'undefined' ? _recomItems : {},
+        notes:    typeof _recomNotes !== 'undefined' ? _recomNotes : {}, // legacy
+        conseils: typeof _conseils   !== 'undefined' && _conseils !== null ? _conseils : null,
       },
       valeurs_defaut: {
         province: v('vd-province'), fu: radio('vd-fu'), fu_mois: v('vd-fu-mois'),
@@ -3358,6 +3445,16 @@
         ret_pct: v('vd-ret-pct'), ret_freq: radio('vd-ret-freq'), ret_calc: radio('vd-ret-calc'),
         inflation: v('vd-inflation'), p_prudent: v('vd-p-prudent'), p_modere: v('vd-p-modere'),
         p_equilibre: v('vd-p-equilibre'), p_croissance: v('vd-p-croissance'), p_audacieux: v('vd-p-audacieux'),
+      },
+      rapport: {
+        sections: (() => {
+          const secs = {};
+          document.querySelectorAll('[id^="rapport-sec-"]').forEach(cb => {
+            secs[cb.id.replace('rapport-sec-', '')] = cb.checked;
+          });
+          return secs;
+        })(),
+        photo: typeof _rapportSelectedPhoto !== 'undefined' ? _rapportSelectedPhoto : null,
       },
       hypotheses: typeof hypotheses !== 'undefined' ? { ...hypotheses } : { evClient: 94, evConj: 96 },
       objectifs: JSON.parse(JSON.stringify(objState)),
@@ -3703,10 +3800,34 @@
         }
       });
     }
-    Object.keys(_recomItems).forEach(cat => recomRenderItems(cat));
+    // Conseils accordion
+    if (Array.isArray(p.recommandations?.conseils) && p.recommandations.conseils.length) {
+      _conseils = p.recommandations.conseils;
+    } else {
+      _conseils = null; // sera initialisé depuis les défauts au premier rendu
+    }
+    Object.keys(_recomItems).filter(cat => cat !== 'conseils').forEach(cat => recomRenderItems(cat));
+    if (typeof conseilsRender === 'function') conseilsRender();
     if (typeof _invalAvList !== 'undefined' && Array.isArray(inv.av_list)) {
       _invalAvList = inv.av_list;
       if (typeof invalRenderAvList === 'function') invalRenderAvList();
+    }
+
+    // Rapport : sections + photo
+    if (p.rapport?.sections) {
+      Object.entries(p.rapport.sections).forEach(([id, checked]) => {
+        const cb = document.getElementById(`rapport-sec-${id}`);
+        if (cb && !cb.disabled) cb.checked = !!checked;
+      });
+    }
+    if (p.rapport?.photo) {
+      _rapportSelectedPhoto = p.rapport.photo;
+      document.querySelectorAll('.rapport-photo-item').forEach(item => {
+        const selected = item.dataset.file === p.rapport.photo;
+        item.style.borderColor = selected ? 'var(--navy)' : 'var(--border)';
+        const chk = item.querySelector('.rapport-photo-check');
+        if (chk) chk.style.display = selected ? 'flex' : 'none';
+      });
     }
 
     // Objectifs
@@ -3752,12 +3873,9 @@
     .then(data => {
       if (data.ok) {
         // Mettre à jour l'URL et le save_url si le slug a été généré
-        if (data.url) {
-          history.replaceState(history.state, '', data.url);
-        }
-        if (data.save_url) {
-          window.ABF_SAVE_URL = data.save_url;
-        }
+        if (data.url)      history.replaceState(history.state, '', data.url);
+        if (data.save_url) window.ABF_SAVE_URL = data.save_url;
+        if (data.pdf_url)  window.ABF_PDF_URL  = data.pdf_url;
         if (!silent) showToast('Brouillon sauvegardé');
       }
     })
@@ -4067,6 +4185,20 @@
           </div>
         </div>`;
     }
+
+    // ── Recommandations Maladie grave ──
+    const mgPanelData = {
+      pct: 0,
+      besoinsRows: [
+        { label: 'Remplacement du revenu',   value: fmtMoney(montantCible * duree) },
+        { label: 'Dépenses supplémentaires', value: fmtMoney(totalDep) },
+        ...(aidantCout > 0 ? [{ label: "Revenu de l'aidant", value: fmtMoney(aidantCout) }] : []),
+      ],
+      disponibleRows: [],
+      manque: grandTotal,
+    };
+    if (role === 'client')   recomUpdatePanel('maladie-grave', mgPanelData, undefined);
+    else                     recomUpdatePanel('maladie-grave', undefined, mgPanelData);
   }
 
   /* ════════════════════════════════════════════════════════
@@ -4323,6 +4455,27 @@
           </div>` : ''}
         </div>`;
     }
+
+    // ── Recommandations Retraite ──
+    const hasSpouseRet = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const cibleCAnnuel = cibleC + totalDep;
+    recomUpdatePanel('retraite',
+      {
+        pct: 0,
+        besoinsRows: [
+          { label: 'Objectif annuel',    value: fmtMoney(cibleC) },
+          ...(totalDep > 0 ? [{ label: 'Dépenses retraite', value: fmtMoney(totalDep) + '/an' }] : []),
+        ],
+        disponibleRows: [],
+        manque: cibleCAnnuel,
+      },
+      hasSpouseRet ? {
+        pct: 0,
+        besoinsRows: [{ label: 'Objectif annuel', value: fmtMoney(cibleJ) }],
+        disponibleRows: [],
+        manque: cibleJ,
+      } : null
+    );
   }
 
   /* ════════════════════════════════════════════════════════
@@ -4511,8 +4664,14 @@
       if (lblJ) lblJ.textContent = conjointPrenom.toUpperCase();
       if (pctJ) pctJ.style.display = hasSpouse ? '' : 'none';
     });
-    // Rendre les items déjà sauvegardés
-    Object.keys(_recomItems).forEach(cat => recomRenderItems(cat));
+    // Rendre les items déjà sauvegardés (sauf conseils → accordion dédié)
+    Object.keys(_recomItems).filter(cat => cat !== 'conseils').forEach(cat => recomRenderItems(cat));
+    conseilsRender();
+    // Ré-afficher les données de couverture si les calculs ont déjà été faits
+    ['deces','invalidite','maladie-grave','fonds-urgence','retraite'].forEach(cat => {
+      const d = _recomPanelData[cat];
+      if (d) recomRenderPanelData(cat, d.client || null, d.client?.pct, d.conjoint?.pct);
+    });
     // Migration legacy: si _recomNotes a du contenu et _recomItems est vide
     Object.entries(_recomNotes).forEach(([cat, text]) => {
       if (text && (!_recomItems[cat] || _recomItems[cat].length === 0)) {
@@ -4612,7 +4771,20 @@
   }
 
   function switchRecomPerson(cat, role, btn) {
-    // Mettre à jour les données affichées selon la personne sélectionnée
+    const d = _recomPanelData[cat];
+    if (!d) return;
+    const personData = role === 'conjoint' && d.conjoint ? d.conjoint : (d.client || null);
+    recomRenderPanelData(cat, personData, d.client?.pct, d.conjoint?.pct);
+  }
+
+  function recomTimeframeChange(cat, timeframe) {
+    // Pour Décès : re-calcule avec le bon horizon temporel
+    // 'today' = situation actuelle / 'lifetime' = à l'espérance de vie
+    // Les deux horizons utilisent les mêmes données de decesCalc pour l'instant.
+    // On stocke l'horizon actif pour usage futur dans le calcul.
+    if (!window._recomTimeframes) window._recomTimeframes = {};
+    window._recomTimeframes[cat] = timeframe;
+    if (cat === 'deces' && typeof decesCalc === 'function') decesCalc();
   }
 
   function recomUpdateCoverage(cat, pctC, pctJ) {
@@ -4622,13 +4794,161 @@
     const tabC = document.getElementById(`recom-pct-c-${cat}`);
     const tabJ = document.getElementById(`recom-pct-j-${cat}`);
     const clamp = v => Math.max(0, Math.min(100, v || 0));
-    if (bar)   bar.style.width = clamp(pctC) + '%';
-    if (pctEl) pctEl.textContent = Math.round(pctC || 0) + ' %';
-    if (tabC)  tabC.textContent  = Math.round(pctC || 0) + '\u00a0%';
-    if (tabJ && pctJ !== undefined) tabJ.textContent = Math.round(pctJ || 0) + '\u00a0%';
+    const barColor = (pctC || 0) >= 100 ? '#22c55e' : (pctC || 0) >= 50 ? 'var(--gold,#f59e0b)' : '#ef4444';
+    if (bar)   { bar.style.width = clamp(pctC) + '%'; bar.style.background = barColor; }
+    if (pctEl) { pctEl.textContent = Math.round(pctC || 0) + ' %'; pctEl.style.color = barColor; }
+    if (tabC)  { tabC.textContent = Math.round(pctC || 0) + '\u00a0%'; tabC.style.background = barColor; tabC.style.color = '#fff'; }
+    if (tabJ && pctJ !== undefined) { tabJ.textContent = Math.round(pctJ || 0) + '\u00a0%'; const jColor = (pctJ||0)>=100?'#22c55e':(pctJ||0)>=50?'var(--gold,#f59e0b)':'#ef4444'; tabJ.style.background = jColor; tabJ.style.color='#fff'; }
+  }
+
+  // Met à jour les panels résumé Recommandations depuis les fonctions calc.
+  // clientData / conjointData = { pct, besoinsRows:[{label,value}], disponibleRows:[{label,value}], manque }
+  // Passer undefined pour ne pas modifier le côté correspondant.
+  function recomUpdatePanel(cat, clientData, conjointData) {
+    if (!_recomPanelData[cat]) _recomPanelData[cat] = {};
+    if (clientData   !== undefined) _recomPanelData[cat].client   = clientData;
+    if (conjointData !== undefined) _recomPanelData[cat].conjoint = conjointData;
+    const activePerson = document.querySelector(`input[name="recom-person-${cat}"]:checked`)?.value || 'client';
+    const d = _recomPanelData[cat];
+    const personData = activePerson === 'conjoint' && d.conjoint ? d.conjoint : (d.client || null);
+    recomRenderPanelData(cat, personData, d.client?.pct, d.conjoint?.pct);
+  }
+
+  function recomRenderPanelData(cat, data, pctC, pctJ) {
+    if (!data) return;
+    recomUpdateCoverage(cat, pctC || 0, pctJ);
+    const rowsHtml = rows => rows && rows.length
+      ? rows.map(r => `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">${escHtml(r.label)}</span><strong>${r.value}</strong></div>`).join('')
+      : `<div style="color:var(--muted);font-size:12px;text-align:center;padding:8px 0">—</div>`;
+    const besoinsEl = document.getElementById(`recom-besoins-${cat}`);
+    if (besoinsEl) besoinsEl.innerHTML = rowsHtml(data.besoinsRows);
+    const dispoEl = document.getElementById(`recom-disponible-${cat}`);
+    if (dispoEl) dispoEl.innerHTML = rowsHtml(data.disponibleRows);
+    const manqueEl = document.getElementById(`recom-manque-${cat}`);
+    if (manqueEl) {
+      const m = data.manque || 0;
+      manqueEl.textContent = m > 0 ? fmtMoney(m) : '—';
+      manqueEl.style.color = m > 0 ? '#ef4444' : '#22c55e';
+    }
   }
 
   function recomSaveNotes(cat) { /* legacy no-op */ }
+
+  /* ════════════════════════════════════════════════════════
+     CONSEILS (accordion)
+  ════════════════════════════════════════════════════════ */
+  function conseilsGetData() {
+    if (!_conseils) _conseils = _CONSEILS_DEFAULTS.map(c => Object.assign({}, c));
+    return _conseils;
+  }
+
+  function conseilsRender() {
+    const data = conseilsGetData();
+    const container = document.getElementById('conseils-accordion');
+    const countEl   = document.getElementById('conseils-checked-count');
+    if (!container) return;
+
+    const checkedCount = data.filter(c => c.checked).length;
+    if (countEl) countEl.textContent = checkedCount ? `${checkedCount} conseil${checkedCount > 1 ? 's' : ''} activé${checkedCount > 1 ? 's' : ''}` : '';
+
+    const iconCheckOn  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>`;
+    const iconCheckOff = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c0-1.1.9-2 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/></svg>`;
+    const iconDel      = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="m6,19.008q0,0.82 0.586,1.406t1.406,0.586l8.016,0q0.82,0 1.406,-0.586t0.586,-1.406l0,-12l-12,0l0,12zm9.492,-15l-0.984,-1.008l-5.016,0l-0.984,1.008l-3.516,0l0,1.992l14.016,0l0,-1.992l-3.516,0z"/></svg>`;
+    const iconDown     = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>`;
+    const iconUp       = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6 1.41 1.41z"/></svg>`;
+
+    container.innerHTML = data.map((c, i) => {
+      const textLen    = (c.text || '').length;
+      const ctColor    = textLen > 1800 ? (textLen >= 2000 ? '#ef4444' : '#f59e0b') : '#22c55e';
+      const isChecked  = !!c.checked;
+      const isExpanded = !!c.expanded;
+      return `
+      <div style="border:1px solid ${isChecked ? '#bfdbfe' : 'var(--border)'};border-radius:8px;margin-bottom:8px;overflow:hidden;transition:border-color .15s">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;background:${isChecked ? '#f0f7ff' : 'white'};user-select:none" onclick="conseilsToggleExpand(${i})">
+          <button onclick="event.stopPropagation();conseilsToggle(${i})" title="${isChecked ? 'Désactiver ce conseil' : 'Activer ce conseil'}"
+            style="background:none;border:none;cursor:pointer;padding:2px;flex-shrink:0;color:${isChecked ? 'var(--navy)' : '#9ca3af'};display:flex;align-items:center;line-height:1">
+            ${isChecked ? iconCheckOn : iconCheckOff}
+          </button>
+          <span style="flex:1;font-size:13px;font-weight:${isChecked ? '700' : '500'};color:${isChecked ? 'var(--navy)' : 'var(--text)'}">${escHtml(c.title || '(Sans titre)')}</span>
+          <span style="color:var(--muted);flex-shrink:0;display:flex;align-items:center">${isExpanded ? iconUp : iconDown}</span>
+        </div>
+        ${isExpanded ? `
+        <div style="padding:14px;border-top:1px solid ${isChecked ? '#bfdbfe' : 'var(--border)'};background:#fafbfc">
+          <div style="margin-bottom:10px">
+            <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Titre</label>
+            <input id="conseil-title-${i}" value="${escHtml(c.title || '')}" oninput="conseilsTitleChange(${i})"
+              style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;color:var(--text);font-family:inherit;box-sizing:border-box"
+              maxlength="120"/>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:4px">Description</label>
+            <div style="position:relative">
+              <textarea id="conseil-text-${i}" oninput="conseilsTextChange(${i})"
+                style="width:100%;min-height:80px;padding:10px 36px 10px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;resize:vertical;font-family:inherit;color:var(--text);box-sizing:border-box"
+                maxlength="2000">${escHtml(c.text || '')}</textarea>
+              <button onclick="conseilsRemove(${i})" title="Supprimer ce conseil"
+                style="position:absolute;top:6px;right:6px;background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;border-radius:4px;line-height:1;display:flex"
+                onmouseover="this.style.color='#e53e3e'" onmouseout="this.style.color='var(--muted)'">${iconDel}</button>
+            </div>
+            <div id="conseil-ct-${i}" style="font-size:11px;text-align:right;margin-top:2px;color:${ctColor}">${textLen} / 2000</div>
+          </div>
+        </div>
+        ` : ''}
+      </div>`;
+    }).join('');
+  }
+
+  function conseilsToggle(idx) {
+    const data = conseilsGetData();
+    if (data[idx]) {
+      data[idx].checked = !data[idx].checked;
+      conseilsRender();
+    }
+  }
+
+  function conseilsToggleExpand(idx) {
+    const data = conseilsGetData();
+    if (data[idx]) {
+      data[idx].expanded = !data[idx].expanded;
+      conseilsRender();
+    }
+  }
+
+  function conseilsRemove(idx) {
+    const data = conseilsGetData();
+    data.splice(idx, 1);
+    conseilsRender();
+  }
+
+  function conseilsAdd() {
+    const data = conseilsGetData();
+    data.push({ key:'custom-' + Date.now(), title:'Nouveau conseil', text:'', checked:false, expanded:true });
+    conseilsRender();
+    // Scroll vers le bas pour voir l'item ajouté
+    setTimeout(() => {
+      const acc = document.getElementById('conseils-accordion');
+      if (acc) acc.lastElementChild?.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    }, 50);
+  }
+
+  function conseilsTitleChange(idx) {
+    const el   = document.getElementById(`conseil-title-${idx}`);
+    const data = conseilsGetData();
+    if (el && data[idx]) data[idx].title = el.value;
+  }
+
+  function conseilsTextChange(idx) {
+    const ta   = document.getElementById(`conseil-text-${idx}`);
+    const ct   = document.getElementById(`conseil-ct-${idx}`);
+    const data = conseilsGetData();
+    if (!ta || !data[idx]) return;
+    data[idx].text = ta.value;
+    const len = ta.value.length;
+    if (ct) {
+      ct.textContent = `${len} / 2000`;
+      ct.style.color = len > 1800 ? (len >= 2000 ? '#ef4444' : '#f59e0b') : '#22c55e';
+    }
+  }
 
   /* ════════════════════════════════════════════════════════
      RAPPORT
@@ -4643,6 +4963,22 @@
     }
     const consEl = document.getElementById('rapport-conseiller-nom');
     if (consEl) consEl.textContent = window.ABF_ADVISOR_NAME || '—';
+
+    // Projets : activer si des projets existent
+    const projetsChk = document.getElementById('rapport-sec-projects');
+    if (projetsChk && typeof _projets !== 'undefined' && _projets.length > 0) {
+      projetsChk.disabled = false;
+      const lbl = projetsChk.closest('label');
+      if (lbl) {
+        lbl.style.opacity = '';
+        // Mettre à jour le badge de compte
+        const badge = lbl.querySelector('span[style*="background:#f0f3fa"]');
+        if (badge) badge.textContent = `${_projets.length} projet${_projets.length > 1 ? 's' : ''}`;
+      }
+    }
+
+    // Synchroniser l'état disabled des enfants pour toutes les sections-parents
+    ['retirement', 'recommendations', 'annex'].forEach(id => rapportToggleSection(id));
 
     rapportUpdateCompletude();
   }
@@ -4692,6 +5028,7 @@
       { id: 'invalidite',     label: 'Invalidité' },
       { id: 'maladie-grave',  label: 'Maladie grave' },
       { id: 'retraite',       label: 'Retraite' },
+      { id: 'recommandations',label: 'Recommandations' },
     ];
     const done  = sections.filter(s => document.querySelector(`.nav-item[onclick*="'${s.id}'"]`)?.classList.contains('done'));
     const total = sections.length;
@@ -4711,6 +5048,57 @@
   }
 
   function rapportGenerer() {
-    showToast('Génération du rapport en cours…');
-    // À connecter à la route PDF Laravel
+    if (!window.ABF_PDF_URL) {
+      showToast('Le dossier doit être enregistré avant de générer le PDF.');
+      return;
+    }
+
+    const btn      = document.getElementById('btn-rapport-generer');
+    const origHtml = btn ? btn.innerHTML : '';
+    const iconSpin = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>`;
+
+    const setLoading = (on) => {
+      if (!btn) return;
+      btn.disabled  = on;
+      btn.innerHTML = on
+        ? `${iconSpin} Sauvegarde et génération…`
+        : origHtml;
+    };
+
+    const openPdf = () => {
+      window.open(window.ABF_PDF_URL, '_blank');
+      setLoading(false);
+      showToast('PDF ouvert dans un nouvel onglet.');
+    };
+
+    setLoading(true);
+
+    if (window.ABF_SAVE_URL) {
+      // Sauvegarder en s'assurant que les données les plus récentes sont en base
+      fetch(window.ABF_SAVE_URL, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': window.ABF_CSRF_TOKEN },
+        body:    JSON.stringify({ payload: gatherPayload() }),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.url)      history.replaceState(history.state, '', data.url);
+        if (data.save_url) window.ABF_SAVE_URL = data.save_url;
+        openPdf();
+      })
+      .catch(() => {
+        // Ouvrir quand même si la sauvegarde échoue (ex : réseau)
+        openPdf();
+      });
+    } else {
+      openPdf();
+    }
+  }
+
+  // Injecter l'animation CSS spin si absente
+  if (!document.getElementById('abf-spin-style')) {
+    const s = document.createElement('style');
+    s.id = 'abf-spin-style';
+    s.textContent = '@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}';
+    document.head.appendChild(s);
   }

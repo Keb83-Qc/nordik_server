@@ -66,6 +66,14 @@
               @foreach([
                 ['id'=>'dashboard',                'label'=>'Tableau de bord',                 'default'=>true,  'children'=>[]],
                 ['id'=>'financialPrioritiesPyramid','label'=>'Pyramide des priorités financières','default'=>false,'children'=>[]],
+                ['id'=>'recommendations',          'label'=>'Recommandations',                 'default'=>true,  'children'=>[
+                  ['id'=>'recoDeces',        'label'=>'Décès',             'default'=>true],
+                  ['id'=>'recoInvalidite',   'label'=>'Invalidité',        'default'=>true],
+                  ['id'=>'recoMaladieGrave', 'label'=>'Maladie grave',     'default'=>true],
+                  ['id'=>'recoFondsUrgence', 'label'=>"Fonds d'urgence",   'default'=>true],
+                  ['id'=>'recoRetraite',     'label'=>'Retraite',          'default'=>true],
+                  ['id'=>'recoConseils',     'label'=>'Conseils généraux', 'default'=>true],
+                ]],
                 ['id'=>'deliveryConfirmation',     'label'=>'Confirmation de remise',           'default'=>false, 'tooltip'=>'Requis pour la remise par voie électronique ou en personne (conformité AMF).',  'children'=>[]],
                 ['id'=>'annex',                    'label'=>'Tableaux détaillés (annexes)',     'default'=>false, 'children'=>[
                   ['id'=>'retirementIncome',        'label'=>'Revenus de retraite',     'default'=>false],

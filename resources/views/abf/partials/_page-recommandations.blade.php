@@ -81,8 +81,8 @@ $recomCats = [
       </div>
       @if($cat['hasTime'])
       <div style="display:flex;gap:6px">
-        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="today" checked onchange="switchRecomTab('{{ $cat['id'] }}',document.getElementById('recom-tab-{{ $cat['id'] }}'))"/> Aujourd'hui</label>
-        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="lifetime"/> À l'espérance de vie</label>
+        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="today" checked onchange="recomTimeframeChange('{{ $cat['id'] }}','today')"/> Aujourd'hui</label>
+        <label class="fu-radio-pill"><input type="radio" name="recom-timeframe-{{ $cat['id'] }}" value="lifetime" onchange="recomTimeframeChange('{{ $cat['id'] }}','lifetime')"/> À l'espérance de vie</label>
       </div>
       @endif
     </div>
@@ -152,25 +152,19 @@ $recomCats = [
 
     </div><!-- /grid -->
     @else
-    <!-- Conseils : pleine largeur -->
+    <!-- Conseils : accordion pleine largeur -->
     <div>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <h6 style="margin:0;font-size:14px;font-weight:700;color:var(--navy)">Conseils généraux</h6>
-        <div class="recom-add-dropdown" id="recom-add-wrap-{{ $cat['id'] }}" style="position:relative">
-          <button class="btn btn-primary btn-sm" onclick="recomToggleMenu('{{ $cat['id'] }}',event)">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="13" height="13" style="vertical-align:middle;margin-right:4px;fill:currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
-            Ajouter
-          </button>
-          <div id="recom-add-menu-{{ $cat['id'] }}" style="display:none;position:absolute;right:0;top:calc(100% + 4px);background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:200;min-width:280px;overflow:hidden">
-            @foreach($cat['options'] as $opt)
-            <button onclick="recomAddItem('{{ $cat['id'] }}','{{ $opt['key'] }}');recomCloseMenu('{{ $cat['id'] }}')" style="display:block;width:100%;text-align:left;padding:10px 14px;border:none;background:none;cursor:pointer;font-size:13px;color:var(--text)" onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">{{ $opt['label'] }}</button>
-            @endforeach
-          </div>
-        </div>
+        <span style="font-size:12px;color:var(--muted)" id="conseils-checked-count"></span>
       </div>
-      <div id="recom-items-{{ $cat['id'] }}">
-        <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0">Aucun conseil. Cliquez Ajouter pour commencer.</div>
-      </div>
+      <!-- Accordion items rendus par JS -->
+      <div id="conseils-accordion"></div>
+      <!-- Bouton ajouter conseil personnalisé -->
+      <button onclick="conseilsAdd()" style="margin-top:12px;width:100%;padding:10px;border:1px dashed var(--border);border-radius:8px;background:none;cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s" onmouseover="this.style.borderColor='var(--navy)';this.style.color='var(--navy)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="14" height="14" fill="currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
+        Ajouter un conseil personnalisé
+      </button>
     </div>
     @endif
 

@@ -14,10 +14,12 @@
             @php $recordIdentifier = $record->slug ?: 'nouveau-' . $record->id; @endphp
             window.ABF_RECORD_ID = {{ $record->id }};
             window.ABF_SAVE_URL = '{{ route('abf.editor.save', ['advisorSlug' => $advisorSlug, 'record' => $recordIdentifier]) }}';
+            window.ABF_PDF_URL  = '{{ route('abf.pdf', ['locale' => app()->getLocale(), 'abfCase' => $record->id]) }}';
             window.ABF_INITIAL_PAYLOAD = {!! json_encode($record->payload ?? []) !!};
         @else
             window.ABF_RECORD_ID = null;
-            window.ABF_SAVE_URL = null;
+            window.ABF_SAVE_URL  = null;
+            window.ABF_PDF_URL   = null;
             window.ABF_CREATE_URL = '{{ route('abf.create.json', ['advisorSlug' => $advisorSlug]) }}';
             window.ABF_INITIAL_PAYLOAD = null;
         @endif
