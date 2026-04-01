@@ -183,7 +183,8 @@
       "Bash(findstr /V \"^$\")",
       "Bash(dir D:vipgpi_canordik_serverdatabasemigrations /B /O:N)",
       "Bash(echo \"EXIT:$?\")",
-      "Bash(echo \"DONE EXIT:$?\")"
+      "Bash(echo \"DONE EXIT:$?\")",
+      "Bash(php composer.phar install --no-interaction)"
     ]
   }
 }
