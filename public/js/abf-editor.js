@@ -2875,6 +2875,10 @@
     }
   });
 
+  /* ── Icônes SVG partagées ───────────────────────────────── */
+  const iconEdit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
+  const iconDel  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="m6,19.008q0,0.82 0.586,1.406t1.406,0.586l8.016,0q0.82,0 1.406,-0.586t0.586,-1.406l0,-12l-12,0l0,12zm9.492,-15l-0.984,-1.008l-5.016,0l-0.984,1.008l-3.516,0l0,1.992l14.016,0l0,-1.992l-3.516,0z"/></svg>`;
+
   /* ── DÉCÈS : état des checkboxes actifs/passifs ─────────── */
   // Clé = index de l'item (ordre stable depuis #actifs-list / #passifs-list)
   // Valeur = { c: bool, j: bool }
@@ -3149,8 +3153,6 @@
       list.innerHTML = '<p style="padding:14px;font-size:13px;color:var(--muted);margin:0">Aucune assurance invalidité enregistrée.</p>';
       return;
     }
-    const iconEdit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
-    const iconDel  = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="m6,19.008q0,0.82 0.586,1.406t1.406,0.586l8.016,0q0.82,0 1.406,-0.586t0.586,-1.406l0,-12l-12,0l0,12zm9.492,-15l-0.984,-1.008l-5.016,0l-0.984,1.008l-3.516,0l0,1.992l14.016,0l0,-1.992l-3.516,0z"/></svg>`;
     const cols = 'grid-template-columns:1.2fr 1fr 1fr 1fr 72px';
     const hdrStyle = `display:grid;${cols};padding:8px 16px;background:var(--bg-light,#f8f9fa);border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em`;
     const header = `<div style="${hdrStyle}">
