@@ -49,7 +49,7 @@ class Message extends Model
                                 "Connectez-vous à votre portail VIP GPI pour lire le contenu.\n\n" .
                                 "Cordialement,\nL'équipe VIP Services Financiers",
                             function ($mail) use ($receiver, $senderName, $message) {
-                                $mail->from('no-reply@vipgpi.ca', 'VIP GPI')
+                                $mail->from(app(\App\Settings\EmailSettings::class)->noreply_address, app(\App\Settings\EmailSettings::class)->noreply_name)
                                     ->to($receiver->email)
                                     ->replyTo(optional($message->sender)->email, $senderName)
                                     ->subject("Nouveau message interne de $senderName");
@@ -72,7 +72,7 @@ class Message extends Model
 
             if ($notifyAdmin) {
                 try {
-                    Mail::to('web@vipgpi.ca')->send(new AdminAlertMail($message));
+                    Mail::to(app(\App\Settings\EmailSettings::class)->admin_alert_email)->send(new AdminAlertMail($message));
                 } catch (\Exception $e) {
                     // Ne pas bloquer l'app si le mail échoue
                 }

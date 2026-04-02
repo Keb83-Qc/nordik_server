@@ -3,8 +3,10 @@
 namespace App\Mail;
 
 use App\Models\Message;
+use App\Settings\EmailSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -17,6 +19,8 @@ class AdminAlertMail extends Mailable
 
     public function envelope(): Envelope
     {
+        $settings = app(EmailSettings::class);
+
         $type   = $this->message->data['type'] ?? 'system';
         $prio   = $this->message->data['priority'] ?? null;
         $sender = $this->message->sender
@@ -29,6 +33,7 @@ class AdminAlertMail extends Mailable
         };
 
         return new Envelope(
+            from: new Address($settings->alert_from_email, $settings->alert_from_name),
             subject: "{$prefix} {$this->message->subject} — {$sender}",
         );
     }

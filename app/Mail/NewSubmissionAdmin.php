@@ -6,8 +6,10 @@ use App\Models\ChatStep;
 use App\Models\QuotePortal;
 use App\Models\Submission;
 use App\Models\User;
+use App\Settings\EmailSettings;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -28,8 +30,6 @@ class NewSubmissionAdmin extends Mailable
         $this->advisor    = User::where('advisor_code', $submission->advisor_code)->first();
         $this->portal     = $submission->portal;
 
-        // Charge les steps actifs pour ce type (auto / habitation)
-        // Les champs non hardcodés dans l'email seront affichés dynamiquement.
         $type = $submission->type ?? '';
         $this->chatSteps = in_array($type, ['auto', 'habitation'])
             ? ChatStep::where('chat_type', $type)
@@ -41,31 +41,24 @@ class NewSubmissionAdmin extends Mailable
 
     public function envelope(): Envelope
     {
-        // 1. Nom du conseiller (ou Général)
+        $settings = app(EmailSettings::class);
+
         $advisorName = $this->advisor ? $this->advisor->first_name : 'Général';
-
-        // 2. Nom du client (Sécurisé avec ??)
-        $data = $this->submission->data ?? [];
-        $clientName = ($data['first_name'] ?? 'Client') . ' ' . ($data['last_name'] ?? '');
-
-        // 3. Type de soumission (ex: Auto, Habitation) - Première lettre majuscule
-        $type = ucfirst($this->submission->type ?? 'Soumission');
-
-        // Résultat : "[Auto] Nouvelle Soumission (Julie) - Jean Dupont"
-        // Ajouter le nom du portail partenaire dans le sujet si applicable
-        $portalTag = ($this->portal && $this->portal->isPartner())
+        $data        = $this->submission->data ?? [];
+        $clientName  = ($data['first_name'] ?? 'Client') . ' ' . ($data['last_name'] ?? '');
+        $type        = ucfirst($this->submission->type ?? 'Soumission');
+        $portalTag   = ($this->portal && $this->portal->isPartner())
             ? ' [' . $this->portal->name . ']'
             : '';
 
         return new Envelope(
+            from: new Address($settings->internal_from_email, $settings->internal_from_name),
             subject: "[$type]{$portalTag} Nouvelle Soumission ($advisorName) - $clientName",
         );
     }
 
     public function content(): Content
     {
-        return new Content(
-            view: 'emails.new-submission',
-        );
+        return new Content(view: 'emails.new-submission');
     }
 }

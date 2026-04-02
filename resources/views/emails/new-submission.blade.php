@@ -1,10 +1,15 @@
-<!DOCTYPE html>
-<html lang="fr">
+@php $emailSettings = app(\App\Settings\EmailSettings::class); @endphp
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nouvelle Soumission</title>
+<x-email.layout
+    :headerColor="$emailSettings->internal_header_color"
+    :headerTitle="$emailSettings->internal_header_title"
+    :accentColor="$emailSettings->global_accent_color"
+    :logoUrl="$emailSettings->global_logo_url"
+    :footerText="$emailSettings->global_footer_text"
+    title="Nouvelle Soumission"
+>
+
+<x-slot name="styles">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -106,23 +111,13 @@
             }
         }
 
-        .footer {
-            text-align: center;
-            font-size: 12px;
-            color: #777;
-            padding: 16px 12px;
-            background: #fafafa;
-            border-top: 1px solid #eee;
-        }
-
         .muted {
             color: #666;
             font-size: 12px;
         }
     </style>
-</head>
+</x-slot>
 
-<body>
     @php
     // ------------------------------------------------------------------
     // Data sources
@@ -299,18 +294,12 @@
     $clientName = trim(($clientFirst ?: 'Client').' '.$clientLast);
     @endphp
 
-    <div class="container">
-        <div class="header">
-            <h2>Nouvelle Soumission</h2>
-            <div class="sub">
-                <span class="pill">{{ $badgeType }}</span>
-                &nbsp;• Conseiller : <strong>{{ $advisorName }}</strong>
-                &nbsp;• Client : <strong>{{ $clientName }}</strong>
-                &nbsp;• ID: <strong>#{{ $submission->id }}</strong>
-            </div>
-        </div>
-
-        <div class="content">
+    <div style="margin-bottom:18px;padding:12px 16px;background:#f8f9fa;border-radius:8px;border:1px solid #eee;font-size:13px;color:#444;">
+        <span class="pill">{{ $badgeType }}</span>
+        &nbsp;• Conseiller : <strong>{{ $advisorName }}</strong>
+        &nbsp;• Client : <strong>{{ $clientName }}</strong>
+        &nbsp;• ID: <strong>#{{ $submission->id }}</strong>
+    </div>
 
             {{-- =========================================================
             PORTAIL PARTENAIRE — Bannière d'origine
@@ -687,11 +676,6 @@
 
         </div>
 
-        <div class="footer">
-            Système VIP Gestion de Patrimoine &amp; Investissement Inc. &copy; {{ date('Y') }}<br>
-            Message envoyé automatiquement. ID: #{{ $submission->id }}
-        </div>
-    </div>
-</body>
+    <p style="font-size:11px;color:#999;text-align:center;margin-top:16px;">Message envoyé automatiquement. ID: #{{ $submission->id }}</p>
 
-</html>
+</x-email.layout>

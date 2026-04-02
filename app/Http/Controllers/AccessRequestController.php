@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Settings\EmailSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
@@ -25,8 +26,8 @@ class AccessRequestController extends Controller
         Mail::raw(
             "Nouvelle demande d'accès:\n\nNom: {$request->name}\nEmail: {$request->email}\nTéléphone: {$request->phone}",
             function ($message) {
-                $message->to('claude.goudreau@vipgpi.ca')
-                    ->subject('Nouvelle demande d’accès');
+                $message->to(app(EmailSettings::class)->security_access_request_to)
+                    ->subject(‘Nouvelle demande d\’accès’);
             }
         );
 

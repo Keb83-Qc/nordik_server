@@ -56,7 +56,7 @@ class CareerPageResource extends Resource
                         Forms\Components\TextInput::make('contact_email')
                             ->label('Email de contact (Fallback)')
                             ->email()
-                            ->default('candidature@vipgpi.ca')
+                            ->default(app(\App\Settings\EmailSettings::class)->career_default_email)
                             ->required(),
                         Section::make('Vidéos')
                             ->schema([

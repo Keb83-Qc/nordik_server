@@ -16,7 +16,7 @@ class LeadDispatcher
 
             if ($candidates->isEmpty()) {
                 // Fallback : Si personne n'est actif, on retourne un admin ou null
-                return User::where('email', 'admin@vipgpi.ca')->first();
+                return User::where('email', app(\App\Settings\EmailSettings::class)->fallback_admin_email)->first();
             }
 
             // 2. Filtrer ceux qui n'ont pas encore rempli leur quota pour ce cycle
@@ -39,7 +39,7 @@ class LeadDispatcher
             // Sécurité : si toujours vide (ex: lead_weight = 0 pour tous), on abandonne proprement
             if ($eligible->isEmpty()) {
                 Log::warning('LeadDispatcher: aucun conseiller éligible même après reset du cycle (lead_weight=0?).');
-                return User::where('email', 'admin@vipgpi.ca')->first();
+                return User::where('email', app(\App\Settings\EmailSettings::class)->fallback_admin_email)->first();
             }
 
             // 4. CHOIX DU GAGNANT
