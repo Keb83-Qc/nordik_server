@@ -33,8 +33,7 @@ return [
 
     'panel_providers' => [
         App\Providers\Filament\AdminPanelProvider::class,
-        App\Providers\Filament\AbfPanelProvider::class,
-        App\Providers\Filament\ConseillerPanelProvider::class, // ✅ AJOUT
+        App\Providers\Filament\ConseillerPanelProvider::class,
     ],
 
     /*

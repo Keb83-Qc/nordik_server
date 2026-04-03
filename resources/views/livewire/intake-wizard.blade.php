@@ -30,20 +30,27 @@
     {{-- ─── ÉTAPES ────────────────────────────────────────────────────────── --}}
 
     @if($step === 'identite')
-        <div class="row g-3">
+        {{-- autocomplete="off" sur le form pour éviter que le navigateur remplisse l'adresse dans les champs prénom/nom --}}
+        <div class="row g-3" autocomplete="off">
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.prenom') }} *</label>
-                <input type="text" class="form-control" wire:model="prenom" placeholder="{{ $this->t('ph.prenom') }}" required>
+                <input type="text" class="form-control" wire:model="prenom"
+                       name="intake_prenom"
+                       autocomplete="given-name"
+                       placeholder="{{ $this->t('ph.prenom') }}" required>
                 @error('prenom')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.nom') }} *</label>
-                <input type="text" class="form-control" wire:model="nom" placeholder="{{ $this->t('ph.nom') }}" required>
+                <input type="text" class="form-control" wire:model="nom"
+                       name="intake_nom"
+                       autocomplete="family-name"
+                       placeholder="{{ $this->t('ph.nom') }}" required>
                 @error('nom')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.sexe') }} *</label>
-                <select class="form-select" wire:model="sexe" required>
+                <select class="form-select" wire:model="sexe" name="intake_sexe" autocomplete="sex" required>
                     <option value="">—</option>
                     <option value="Homme">{{ $this->t('sexe.homme') }}</option>
                     <option value="Femme">{{ $this->t('sexe.femme') }}</option>
@@ -53,30 +60,38 @@
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.ddn') }} *</label>
                 <div class="d-flex gap-2">
-                    <select class="form-select" wire:model="ddn_jour">
+                    <select class="form-select" wire:model="ddn_jour" name="intake_ddn_jour" autocomplete="off">
                         <option value="">JJ</option>
                         @for($d=1;$d<=31;$d++)
                             <option value="{{ str_pad($d,2,'0',STR_PAD_LEFT) }}">{{ str_pad($d,2,'0',STR_PAD_LEFT) }}</option>
                         @endfor
                     </select>
-                    <select class="form-select" wire:model="ddn_mois">
+                    <select class="form-select" wire:model="ddn_mois" name="intake_ddn_mois" autocomplete="off">
                         <option value="">MM</option>
                         @foreach(['01'=>'Jan','02'=>'Fév','03'=>'Mar','04'=>'Avr','05'=>'Mai','06'=>'Jun','07'=>'Jul','08'=>'Aoû','09'=>'Sep','10'=>'Oct','11'=>'Nov','12'=>'Déc'] as $v=>$l)
                             <option value="{{ $v }}">{{ $l }}</option>
                         @endforeach
                     </select>
-                    <input type="number" class="form-control" wire:model="ddn_annee" placeholder="AAAA" min="1920" max="{{ date('Y') - 18 }}" style="max-width:90px;">
+                    <input type="number" class="form-control" wire:model="ddn_annee"
+                           name="intake_ddn_annee" autocomplete="off"
+                           placeholder="AAAA" min="1920" max="{{ date('Y') - 18 }}" style="max-width:90px;">
                 </div>
                 @error('ddn_annee')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.courriel') }} *</label>
-                <input type="email" class="form-control" wire:model="courriel" placeholder="{{ $this->t('ph.courriel') }}" required>
+                <input type="email" class="form-control" wire:model="courriel"
+                       name="intake_courriel"
+                       autocomplete="email"
+                       placeholder="{{ $this->t('ph.courriel') }}" required>
                 @error('courriel')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.cellulaire') }} *</label>
-                <input type="tel" class="form-control" wire:model="cellulaire" placeholder="{{ $this->t('ph.cellulaire') }}" required>
+                <input type="tel" class="form-control" wire:model="cellulaire"
+                       name="intake_cellulaire"
+                       autocomplete="tel"
+                       placeholder="{{ $this->t('ph.cellulaire') }}" required>
                 @error('cellulaire')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
         </div>
@@ -85,20 +100,27 @@
         <div class="row g-3">
             <div class="col-4 col-sm-3">
                 <label class="form-label">{{ $this->t('field.addr_civique') }}</label>
-                <input type="text" class="form-control" wire:model="addr_civique" placeholder="123">
+                <input type="text" class="form-control" wire:model="addr_civique"
+                       name="intake_addr_civique" autocomplete="address-line1"
+                       placeholder="123">
             </div>
             <div class="col-8 col-sm-9">
                 <label class="form-label">{{ $this->t('field.addr_rue') }}</label>
-                <input type="text" class="form-control" wire:model="addr_rue" placeholder="Rue Principale">
+                <input type="text" class="form-control" wire:model="addr_rue"
+                       name="intake_addr_rue" autocomplete="address-line2"
+                       placeholder="Rue Principale">
             </div>
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.addr_ville') }} *</label>
-                <input type="text" class="form-control" wire:model="addr_ville" placeholder="Montréal" required>
+                <input type="text" class="form-control" wire:model="addr_ville"
+                       name="intake_addr_ville" autocomplete="address-level2"
+                       placeholder="Montréal" required>
                 @error('addr_ville')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
             <div class="col-7 col-sm-4">
                 <label class="form-label">{{ $this->t('field.addr_province') }} *</label>
-                <select class="form-select" wire:model="addr_province" required>
+                <select class="form-select" wire:model="addr_province"
+                        name="intake_addr_province" autocomplete="address-level1" required>
                     <option value="">—</option>
                     @foreach(['QC'=>'Québec','ON'=>'Ontario','BC'=>'Colombie-Britannique','AB'=>'Alberta','MB'=>'Manitoba','SK'=>'Saskatchewan','NS'=>'Nouvelle-Écosse','NB'=>'Nouveau-Brunswick','NL'=>'T.-N.-L.','PE'=>'Î.-P.-É.','NT'=>'T.N.-O.','YT'=>'Yukon','NU'=>'Nunavut'] as $code=>$name)
                         <option value="{{ $code }}">{{ $name }}</option>
@@ -108,7 +130,9 @@
             </div>
             <div class="col-5 col-sm-2">
                 <label class="form-label">{{ $this->t('field.addr_postal') }} *</label>
-                <input type="text" class="form-control text-uppercase" wire:model="addr_postal" placeholder="H1A 1A1" maxlength="7">
+                <input type="text" class="form-control text-uppercase" wire:model="addr_postal"
+                       name="intake_addr_postal" autocomplete="postal-code"
+                       placeholder="H1A 1A1" maxlength="7">
                 @error('addr_postal')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
         </div>
