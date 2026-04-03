@@ -72,22 +72,32 @@ class EmailLogResource extends Resource
                 ->readOnly(),
 
             Forms\Components\Grid::make(2)->schema([
-                Forms\Components\TextInput::make('context.to')
+                Forms\Components\TextInput::make('ctx_to')
                     ->label('Destinataire(s)')
-                    ->readOnly(),
+                    ->readOnly()
+                    ->afterStateHydrated(fn($component, $record) =>
+                        $component->state($record?->context['to'] ?? '—')
+                    ),
 
-                Forms\Components\TextInput::make('context.subject')
-                    ->label('Sujet (context)')
-                    ->readOnly(),
+                Forms\Components\TextInput::make('ctx_subject')
+                    ->label('Sujet détaillé')
+                    ->readOnly()
+                    ->afterStateHydrated(fn($component, $record) =>
+                        $component->state($record?->context['subject'] ?? '—')
+                    ),
             ]),
 
-            Forms\Components\Textarea::make('context')
+            Forms\Components\Textarea::make('ctx_json')
                 ->label('Détails (JSON)')
                 ->columnSpanFull()
                 ->rows(8)
                 ->readOnly()
                 ->extraAttributes(['class' => 'font-mono'])
-                ->formatStateUsing(fn($state) => json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+                ->afterStateHydrated(fn($component, $record) =>
+                    $component->state(
+                        json_encode($record?->context ?? [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                    )
+                ),
         ]);
     }
 
@@ -126,11 +136,11 @@ class EmailLogResource extends Resource
                     ->tooltip(fn($record) => $record->message)
                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('context.to')
+                Tables\Columns\TextColumn::make('destinataire')
                     ->label('Destinataire')
                     ->limit(40)
-                    ->tooltip(fn($record) => $record->context['to'] ?? null)
-                    ->searchable(),
+                    ->getStateUsing(fn($record) => $record->context['to'] ?? '—')
+                    ->tooltip(fn($record) => $record->context['to'] ?? null),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Date d\'envoi')
