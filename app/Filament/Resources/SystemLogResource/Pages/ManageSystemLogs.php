@@ -14,17 +14,11 @@ class ManageSystemLogs extends ManageRecords
     public function getTabs(): array
     {
         return [
-            'tous' => Tab::make('Tous'),
-
-            'connexions' => Tab::make('Connexions')
-                ->query(fn(Builder $query) => $query->whereIn('level', ['login', 'login_fail']))
-                ->icon('heroicon-m-key')
-                ->badgeColor('info'),
-
-            'echecs' => Tab::make('Échecs')
-                ->query(fn(Builder $query) => $query->where('level', 'login_fail'))
-                ->icon('heroicon-m-exclamation-circle')
-                ->badgeColor('danger'),
+            // Tous les logs système (exclut emails et connexions)
+            'tous' => Tab::make('Tous')
+                ->query(fn(Builder $query) => $query
+                    ->where('source', 'not like', 'email_%')
+                    ->whereNotIn('level', ['login', 'login_fail'])),
 
             'info' => Tab::make('Infos')
                 ->query(fn(Builder $query) => $query->where('level', 'info'))
@@ -45,42 +39,6 @@ class ManageSystemLogs extends ManageRecords
                 ->query(fn(Builder $query) => $query->where('level', 'fatal'))
                 ->icon('heroicon-m-x-circle')
                 ->badgeColor('danger'),
-
-            // ── Emails envoyés ──────────────────────────────────────────────
-            'emails' => Tab::make('Tous les emails')
-                ->query(fn(Builder $query) => $query->where('source', 'like', 'email_%'))
-                ->icon('heroicon-m-envelope')
-                ->badgeColor('primary'),
-
-            'email_internal' => Tab::make('Soumissions internes')
-                ->query(fn(Builder $query) => $query->where('source', 'email_internal'))
-                ->icon('heroicon-m-inbox-arrow-down')
-                ->badgeColor('success'),
-
-            'email_partner' => Tab::make('Soumissions partenaires')
-                ->query(fn(Builder $query) => $query->where('source', 'email_partner'))
-                ->icon('heroicon-m-building-office')
-                ->badgeColor('info'),
-
-            'email_security' => Tab::make('Sécurité & accès')
-                ->query(fn(Builder $query) => $query->where('source', 'email_security'))
-                ->icon('heroicon-m-shield-check')
-                ->badgeColor('warning'),
-
-            'email_abf' => Tab::make('Profil financier')
-                ->query(fn(Builder $query) => $query->where('source', 'email_abf'))
-                ->icon('heroicon-m-chart-bar')
-                ->badgeColor('info'),
-
-            'email_alert' => Tab::make('Alertes système')
-                ->query(fn(Builder $query) => $query->where('source', 'email_alert'))
-                ->icon('heroicon-m-bell-alert')
-                ->badgeColor('danger'),
-
-            'email_advisor' => Tab::make('Liens conseillers')
-                ->query(fn(Builder $query) => $query->where('source', 'email_advisor'))
-                ->icon('heroicon-m-user-group')
-                ->badgeColor('success'),
         ];
     }
 }

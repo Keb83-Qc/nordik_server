@@ -13,12 +13,13 @@ use Filament\Tables\Table;
 class SystemLogResource extends Resource
 {
     protected static ?string $model = SystemLog::class;
-    protected static ?string $navigationIcon = 'heroicon-o-cpu-chip';
-    protected static ?string $navigationLabel = 'Logs Système';
+    protected static ?string $navigationIcon  = 'heroicon-o-cpu-chip';
+    protected static ?string $navigationLabel = 'Système';
+    protected static ?int    $navigationSort  = 1;
 
     public static function getNavigationGroup(): ?string
     {
-        return 'Configuration';
+        return 'Logs';
     }
 
     public static function getNavigationSort(): ?int

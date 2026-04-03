@@ -133,20 +133,35 @@ final class InvestorProfileStep
                     ]),
 
                 // ── Score et profil ────────────────────────────────────────
-                Section::make('Résultat')
+                Section::make('Résultat du profil')
+                    ->description('Le profil est calculé automatiquement à partir du score total des 8 questions.')
                     ->columns(3)
                     ->schema([
                         Placeholder::make('_score_total')
                             ->label('Score total')
-                            ->content(fn(Get $get): string => self::totalScore($get) . ' / 160'),
+                            ->content(fn(Get $get): \Illuminate\Support\HtmlString => new \Illuminate\Support\HtmlString(
+                                '<span style="font-size:1.5rem;font-weight:700;color:#1d4ed8;">'
+                                . self::totalScore($get) . ' <span style="font-size:1rem;font-weight:400;color:#6b7280;">/ 160 pts</span></span>'
+                            )),
 
                         Placeholder::make('_profil_label')
                             ->label('Profil d\'investisseur')
-                            ->content(fn(Get $get): string => self::profileLabel(self::totalScore($get))),
+                            ->content(fn(Get $get): \Illuminate\Support\HtmlString => new \Illuminate\Support\HtmlString(
+                                '<span style="font-size:1.25rem;font-weight:600;">'
+                                . self::profileLabel(self::totalScore($get)) . '</span>'
+                            )),
 
-                        Placeholder::make('_profil_note')
-                            ->label('Note')
-                            ->content('Le profil est déterminé à partir du score total sur 160 points.'),
+                        Placeholder::make('_profil_grille')
+                            ->label('Grille de référence')
+                            ->content(new \Illuminate\Support\HtmlString(
+                                '<ul style="margin:0;padding:0;list-style:none;font-size:0.8rem;line-height:1.6;">'
+                                . '<li>🛡️ <strong>Prudent</strong> — 8 à 25 pts</li>'
+                                . '<li>⚖️ <strong>Modéré</strong> — 26 à 55 pts</li>'
+                                . '<li>🔄 <strong>Équilibré</strong> — 56 à 90 pts</li>'
+                                . '<li>📈 <strong>Croissance</strong> — 91 à 120 pts</li>'
+                                . '<li>🚀 <strong>Audacieux</strong> — 121 à 160 pts</li>'
+                                . '</ul>'
+                            )),
                     ]),
             ]);
     }
@@ -180,14 +195,36 @@ final class InvestorProfileStep
         return $total;
     }
 
-    private static function profileLabel(int $score): string
+    /**
+     * Seuils de score sur 160 points — 5 profils d'investisseur.
+     * Prudent    :   8 –  25 pts
+     * Modéré     :  26 –  55 pts
+     * Équilibré  :  56 –  90 pts
+     * Croissance :  91 – 120 pts
+     * Audacieux  : 121 – 160 pts
+     */
+    public static function profileLabel(int $score): string
     {
         return match (true) {
-            $score <= 25  => 'Conservateur',
-            $score <= 55  => 'Modérément conservateur',
-            $score <= 90  => 'Équilibré',
-            $score <= 120 => 'Croissance',
-            default       => 'Croissance agressive',
+            $score <= 25  => '🛡️ Prudent',
+            $score <= 55  => '⚖️ Modéré',
+            $score <= 90  => '🔄 Équilibré',
+            $score <= 120 => '📈 Croissance',
+            default       => '🚀 Audacieux',
+        };
+    }
+
+    /**
+     * Clé machine du profil (pour stockage dans payload).
+     */
+    public static function profileKey(int $score): string
+    {
+        return match (true) {
+            $score <= 25  => 'prudent',
+            $score <= 55  => 'modere',
+            $score <= 90  => 'equilibre',
+            $score <= 120 => 'croissance',
+            default       => 'audacieux',
         };
     }
 }
