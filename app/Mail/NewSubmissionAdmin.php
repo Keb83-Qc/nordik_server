@@ -19,6 +19,8 @@ class NewSubmissionAdmin extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_internal';
+
     public Submission $submission;
     public ?User $advisor;
     public ?QuotePortal $portal;

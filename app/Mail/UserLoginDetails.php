@@ -15,6 +15,8 @@ class UserLoginDetails extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_security';
+
     public EmailSettings $emailSettings;
 
     public function __construct(

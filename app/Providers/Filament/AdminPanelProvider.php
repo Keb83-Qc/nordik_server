@@ -198,7 +198,11 @@ class AdminPanelProvider extends PanelProvider
     private function globalStyles(): string
     {
         $docsUrl = url('/espace-conseiller/wiki');      // Wiki Filament
-        $supportUrl = app(\App\Settings\EmailSettings::class)->support_url;      // Support
+        try {
+            $supportUrl = app(\App\Settings\EmailSettings::class)->support_url;
+        } catch (\Throwable) {
+            $supportUrl = 'mailto:' . config('mail.from.address', 'support@vipgpi.ca');
+        }
         $build = $this->resolveBuildVersion();         // build auto
 
         return <<<HTML
@@ -732,7 +736,11 @@ HTML;
     private function globalScripts(): string
     {
         $docsUrl = url('/espace-conseiller/wiki');      // Wiki Filament
-        $supportUrl = app(\App\Settings\EmailSettings::class)->support_url;      // Support
+        try {
+            $supportUrl = app(\App\Settings\EmailSettings::class)->support_url;
+        } catch (\Throwable) {
+            $supportUrl = 'mailto:' . config('mail.from.address', 'support@vipgpi.ca');
+        }
         $build = $this->resolveBuildVersion();         // build auto
 
         return <<<HTML

@@ -15,6 +15,8 @@ class AdminAlertMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_alert';
+
     public function __construct(public Message $message) {}
 
     public function envelope(): Envelope

@@ -17,6 +17,8 @@ class PartnerSubmissionMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_partner';
+
     public Submission  $submission;
     public QuotePortal $portal;
     public ?User       $advisor;

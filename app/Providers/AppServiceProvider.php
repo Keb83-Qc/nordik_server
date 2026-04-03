@@ -25,6 +25,8 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Failed;
 use App\Listeners\LogSuccessfulLogin;
 use App\Listeners\LogFailedLogin;
+use App\Listeners\LogMailSent;
+use Illuminate\Mail\Events\MessageSent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -45,8 +47,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // Historique des connexions
-        Event::listen(Login::class,  LogSuccessfulLogin::class);
-        Event::listen(Failed::class, LogFailedLogin::class);
+        Event::listen(Login::class,   LogSuccessfulLogin::class);
+        Event::listen(Failed::class,  LogFailedLogin::class);
+
+        // Log de tous les emails envoyés (par département)
+        Event::listen(MessageSent::class, LogMailSent::class);
 
         // Invalide le cache HTML de page quand du contenu public change
         BlogPost::observe(ClearPageCacheObserver::class);

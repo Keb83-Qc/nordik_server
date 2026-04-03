@@ -16,6 +16,8 @@ class IntakeCompletedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_abf';
+
     public AbfIntake $intake;
     public AbfCase   $case;
 

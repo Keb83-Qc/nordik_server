@@ -15,6 +15,8 @@ class IntakeInviteMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_abf';
+
     public AbfIntake $intake;
 
     public function __construct(AbfIntake $intake)

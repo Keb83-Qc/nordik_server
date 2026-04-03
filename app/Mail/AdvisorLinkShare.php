@@ -15,6 +15,8 @@ class AdvisorLinkShare extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_advisor';
+
     public $advisor;
     public $link;
 

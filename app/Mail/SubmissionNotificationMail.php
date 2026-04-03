@@ -15,6 +15,8 @@ class SubmissionNotificationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
+    public string $emailDept = 'email_internal';
+
     public string $clientName;
     public string $vehicle;
 

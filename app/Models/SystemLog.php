@@ -16,10 +16,19 @@ class SystemLog extends Model
     use Prunable;
 
     // ── Sources possibles ──────────────────────────────────────────────────────
-    const SOURCE_PUBLIC = 'public';  // Site principal (visiteurs)
-    const SOURCE_ADMIN  = 'admin';   // Panel Filament (conseillers/admins)
-    const SOURCE_API    = 'api';     // Requêtes API / webhooks
-    const SOURCE_CLI    = 'cli';     // Artisan / queues / crons
+    const SOURCE_PUBLIC   = 'public';          // Site principal (visiteurs)
+    const SOURCE_ADMIN    = 'admin';           // Panel Filament (conseillers/admins)
+    const SOURCE_API      = 'api';             // Requêtes API / webhooks
+    const SOURCE_CLI      = 'cli';             // Artisan / queues / crons
+
+    // ── Sources email ──────────────────────────────────────────────────────────
+    const SOURCE_EMAIL_INTERNAL = 'email_internal'; // Soumissions internes
+    const SOURCE_EMAIL_PARTNER  = 'email_partner';  // Soumissions partenaires
+    const SOURCE_EMAIL_SECURITY = 'email_security'; // Sécurité & accès
+    const SOURCE_EMAIL_ABF      = 'email_abf';      // Profil financier (ABF)
+    const SOURCE_EMAIL_ALERT    = 'email_alert';    // Alertes système
+    const SOURCE_EMAIL_ADVISOR  = 'email_advisor';  // Liens conseillers
+    const SOURCE_EMAIL_SYSTEM   = 'email_system';   // Système (non catégorisé)
 
     public function user()
     {
