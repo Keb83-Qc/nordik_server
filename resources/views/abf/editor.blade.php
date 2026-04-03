@@ -58,6 +58,7 @@
     @include('abf.partials._page-objectifs')
     @include('abf.partials._page-actifs-passifs')
     @include('abf.partials._page-revenu-epargne')
+    @include('abf.partials._page-profil-investisseur')
     @include('abf.partials._page-fonds-urgence')
     @include('abf.partials._page-deces')
     @include('abf.partials._page-invalidite')

@@ -49,6 +49,9 @@
       <button class="nav-item locked" onclick="goTo('revenu-epargne',this)">
         <span class="dot"></span> Revenu et épargne
       </button>
+      <button class="nav-item locked" onclick="goTo('profil-investisseur',this)">
+        <span class="dot"></span> Profil d'investisseur
+      </button>
       <button class="nav-item locked" onclick="goTo('fonds-urgence',this)">
         <span class="dot"></span> Fonds d'urgence
       </button>

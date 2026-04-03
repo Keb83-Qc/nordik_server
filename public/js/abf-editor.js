@@ -45,7 +45,7 @@
 
   const pages = [
     'infos-perso','objectifs','actifs-passifs','revenu-epargne',
-    'fonds-urgence','deces','invalidite','maladie-grave',
+    'profil-investisseur','fonds-urgence','deces','invalidite','maladie-grave',
     'projets','retraite','recommandations','rapport'
   ];
   let current = 0;
@@ -129,6 +129,7 @@
     if (id === 'objectifs') renderObjectives();
     if (id === 'actifs-passifs') updateApSidebar();
     if (id === 'revenu-epargne') updateReSidebar();
+    if (id === 'profil-investisseur') profilInvestisseurInit();
     if (id === 'fonds-urgence') { fuRenderActifs(); fuCalc(); }
     if (id === 'deces') decesInit();
     if (id === 'invalidite') invaliditeInit();
@@ -1970,6 +1971,81 @@
     setTimeout(() => t.classList.remove('show'), 3000);
   }
 
+  /* ── Profil d'investisseur ─────────────────────────────────────── */
+
+  function piProfileLabel(score) {
+    if (score <= 25)  return '🛡️ Prudent';
+    if (score <= 55)  return '⚖️ Modéré';
+    if (score <= 90)  return '🔄 Équilibré';
+    if (score <= 120) return '📈 Croissance';
+    return '🚀 Audacieux';
+  }
+
+  function piProfileKey(score) {
+    if (score <= 25)  return 'prudent';
+    if (score <= 55)  return 'modere';
+    if (score <= 90)  return 'equilibre';
+    if (score <= 120) return 'croissance';
+    return 'audacieux';
+  }
+
+  function piCalcScore(role) {
+    let total = 0;
+    for (let q = 1; q <= 8; q++) {
+      const val = document.querySelector(`input[name="pi-${role}-q${q}"]:checked`)?.value;
+      if (val) total += parseInt(val, 10);
+    }
+    const scoreEl  = document.getElementById(`pi-score-${role}`);
+    const profilEl = document.getElementById(`pi-profil-${role}`);
+    if (scoreEl)  scoreEl.textContent = total;
+    if (profilEl) {
+      profilEl.textContent = piProfileLabel(total);
+      profilEl.className   = 'pi-result-profil pi-badge-' + piProfileKey(total);
+    }
+    return total;
+  }
+
+  function profilInvestisseurInit() {
+    const isCouple = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const tabs = document.getElementById('pi-person-tabs');
+    if (tabs) tabs.style.display = isCouple ? 'block' : 'none';
+    // Recalculer les scores affichés
+    piCalcScore('client');
+    if (isCouple) piCalcScore('conjoint');
+  }
+
+  function switchPiTab(role, btn) {
+    document.querySelectorAll('#pi-person-tabs .pi-person-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const panelC = document.getElementById('pi-panel-client');
+    const panelJ = document.getElementById('pi-panel-conjoint');
+    if (panelC) panelC.style.display = role === 'client'   ? '' : 'none';
+    if (panelJ) panelJ.style.display = role === 'conjoint' ? '' : 'none';
+  }
+
+  function gatherProfilInvestisseur(role) {
+    const data = {};
+    for (let q = 1; q <= 8; q++) {
+      const val = document.querySelector(`input[name="pi-${role}-q${q}"]:checked`)?.value;
+      data[`q${q}`] = val !== undefined ? parseInt(val, 10) : null;
+    }
+    data.score  = piCalcScore(role);
+    data.profil = piProfileKey(data.score);
+    return data;
+  }
+
+  function restoreProfilInvestisseur(role, data) {
+    if (!data) return;
+    for (let q = 1; q <= 8; q++) {
+      const val = data[`q${q}`];
+      if (val !== null && val !== undefined) {
+        const el = document.querySelector(`input[name="pi-${role}-q${q}"][value="${val}"]`);
+        if (el) el.checked = true;
+      }
+    }
+    piCalcScore(role);
+  }
+
   /* ── Fonds d'urgence ── */
   const FU_ELIGIBLE_TYPES = ['Compte bancaire','CELI','Non enregistré'];
 
@@ -3536,6 +3612,10 @@
         actifs:         typeof _retraiteActifs         !== 'undefined' ? _retraiteActifs         : [],
       },
       projets: typeof _projets !== 'undefined' ? _projets : [],
+      profil_investisseur: {
+        client:   gatherProfilInvestisseur('client'),
+        conjoint: gatherProfilInvestisseur('conjoint'),
+      },
       recommandations: {
         items:    typeof _recomItems !== 'undefined' ? _recomItems : {},
         notes:    typeof _recomNotes !== 'undefined' ? _recomNotes : {}, // legacy
@@ -3910,6 +3990,14 @@
       try { projetsRender(); } catch(e) { console.warn('projetsRender error', e); }
     }
 
+    // Profil investisseur
+    if (p.profil_investisseur) {
+      try {
+        restoreProfilInvestisseur('client',   p.profil_investisseur.client);
+        restoreProfilInvestisseur('conjoint', p.profil_investisseur.conjoint);
+      } catch(e) { console.warn('restoreProfilInvestisseur error', e); }
+    }
+
     // Recommandations
     if (p.recommandations?.items) {
       _recomItems = p.recommandations.items;
@@ -3963,15 +4051,20 @@
     const nav = p.navigation || {};
     const savedPage = nav.current_page;
     const donePagesSet = new Set(nav.done_pages || []);
+    const navItems = document.querySelectorAll('.nav-item');
     if (savedPage && pages.includes(savedPage)) {
-      const navItems = document.querySelectorAll('.nav-item');
       const savedIdx = pages.indexOf(savedPage);
+      // Déverrouiller toutes les pages visitées (jusqu'à la dernière enregistrée)
       navItems.forEach((el, i) => {
         if (i <= savedIdx) el.classList.remove('locked');
         if (donePagesSet.has(pages[i])) el.classList.add('done');
       });
-      goTo(savedPage, navItems[savedIdx]);
+    } else {
+      // Nouveau dossier : déverrouiller uniquement la première page
+      navItems[0]?.classList.remove('locked');
     }
+    // Toujours ouvrir sur "Informations personnelles" à la (ré)ouverture
+    goTo('infos-perso', navItems[0]);
 
     // Recalculs
     setTimeout(() => {
