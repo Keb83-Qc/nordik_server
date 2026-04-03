@@ -15,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (\Illuminate\Foundation\Configuration\Middleware $middleware) {
+        $middleware->redirectGuestsTo(
+            fn (\Illuminate\Http\Request $request) => route('login', ['locale' => app()->getLocale()])
+        );
+
         $middleware->alias([
             'set-locale' => \App\Http\Middleware\SetLocale::class,
              'setlocale'  => \App\Http\Middleware\SetLocale::class,
