@@ -59,24 +59,85 @@ class IntakeWizard extends Component
     public string $valeur_placements = '';
 
     // ─── Step 7 : Objectifs ───────────────────────────────────────────────────
-    public string $age_retraite        = '';
+    public string $age_retraite          = '';
     public string $age_retraite_conjoint = '';
-    public string $objectifs_texte     = '';
+    public string $objectifs_texte       = '';
+
+    // ─── Step 8 : Autres revenus ──────────────────────────────────────────────
+    public string $autre_revenu_client_montant  = '';
+    public string $autre_revenu_client_type     = '';
+    public string $autre_revenu_conjoint_montant = '';
+    public string $autre_revenu_conjoint_type   = '';
+
+    // ─── Step 9 : Épargne détaillée ───────────────────────────────────────────
+    public string $reer_conjoint        = '';
+    public string $ferr_client          = '';
+    public string $ferr_conjoint        = '';
+    public string $celiapp_client       = '';
+    public string $celiapp_conjoint     = '';
+    public string $fonds_pension_client  = '';
+    public string $fonds_pension_conjoint = '';
+
+    // ─── Step 10 : Dettes ─────────────────────────────────────────────────────
+    public string $dette_hypotheque  = '';
+    public string $dette_auto        = '';
+    public string $dette_cartes      = '';
+    public string $dette_marge       = '';
+    public string $dette_pret_perso  = '';
+    public string $dette_autres      = '';
+
+    // ─── Step 11 : Assurance vie ──────────────────────────────────────────────
+    public string $ass_vie_client_montant = '';
+    public string $ass_vie_client_type    = '';
+    public string $ass_vie_client_prime   = '';
+    public string $ass_vie_conj_montant   = '';
+    public string $ass_vie_conj_type      = '';
+    public string $ass_vie_conj_prime     = '';
+
+    // ─── Step 12 : Assurance invalidité ───────────────────────────────────────
+    public string $ass_inv_client_rente = '';
+    public string $ass_inv_client_prime = '';
+    public string $ass_inv_conj_rente   = '';
+    public string $ass_inv_conj_prime   = '';
+
+    // ─── Step 13 : Assurance maladie grave ────────────────────────────────────
+    public string $ass_mg_client_montant = '';
+    public string $ass_mg_client_prime   = '';
+    public string $ass_mg_conj_montant   = '';
+    public string $ass_mg_conj_prime     = '';
+
+    // ─── Step 14 : Fonds d'urgence ────────────────────────────────────────────
+    public string $fu_montant_actuel = '';
+
+    // ─── Step 15 : Retraite ───────────────────────────────────────────────────
+    public string $rev_retraite_mensuel      = '';
+    public string $rev_retraite_conj_mensuel = '';
+    public string $regime_retraite_client    = '';
+    public string $regime_retraite_conjoint  = '';
+
+    // ─── Step 16 : Profil d'investisseur ──────────────────────────────────────
+    public string $profil_risque   = '';
+    public string $profil_horizon  = '';
 
     // ─── Steps ordonnés ───────────────────────────────────────────────────────
 
     protected array $allSteps = [
-        'identite',
-        'adresse',
-        'famille',
-        'conjoint',
-        'revenus',
-        'actifs',
-        'objectifs',
+        'identite', 'adresse', 'famille', 'conjoint',
+        'revenus', 'autres_revenus', 'epargne',
+        'actifs', 'dettes',
+        'assurance_vie', 'assurance_invalidite', 'assurance_mg',
+        'fonds_urgence', 'retraite', 'objectifs',
+        'profil_investisseur',
     ];
 
-    // Ordre canonique pour s'assurer que les steps configurés restent dans le bon ordre
-    private const STEP_ORDER = ['identite', 'adresse', 'famille', 'conjoint', 'revenus', 'actifs', 'objectifs'];
+    private const STEP_ORDER = [
+        'identite', 'adresse', 'famille', 'conjoint',
+        'revenus', 'autres_revenus', 'epargne',
+        'actifs', 'dettes',
+        'assurance_vie', 'assurance_invalidite', 'assurance_mg',
+        'fonds_urgence', 'retraite', 'objectifs',
+        'profil_investisseur',
+    ];
 
     // ─── Mount ────────────────────────────────────────────────────────────────
 
@@ -248,9 +309,54 @@ class IntakeWizard extends Component
             'valeur_reer'       => $this->valeur_reer,
             'valeur_celi'       => $this->valeur_celi,
             'valeur_placements' => $this->valeur_placements,
-            'age_retraite'      => $this->age_retraite,
-            'age_retraite_conjoint' => $this->age_retraite_conjoint,
-            'objectifs_texte'   => $this->objectifs_texte,
+            'age_retraite'           => $this->age_retraite,
+            'age_retraite_conjoint'  => $this->age_retraite_conjoint,
+            'objectifs_texte'        => $this->objectifs_texte,
+            // autres_revenus
+            'autre_revenu_client_montant'   => $this->autre_revenu_client_montant,
+            'autre_revenu_client_type'      => $this->autre_revenu_client_type,
+            'autre_revenu_conjoint_montant' => $this->autre_revenu_conjoint_montant,
+            'autre_revenu_conjoint_type'    => $this->autre_revenu_conjoint_type,
+            // epargne
+            'reer_conjoint'         => $this->reer_conjoint,
+            'ferr_client'           => $this->ferr_client,
+            'ferr_conjoint'         => $this->ferr_conjoint,
+            'celiapp_client'        => $this->celiapp_client,
+            'celiapp_conjoint'      => $this->celiapp_conjoint,
+            'fonds_pension_client'  => $this->fonds_pension_client,
+            'fonds_pension_conjoint'=> $this->fonds_pension_conjoint,
+            // dettes
+            'dette_hypotheque' => $this->dette_hypotheque,
+            'dette_auto'       => $this->dette_auto,
+            'dette_cartes'     => $this->dette_cartes,
+            'dette_marge'      => $this->dette_marge,
+            'dette_pret_perso' => $this->dette_pret_perso,
+            'dette_autres'     => $this->dette_autres,
+            // assurances
+            'ass_vie_client_montant' => $this->ass_vie_client_montant,
+            'ass_vie_client_type'    => $this->ass_vie_client_type,
+            'ass_vie_client_prime'   => $this->ass_vie_client_prime,
+            'ass_vie_conj_montant'   => $this->ass_vie_conj_montant,
+            'ass_vie_conj_type'      => $this->ass_vie_conj_type,
+            'ass_vie_conj_prime'     => $this->ass_vie_conj_prime,
+            'ass_inv_client_rente'   => $this->ass_inv_client_rente,
+            'ass_inv_client_prime'   => $this->ass_inv_client_prime,
+            'ass_inv_conj_rente'     => $this->ass_inv_conj_rente,
+            'ass_inv_conj_prime'     => $this->ass_inv_conj_prime,
+            'ass_mg_client_montant'  => $this->ass_mg_client_montant,
+            'ass_mg_client_prime'    => $this->ass_mg_client_prime,
+            'ass_mg_conj_montant'    => $this->ass_mg_conj_montant,
+            'ass_mg_conj_prime'      => $this->ass_mg_conj_prime,
+            // fonds urgence
+            'fu_montant_actuel'          => $this->fu_montant_actuel,
+            // retraite
+            'rev_retraite_mensuel'       => $this->rev_retraite_mensuel,
+            'rev_retraite_conj_mensuel'  => $this->rev_retraite_conj_mensuel,
+            'regime_retraite_client'     => $this->regime_retraite_client,
+            'regime_retraite_conjoint'   => $this->regime_retraite_conjoint,
+            // profil investisseur
+            'profil_risque'  => $this->profil_risque,
+            'profil_horizon' => $this->profil_horizon,
         ];
     }
 
@@ -400,6 +506,104 @@ class IntakeWizard extends Component
             ];
         }
 
+        // Épargne détaillée
+        $epargneMap = [
+            'reer_conjoint'         => ['REER',      'conjoint'],
+            'ferr_client'           => ['FERR',      'client'],
+            'ferr_conjoint'         => ['FERR',      'conjoint'],
+            'celiapp_client'        => ['CELIAPP',   'client'],
+            'celiapp_conjoint'      => ['CELIAPP',   'conjoint'],
+            'fonds_pension_client'  => ['Fonds de pension', 'client'],
+            'fonds_pension_conjoint'=> ['Fonds de pension', 'conjoint'],
+        ];
+        foreach ($epargneMap as $prop => [$label, $owner]) {
+            $raw = $this->$prop;
+            if ($raw !== '' && is_numeric(str_replace([' ', ','], ['', '.'], $raw))) {
+                $val = (float) str_replace([' ', ','], ['', '.'], $raw);
+                $actifs[] = [
+                    '_type'       => $label,
+                    '_valeur'     => $val,
+                    '_owner'      => $owner,
+                    '_modalType'  => 'placement',
+                    'description' => $label . ($owner === 'conjoint' ? ' (conjoint)' : ''),
+                    'valeur'      => (string) $val,
+                ];
+            }
+        }
+
+        // Autres revenus
+        $autresRevenus = [
+            ['montant' => $this->autre_revenu_client_montant,   'type' => $this->autre_revenu_client_type,   'owner' => 'client'],
+            ['montant' => $this->autre_revenu_conjoint_montant, 'type' => $this->autre_revenu_conjoint_type, 'owner' => 'conjoint'],
+        ];
+        foreach ($autresRevenus as $ar) {
+            if ($ar['montant'] !== '' && is_numeric(str_replace([' ', ','], ['', '.'], $ar['montant']))) {
+                $montantNum = (float) str_replace([' ', ','], ['', '.'], $ar['montant']);
+                $revenus[] = [
+                    'type'        => $ar['type'] ?: 'Autre',
+                    'owner'       => $ar['owner'],
+                    'isEmploi'    => false,
+                    'description' => $ar['type'] ?: 'Autre revenu',
+                    'montant'     => (string) $montantNum,
+                    'frequence'   => 'Annuelle',
+                    'freqFactor'  => 1,
+                    'annuel'      => $montantNum,
+                ];
+            }
+        }
+
+        // Dettes / passifs
+        $passifs = [];
+        $dettesMap = [
+            'dette_hypotheque' => 'Hypothèque',
+            'dette_auto'       => 'Prêt auto',
+            'dette_cartes'     => 'Cartes de crédit',
+            'dette_marge'      => 'Marge de crédit',
+            'dette_pret_perso' => 'Prêt personnel',
+            'dette_autres'     => 'Autres dettes',
+        ];
+        foreach ($dettesMap as $prop => $label) {
+            $raw = $this->$prop;
+            if ($raw !== '' && is_numeric(str_replace([' ', ','], ['', '.'], $raw))) {
+                $val = (float) str_replace([' ', ','], ['', '.'], $raw);
+                $passifs[] = [
+                    '_type'       => $label,
+                    '_valeur'     => $val,
+                    '_owner'      => 'client',
+                    '_modalType'  => 'passif',
+                    'description' => $label,
+                    'solde'       => (string) $val,
+                ];
+            }
+        }
+
+        // Assurances en vigueur
+        $assurances = [];
+        if ($this->ass_vie_client_montant !== '') {
+            $assurances[] = ['categorie' => 'vie', 'owner' => 'client',
+                'montant' => $this->ass_vie_client_montant, 'type' => $this->ass_vie_client_type, 'prime' => $this->ass_vie_client_prime];
+        }
+        if ($hasSpouse && $this->ass_vie_conj_montant !== '') {
+            $assurances[] = ['categorie' => 'vie', 'owner' => 'conjoint',
+                'montant' => $this->ass_vie_conj_montant, 'type' => $this->ass_vie_conj_type, 'prime' => $this->ass_vie_conj_prime];
+        }
+        if ($this->ass_inv_client_rente !== '') {
+            $assurances[] = ['categorie' => 'invalidite', 'owner' => 'client',
+                'rente' => $this->ass_inv_client_rente, 'prime' => $this->ass_inv_client_prime];
+        }
+        if ($hasSpouse && $this->ass_inv_conj_rente !== '') {
+            $assurances[] = ['categorie' => 'invalidite', 'owner' => 'conjoint',
+                'rente' => $this->ass_inv_conj_rente, 'prime' => $this->ass_inv_conj_prime];
+        }
+        if ($this->ass_mg_client_montant !== '') {
+            $assurances[] = ['categorie' => 'maladie_grave', 'owner' => 'client',
+                'montant' => $this->ass_mg_client_montant, 'prime' => $this->ass_mg_client_prime];
+        }
+        if ($hasSpouse && $this->ass_mg_conj_montant !== '') {
+            $assurances[] = ['categorie' => 'maladie_grave', 'owner' => 'conjoint',
+                'montant' => $this->ass_mg_conj_montant, 'prime' => $this->ass_mg_conj_prime];
+        }
+
         // Enfants (placeholders)
         $enfants = [];
         for ($i = 0; $i < (int) $this->nb_enfants; $i++) {
@@ -447,17 +651,27 @@ class IntakeWizard extends Component
             'enfants' => $enfants,
             'revenus' => $revenus,
             'actifs'  => $actifs,
-            'passifs' => [],
+            'passifs' => $passifs,
             'legal'   => [],
+            'assurances_en_vigueur' => $assurances,
+            'fonds_urgence_actuel'  => $this->fu_montant_actuel,
             'retraite' => [
-                'ageClient'   => $this->age_retraite ?: '65',
-                'typeClient'  => 'age',
-                'ageConjoint' => ($hasSpouse && $this->age_retraite_conjoint) ? $this->age_retraite_conjoint : '65',
-                'typeConjoint'=> 'age',
+                'ageClient'           => $this->age_retraite ?: '65',
+                'typeClient'          => 'age',
+                'ageConjoint'         => ($hasSpouse && $this->age_retraite_conjoint) ? $this->age_retraite_conjoint : '65',
+                'typeConjoint'        => 'age',
+                'revMensuelClient'    => $this->rev_retraite_mensuel,
+                'revMensuelConjoint'  => $this->rev_retraite_conj_mensuel,
+                'regimeClient'        => $this->regime_retraite_client,
+                'regimeConjoint'      => $this->regime_retraite_conjoint,
+            ],
+            'profil_investisseur' => [
+                'risque'  => $this->profil_risque,
+                'horizon' => $this->profil_horizon,
             ],
             'navigation' => [
-                'done_pages'     => ['infos-perso'],
-                'intake_source'  => true,
+                'done_pages'       => ['infos-perso'],
+                'intake_source'    => true,
                 'objectifs_client' => $this->objectifs_texte,
             ],
         ];

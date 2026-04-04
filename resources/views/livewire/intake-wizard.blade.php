@@ -300,6 +300,345 @@
                 <textarea class="form-control" wire:model="objectifs_texte" rows="4" placeholder="{{ $this->t('ph.objectifs') }}"></textarea>
             </div>
         </div>
+
+    @elseif($step === 'autres_revenus')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.autres_revenus') }}</p>
+        <div class="row g-3">
+            <div class="col-12"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.vous') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.autre_revenu_type') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <select class="form-select" wire:model="autre_revenu_client_type">
+                    <option value="">— {{ $this->t('label.choisir') }} —</option>
+                    <option value="Rente gouvernementale">{{ $this->t('revtype.rente_gouv') }}</option>
+                    <option value="Revenu locatif">{{ $this->t('revtype.locatif') }}</option>
+                    <option value="Dividendes / intérêts">{{ $this->t('revtype.dividendes') }}</option>
+                    <option value="Pension de retraite">{{ $this->t('revtype.pension') }}</option>
+                    <option value="Travail autonome">{{ $this->t('revtype.autonome') }}</option>
+                    <option value="Autre">{{ $this->t('revtype.autre') }}</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.montant_annuel') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="autre_revenu_client_montant" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 mt-2"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.conjoint') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.autre_revenu_type') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <select class="form-select" wire:model="autre_revenu_conjoint_type">
+                    <option value="">— {{ $this->t('label.choisir') }} —</option>
+                    <option value="Rente gouvernementale">{{ $this->t('revtype.rente_gouv') }}</option>
+                    <option value="Revenu locatif">{{ $this->t('revtype.locatif') }}</option>
+                    <option value="Dividendes / intérêts">{{ $this->t('revtype.dividendes') }}</option>
+                    <option value="Pension de retraite">{{ $this->t('revtype.pension') }}</option>
+                    <option value="Travail autonome">{{ $this->t('revtype.autonome') }}</option>
+                    <option value="Autre">{{ $this->t('revtype.autre') }}</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.montant_annuel') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group">
+                    <span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="autre_revenu_conjoint_montant" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'epargne')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.epargne') }}</p>
+        <div class="row g-3">
+            @if($hasSpouse)
+            <div class="col-12"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.reer_ferr') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.reer_conjoint') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="reer_conjoint" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @endif
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ferr_client') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ferr_client" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ferr_conjoint') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ferr_conjoint" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @endif
+            <div class="col-12"><h6 class="fw-bold mt-2" style="color:var(--vip-navy);">{{ $this->t('label.celiapp_pension') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.celiapp_client') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="celiapp_client" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.celiapp_conjoint') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="celiapp_conjoint" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @endif
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.fonds_pension_client') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="fonds_pension_client" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.fonds_pension_conjoint') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="fonds_pension_conjoint" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'dettes')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.dettes') }}</p>
+        <div class="row g-3">
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_hypotheque') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_hypotheque" placeholder="0" min="0" step="1000">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_auto') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_auto" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_cartes') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_cartes" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_marge') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_marge" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_pret_perso') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_pret_perso" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.dette_autres') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="dette_autres" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+        </div>
+
+    @elseif($step === 'assurance_vie')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.assurance_vie') }}</p>
+        <div class="row g-3">
+            <div class="col-12"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.vous') }}</h6></div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_type') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <select class="form-select" wire:model="ass_vie_client_type">
+                    <option value="">—</option>
+                    <option value="Temporaire 10 ans">{{ $this->t('asstype.t10') }}</option>
+                    <option value="Temporaire 20 ans">{{ $this->t('asstype.t20') }}</option>
+                    <option value="Temporaire 30 ans">{{ $this->t('asstype.t30') }}</option>
+                    <option value="Permanente entière">{{ $this->t('asstype.permanente') }}</option>
+                    <option value="Universelle">{{ $this->t('asstype.universelle') }}</option>
+                    <option value="Autre">{{ $this->t('revtype.autre') }}</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_montant') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_vie_client_montant" placeholder="0" min="0" step="10000">
+                </div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_prime_annuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_vie_client_prime" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 mt-2"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.conjoint') }}</h6></div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_type') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <select class="form-select" wire:model="ass_vie_conj_type">
+                    <option value="">—</option>
+                    <option value="Temporaire 10 ans">{{ $this->t('asstype.t10') }}</option>
+                    <option value="Temporaire 20 ans">{{ $this->t('asstype.t20') }}</option>
+                    <option value="Temporaire 30 ans">{{ $this->t('asstype.t30') }}</option>
+                    <option value="Permanente entière">{{ $this->t('asstype.permanente') }}</option>
+                    <option value="Universelle">{{ $this->t('asstype.universelle') }}</option>
+                    <option value="Autre">{{ $this->t('revtype.autre') }}</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_montant') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_vie_conj_montant" placeholder="0" min="0" step="10000">
+                </div>
+            </div>
+            <div class="col-12 col-sm-4">
+                <label class="form-label">{{ $this->t('field.ass_prime_annuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_vie_conj_prime" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'assurance_invalidite')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.assurance_invalidite') }}</p>
+        <div class="row g-3">
+            <div class="col-12"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.vous') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_inv_rente') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_inv_client_rente" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_prime_mensuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_inv_client_prime" placeholder="0" min="0" step="10">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 mt-2"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.conjoint') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_inv_rente') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_inv_conj_rente" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_prime_mensuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_inv_conj_prime" placeholder="0" min="0" step="10">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'assurance_mg')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.assurance_mg') }}</p>
+        <div class="row g-3">
+            <div class="col-12"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.vous') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_montant') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_mg_client_montant" placeholder="0" min="0" step="10000">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_prime_annuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_mg_client_prime" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 mt-2"><h6 class="fw-bold" style="color:var(--vip-navy);">{{ $this->t('label.conjoint') }}</h6></div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_montant') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_mg_conj_montant" placeholder="0" min="0" step="10000">
+                </div>
+            </div>
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.ass_prime_annuelle') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="ass_mg_conj_prime" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'fonds_urgence')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.fonds_urgence') }}</p>
+        <div class="row g-3">
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.fu_montant_actuel') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="fu_montant_actuel" placeholder="0" min="0" step="500">
+                </div>
+            </div>
+        </div>
+
+    @elseif($step === 'retraite')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.retraite') }}</p>
+        <div class="row g-3">
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.rev_retraite_mensuel') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="rev_retraite_mensuel" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.rev_retraite_conj_mensuel') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="rev_retraite_conj_mensuel" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @endif
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.regime_retraite_client') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="regime_retraite_client" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @if($hasSpouse)
+            <div class="col-12 col-sm-6">
+                <label class="form-label">{{ $this->t('field.regime_retraite_conjoint') }} <span class="text-muted small">{{ $this->t('optional') }}</span></label>
+                <div class="input-group"><span class="input-group-text">$</span>
+                    <input type="number" class="form-control" wire:model="regime_retraite_conjoint" placeholder="0" min="0" step="100">
+                </div>
+            </div>
+            @endif
+        </div>
+
+    @elseif($step === 'profil_investisseur')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.profil_investisseur') }}</p>
+        <div class="row g-3">
+            <div class="col-12">
+                <label class="form-label">{{ $this->t('field.profil_risque') }}</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach(['prudent','modere','equilibre','croissance','audacieux'] as $val)
+                        <label class="intake-pill {{ $profil_risque === $val ? 'active' : '' }}">
+                            <input type="radio" wire:model.live="profil_risque" value="{{ $val }}" style="display:none">
+                            {{ $this->t('risque.' . $val) }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+            <div class="col-12">
+                <label class="form-label">{{ $this->t('field.profil_horizon') }}</label>
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach(['court','moyen','long'] as $val)
+                        <label class="intake-pill {{ $profil_horizon === $val ? 'active' : '' }}">
+                            <input type="radio" wire:model.live="profil_horizon" value="{{ $val }}" style="display:none">
+                            {{ $this->t('horizon.' . $val) }}
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+        </div>
     @endif
 
     {{-- ─── Boutons de navigation ─────────────────────────────────────────── --}}
