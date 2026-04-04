@@ -29,7 +29,7 @@ return [
 
         // ─── CLIENTS ─────────────────────────────────────────────
         'Gestion Clients' => [
-            'label'     => 'Gestion Clients',
+            'label'     => 'Gestion ABF',
             'icon'      => 'heroicon-o-user-group',
             'sort'      => 4,
             'collapsed' => true,
