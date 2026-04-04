@@ -3,17 +3,8 @@
 
     $p = $case->payload ?? [];
     $c = $p['client'] ?? [];
-    $j = $p['conjoint'] ?? [];
-    $hasSpouse = $p['has_spouse'] ?? false;
-    $rev = $p['revenus'] ?? [];
-    $actifs = $p['actifs'] ?? [];
-    $retraite = $p['retraite'] ?? [];
-    $objectifsTexte = $p['navigation']['objectifs_client'] ?? '';
-
     $advisor = $intake->advisor;
-
     $clientName = trim(($c['prenom'] ?? '') . ' ' . ($c['nom'] ?? '')) ?: 'Client';
-    $fmtMoney = fn($v) => $v ? number_format((float)$v, 0, ',', ' ') . ' $' : '—';
 @endphp
 
 <x-email.layout
@@ -48,74 +39,5 @@
 
     <div class="btn-wrap">
         <a href="{{ $case->editor_url }}" class="btn-link">Ouvrir le dossier ABF →</a>
-    </div>
-
-    {{-- Client --}}
-    <div class="section">
-        <div class="section-title">Informations client</div>
-        <div class="section-body">
-            <div class="grid">
-                <div class="info-row"><span class="label">Nom :</span> {{ $clientName }}</div>
-                <div class="info-row"><span class="label">Sexe :</span> {{ $c['sexe'] ?? '—' }}</div>
-                <div class="info-row"><span class="label">Date de naissance :</span> {{ implode('/', array_filter([$c['ddn_jour']??'',$c['ddn_mois']??'',$c['ddn_annee']??''])) ?: '—' }}</div>
-                <div class="info-row"><span class="label">État civil :</span> {{ $c['etat_civil'] ?? '—' }}</div>
-                <div class="info-row"><span class="label">Courriel :</span> {{ $c['courriel'] ?? '—' }}</div>
-                <div class="info-row"><span class="label">Cellulaire :</span> {{ $c['cellulaire'] ?? '—' }}</div>
-                <div class="info-row" style="grid-column:span 2;"><span class="label">Adresse :</span> {{ trim(implode(' ', array_filter([$c['addr_civique']??'',$c['addr_rue']??'',$c['addr_ville']??'',$c['addr_province']??'',$c['addr_postal']??'']))) ?: '—' }}</div>
-            </div>
-        </div>
-    </div>
-
-    @if($hasSpouse && ($j['prenom'] ?? ''))
-    <div class="section">
-        <div class="section-title">Conjoint(e)</div>
-        <div class="section-body">
-            <div class="grid">
-                <div class="info-row"><span class="label">Nom :</span> {{ $j['prenom'] }} {{ $j['nom'] ?? '' }}</div>
-                <div class="info-row"><span class="label">Date de naissance :</span> {{ implode('/', array_filter([$j['ddn_jour']??'',$j['ddn_mois']??'',$j['ddn_annee']??''])) ?: '—' }}</div>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    @if(!empty($rev))
-    <div class="section">
-        <div class="section-title">Revenus déclarés</div>
-        <div class="section-body">
-            @foreach($rev as $r)
-            <div class="info-row">
-                <span class="label">{{ ucfirst($r['owner'] ?? 'Client') }} :</span>
-                {{ $fmtMoney($r['annuel'] ?? $r['montant'] ?? 0) }} / an
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    @if(!empty($actifs))
-    <div class="section">
-        <div class="section-title">Actifs déclarés</div>
-        <div class="section-body">
-            @foreach($actifs as $a)
-            <div class="info-row">
-                <span class="label">{{ $a['description'] ?? $a['_type'] ?? '—' }} :</span>
-                {{ $fmtMoney($a['_valeur'] ?? $a['valeur'] ?? 0) }}
-            </div>
-            @endforeach
-        </div>
-    </div>
-    @endif
-
-    <div class="section">
-        <div class="section-title">Objectifs</div>
-        <div class="section-body">
-            <div class="info-row"><span class="label">Âge retraite client :</span> {{ $retraite['ageClient'] ?? '—' }} ans</div>
-            @if($hasSpouse && ($retraite['ageConjoint'] ?? ''))
-            <div class="info-row"><span class="label">Âge retraite conjoint :</span> {{ $retraite['ageConjoint'] }} ans</div>
-            @endif
-            @if($objectifsTexte)
-            <div class="info-row" style="margin-top:8px;"><span class="label">Objectifs :</span><br><span style="color:#555;">{{ $objectifsTexte }}</span></div>
-            @endif
-        </div>
     </div>
 </x-email.layout>
