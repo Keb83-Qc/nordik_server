@@ -201,7 +201,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                     ->tabs([
                         // ── Tab 1: Valeurs par défaut ──────────────────────────
                         Tabs\Tab::make('Valeurs par défaut')
-                            ->icon('heroicon-o-sliders')
+                            ->icon('heroicon-o-adjustments-horizontal')
                             ->schema([
                                 Section::make('Province')
                                     ->schema([
