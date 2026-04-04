@@ -33,6 +33,11 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
         return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
     }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRoleByName(['admin', 'super_admin']) ?? false;
+    }
+
     public function mount(): void
     {
         $p = AbfParameter::allAsMap();
@@ -393,8 +398,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                                 TextInput::make('max')
                                                     ->label('Revenu max ($)')
                                                     ->placeholder('Illimité')
-                                                    ->numeric()
-                                                    ->nullable(),
+                                                    ->numeric(),
                                                 TextInput::make('rate')
                                                     ->label('Taux (%)')
                                                     ->suffix('%')
@@ -438,8 +442,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                                 TextInput::make('max')
                                                     ->label('Revenu max ($)')
                                                     ->placeholder('Illimité')
-                                                    ->numeric()
-                                                    ->nullable(),
+                                                    ->numeric(),
                                                 TextInput::make('rate')
                                                     ->label('Taux (%)')
                                                     ->suffix('%')
@@ -593,8 +596,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                             ->numeric(),
                                     ])
                                     ->columns(2)
-                                    ->addActionLabel('+ Ajouter une année')
-                                    ->orderColumn('annee'),
+                                    ->addActionLabel('+ Ajouter une année'),
                             ]),
 
                         // ── Tab 6: Sécurité de vieillesse ─────────────────────
