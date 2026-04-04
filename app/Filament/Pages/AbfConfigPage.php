@@ -171,7 +171,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
             'celi_plafonds'         => $celiPlafonds,
 
             // Formulaire client (intake)
-            'intake_steps'   => json_decode($p['intake']['steps_enabled'] ?? '["adresse","famille","revenus","actifs","objectifs"]', true) ?? [],
+            'intake_steps'   => json_decode($p['intake']['steps_enabled'] ?? '["adresse","famille","revenus","epargne","actifs","dettes","retraite","objectifs"]', true) ?? [],
 
             // SV
             'sv_max_65_74'   => $p['sv']['max_mensuel_65_74']  ?? '727.67',
@@ -593,20 +593,16 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                         TextInput::make('annee')
                                             ->label('Année')
                                             ->numeric()
-                                            ->maxLength(4)
-                                            ->columnSpan(1)
-                                            ->extraInputAttributes(['style' => 'text-align:center']),
+                                            ->maxLength(4),
                                         TextInput::make('montant')
                                             ->label('Montant ($)')
                                             ->prefix('$')
-                                            ->numeric()
-                                            ->columnSpan(2),
+                                            ->numeric(),
                                     ])
-                                    ->columns(3)
+                                    ->columns(2)
                                     ->grid(4)
-                                    ->addActionLabel('+ Ajouter une année')
-                                    ->reorderableWithButtons()
-                                    ->cloneable(),
+                                    ->reorderable(false)
+                                    ->addActionLabel('+ Ajouter une année'),
                             ]),
 
                         // ── Tab 6: Sécurité de vieillesse ─────────────────────
@@ -671,11 +667,31 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                         CheckboxList::make('intake_steps')
                                             ->label('Sections à inclure')
                                             ->options([
-                                                'adresse'   => 'Adresse postale',
-                                                'famille'   => 'Famille (état civil, nombre d\'enfants)',
-                                                'revenus'   => 'Revenus annuels',
-                                                'actifs'    => 'Actifs et placements (propriété, REER, CELI…)',
-                                                'objectifs' => 'Objectifs (âge de retraite, revenus souhaités…)',
+                                                // Infos de base
+                                                'adresse'             => '📍 Adresse postale',
+                                                'famille'             => '👨‍👩‍👧 Famille (état civil, nombre d\'enfants)',
+
+                                                // Revenus & épargne
+                                                'revenus'             => '💼 Revenus annuels (emploi)',
+                                                'autres_revenus'      => '📈 Autres revenus (rentes, loyers, dividendes…)',
+                                                'epargne'             => '🏦 Épargne et placements (REER, CELI, placements non enregistrés)',
+
+                                                // Actifs & passifs
+                                                'actifs'              => '🏠 Actifs (propriété, valeur marchande)',
+                                                'dettes'              => '💳 Dettes et passifs (hypothèque, prêts, cartes de crédit)',
+
+                                                // Assurances actuelles
+                                                'assurance_vie'       => '🛡️ Assurance vie en vigueur',
+                                                'assurance_invalidite'=> '🏥 Assurance invalidité en vigueur',
+                                                'assurance_mg'        => '⚕️ Assurance maladie grave en vigueur',
+
+                                                // Analyse de besoins
+                                                'fonds_urgence'       => '🆘 Fonds d\'urgence (montant disponible)',
+                                                'retraite'            => '🌅 Retraite (âge visé, objectif de revenus)',
+                                                'objectifs'           => '🎯 Objectifs et projets de vie',
+
+                                                // Profil
+                                                'profil_investisseur' => '📊 Profil d\'investisseur (tolérance au risque)',
                                             ])
                                             ->columns(1)
                                             ->gridDirection('row'),
