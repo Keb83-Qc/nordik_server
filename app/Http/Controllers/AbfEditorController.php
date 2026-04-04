@@ -59,6 +59,8 @@ class AbfEditorController extends Controller
             'advisorSlug'        => $advisor->slug,
             'abfRecommendations' => AbfRecommendation::dropdownOptions(),
             'abfRecomJs'         => AbfRecommendation::forJs(),
+            'advisorTitreFr'     => $advisor->abf_titre_fr ?? '',
+            'advisorTitreEn'     => $advisor->abf_titre_en ?? '',
         ]);
     }
 
@@ -132,12 +134,16 @@ class AbfEditorController extends Controller
             $abfParams = [];
         }
 
+        $advisor = $this->resolveAdvisor($advisorSlug);
+
         return view('abf.editor', [
             'record'             => $abfCase,
             'abfParams'          => $abfParams,
             'advisorSlug'        => $advisorSlug,
             'abfRecommendations' => AbfRecommendation::dropdownOptions(),
             'abfRecomJs'         => AbfRecommendation::forJs(),
+            'advisorTitreFr'     => $advisor->abf_titre_fr ?? '',
+            'advisorTitreEn'     => $advisor->abf_titre_en ?? '',
         ]);
     }
 
@@ -214,6 +220,19 @@ class AbfEditorController extends Controller
         }
 
         return response()->json(['ok' => true, 'params' => AbfParameter::allAsMap()]);
+    }
+
+    public function saveProfil(Request $request, string $advisorSlug = ''): JsonResponse
+    {
+        $advisorSlug = $advisorSlug ?: (request()->route('advisorSlug') ?? auth()->user()?->slug ?? 'conseiller');
+        $advisor = $this->resolveAdvisor($advisorSlug);
+
+        $advisor->update([
+            'abf_titre_fr' => \Illuminate\Support\Str::limit($request->input('titre_fr', ''), 200),
+            'abf_titre_en' => \Illuminate\Support\Str::limit($request->input('titre_en', ''), 200),
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

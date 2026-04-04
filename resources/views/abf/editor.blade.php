@@ -26,7 +26,10 @@
         window.ABF_CSRF_TOKEN = '{{ csrf_token() }}';
         window.ABF_ADVISOR_NAME = '{{ auth()->user()->full_name ?? (auth()->user()->name ?? '') }}';
         window.ABF_LANDING_URL  = '{{ route('abf.landing', ['advisorSlug' => $advisorSlug]) }}';
-        window.ABF_PARAMS_SAVE_URL = '{{ route('abf.params.save', ['advisorSlug' => $advisorSlug]) }}';
+        window.ABF_PARAMS_SAVE_URL  = '{{ route('abf.params.save', ['advisorSlug' => $advisorSlug]) }}';
+        window.ABF_PROFIL_SAVE_URL  = '{{ route('abf.profil.save', ['advisorSlug' => $advisorSlug]) }}';
+        window.ABF_ADVISOR_TITRE_FR = @json($advisorTitreFr ?? '');
+        window.ABF_ADVISOR_TITRE_EN = @json($advisorTitreEn ?? '');
 
         {{-- Paramètres système chargés depuis la base de données --}}
         window.ABF_PARAMS = {!! json_encode($abfParams ?? []) !!};

@@ -1926,9 +1926,35 @@
   // ── Aliases pour compatibilité (ancien code / boutons existants) ──
   function openProfilModal()  { openConfigModal('profil'); }
   function closeProfilModal() { closeConfigModal(); }
+  // Charger les titres du conseiller au démarrage
+  (function initProfilTitres() {
+    const fr = window.ABF_ADVISOR_TITRE_FR || '';
+    const en = window.ABF_ADVISOR_TITRE_EN || '';
+    const elFr = document.getElementById('profil-titre-fr');
+    const elEn = document.getElementById('profil-titre-en');
+    if (elFr && fr) elFr.value = fr;
+    if (elEn && en) elEn.value = en;
+  })();
+
   function saveProfilModal() {
-    closeConfigModal();
-    showToast('Profil enregistré');
+    const titreFr = document.getElementById('profil-titre-fr')?.value ?? '';
+    const titreEn = document.getElementById('profil-titre-en')?.value ?? '';
+
+    fetch(window.ABF_PROFIL_SAVE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': window.ABF_CSRF_TOKEN },
+      body: JSON.stringify({ titre_fr: titreFr, titre_en: titreEn }),
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.ok) {
+        window.ABF_ADVISOR_TITRE_FR = titreFr;
+        window.ABF_ADVISOR_TITRE_EN = titreEn;
+        closeConfigModal();
+        showToast('Profil enregistré');
+      }
+    })
+    .catch(() => showToast('Erreur lors de la sauvegarde'));
   }
   function openValeursDefaut()  { openConfigModal('valeurs'); }
   function closeValeursDefaut() { closeConfigModal(); }

@@ -52,6 +52,7 @@ Route::middleware(['auth', '2fa'])->prefix('{advisorSlug}/liste-bilan')->group(f
     Route::post('/nouveau',                      [AbfEditorController::class, 'createJson'])->name('abf.create.json');
     Route::get('/creer',                         [AbfEditorController::class, 'create'])->name('abf.new');
     Route::post('/parametres',                   [AbfEditorController::class, 'saveParams'])->name('abf.params.save');
+    Route::post('/profil',                       [AbfEditorController::class, 'saveProfil'])->name('abf.profil.save');
     Route::post('/nouveautes/{id}/vu',           [AbfEditorController::class, 'markAnnouncementSeen'])->name('abf.announcement.seen');
     Route::get('/{record}',                      [AbfEditorController::class, 'show'])->name('abf.editor.show')->where('record', '.*');
     Route::post('/{record}/sauvegarder',         [AbfEditorController::class, 'save'])->name('abf.editor.save')->where('record', '.*');

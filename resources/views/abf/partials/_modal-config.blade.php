@@ -20,7 +20,7 @@
 
     {{-- ── En-tête ── --}}
     <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Configuration du profil</h4>
+      <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Profil</h4>
       <button onclick="closeConfigModal()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px;line-height:1">×</button>
     </div>
 

@@ -68,6 +68,8 @@ class User extends Authenticatable implements HasName, FilamentUser
         'last_lead_received_at',
         'two_factor_secret',
         'two_factor_confirmed_at',
+        'abf_titre_fr',
+        'abf_titre_en',
     ];
 
     protected $hidden = ['password', 'remember_token'];
