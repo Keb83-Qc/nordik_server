@@ -589,14 +589,18 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                         TextInput::make('annee')
                                             ->label('Année')
                                             ->numeric()
-                                            ->maxLength(4),
+                                            ->maxLength(4)
+                                            ->extraInputAttributes(['style' => 'text-align:center']),
                                         TextInput::make('montant')
                                             ->label('Montant ($)')
                                             ->prefix('$')
                                             ->numeric(),
                                     ])
                                     ->columns(2)
-                                    ->addActionLabel('+ Ajouter une année'),
+                                    ->grid(4)
+                                    ->addActionLabel('+ Ajouter une année')
+                                    ->reorderableWithButtons()
+                                    ->cloneable(),
                             ]),
 
                         // ── Tab 6: Sécurité de vieillesse ─────────────────────
