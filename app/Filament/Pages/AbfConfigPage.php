@@ -601,7 +601,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                     ])
                                     ->columns(2)
                                     ->grid(4)
-                                    ->reorderable(false)
+                                    ->reorderableWithDragAndDrop(false)
                                     ->addActionLabel('+ Ajouter une année'),
                             ]),
 
