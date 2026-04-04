@@ -40,6 +40,12 @@ Route::middleware(['auth'])->prefix('2fa')->name('2fa.')->group(function () {
     Route::post('/disable', [TwoFactorController::class, 'disable'])->name('disable');
 });
 
+// ── Raccourci /abf → redirige vers le vrai ABF de l'utilisateur connecté ────────
+Route::middleware(['auth', '2fa'])->get('/abf', function () {
+    $slug = auth()->user()->slug ?? 'conseiller';
+    return redirect("/{$slug}/liste-bilan");
+})->name('abf.redirect');
+
 // ── Routes ABF avec préfixe conseiller (prenom-nom/liste-bilan) ───────────────
 Route::middleware(['auth', '2fa'])->prefix('{advisorSlug}/liste-bilan')->group(function () {
     Route::get('/',                              [AbfEditorController::class, 'landing'])->name('abf.landing');
