@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\AbfParameter;
 use Filament\Forms;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -168,6 +169,9 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
 
             // CELI
             'celi_plafonds'         => $celiPlafonds,
+
+            // Formulaire client (intake)
+            'intake_steps'   => json_decode($p['intake']['steps_enabled'] ?? '["adresse","famille","revenus","actifs","objectifs"]', true) ?? [],
 
             // SV
             'sv_max_65_74'   => $p['sv']['max_mensuel_65_74']  ?? '727.67',
@@ -590,13 +594,15 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                             ->label('Année')
                                             ->numeric()
                                             ->maxLength(4)
+                                            ->columnSpan(1)
                                             ->extraInputAttributes(['style' => 'text-align:center']),
                                         TextInput::make('montant')
                                             ->label('Montant ($)')
                                             ->prefix('$')
-                                            ->numeric(),
+                                            ->numeric()
+                                            ->columnSpan(2),
                                     ])
-                                    ->columns(2)
+                                    ->columns(3)
                                     ->grid(4)
                                     ->addActionLabel('+ Ajouter une année')
                                     ->reorderableWithButtons()
@@ -652,6 +658,27 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                             ->label('Bonification par mois de report')
                                             ->suffix('%')
                                             ->numeric(),
+                                    ]),
+                            ]),
+
+                        // ── Tab 7: Formulaire client ───────────────────────────
+                        Tabs\Tab::make('Formulaire client')
+                            ->icon('heroicon-o-clipboard-document-list')
+                            ->schema([
+                                Section::make('Sections incluses dans le formulaire envoyé au client')
+                                    ->description('L\'identité (nom, date de naissance, courriel, téléphone) est toujours incluse. Le conjoint apparaît automatiquement si le client indique être marié.')
+                                    ->schema([
+                                        CheckboxList::make('intake_steps')
+                                            ->label('Sections à inclure')
+                                            ->options([
+                                                'adresse'   => 'Adresse postale',
+                                                'famille'   => 'Famille (état civil, nombre d\'enfants)',
+                                                'revenus'   => 'Revenus annuels',
+                                                'actifs'    => 'Actifs et placements (propriété, REER, CELI…)',
+                                                'objectifs' => 'Objectifs (âge de retraite, revenus souhaités…)',
+                                            ])
+                                            ->columns(1)
+                                            ->gridDirection('row'),
                                     ]),
                             ]),
                     ])
@@ -744,6 +771,10 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
             'montant' => (float)($row['montant'] ?? 0),
         ], $celiPlafonds);
         $this->saveParam('celi', 'plafonds', json_encode($celiPlafonds), 'Plafonds annuels CELI', 'json');
+
+        // Formulaire client (intake)
+        $intakeSteps = array_values(array_filter($state['intake_steps'] ?? [], fn($s) => is_string($s)));
+        $this->saveParam('intake', 'steps_enabled', json_encode($intakeSteps), 'Sections du formulaire client', 'json');
 
         // SV
         $this->saveParam('sv', 'max_mensuel_65_74',  $state['sv_max_65_74']    ?? '');

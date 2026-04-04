@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Mail\IntakeCompletedMail;
 use App\Models\AbfCase;
 use App\Models\AbfIntake;
+use App\Models\AbfParameter;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -74,12 +75,34 @@ class IntakeWizard extends Component
         'objectifs',
     ];
 
+    // Ordre canonique pour s'assurer que les steps configurés restent dans le bon ordre
+    private const STEP_ORDER = ['identite', 'adresse', 'famille', 'conjoint', 'revenus', 'actifs', 'objectifs'];
+
     // ─── Mount ────────────────────────────────────────────────────────────────
 
     public function mount(int $intakeId, string $locale = 'fr'): void
     {
         $this->intakeId = $intakeId;
         $this->locale   = $locale;
+
+        // Charger les sections activées depuis la configuration admin
+        try {
+            $p = AbfParameter::allAsMap();
+            $raw = $p['intake']['steps_enabled'] ?? null;
+            if ($raw) {
+                $configured = json_decode($raw, true);
+                if (is_array($configured)) {
+                    // Toujours inclure identite + conjoint, dans l'ordre canonique
+                    $enabled = array_merge(['identite'], $configured, ['conjoint']);
+                    $this->allSteps = array_values(array_filter(
+                        self::STEP_ORDER,
+                        fn($s) => in_array($s, $enabled, true)
+                    ));
+                }
+            }
+        } catch (\Throwable) {
+            // Garde les steps par défaut si la table n'existe pas encore
+        }
 
         // Pré-remplir depuis les données partiellement sauvegardées
         $intake = AbfIntake::find($intakeId);
