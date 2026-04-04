@@ -98,6 +98,7 @@ return [
         \App\Filament\Resources\AbfCaseAdminResource::class        => 1,
         \App\Filament\Resources\AbfAnnouncementResource::class     => 2,
         \App\Filament\Resources\AbfRecommendationResource::class   => 3,
+        \App\Filament\Pages\AbfConfigPage::class                   => 10,
 
         // Site Web
         \App\Filament\Resources\MenuItemResource::class              => 1,

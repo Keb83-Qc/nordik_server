@@ -1355,13 +1355,27 @@
   }
   function editEpargneItem(item) { showToast('Modification disponible dans la version complète'); }
 
-  const CELI_LIMITS = {
+  const CELI_LIMITS_DEFAULT = {
     2009:5000,2010:5000,2011:5000,2012:5000,
     2013:5500,2014:5500,2015:10000,
     2016:5500,2017:5500,2018:5500,
     2019:6000,2020:6000,2021:6000,2022:6000,
     2023:6500,2024:7000,2025:7000,2026:7000
   };
+  const CELI_LIMITS = (() => {
+    try {
+      const raw = window.ABF_PARAMS?.celi?.plafonds;
+      if (raw) {
+        const arr = JSON.parse(raw);
+        if (Array.isArray(arr) && arr.length > 0) {
+          const r = {};
+          arr.forEach(({annee, montant}) => { r[parseInt(annee)] = parseFloat(montant) || 0; });
+          return r;
+        }
+      }
+    } catch(e) {}
+    return CELI_LIMITS_DEFAULT;
+  })();
   function calcDroitsCeli(who) {
     const curY = new Date().getFullYear();
     const birthYear = parseInt(document.getElementById(who==='client'?'client-naissance-annee':'conjoint-naissance-annee')?.value) || null;
@@ -1795,10 +1809,42 @@
     ae:   { ceil: 68900,  rate: 1.30  },
     rqap: { ceil: 103000, rate: 0.430 }
   };
-  let fiscalParams = JSON.parse(JSON.stringify(FISCAL_2026));
-  // Fix Infinity after JSON round-trip
-  fiscalParams.fed.brackets[4].max = Infinity;
-  fiscalParams.qc.brackets[3].max  = Infinity;
+  function buildFiscalFromDb() {
+    const f = window.ABF_PARAMS?.fiscalite;
+    if (!f) return null;
+    try {
+      const parseBrackets = (key) => {
+        const arr = JSON.parse(f[key] || '[]');
+        return arr.map(b => ({ max: b.max == null ? Infinity : parseFloat(b.max), rate: parseFloat(b.rate) }));
+      };
+      const fedBrackets = parseBrackets('brackets_fed');
+      const qcBrackets  = parseBrackets('brackets_qc');
+      if (!fedBrackets.length || !qcBrackets.length) return null;
+      return {
+        fed: {
+          brackets: fedBrackets,
+          baseMax: parseFloat(f.fed_base_max) || FISCAL_2026.fed.baseMax,
+          baseMin: parseFloat(f.fed_base_min) || FISCAL_2026.fed.baseMin,
+          baseThreshLow:  parseFloat(f.fed_base_seuil_bas)  || FISCAL_2026.fed.baseThreshLow,
+          baseThreshHigh: parseFloat(f.fed_base_seuil_haut) || FISCAL_2026.fed.baseThreshHigh,
+          creditRate: parseFloat(f.fed_credit_rate) || FISCAL_2026.fed.creditRate,
+        },
+        qc: {
+          brackets: qcBrackets,
+          base: parseFloat(f.qc_base) || FISCAL_2026.qc.base,
+          creditRate: parseFloat(f.qc_credit_rate) || FISCAL_2026.qc.creditRate,
+        },
+        rrq:  { exemption: parseFloat(f.rrq_exemption)||3500, ceil1: parseFloat(f.rrq_ceil1)||74600, rate1: parseFloat(f.rrq_rate1)||5.4, ceil2: parseFloat(f.rrq_ceil2)||85000, rate2: parseFloat(f.rrq_rate2)||1.0 },
+        ae:   { ceil: parseFloat(f.ae_ceil)||68900,   rate: parseFloat(f.ae_rate)||1.30 },
+        rqap: { ceil: parseFloat(f.rqap_ceil)||103000, rate: parseFloat(f.rqap_rate)||0.430 },
+      };
+    } catch(e) { return null; }
+  }
+  let fiscalParams = buildFiscalFromDb() || JSON.parse(JSON.stringify(FISCAL_2026));
+  if (fiscalParams.fed.brackets[fiscalParams.fed.brackets.length-1].max !== Infinity)
+    fiscalParams.fed.brackets[fiscalParams.fed.brackets.length-1].max = Infinity;
+  if (fiscalParams.qc.brackets[fiscalParams.qc.brackets.length-1].max !== Infinity)
+    fiscalParams.qc.brackets[fiscalParams.qc.brackets.length-1].max = Infinity;
 
   function computeImpot(brut) {
     if (brut <= 0) return null;

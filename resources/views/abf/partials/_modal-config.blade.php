@@ -16,28 +16,18 @@
 @endphp
 
 <div id="modal-config">
-  <div style="background:white;border-radius:14px;width:100%;max-width:740px;max-height:90vh;box-shadow:0 24px 64px rgba(0,0,0,.28);margin:20px;display:flex;flex-direction:column;overflow:hidden">
+  <div style="background:white;border-radius:14px;width:100%;max-width:540px;max-height:90vh;box-shadow:0 24px 64px rgba(0,0,0,.28);margin:20px;display:flex;flex-direction:column;overflow:hidden">
 
     {{-- ── En-tête ── --}}
     <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-      <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Configuration</h4>
+      <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Configuration du profil</h4>
       <button onclick="closeConfigModal()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px;line-height:1">×</button>
     </div>
 
-    {{-- ── Onglets ── --}}
-    <div class="cfg-tabs" style="flex-shrink:0">
-      <button class="cfg-tab-btn active" data-tab="profil"  onclick="switchConfigTab('profil')">Profil</button>
-      <button class="cfg-tab-btn"        data-tab="valeurs" onclick="switchConfigTab('valeurs')">Valeurs par défaut</button>
-      @if($isAdmin)
-      <button class="cfg-tab-btn"        data-tab="impot"   onclick="switchConfigTab('impot')">Gestion de l'impôt</button>
-      @endif
-      <button class="cfg-tab-btn"        data-tab="rente"   onclick="switchConfigTab('rente')">Rente conjoint survivant</button>
-    </div>
-
-    {{-- ── Contenu des onglets (scrollable) ── --}}
+    {{-- ── Contenu (scrollable) ── --}}
     <div style="flex:1;overflow-y:auto;min-height:0">
 
-      {{-- ═══ ONGLET PROFIL ═══ --}}
+      {{-- ═══ PROFIL ═══ --}}
       <div id="cfg-tab-profil" class="cfg-tab-pane active">
         <div class="form-group">
           <label class="form-label">Titre professionnel</label>
@@ -49,8 +39,9 @@
         </div>
       </div>
 
-      {{-- ═══ ONGLET VALEURS PAR DÉFAUT ═══ --}}
-      <div id="cfg-tab-valeurs" class="cfg-tab-pane">
+      {{-- Valeurs par défaut, Impôt et Rente — gérés dans Configuration ABF (Filament) --}}
+      {{-- ═══ ONGLET VALEURS PAR DÉFAUT — masqué, conservé pour compatibilité JS ═══ --}}
+      <div id="cfg-tab-valeurs" class="cfg-tab-pane" style="display:none">
         {{-- Province --}}
         <div class="form-group">
           <label class="form-label">Province d'imposition</label>
@@ -174,9 +165,9 @@
         </table>
       </div>{{-- /cfg-tab-valeurs --}}
 
-      {{-- ═══ ONGLET GESTION DE L'IMPÔT ═══ --}}
+      {{-- ═══ ONGLET GESTION DE L'IMPÔT — masqué, conservé pour compatibilité JS ═══ --}}
       @if($isAdmin)
-      <div id="cfg-tab-impot" class="cfg-tab-pane">
+      <div id="cfg-tab-impot" class="cfg-tab-pane" style="display:none">
         <fieldset style="border:none;padding:0">
           <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Québec 2026 — taux et plafonds utilisés dans les calculs</div>
 
@@ -240,8 +231,8 @@
       </div>{{-- /cfg-tab-impot --}}
       @endif
 
-      {{-- ═══ ONGLET RENTE CONJOINT SURVIVANT ═══ --}}
-      <div id="cfg-tab-rente" class="cfg-tab-pane">
+      {{-- ═══ ONGLET RENTE CONJOINT SURVIVANT — masqué, conservé pour compatibilité JS ═══ --}}
+      <div id="cfg-tab-rente" class="cfg-tab-pane" style="display:none">
         <div style="font-size:11px;color:var(--muted);margin-bottom:16px">Montants maximaux utilisés pour les suggestions automatiques dans la section Décès</div>
         {{-- Régime --}}
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;font-size:13px">
@@ -313,7 +304,7 @@
 
     </div>{{-- /scrollable --}}
 
-    {{-- ── Pieds de page par onglet ── --}}
+    {{-- ── Pied de page ── --}}
     <div style="border-top:1px solid var(--border);background:#f8f9fd;flex-shrink:0">
 
       {{-- Footer Profil --}}
@@ -325,37 +316,10 @@
         </div>
       </div>
 
-      {{-- Footer Valeurs par défaut --}}
-      <div id="cfg-footer-valeurs" class="cfg-footer-pane">
-        <button style="background:none;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer" onclick="resetValeursDefaut()">
-          ↻ Réinitialiser aux normes IPF
-        </button>
-        <div style="display:flex;gap:8px;align-items:center">
-          <span id="vd-save-status" style="font-size:12px;color:var(--muted);display:none"></span>
-          <button class="btn btn-secondary" onclick="closeConfigModal()">Annuler</button>
-          <button class="btn btn-primary" id="vd-save-btn" onclick="saveValeursDefaut()">Enregistrer</button>
-        </div>
-      </div>
-
-      {{-- Footer Gestion de l'impôt (admin seulement) --}}
-      @if($isAdmin)
-      <div id="cfg-footer-impot" class="cfg-footer-pane">
-        <button class="btn btn-secondary" onclick="impotResetParams()" style="font-size:12px">↻ Rétablir 2026</button>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="closeConfigModal()">Annuler</button>
-          <button class="btn btn-primary" onclick="impotSaveParams()">Enregistrer</button>
-        </div>
-      </div>
-      @endif
-
-      {{-- Footer Rente conjoint survivant --}}
-      <div id="cfg-footer-rente" class="cfg-footer-pane">
-        <button style="background:none;border:1px solid var(--border);border-radius:6px;padding:7px 14px;font-size:13px;cursor:pointer" onclick="rcReset()">↻ Réinitialiser</button>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-secondary" onclick="closeConfigModal()">Annuler</button>
-          <button class="btn btn-primary" onclick="saveRenteConjModal()">Enregistrer</button>
-        </div>
-      </div>
+      {{-- Footers masqués pour compatibilité JS --}}
+      <div id="cfg-footer-valeurs" class="cfg-footer-pane" style="display:none"></div>
+      @if($isAdmin)<div id="cfg-footer-impot" class="cfg-footer-pane" style="display:none"></div>@endif
+      <div id="cfg-footer-rente" class="cfg-footer-pane" style="display:none"></div>
 
     </div>{{-- /footers --}}
   </div>
