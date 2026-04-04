@@ -685,7 +685,7 @@
     document.getElementById('plac-institution').value = prefill?.institution ?? '';
     document.getElementById('plac-valeur').value = prefill?.valeur ?? '';
     document.getElementById('plac-notes').value = prefill?.notes ?? '';
-    document.getElementById('plac-portefeuille').value = prefill?.portefeuille ?? 'balanced';
+    document.getElementById('plac-portefeuille').value = prefill?.portefeuille ?? _defaultPortefeuille;
     document.getElementById('plac-rendement').value = prefill?.rendement ?? '3,70';
     document.getElementById('plac-categorie').value = prefill?.categorie ?? '';
     document.getElementById('modal-placement').classList.add('open');
@@ -2096,6 +2096,10 @@
   }
 
   function gatherProfilInvestisseur(role) {
+    // Si le profil vient du formulaire client (intake), préserver les données d'origine
+    if (_piIntakeData[role]?.intake_source) {
+      return _piIntakeData[role];
+    }
     const data = {};
     for (let q = 1; q <= 8; q++) {
       const val = document.querySelector(`input[name="pi-${role}-q${q}"]:checked`)?.value;
@@ -2106,8 +2110,32 @@
     return data;
   }
 
+  // Profil par défaut (depuis intake) pour pré-remplir le portefeuille des placements
+  const _intakeProfilMap = { prudent:'prudent', modere:'moderate', equilibre:'balanced', croissance:'growth', audacieux:'aggressive' };
+  let _defaultPortefeuille = 'balanced';
+  // Données de profil provenant du formulaire client (intake), à préserver lors de la sauvegarde
+  const _piIntakeData = { client: null, conjoint: null };
+
   function restoreProfilInvestisseur(role, data) {
     if (!data) return;
+    // Cas provenant du formulaire client (intake) : pas de q1-q8, juste profil+score direct
+    if (data.intake_source) {
+      const score    = data.score ?? 0;
+      const profil   = data.profil || piProfileKey(score);
+      const scoreEl  = document.getElementById(`pi-score-${role}`);
+      const profilEl = document.getElementById(`pi-profil-${role}`);
+      if (scoreEl)  scoreEl.textContent = score;
+      if (profilEl) {
+        profilEl.textContent = piProfileLabel(score);
+        profilEl.className   = 'pi-result-profil pi-badge-' + profil;
+      }
+      // Mémoriser pour le portefeuille par défaut des placements et pour la sauvegarde
+      if (role === 'client') {
+        _defaultPortefeuille = _intakeProfilMap[profil] || 'balanced';
+      }
+      _piIntakeData[role] = data;
+      return;
+    }
     for (let q = 1; q <= 8; q++) {
       const val = data[`q${q}`];
       if (val !== null && val !== undefined) {

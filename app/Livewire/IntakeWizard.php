@@ -263,6 +263,16 @@ class IntakeWizard extends Component
                 'conj_sexe'      => 'required|string',
                 'conj_ddn_annee' => 'required|digits:4|integer|min:1920|max:' . (date('Y') - 18),
             ]),
+            'revenus' => $this->validate([
+                'revenu_client' => 'required',
+            ]),
+            'objectifs' => $this->validate([
+                'age_retraite' => 'nullable|integer|min:50|max:90',
+            ]),
+            'profil_investisseur' => $this->validate([
+                'profil_risque'  => 'required|in:prudent,modere,equilibre,croissance,audacieux',
+                'profil_horizon' => 'required|in:court,moyen,long',
+            ]),
             default => null,
         };
     }
@@ -666,8 +676,12 @@ class IntakeWizard extends Component
                 'regimeConjoint'      => $this->regime_retraite_conjoint,
             ],
             'profil_investisseur' => [
-                'risque'  => $this->profil_risque,
-                'horizon' => $this->profil_horizon,
+                'client' => [
+                    'profil'        => $this->profil_risque,
+                    'score'         => $this->profilToScore($this->profil_risque),
+                    'horizon'       => $this->profil_horizon,
+                    'intake_source' => true,
+                ],
             ],
             'navigation' => [
                 'done_pages'       => ['infos-perso'],
@@ -675,6 +689,18 @@ class IntakeWizard extends Component
                 'objectifs_client' => $this->objectifs_texte,
             ],
         ];
+    }
+
+    protected function profilToScore(string $profil): int
+    {
+        return match($profil) {
+            'prudent'    => 20,
+            'modere'     => 40,
+            'equilibre'  => 73,
+            'croissance' => 106,
+            'audacieux'  => 140,
+            default      => 0,
+        };
     }
 
     protected function buildBirthDate(): ?string
