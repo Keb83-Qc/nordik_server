@@ -412,76 +412,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- Adresse conjoint structurée -->
-                <div class="card-body" style="padding-top:0">
-                    <label class="form-label required" style="margin-bottom:10px;display:block">Adresse</label>
-                    <div class="row">
-                        <div class="col form-group" style="max-width:120px">
-                            <label class="form-label">N° civique</label>
-                            <input class="form-input" type="text" id="conjoint-addr-civique" />
-                        </div>
-                        <div class="col form-group">
-                            <label class="form-label">Rue</label>
-                            <input class="form-input" type="text" id="conjoint-addr-rue" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col form-group">
-                            <label class="form-label">Type d'unité</label>
-                            <select class="form-select" id="conjoint-addr-type-unite">
-                                <option value="">—</option>
-                                <option>Appartement</option>
-                                <option>Suite</option>
-                                <option>Bureau</option>
-                                <option>Unité</option>
-                            </select>
-                        </div>
-                        <div class="col form-group" style="max-width:100px">
-                            <label class="form-label">Numéro</label>
-                            <input class="form-input" type="text" id="conjoint-addr-numero" />
-                        </div>
-                        <div class="col form-group">
-                            <label class="form-label">Case postale</label>
-                            <input class="form-input" type="text" id="conjoint-addr-case" placeholder="—" />
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom:0">
-                        <div class="col form-group">
-                            <label class="form-label">Ville</label>
-                            <input class="form-input" type="text" id="conjoint-addr-ville" />
-                        </div>
-                        <div class="col form-group">
-                            <label class="form-label">Province</label>
-                            <select class="form-select" id="conjoint-addr-province">
-                                <option value="">—</option>
-                                <option>Alberta</option>
-                                <option>Colombie-Britannique</option>
-                                <option>Île-du-Prince-Édouard</option>
-                                <option>Manitoba</option>
-                                <option>Nouveau-Brunswick</option>
-                                <option>Nouvelle-Écosse</option>
-                                <option>Nunavut</option>
-                                <option>Ontario</option>
-                                <option selected>Québec</option>
-                                <option>Saskatchewan</option>
-                                <option>Terre-Neuve-et-Labrador</option>
-                                <option>Territoires du Nord-Ouest</option>
-                                <option>Yukon</option>
-                            </select>
-                        </div>
-                        <div class="col form-group">
-                            <label class="form-label">Code postal</label>
-                            <input class="form-input" type="text" id="conjoint-addr-postal" placeholder="A1A 1A1"
-                                maxlength="7"
-                                oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v" />
-                        </div>
-                        <div class="col form-group">
-                            <label class="form-label">Pays</label>
-                            <input class="form-input" type="text" id="conjoint-addr-pays" value="Canada" disabled
-                                style="background:#f8f9fd" />
-                        </div>
-                    </div>
-                </div>
+
                 <!-- Infos supp. conjoint collapsible -->
                 <button class="collapse-toggle" onclick="toggleCollapse(this)">
                     Informations supplémentaires
@@ -491,6 +422,77 @@
                     </svg>
                 </button>
                 <div class="collapse-body">
+                    <!-- Adresse conjoint structurée -->
+                    <div class="card-body" style="padding-top:0">
+                        <label class="form-label required" style="margin-bottom:10px;display:block">Adresse</label>
+                        <div class="row">
+                            <div class="col form-group" style="max-width:120px">
+                                <label class="form-label">N° civique</label>
+                                <input class="form-input" type="text" id="conjoint-addr-civique" />
+                            </div>
+                            <div class="col form-group">
+                                <label class="form-label">Rue</label>
+                                <input class="form-input" type="text" id="conjoint-addr-rue" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col form-group">
+                                <label class="form-label">Type d'unité</label>
+                                <select class="form-select" id="conjoint-addr-type-unite">
+                                    <option value="">—</option>
+                                    <option>Appartement</option>
+                                    <option>Suite</option>
+                                    <option>Bureau</option>
+                                    <option>Unité</option>
+                                </select>
+                            </div>
+                            <div class="col form-group" style="max-width:100px">
+                                <label class="form-label">Numéro</label>
+                                <input class="form-input" type="text" id="conjoint-addr-numero" />
+                            </div>
+                            <div class="col form-group">
+                                <label class="form-label">Case postale</label>
+                                <input class="form-input" type="text" id="conjoint-addr-case" placeholder="—" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom:0">
+                            <div class="col form-group">
+                                <label class="form-label">Ville</label>
+                                <input class="form-input" type="text" id="conjoint-addr-ville" />
+                            </div>
+                            <div class="col form-group">
+                                <label class="form-label">Province</label>
+                                <select class="form-select" id="conjoint-addr-province">
+                                    <option value="">—</option>
+                                    <option>Alberta</option>
+                                    <option>Colombie-Britannique</option>
+                                    <option>Île-du-Prince-Édouard</option>
+                                    <option>Manitoba</option>
+                                    <option>Nouveau-Brunswick</option>
+                                    <option>Nouvelle-Écosse</option>
+                                    <option>Nunavut</option>
+                                    <option>Ontario</option>
+                                    <option selected>Québec</option>
+                                    <option>Saskatchewan</option>
+                                    <option>Terre-Neuve-et-Labrador</option>
+                                    <option>Territoires du Nord-Ouest</option>
+                                    <option>Yukon</option>
+                                </select>
+                            </div>
+                            <div class="col form-group">
+                                <label class="form-label">Code postal</label>
+                                <input class="form-input" type="text" id="conjoint-addr-postal"
+                                    placeholder="A1A 1A1" maxlength="7"
+                                    oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v" />
+                            </div>
+                            <div class="col form-group">
+                                <label class="form-label">Pays</label>
+                                <input class="form-input" type="text" id="conjoint-addr-pays" value="Canada"
+                                    disabled style="background:#f8f9fd" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col form-group">
                             <label class="form-label">Cellulaire</label>
