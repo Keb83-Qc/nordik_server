@@ -67,7 +67,7 @@
                 <span class="dot"></span> Objectifs
             </button>
             <button class="nav-item locked" onclick="goTo('actifs-passifs',this)">
-                <span class="dot"></span> Actifs et passifs
+                <span class="dot"></span> Bilan Financier (actifs et passifs)
             </button>
             <button class="nav-item locked" onclick="goTo('revenu-epargne',this)">
                 <span class="dot"></span> Revenu et épargne
