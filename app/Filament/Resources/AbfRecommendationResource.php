@@ -10,7 +10,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Illuminate\Support\Str;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -59,17 +61,25 @@ class AbfRecommendationResource extends Resource
                 ->live()
                 ->columnSpanFull(),
 
-            TextInput::make('key')
-                ->label('Clé (slug unique)')
-                ->helperText('Identifiant unique utilisé par le JS (ex: temporaryLifeInsurance, rrq). Ne pas modifier après création.')
-                ->maxLength(100)
-                ->columnSpanFull(),
-
             TextInput::make('title')
                 ->label('Titre')
                 ->helperText('Pour les conseils : titre de l\'accordéon. Pour les autres : libellé dans le menu Ajouter.')
                 ->maxLength(500)
                 ->required()
+                ->live(debounce: 400)
+                ->afterStateUpdated(function (?string $state, Set $set, Get $get): void {
+                    // Générer la clé automatiquement seulement si elle est encore vide
+                    if (blank($get('key')) && filled($state)) {
+                        $set('key', Str::camel(Str::slug($state, ' ')));
+                    }
+                })
+                ->columnSpanFull(),
+
+            TextInput::make('key')
+                ->label('Clé (slug unique)')
+                ->helperText('Générée automatiquement depuis le titre (camelCase). Identifiant utilisé par le JS — ne pas modifier après création.')
+                ->maxLength(100)
+                ->readOnly(fn (string $operation): bool => $operation === 'edit')
                 ->columnSpanFull(),
 
             Textarea::make('text')
