@@ -80,7 +80,7 @@ class AbfRecommendationResource extends Resource
                 ->helperText('Générée automatiquement depuis le titre (camelCase). Identifiant utilisé par le JS — ne pas modifier après création.')
                 ->maxLength(100)
                 ->readOnly()
-                ->hidden(fn (string $operation): bool => $operation === 'create')
+                ->hiddenOn('create')
                 ->columnSpanFull(),
 
             Textarea::make('text')
