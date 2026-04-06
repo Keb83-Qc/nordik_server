@@ -846,6 +846,37 @@
     const type   = document.getElementById('modal-passif').dataset.type || '';
     const prop   = document.getElementById('pass-proprietaire');
     const propVal = prop.value;
+
+    // ── Vérification CELIAPP + Prêt hypothécaire ──────────────────────────
+    if (type === 'Prêt hypothécaire') {
+      // Déterminer les propriétaires CELIAPP à vérifier selon le proprio du prêt
+      const celiappItems = document.querySelectorAll('#actifs-list [data-aptype="CELIAPP"]');
+      let celiappConflict = false;
+      celiappItems.forEach(item => {
+        const celiOwner = item.dataset.owner || '';
+        if (propVal === 'both') {
+          celiappConflict = true; // tout CELIAPP est potentiellement affecté
+        } else if (propVal === 'client' && (celiOwner === 'client' || celiOwner === 'both')) {
+          celiappConflict = true;
+        } else if (propVal === 'conjoint' && (celiOwner === 'conjoint' || celiOwner === 'both')) {
+          celiappConflict = true;
+        }
+      });
+      if (celiappConflict) {
+        const continuer = window.confirm(
+          '⚠️  Conflit réglementaire — CELIAPP\n\n' +
+          'Un compte CELIAPP est présent au dossier pour ce propriétaire.\n\n' +
+          'Selon les règles de l\'ARC, le titulaire d\'un CELIAPP ne peut pas ' +
+          'avoir été propriétaire d\'une résidence principale au cours des 4 ' +
+          'dernières années civiles. L\'ajout d\'un prêt hypothécaire peut ' +
+          'indiquer une non-admissibilité au CELIAPP.\n\n' +
+          'Veuillez vérifier l\'admissibilité avant de continuer.\n\n' +
+          'Voulez-vous tout de même enregistrer ce passif?'
+        );
+        if (!continuer) return;
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────
     const propTx  = propVal ? prop.options[prop.selectedIndex].text : '';
     const solde   = document.getElementById('pass-solde').value.trim();
     const soldeNum = parseFloat(solde.replace(/\s/g,'').replace(',','.')) || 0;
