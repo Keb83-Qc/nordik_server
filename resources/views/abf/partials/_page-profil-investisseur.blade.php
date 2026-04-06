@@ -3,11 +3,6 @@
       <div class="page-title">Profil d'investisseur</div>
 
       <style>
-        /* ── Onglets client/conjoint ── */
-        #pi-person-tabs { margin:0 0 20px;border-bottom:2px solid var(--border); }
-        .pi-person-tab { background:none;border:none;border-bottom:3px solid transparent;padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s;margin-bottom:-2px; }
-        .pi-person-tab.active { border-bottom-color:var(--navy);color:var(--navy); }
-
         /* ── Section de question ── */
         .pi-section-header { background:var(--navy);color:#fff;font-size:13px;font-weight:700;padding:9px 16px;border-radius:8px 8px 0 0;margin-top:16px; }
         .pi-questions { border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden;background:var(--surface); }
@@ -21,7 +16,7 @@
         .pi-option:hover { background:rgba(var(--navy-rgb,14,16,48),.05); }
         .pi-option input[type=radio] { margin-top:2px;accent-color:var(--navy);flex-shrink:0; }
         .pi-option-text { flex:1;font-size:13px;color:var(--text);line-height:1.45; }
-        .pi-option-pts { font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;min-width:60px;text-align:right;padding-top:2px; }
+        .pi-option-pts { display:none; }
         .pi-option:has(input:checked) { background:rgba(var(--navy-rgb,14,16,48),.06); }
         .pi-option:has(input:checked) .pi-option-text { font-weight:600;color:var(--navy); }
         .pi-option:has(input:checked) .pi-option-pts { color:var(--navy); }
@@ -43,26 +38,22 @@
 
       <div style="display:flex;gap:20px;align-items:start">
 
-        <!-- ── Questionnaire (gauche) ── -->
-        <div style="flex:1;min-width:0">
-
-          <!-- Onglets Client / Conjoint (masqués si individuel) -->
-          <div id="pi-person-tabs" style="display:none">
-            <button class="pi-person-tab active" id="pi-tab-client"   onclick="switchPiTab('client',this)">CLIENT</button>
-            <button class="pi-person-tab"        id="pi-tab-conjoint" onclick="switchPiTab('conjoint',this)">CONJOINT</button>
-          </div>
+        <!-- ── Questionnaires côte à côte ── -->
+        <div style="flex:1;min-width:0;display:flex;gap:20px;align-items:start" id="pi-panels-wrapper">
 
           <!-- ───────────── PANEL CLIENT ───────────── -->
-          <div id="pi-panel-client">
+          <div id="pi-panel-client" style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--navy);padding:6px 0 10px;border-bottom:2px solid var(--navy);margin-bottom:14px" id="pi-panel-client-title">Client</div>
             @include('abf.partials._profil-investisseur-questions', ['role' => 'client'])
           </div>
 
-          <!-- ───────────── PANEL CONJOINT ───────────── -->
-          <div id="pi-panel-conjoint" style="display:none">
+          <!-- ───────────── PANEL CONJOINT (caché si individuel) ───────────── -->
+          <div id="pi-panel-conjoint" style="flex:1;min-width:0;display:none">
+            <div style="font-size:13px;font-weight:700;color:var(--navy);padding:6px 0 10px;border-bottom:2px solid var(--navy);margin-bottom:14px" id="pi-panel-conjoint-title">Conjoint(e)</div>
             @include('abf.partials._profil-investisseur-questions', ['role' => 'conjoint'])
           </div>
 
-        </div><!-- /questionnaire -->
+        </div><!-- /questionnaires -->
 
         <!-- ── Résultats (droite, sticky) ── -->
         <div style="width:280px;flex-shrink:0;position:sticky;top:80px">

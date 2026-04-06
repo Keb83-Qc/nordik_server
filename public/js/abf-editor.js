@@ -2123,13 +2123,14 @@
     const isCouple = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
     const cPrenom  = document.getElementById('client-prenom')?.value   || 'Client';
     const jPrenom  = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
-    const tabs = document.getElementById('pi-person-tabs');
-    if (tabs) tabs.style.display = isCouple ? 'block' : 'none';
-    // Noms dans les onglets
-    const tabC = document.getElementById('pi-tab-client');
-    const tabJ = document.getElementById('pi-tab-conjoint');
-    if (tabC) tabC.textContent = cPrenom.toUpperCase();
-    if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
+    // Afficher/masquer le panel conjoint (côte à côte avec client)
+    const panelJ = document.getElementById('pi-panel-conjoint');
+    if (panelJ) panelJ.style.display = isCouple ? '' : 'none';
+    // Titres des panneaux avec vrais prénoms
+    const titleC = document.getElementById('pi-panel-client-title');
+    const titleJ = document.getElementById('pi-panel-conjoint-title');
+    if (titleC) titleC.textContent = cPrenom;
+    if (titleJ) titleJ.textContent = jPrenom;
     // Titres des cartes résultat + visibilité conjoint
     const hdrC = document.getElementById('pi-result-header-client');
     const hdrJ = document.getElementById('pi-result-header-conjoint');
