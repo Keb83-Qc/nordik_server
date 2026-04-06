@@ -81,11 +81,7 @@
             </div>
           </div>
 
-          <!-- Onglets personne (couple uniquement) -->
-          <div id="retraite-objectif-tabs" style="display:none;border-bottom:1px solid var(--border);margin:0 -20px 16px;padding:0 20px">
-            <button class="deces-person-tab active" id="retraite-obj-tab-client"   onclick="switchRetraiteObjTab('client',this)">CLIENT</button>
-            <button class="deces-person-tab"        id="retraite-obj-tab-conjoint" onclick="switchRetraiteObjTab('conjoint',this)">CONJOINT</button>
-          </div>
+          <div id="retraite-obj-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
 
           <!-- Panel client -->
           <div id="retraite-obj-panel-client">
@@ -123,6 +119,7 @@
 
           <!-- Panel conjoint -->
           <div id="retraite-obj-panel-conjoint" style="display:none">
+
             <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
               Revenu <span class="retraite-freq-label">annuel</span> net actuel : <strong id="retraite-revenu-net-conjoint">—</strong>
             </div>
@@ -151,6 +148,8 @@
               </div>
             </div>
           </div>
+
+          </div><!-- /retraite-obj-two-col -->
         </div>
       </div>
 
@@ -177,10 +176,7 @@
           </span>
         </div>
         <div class="card-body">
-          <div id="retraite-profil-tabs" style="display:none;border-bottom:1px solid var(--border);margin:0 -20px 16px;padding:0 20px">
-            <button class="deces-person-tab active" onclick="switchRetraitProfileTab('client',this)">CLIENT</button>
-            <button class="deces-person-tab"        onclick="switchRetraitProfileTab('conjoint',this)">CONJOINT</button>
-          </div>
+          <div id="retraite-profil-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
           <div id="retraite-profil-panel-client">
             <div class="row">
               <div class="col form-group">
@@ -206,6 +202,7 @@
             </div>
           </div>
           <div id="retraite-profil-panel-conjoint" style="display:none">
+
             <div class="row">
               <div class="col form-group">
                 <label class="form-label">Avant la retraite</label>
@@ -229,6 +226,7 @@
               </div>
             </div>
           </div>
+          </div><!-- /retraite-profil-two-col -->
         </div>
       </div>
 
@@ -241,15 +239,13 @@
           </span>
         </div>
         <div style="padding:0">
-          <div id="retraite-regpub-tabs" style="display:none;border-bottom:1px solid var(--border);padding:0 16px">
-            <button class="deces-person-tab active" id="retraite-regpub-tab-client"   onclick="switchRetraiteRegPubTab('client',this)">CLIENT</button>
-            <button class="deces-person-tab"        id="retraite-regpub-tab-conjoint" onclick="switchRetraiteRegPubTab('conjoint',this)">CONJOINT</button>
-          </div>
-          <div id="retraite-regpub-panel-client">
-            <div id="retraite-regpub-table-client"></div>
-          </div>
-          <div id="retraite-regpub-panel-conjoint" style="display:none">
-            <div id="retraite-regpub-table-conjoint"></div>
+          <div id="retraite-regpub-two-col" style="display:grid;grid-template-columns:1fr;gap:0;padding:0">
+            <div id="retraite-regpub-panel-client">
+              <div id="retraite-regpub-table-client"></div>
+            </div>
+            <div id="retraite-regpub-panel-conjoint" style="display:none">
+              <div id="retraite-regpub-table-conjoint"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -267,8 +263,10 @@
           </div>
         </div>
         <div style="padding:0">
-          <div id="retraite-rpd-panel-client"><div id="retraite-rpd-list-client"></div></div>
-          <div id="retraite-rpd-panel-conjoint" style="display:none"><div id="retraite-rpd-list-conjoint"></div></div>
+          <div id="retraite-rpd-two-col" style="display:grid;grid-template-columns:1fr;gap:0">
+            <div id="retraite-rpd-panel-client"><div id="retraite-rpd-list-client"></div></div>
+            <div id="retraite-rpd-panel-conjoint" style="display:none"><div id="retraite-rpd-list-conjoint"></div></div>
+          </div>
         </div>
       </div>
 
@@ -292,8 +290,10 @@
           </div>
         </div>
         <div style="padding:0">
-          <div id="retraite-retraits-panel-client"><div id="retraite-retraits-list-client"></div></div>
-          <div id="retraite-retraits-panel-conjoint" style="display:none"><div id="retraite-retraits-list-conjoint"></div></div>
+          <div id="retraite-retraits-two-col" style="display:grid;grid-template-columns:1fr;gap:0">
+            <div id="retraite-retraits-panel-client"><div id="retraite-retraits-list-client"></div></div>
+            <div id="retraite-retraits-panel-conjoint" style="display:none"><div id="retraite-retraits-list-conjoint"></div></div>
+          </div>
         </div>
       </div>
 

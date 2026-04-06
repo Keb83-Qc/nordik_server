@@ -61,26 +61,38 @@
           Dépenses prévues si [client] décède
         </div>
         <div class="card-body" style="padding-top:0">
-          <!-- Tabs (couple seulement) -->
-          <div id="deces-dep-tabs" style="display:none;border-bottom:1px solid var(--border);margin-bottom:12px;display:none">
-            <button class="deces-person-tab active" id="deces-dep-tab-client" onclick="switchDecesDepTab('client',this)">CLIENT</button>
-            <button class="deces-person-tab" id="deces-dep-tab-conjoint" onclick="switchDecesDepTab('conjoint',this)">CONJOINT</button>
-          </div>
-          <div id="deces-dep-list" style="margin-top:12px">
-            <!-- pré-rempli par decesInit() avec Frais funéraires 25 000 $ -->
-          </div>
-          <div id="deces-dep-list-conjoint" style="display:none;margin-top:12px"></div>
-          <div style="position:relative;margin-top:10px">
-            <button class="btn btn-primary btn-sm" onclick="toggleDecesDep()">+ Ajouter une dépense</button>
-            <div id="deces-dep-dd" style="display:none;position:fixed;z-index:9999;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:4px 0;min-width:200px">
-              <div class="deces-dep-item" onclick="addDecesDep('Frais funéraires', parseFloat(String(window.ABF_PARAMS?.deces?.funerailles??'10000').replace(/\s/g,'').replace(',','.'))||10000)">Frais funéraires</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Fonds d\'urgence',0)">Fonds d'urgence</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Héritage',0)">Héritage</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Impôts',0)">Impôts</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Dons',0)">Dons</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Frais juridiques',0)">Frais juridiques</div>
-              <div class="deces-dep-item" onclick="addDecesDep('Autre',0)">Autre</div>
+          <!-- Layout côte à côte client | conjoint -->
+          <div id="deces-dep-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
+
+            <!-- Colonne client -->
+            <div>
+              <div id="deces-dep-col-c-hdr" style="display:none;font-size:12px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:6px 12px;margin:8px 0;text-align:center"></div>
+              <div id="deces-dep-list" style="margin-top:8px">
+                <!-- pré-rempli par decesInit() avec Frais funéraires -->
+              </div>
+              <div style="position:relative;margin-top:10px">
+                <button class="btn btn-primary btn-sm" onclick="_decesDepActiveTab='client';toggleDecesDep()">+ Ajouter une dépense</button>
+                <div id="deces-dep-dd" style="display:none;position:fixed;z-index:9999;background:white;border:1px solid var(--border);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:4px 0;min-width:200px">
+                  <div class="deces-dep-item" onclick="addDecesDep('Frais funéraires', parseFloat(String(window.ABF_PARAMS?.deces?.funerailles??'10000').replace(/\s/g,'').replace(',','.'))||10000)">Frais funéraires</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Fonds d\'urgence',0)">Fonds d'urgence</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Héritage',0)">Héritage</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Impôts',0)">Impôts</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Dons',0)">Dons</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Frais juridiques',0)">Frais juridiques</div>
+                  <div class="deces-dep-item" onclick="addDecesDep('Autre',0)">Autre</div>
+                </div>
+              </div>
             </div>
+
+            <!-- Colonne conjoint (cachée en mode solo) -->
+            <div id="deces-dep-col-j" style="display:none">
+              <div id="deces-dep-col-j-hdr" style="font-size:12px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:6px 12px;margin:8px 0;text-align:center"></div>
+              <div id="deces-dep-list-conjoint" style="margin-top:8px"></div>
+              <div style="margin-top:10px">
+                <button class="btn btn-primary btn-sm" onclick="_decesDepActiveTab='conjoint';toggleDecesDep()">+ Ajouter une dépense</button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
@@ -115,13 +127,7 @@
             </div>
           </div>
 
-          <!-- Person tabs for income replacement (couple seulement) -->
-          <div id="deces-rr-person-tabs" style="display:none;margin:0 -20px 16px;padding:0 20px;border-bottom:1px solid var(--border)">
-            <button class="deces-rr-person-tab active" id="deces-rr-tab-client" onclick="switchDecesRrTab('c',this)">CLIENT</button>
-            <button class="deces-rr-person-tab" id="deces-rr-tab-conjoint" onclick="switchDecesRrTab('j',this)">CONJOINT</button>
-          </div>
-
-          <div id="deces-rr-form">
+          <div id="deces-rr-form" style="display:grid;grid-template-columns:1fr;gap:20px">
             <!-- ── Panel Client ───────────────────────────────── -->
             <div id="deces-rr-panel-c">
               <div id="deces-rr-panel-c-title" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
@@ -169,7 +175,7 @@
             </div>
 
             <!-- ── Panel Conjoint (hidden until couple mode) ─── -->
-            <div id="deces-rr-panel-j" style="display:none">
+            <div id="deces-rr-panel-j">
               <div id="deces-rr-panel-j-title" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
               <div id="deces-lbl-j-actuels" style="font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase">Revenus actuels</div>
               <div id="deces-revenus-table-j" style="margin-bottom:16px;background:#f8f9fd;border-radius:6px;padding:10px 14px;font-size:13px"></div>

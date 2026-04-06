@@ -2386,29 +2386,12 @@
   let _decesDepActiveTab = 'client';
 
   function switchDecesDepTab(who, btn) {
-    _decesDepActiveTab = who;
-    document.querySelectorAll('.deces-person-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('deces-dep-list').style.display = who === 'client' ? '' : 'none';
-    document.getElementById('deces-dep-list-conjoint').style.display = who === 'conjoint' ? '' : 'none';
-    // Update dep header
-    const hdr = document.getElementById('deces-dep-header');
-    if (hdr) {
-      const prenom = who === 'client'
-        ? (document.getElementById('client-prenom')?.value || 'le client')
-        : (document.getElementById('conjoint-prenom')?.value || 'le conjoint');
-      hdr.textContent = `Dépenses prévues si ${prenom} décède`;
-    }
+    _decesDepActiveTab = who; /* layout côte à côte — pas d'onglets */
   }
 
   let _decesRrActiveTab = 'c';
   function switchDecesRrTab(sfx, btn) {
-    _decesRrActiveTab = sfx;
-    document.querySelectorAll('.deces-rr-person-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('deces-rr-panel-c').style.display = sfx === 'c' ? '' : 'none';
-    document.getElementById('deces-rr-panel-j').style.display = sfx === 'j' ? '' : 'none';
-    decesCalc();
+    _decesRrActiveTab = sfx; /* layout côte à côte — pas d'onglets */
   }
 
   function decesInit() {
@@ -2464,15 +2447,18 @@
       const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
       const clientPrenom2 = document.getElementById('client-prenom')?.value || 'Client';
 
-      // Show dep tabs with real names
-      const tabsEl = document.getElementById('deces-dep-tabs');
-      if (tabsEl) {
-        tabsEl.style.display = 'flex';
-        const tabClient = document.getElementById('deces-dep-tab-client');
-        const tabConj = document.getElementById('deces-dep-tab-conjoint');
-        if (tabClient) tabClient.textContent = clientPrenom2.toUpperCase();
-        if (tabConj) tabConj.textContent = conjointPrenom.toUpperCase();
-      }
+      // Two-col dépenses
+      const depTwoCol  = document.getElementById('deces-dep-two-col');
+      const depColJ    = document.getElementById('deces-dep-col-j');
+      const depHdrC    = document.getElementById('deces-dep-col-c-hdr');
+      const depHdrJ    = document.getElementById('deces-dep-col-j-hdr');
+      if (depTwoCol)  depTwoCol.style.gridTemplateColumns = '1fr 1fr';
+      if (depColJ)    depColJ.style.display = '';
+      if (depHdrC)    { depHdrC.style.display = ''; depHdrC.textContent = clientPrenom2; }
+      if (depHdrJ)    depHdrJ.textContent = conjointPrenom;
+      // Mettre à jour l'en-tête de carte
+      const hdr = document.getElementById('deces-dep-header');
+      if (hdr) hdr.textContent = 'Dépenses prévues en cas de décès';
 
       // Pre-populate conjoint dep list if empty
       const conjList = document.getElementById('deces-dep-list-conjoint');
@@ -2490,25 +2476,18 @@
         if (famRadio) famRadio.checked = true;
       }
 
-      // Use tabs for RR panels in couple mode
-      const rrTabs = document.getElementById('deces-rr-person-tabs');
-      if (rrTabs) rrTabs.style.display = 'flex';
-      const tabClient = document.getElementById('deces-rr-tab-client');
-      const tabConj   = document.getElementById('deces-rr-tab-conjoint');
-      if (tabClient) { tabClient.textContent = clientPrenom2.toUpperCase(); tabClient.classList.add('active'); }
-      if (tabConj)   { tabConj.textContent   = conjointPrenom.toUpperCase(); tabConj.classList.remove('active'); }
+      // Two-col remplacement du revenu
+      const rrForm = document.getElementById('deces-rr-form');
+      if (rrForm) { rrForm.style.gridTemplateColumns = '1fr 1fr'; rrForm.style.gap = '20px'; rrForm.style.alignItems = 'start'; }
       const panelC = document.getElementById('deces-rr-panel-c');
       const panelJ = document.getElementById('deces-rr-panel-j');
-      if (panelC) panelC.style.display = '';   // show client tab by default
-      if (panelJ) panelJ.style.display = 'none'; // hide conjoint tab
-      const rrForm = document.getElementById('deces-rr-form');
-      if (rrForm) { rrForm.style.display = ''; rrForm.style.gridTemplateColumns = ''; rrForm.style.gap = ''; rrForm.style.alignItems = ''; }
-      // Hide the "Si X décède" title banners (tabs already show context)
+      if (panelC) panelC.style.display = '';
+      if (panelJ) panelJ.style.display = '';
+      // Afficher les bandeaux de nom
       const titleC = document.getElementById('deces-rr-panel-c-title');
       const titleJ = document.getElementById('deces-rr-panel-j-title');
-      if (titleC) titleC.style.display = 'none';
-      if (titleJ) titleJ.style.display = 'none';
-      // Restore panel-j labels to visible (each tab is independent)
+      if (titleC) { titleC.style.display = ''; titleC.textContent = clientPrenom2; }
+      if (titleJ) { titleJ.style.display = ''; titleJ.textContent = conjointPrenom; }
       ['deces-lbl-j-actuels','deces-lbl-j-vises','deces-lbl-j-dispos'].forEach(id => {
         const el = document.getElementById(id); if (el) el.style.visibility = '';
       });
@@ -2520,16 +2499,27 @@
       if (benLabelJ) benLabelJ.textContent = 'Le conjoint survivant désire recevoir';
     } else {
       // Reset couple elements hidden
-      const tabsEl = document.getElementById('deces-dep-tabs');
-      if (tabsEl) tabsEl.style.display = 'none';
+      const depTwoColSolo = document.getElementById('deces-dep-two-col');
+      const depColJSolo   = document.getElementById('deces-dep-col-j');
+      const depHdrCSolo   = document.getElementById('deces-dep-col-c-hdr');
+      if (depTwoColSolo)  depTwoColSolo.style.gridTemplateColumns = '1fr';
+      if (depColJSolo)    depColJSolo.style.display = 'none';
+      if (depHdrCSolo)    depHdrCSolo.style.display = 'none';
+      const hdrSolo = document.getElementById('deces-dep-header');
+      if (hdrSolo) {
+        const clientPrenomSolo = document.getElementById('client-prenom')?.value || 'le client';
+        hdrSolo.textContent = `Dépenses prévues si ${clientPrenomSolo} décède`;
+      }
       const famPill = document.getElementById('deces-rr-familial-pill');
       if (famPill) famPill.style.display = 'none';
-      const rrTabs = document.getElementById('deces-rr-person-tabs');
-      if (rrTabs) rrTabs.style.display = 'none';
       const rrFormSolo = document.getElementById('deces-rr-form');
-      if (rrFormSolo) { rrFormSolo.style.display = ''; rrFormSolo.style.gridTemplateColumns = ''; rrFormSolo.style.gap = ''; rrFormSolo.style.alignItems = ''; }
+      if (rrFormSolo) { rrFormSolo.style.gridTemplateColumns = '1fr'; rrFormSolo.style.gap = ''; rrFormSolo.style.alignItems = ''; }
+      const panelJSolo = document.getElementById('deces-rr-panel-j');
+      if (panelJSolo) panelJSolo.style.display = 'none';
       const titleCSolo = document.getElementById('deces-rr-panel-c-title');
+      const titleJSolo = document.getElementById('deces-rr-panel-j-title');
       if (titleCSolo) titleCSolo.style.display = 'none';
+      if (titleJSolo) titleJSolo.style.display = 'none';
       const benLabelC = document.getElementById('deces-rr-beneficiaire-label-c');
       if (benLabelC) benLabelC.textContent = 'Le bénéficiaire désire recevoir';
     }
@@ -3216,13 +3206,18 @@
     const conjointPrenom = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
     const isNet = document.querySelector('input[name="inval-rr-brutnnet"]:checked')?.value === 'net';
 
-    // Autres sources — onglets noms + visibilité conjoint
-    const tabLabelC = document.getElementById('inval-autres-tab-label-c');
-    const tabLabelJ = document.getElementById('inval-autres-tab-label-j');
-    const tabBtnJ   = document.getElementById('inval-autres-tab-j');
-    if (tabLabelC) tabLabelC.textContent = clientPrenom.toUpperCase();
-    if (tabLabelJ) tabLabelJ.textContent = conjointPrenom.toUpperCase();
-    if (tabBtnJ)   tabBtnJ.style.display = isCouple ? '' : 'none';
+    // Autres sources — two-col layout
+    const autresTwoCol  = document.getElementById('inval-autres-two-col');
+    const autresColJ    = document.getElementById('inval-autres-col-j');
+    const autresHdrC    = document.getElementById('inval-autres-hdr-c');
+    const autresHdrJ    = document.getElementById('inval-autres-hdr-j');
+    if (autresTwoCol)  autresTwoCol.style.gridTemplateColumns = isCouple ? '1fr 1fr' : '1fr';
+    if (autresColJ)    autresColJ.style.display   = isCouple ? '' : 'none';
+    if (autresHdrC)    { autresHdrC.style.display = isCouple ? '' : 'none'; if (isCouple) autresHdrC.textContent = clientPrenom; }
+    if (autresHdrJ)    autresHdrJ.textContent     = conjointPrenom;
+    // Afficher le panel conjoint directement
+    const autresPanelJ = document.getElementById('inval-autres-panel-j');
+    if (autresPanelJ) autresPanelJ.style.display = isCouple ? '' : 'none';
 
     // Dépenses courantes — entêtes colonnes + visibilité colonne conjoint
     const hdrC = document.getElementById('inval-dep-hdr-c');
@@ -3338,11 +3333,7 @@
     invaliditeCalc();
   }
 
-  function invalAutresTab(sfx) {
-    document.querySelectorAll('.inval-autres-tab').forEach(b => b.classList.remove('active'));
-    document.getElementById('inval-autres-tab-' + sfx)?.classList.add('active');
-    document.getElementById('inval-autres-panel-c').style.display = sfx === 'c' ? '' : 'none';
-    document.getElementById('inval-autres-panel-j').style.display = sfx === 'j' ? '' : 'none';
+  function invalAutresTab(sfx) { /* layout côte à côte — pas d'onglets */
   }
 
   function toggleInvalInfo() {
@@ -4550,17 +4541,26 @@
 
   function mgInit() {
     const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
-    const tabs = document.getElementById('mg-person-tabs');
-    if (tabs) tabs.style.display = hasSpouse ? 'block' : 'none';
 
     // Noms
     const cPrenom = document.getElementById('client-prenom')?.value || 'le client';
     const jPrenom = document.getElementById('conjoint-prenom')?.value || 'le conjoint';
-    // Onglets avec vrais prénoms
-    const tabC = document.getElementById('mg-tab-client');
-    const tabJ = document.getElementById('mg-tab-conjoint');
-    if (tabC) tabC.textContent = cPrenom.toUpperCase();
-    if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
+
+    // Layout two-col
+    const twoCol   = document.getElementById('mg-two-col');
+    const conjPanel = document.getElementById('mg-panel-conjoint');
+    const hdrC     = document.getElementById('mg-panel-client-hdr');
+    const hdrJ     = document.getElementById('mg-panel-conjoint-hdr');
+    if (hasSpouse) {
+      if (twoCol)    twoCol.style.gridTemplateColumns = '1fr 1fr';
+      if (conjPanel) conjPanel.style.display = '';
+      if (hdrC)      { hdrC.style.display = ''; hdrC.textContent = cPrenom; }
+      if (hdrJ)      hdrJ.textContent = jPrenom;
+    } else {
+      if (twoCol)    twoCol.style.gridTemplateColumns = '1fr';
+      if (conjPanel) conjPanel.style.display = 'none';
+      if (hdrC)      hdrC.style.display = 'none';
+    }
     ['c','j'].forEach((k, i) => {
       const nom = i === 0 ? cPrenom : jPrenom;
       const el = document.getElementById(`mg-rr-client-label-${k}`);
@@ -4607,14 +4607,7 @@
     return revenu;
   }
 
-  function switchMgTab(role, btn) {
-    document.querySelectorAll('.deces-person-tab').forEach(b => {
-      if (b.id && b.id.startsWith('mg-tab-')) b.classList.remove('active');
-    });
-    btn.classList.add('active');
-    document.getElementById('mg-panel-client').style.display  = role === 'client'   ? '' : 'none';
-    document.getElementById('mg-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
-  }
+  function switchMgTab(role, btn) { /* layout côte à côte — pas d'onglets */ }
 
   function setMgBrutNet(role, val) {
     const k = role === 'client' ? 'c' : 'j';
@@ -4790,11 +4783,17 @@
     const rowConj = document.getElementById('retraite-row-conjoint');
     if (rowConj) rowConj.style.display = hasSpouse ? 'grid' : 'none';
 
-    const tabs = document.getElementById('retraite-objectif-tabs');
-    if (tabs) tabs.style.display = hasSpouse ? 'block' : 'none';
+    // Two-col layout objectif
+    const objTwoCol  = document.getElementById('retraite-obj-two-col');
+    const objPanelJ  = document.getElementById('retraite-obj-panel-conjoint');
+    if (objTwoCol)   objTwoCol.style.gridTemplateColumns  = hasSpouse ? '1fr 1fr' : '1fr';
+    if (objPanelJ)   objPanelJ.style.display              = hasSpouse ? '' : 'none';
 
-    const profilTabs = document.getElementById('retraite-profil-tabs');
-    if (profilTabs) profilTabs.style.display = hasSpouse ? 'block' : 'none';
+    // Two-col layout profil
+    const profilTwoCol  = document.getElementById('retraite-profil-two-col');
+    const profilPanelJ  = document.getElementById('retraite-profil-panel-conjoint');
+    if (profilTwoCol)   profilTwoCol.style.gridTemplateColumns  = hasSpouse ? '1fr 1fr' : '1fr';
+    if (profilPanelJ)   profilPanelJ.style.display              = hasSpouse ? '' : 'none';
 
     const goalWrap = document.getElementById('retraite-goal-type-wrap');
     if (goalWrap) goalWrap.style.display = hasSpouse ? 'flex' : 'none';
@@ -4807,21 +4806,11 @@
     if (rnc) rnc.textContent = fmtMoney(revenu * 0.72);
     if (rnj) rnj.textContent = fmtMoney(revenuConj * 0.72);
 
-    // Tabs régimes publics (statiques dans le HTML, juste montrer/cacher + renommer)
-    const regPubTabs = document.getElementById('retraite-regpub-tabs');
-    if (regPubTabs) {
-      regPubTabs.style.display = hasSpouse ? 'flex' : 'none';
-      const tabC = document.getElementById('retraite-regpub-tab-client');
-      const tabJ = document.getElementById('retraite-regpub-tab-conjoint');
-      if (tabC) tabC.textContent = cPrenom.toUpperCase();
-      if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
-    }
-
-    // Onglets Objectif : noms réels
-    const objTabC = document.getElementById('retraite-obj-tab-client');
-    const objTabJ = document.getElementById('retraite-obj-tab-conjoint');
-    if (objTabC) objTabC.textContent = cPrenom.toUpperCase();
-    if (objTabJ) objTabJ.textContent = jPrenom.toUpperCase();
+    // Two-col régimes publics
+    const regPubTwoCol = document.getElementById('retraite-regpub-two-col');
+    const regPubPanelJ = document.getElementById('retraite-regpub-panel-conjoint');
+    if (regPubTwoCol)  regPubTwoCol.style.gridTemplateColumns = hasSpouse ? '1fr 1fr' : '1fr';
+    if (regPubPanelJ)  regPubPanelJ.style.display             = hasSpouse ? '' : 'none';
 
     // Tabs RPD et Retraits (rendus dynamiquement si couple)
     retraiteRenderPersonTabs('retraite-rpd-tabs', 'retraite-rpd-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRpdTab');
@@ -4841,18 +4830,15 @@
   }
 
   function retraiteRenderPersonTabs(tabsId, panelPrefix, hasSpouse, cPrenom, jPrenom, switchFn) {
-    const el = document.getElementById(tabsId);
-    if (!el) return;
-    if (!hasSpouse) {
-      el.innerHTML = '';
-      el.style.display = 'none';
-      return;
-    }
-    el.style.display = 'flex';
-    el.innerHTML = `
-      <button class="deces-person-tab active" onclick="${switchFn}('client',this)">${cPrenom}</button>
-      <button class="deces-person-tab"        onclick="${switchFn}('conjoint',this)">${jPrenom}</button>
-    `;
+    // Cacher l'élément d'onglets (plus utilisé, remplacé par two-col)
+    const tabsEl = document.getElementById(tabsId);
+    if (tabsEl) { tabsEl.innerHTML = ''; tabsEl.style.display = 'none'; }
+    // Trouver le conteneur two-col correspondant
+    const twoColId = tabsId.replace('-tabs', '-two-col');
+    const twoCol   = document.getElementById(twoColId);
+    const panelJ   = document.getElementById(panelPrefix + 'conjoint');
+    if (twoCol) twoCol.style.gridTemplateColumns = hasSpouse ? '1fr 1fr' : '1fr';
+    if (panelJ) panelJ.style.display             = hasSpouse ? '' : 'none';
   }
 
   function _retraiteGetRevenu(role) {
@@ -4880,20 +4866,8 @@
     retraiteCalc();
   }
 
-  function switchRetraiteObjTab(role, btn) {
-    document.querySelectorAll('#retraite-objectif-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('retraite-obj-panel-client').style.display  = role === 'client'   ? '' : 'none';
-    document.getElementById('retraite-obj-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
-    retraiteCalc();
-  }
-
-  function switchRetraitProfileTab(role, btn) {
-    document.querySelectorAll('#retraite-profil-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('retraite-profil-panel-client').style.display  = role === 'client'   ? '' : 'none';
-    document.getElementById('retraite-profil-panel-conjoint').style.display = role === 'conjoint' ? '' : 'none';
-  }
+  function switchRetraiteObjTab(role, btn) { /* layout côte à côte */ retraiteCalc(); }
+  function switchRetraitProfileTab(role, btn) { /* layout côte à côte */ }
 
   function retraiteAddPeriode(role) {
     const container = document.getElementById(`retraite-periodes-${role}`);
@@ -5219,14 +5193,7 @@
       </table>`;
   }
 
-  function switchRetraiteRegPubTab(role, btn) {
-    document.querySelectorAll('#retraite-regpub-tabs .deces-person-tab').forEach(b => b.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    ['client','conjoint'].forEach(r => {
-      const p = document.getElementById(`retraite-regpub-panel-${r}`);
-      if (p) p.style.display = r === role ? '' : 'none';
-    });
-  }
+  function switchRetraiteRegPubTab(role, btn) { /* layout côte à côte */ }
 
   function openRetraiteRegPubModal(role, idx) {
     const r = (_retraiteRegimesPublics[role] || [])[idx];

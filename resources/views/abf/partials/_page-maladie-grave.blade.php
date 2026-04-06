@@ -26,14 +26,12 @@
         </div>
       </div>
 
-      <!-- Onglets client / conjoint -->
-      <div id="mg-person-tabs" style="display:none;border-bottom:1px solid var(--border);margin-bottom:16px">
-        <button class="deces-person-tab active" id="mg-tab-client" onclick="switchMgTab('client',this)">CLIENT</button>
-        <button class="deces-person-tab" id="mg-tab-conjoint" onclick="switchMgTab('conjoint',this)">CONJOINT</button>
-      </div>
+      <!-- Layout côte à côte client | conjoint (JS gère grid-template-columns) -->
+      <div id="mg-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
 
       <!-- ══ PANEL CLIENT ══ -->
       <div id="mg-panel-client">
+        <div id="mg-panel-client-hdr" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
 
         <!-- A — Montants disponibles -->
         <div class="card" style="margin-bottom:16px">
@@ -215,6 +213,7 @@
 
       <!-- ══ PANEL CONJOINT (copie miroir, caché par défaut) ══ -->
       <div id="mg-panel-conjoint" style="display:none">
+        <div id="mg-panel-conjoint-hdr" style="font-size:13px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
 
         <!-- A — Montants disponibles -->
         <div class="card" style="margin-bottom:16px">
@@ -343,6 +342,8 @@
         </div>
 
       </div><!-- /mg-panel-conjoint -->
+
+      </div><!-- /mg-two-col -->
 
     </div><!-- /col principale -->
 

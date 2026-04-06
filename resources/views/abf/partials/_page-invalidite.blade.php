@@ -33,52 +33,52 @@
           <!-- Autres sources de revenu -->
           <div class="card" style="margin-bottom:16px">
             <div class="card-header" style="font-weight:700;font-size:13px;padding:12px 16px;border-bottom:1px solid var(--border)">Autres sources de revenu</div>
-            <!-- Onglets client / conjoint -->
-            <div style="display:flex;border-bottom:1px solid var(--border)">
-              <button id="inval-autres-tab-c" class="deces-person-tab active inval-autres-tab" onclick="invalAutresTab('c')">
-                <span id="inval-autres-tab-label-c">Client</span>
-              </button>
-              <button id="inval-autres-tab-j" class="deces-person-tab inval-autres-tab" onclick="invalAutresTab('j')" style="display:none">
-                <span id="inval-autres-tab-label-j">Conjoint(e)</span>
-              </button>
-            </div>
-            <!-- Panel client -->
-            <div id="inval-autres-panel-c" class="card-body">
-              <div class="form-group">
-                <label class="form-label">
-                  Revenus mensuels
-                  <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
-                    <i class="abf-tooltip-icon">i</i>
-                    <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
-                  </span>
-                </label>
-                <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-client" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
-              </div>
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
-                <div style="display:flex;gap:8px;margin-top:4px">
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="oui" onchange="invaliditeCalc()"/> Oui</label>
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+            <!-- Layout côte à côte (JS gère grid-template-columns) -->
+            <div id="inval-autres-two-col" style="display:grid;grid-template-columns:1fr;gap:0">
+              <!-- Panel client -->
+              <div>
+                <div id="inval-autres-hdr-c" style="display:none;font-size:12px;font-weight:700;color:white;background:var(--navy);border-radius:0;padding:6px 16px;text-align:center"></div>
+                <div id="inval-autres-panel-c" class="card-body">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Revenus mensuels
+                      <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
+                        <i class="abf-tooltip-icon">i</i>
+                        <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
+                      </span>
+                    </label>
+                    <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-client" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
+                    <div style="display:flex;gap:8px;margin-top:4px">
+                      <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="oui" onchange="invaliditeCalc()"/> Oui</label>
+                      <label class="fu-radio-pill"><input type="radio" name="inval-ae-c" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-            <!-- Panel conjoint -->
-            <div id="inval-autres-panel-j" class="card-body" style="display:none">
-              <div class="form-group">
-                <label class="form-label">
-                  Revenus mensuels
-                  <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
-                    <i class="abf-tooltip-icon">i</i>
-                    <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
-                  </span>
-                </label>
-                <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-conjoint" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
-              </div>
-              <div class="form-group" style="margin-bottom:0">
-                <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
-                <div style="display:flex;gap:8px;margin-top:4px">
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="oui" onchange="invaliditeCalc()"/> Oui</label>
-                  <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+              <!-- Panel conjoint -->
+              <div id="inval-autres-col-j" style="display:none">
+                <div id="inval-autres-hdr-j" style="font-size:12px;font-weight:700;color:white;background:var(--gold);border-radius:0;padding:6px 16px;text-align:center"></div>
+                <div id="inval-autres-panel-j" class="card-body">
+                  <div class="form-group">
+                    <label class="form-label">
+                      Revenus mensuels
+                      <span class="abf-tooltip-wrap" style="position:relative;display:inline-block;margin-left:4px">
+                        <i class="abf-tooltip-icon">i</i>
+                        <span class="abf-tooltip-box">Comprend toute autre source de revenu non liée à la capacité de travailler du client et qui pourrait lui servir à payer des frais en cas d'invalidité, telle qu'un revenu de location.</span>
+                      </span>
+                    </label>
+                    <div class="input-sfx" style="max-width:200px"><input class="form-input" id="inval-rev-conjoint" type="text" placeholder="0" oninput="invaliditeCalc()"/><span class="sfx">$</span></div>
+                  </div>
+                  <div class="form-group" style="margin-bottom:0">
+                    <label class="form-label">Êtes-vous couvert par l'assurance-emploi?</label>
+                    <div style="display:flex;gap:8px;margin-top:4px">
+                      <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="oui" onchange="invaliditeCalc()"/> Oui</label>
+                      <label class="fu-radio-pill"><input type="radio" name="inval-ae-j" value="non" checked onchange="invaliditeCalc()"/> Non</label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
