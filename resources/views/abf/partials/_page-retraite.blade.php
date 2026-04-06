@@ -85,6 +85,7 @@
 
           <!-- Panel client -->
           <div id="retraite-obj-panel-client">
+            <div id="retraite-obj-hdr-c" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
             <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
               Revenu <span class="retraite-freq-label">annuel</span> net actuel : <strong id="retraite-revenu-net-client">—</strong>
             </div>
@@ -119,6 +120,7 @@
 
           <!-- Panel conjoint -->
           <div id="retraite-obj-panel-conjoint" style="display:none">
+            <div id="retraite-obj-hdr-j" style="font-size:13px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
 
             <div style="font-size:12px;color:var(--muted);margin-bottom:12px">
               Revenu <span class="retraite-freq-label">annuel</span> net actuel : <strong id="retraite-revenu-net-conjoint">—</strong>
@@ -178,6 +180,7 @@
         <div class="card-body">
           <div id="retraite-profil-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
           <div id="retraite-profil-panel-client">
+            <div id="retraite-profil-hdr-c" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
             <div class="row">
               <div class="col form-group">
                 <label class="form-label" style="display:flex;align-items:center;gap:6px">Avant la retraite <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">Profil utilisé jusqu'à l'âge de la retraite.</span></span></label>
@@ -202,7 +205,7 @@
             </div>
           </div>
           <div id="retraite-profil-panel-conjoint" style="display:none">
-
+            <div id="retraite-profil-hdr-j" style="font-size:13px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center"></div>
             <div class="row">
               <div class="col form-group">
                 <label class="form-label">Avant la retraite</label>
@@ -241,9 +244,11 @@
         <div style="padding:0">
           <div id="retraite-regpub-two-col" style="display:grid;grid-template-columns:1fr;gap:0;padding:0">
             <div id="retraite-regpub-panel-client">
+              <div id="retraite-regpub-hdr-c" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);padding:7px 16px;text-align:center"></div>
               <div id="retraite-regpub-table-client"></div>
             </div>
             <div id="retraite-regpub-panel-conjoint" style="display:none">
+              <div id="retraite-regpub-hdr-j" style="font-size:13px;font-weight:700;color:white;background:var(--gold);padding:7px 16px;text-align:center"></div>
               <div id="retraite-regpub-table-conjoint"></div>
             </div>
           </div>
@@ -264,8 +269,14 @@
         </div>
         <div style="padding:0">
           <div id="retraite-rpd-two-col" style="display:grid;grid-template-columns:1fr;gap:0">
-            <div id="retraite-rpd-panel-client"><div id="retraite-rpd-list-client"></div></div>
-            <div id="retraite-rpd-panel-conjoint" style="display:none"><div id="retraite-rpd-list-conjoint"></div></div>
+            <div id="retraite-rpd-panel-client">
+              <div id="retraite-rpd-hdr-c" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);padding:7px 16px;text-align:center"></div>
+              <div id="retraite-rpd-list-client"></div>
+            </div>
+            <div id="retraite-rpd-panel-conjoint" style="display:none">
+              <div id="retraite-rpd-hdr-j" style="font-size:13px;font-weight:700;color:white;background:var(--gold);padding:7px 16px;text-align:center"></div>
+              <div id="retraite-rpd-list-conjoint"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -291,8 +302,14 @@
         </div>
         <div style="padding:0">
           <div id="retraite-retraits-two-col" style="display:grid;grid-template-columns:1fr;gap:0">
-            <div id="retraite-retraits-panel-client"><div id="retraite-retraits-list-client"></div></div>
-            <div id="retraite-retraits-panel-conjoint" style="display:none"><div id="retraite-retraits-list-conjoint"></div></div>
+            <div id="retraite-retraits-panel-client">
+              <div id="retraite-retraits-hdr-c" style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);padding:7px 16px;text-align:center"></div>
+              <div id="retraite-retraits-list-client"></div>
+            </div>
+            <div id="retraite-retraits-panel-conjoint" style="display:none">
+              <div id="retraite-retraits-hdr-j" style="font-size:13px;font-weight:700;color:white;background:var(--gold);padding:7px 16px;text-align:center"></div>
+              <div id="retraite-retraits-list-conjoint"></div>
+            </div>
           </div>
         </div>
       </div>

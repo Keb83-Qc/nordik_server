@@ -4795,6 +4795,14 @@
     if (profilTwoCol)   profilTwoCol.style.gridTemplateColumns  = hasSpouse ? '1fr 1fr' : '1fr';
     if (profilPanelJ)   profilPanelJ.style.display              = hasSpouse ? '' : 'none';
 
+    // Bandeaux nom client/conjoint pour toutes les sections two-col
+    ['obj','profil','regpub','rpd','retraits'].forEach(sec => {
+      const hC = document.getElementById(`retraite-${sec}-hdr-c`);
+      const hJ = document.getElementById(`retraite-${sec}-hdr-j`);
+      if (hC) { hC.style.display = hasSpouse ? '' : 'none'; hC.textContent = cPrenom; }
+      if (hJ) hJ.textContent = jPrenom;
+    });
+
     const goalWrap = document.getElementById('retraite-goal-type-wrap');
     if (goalWrap) goalWrap.style.display = hasSpouse ? 'flex' : 'none';
 
