@@ -79,7 +79,7 @@ class AbfRecommendationResource extends Resource
                 ->label('Clé (slug unique)')
                 ->helperText('Générée automatiquement depuis le titre (camelCase). Identifiant utilisé par le JS — ne pas modifier après création.')
                 ->maxLength(100)
-                ->readOnly(fn (string $operation): bool => $operation === 'edit')
+                ->readOnly()
                 ->columnSpanFull(),
 
             Textarea::make('text')
