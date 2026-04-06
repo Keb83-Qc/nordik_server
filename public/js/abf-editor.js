@@ -712,7 +712,9 @@
     document.getElementById('plac-institution').value = prefill?.institution ?? '';
     document.getElementById('plac-valeur').value = prefill?.valeur ?? '';
     document.getElementById('plac-notes').value = prefill?.notes ?? '';
-    document.getElementById('plac-portefeuille').value = prefill?.portefeuille ?? _defaultPortefeuille;
+    const _placOwner = document.getElementById('plac-proprietaire')?.value ?? '';
+    const _placPortefDefault = (_placOwner === 'conjoint') ? _defaultPortefeuilleConjoint : _defaultPortefeuille;
+    document.getElementById('plac-portefeuille').value = prefill?.portefeuille ?? _placPortefDefault;
     document.getElementById('plac-rendement').value = prefill?.rendement ?? '3,70';
     document.getElementById('plac-categorie').value = prefill?.categorie ?? '';
     document.getElementById('modal-placement').classList.add('open');
@@ -2116,6 +2118,10 @@
       profilEl.textContent = piProfileLabel(total);
       profilEl.className   = 'pi-result-profil pi-badge-' + piProfileKey(total);
     }
+    // Mettre à jour le portefeuille par défaut du bon propriétaire
+    const profil = piProfileKey(total);
+    if (role === 'client')   _defaultPortefeuille         = _intakeProfilMap[profil] || 'balanced';
+    if (role === 'conjoint') _defaultPortefeuilleConjoint = _intakeProfilMap[profil] || 'balanced';
     return total;
   }
 
@@ -2169,7 +2175,8 @@
 
   // Profil par défaut (depuis intake) pour pré-remplir le portefeuille des placements
   const _intakeProfilMap = { prudent:'prudent', modere:'moderate', equilibre:'balanced', croissance:'growth', audacieux:'aggressive' };
-  let _defaultPortefeuille = 'balanced';
+  let _defaultPortefeuille         = 'balanced'; // profil investisseur client
+  let _defaultPortefeuilleConjoint = 'balanced'; // profil investisseur conjoint
   // Données de profil provenant du formulaire client (intake), à préserver lors de la sauvegarde
   const _piIntakeData = { client: null, conjoint: null };
 
@@ -2187,9 +2194,8 @@
         profilEl.className   = 'pi-result-profil pi-badge-' + profil;
       }
       // Mémoriser pour le portefeuille par défaut des placements et pour la sauvegarde
-      if (role === 'client') {
-        _defaultPortefeuille = _intakeProfilMap[profil] || 'balanced';
-      }
+      if (role === 'client')   _defaultPortefeuille         = _intakeProfilMap[profil] || 'balanced';
+      if (role === 'conjoint') _defaultPortefeuilleConjoint = _intakeProfilMap[profil] || 'balanced';
       _piIntakeData[role] = data;
       return;
     }
