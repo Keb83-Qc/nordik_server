@@ -3801,7 +3801,7 @@
     const enfList = document.getElementById('enfants-list');
     if (enfList && (p.enfants || []).length) {
       enfList.classList.remove('list-empty'); enfList.innerHTML = '';
-      const REL = { child:'Enfant', dependent:'Autre', fathermother:'Père-Mère', grandparent:'Grand-parent', grandchild:'Petit-enfant', sibling:'Frère-Sœur', otherrelative:'Parenté', exspouse:'Ex-conjoint(e)' };
+      const REL = { child:'Enfant', dependent:'Autre', fathermother:'Père-Mère', grandparent:'Grand-parent', grandchild:'Petit-enfant', sibling:'Frère-Sœur', otherrelative:'Parenté', exspouse:'Ex-conjoint(e)', stepson:'Beau-fils', stepdaughter:'Belle-fille', stepparent:'Beau-parent', legalguardian:'Tuteur légal' };
       const CHARGE = { client:'Client', conjoint:'Conjoint', both:'Les deux', none:'Non à charge' };
       (p.enfants || []).forEach(d => {
         const item = document.createElement('div');

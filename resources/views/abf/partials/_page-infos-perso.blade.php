@@ -668,6 +668,10 @@
                                 <option value="sibling">Frère-Sœur</option>
                                 <option value="otherrelative">Parenté</option>
                                 <option value="exspouse">Ex-conjoint(e)</option>
+                                <option value="stepson">Beau-fils</option>
+                                <option value="stepdaughter">Belle-fille</option>
+                                <option value="stepparent">Beau-parent</option>
+                                <option value="legalguardian">Tuteur légal</option>
                             </select>
                         </div>
                         <div class="col form-group" id="enf-relation-conjoint-col" style="display:none">
@@ -683,6 +687,10 @@
                                 <option value="sibling">Frère-Sœur</option>
                                 <option value="otherrelative">Parenté</option>
                                 <option value="exspouse">Ex-conjoint(e)</option>
+                                <option value="stepson">Beau-fils</option>
+                                <option value="stepdaughter">Belle-fille</option>
+                                <option value="stepparent">Beau-parent</option>
+                                <option value="legalguardian">Tuteur légal</option>
                             </select>
                         </div>
                     </div>
