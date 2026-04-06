@@ -306,6 +306,35 @@
               </div>
             </div>
           </div>
+          <!-- Bloc Couple (affiché seulement si conjoint) -->
+          <div class="ap-sidebar-section" id="re-couple-block" style="display:none;border-top:2px solid var(--border);padding-top:10px">
+            <div style="margin-bottom:8px">
+              <div style="font-size:12px;font-weight:700;color:var(--navy)">Couple</div>
+            </div>
+            <div style="margin-top:6px">
+              <div class="ap-sb-row" style="margin-bottom:4px">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--navy)">
+                  <span style="width:8px;height:8px;border-radius:50%;background:var(--navy);flex-shrink:0"></span>
+                  Revenu net
+                </span>
+                <span class="ap-sb-val" style="font-weight:700;color:var(--navy)" id="re-couple-net">0 $</span>
+              </div>
+              <div class="ap-sb-row" style="margin-bottom:4px">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)">
+                  <span style="width:8px;height:8px;border-radius:50%;background:#22c55e;flex-shrink:0"></span>
+                  Épargne
+                </span>
+                <span class="ap-sb-val" id="re-couple-epargne">0 $</span>
+              </div>
+              <div class="ap-sb-row">
+                <span style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted)">
+                  <span style="width:8px;height:8px;border-radius:50%;background:#ef4444;flex-shrink:0"></span>
+                  Dépenses
+                </span>
+                <span class="ap-sb-val" id="re-couple-depenses">0 $</span>
+              </div>
+            </div>
+          </div>
         </div><!-- /re-sidebar -->
 
       </div><!-- /flex -->

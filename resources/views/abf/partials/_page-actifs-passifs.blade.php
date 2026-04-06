@@ -113,6 +113,13 @@
             <div class="ap-sb-row"><span class="ap-sb-label">Actifs</span><span class="ap-sb-val" style="color:var(--valid)" id="ap-conjoint-actifs">0 $</span></div>
             <div class="ap-sb-row"><span class="ap-sb-label">Passifs</span><span class="ap-sb-val" style="color:#ef4444" id="ap-conjoint-passifs">0 $</span></div>
           </div>
+          <!-- Bloc Couple (affiché seulement si conjoint) -->
+          <div class="ap-sidebar-section" id="ap-couple-block" style="display:none;border-top:2px solid var(--border);padding-top:10px">
+            <div style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:8px">Couple</div>
+            <div class="ap-sb-row"><span class="ap-sb-label">Valeur nette</span><span class="ap-sb-val" style="font-weight:700" id="ap-couple-vn">0 $</span></div>
+            <div class="ap-sb-row"><span class="ap-sb-label">Actifs</span><span class="ap-sb-val" style="color:var(--valid)" id="ap-couple-actifs">0 $</span></div>
+            <div class="ap-sb-row"><span class="ap-sb-label">Passifs</span><span class="ap-sb-val" style="color:#ef4444" id="ap-couple-passifs">0 $</span></div>
+          </div>
         </div>
       </div>
 

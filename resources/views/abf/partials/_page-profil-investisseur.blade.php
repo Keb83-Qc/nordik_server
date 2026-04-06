@@ -41,20 +41,84 @@
         .pi-result-grille { font-size:11px;color:var(--muted);line-height:1.8;margin-left:auto; }
       </style>
 
-      <!-- Onglets Client / Conjoint (masqués si individuel) -->
-      <div id="pi-person-tabs" style="display:none">
-        <button class="pi-person-tab active" id="pi-tab-client"   onclick="switchPiTab('client',this)">CLIENT</button>
-        <button class="pi-person-tab"        id="pi-tab-conjoint" onclick="switchPiTab('conjoint',this)">CONJOINT</button>
-      </div>
+      <div style="display:flex;gap:20px;align-items:start">
 
-      <!-- ───────────── PANEL CLIENT ───────────── -->
-      <div id="pi-panel-client">
-        @include('abf.partials._profil-investisseur-questions', ['role' => 'client'])
-      </div>
+        <!-- ── Questionnaire (gauche) ── -->
+        <div style="flex:1;min-width:0">
 
-      <!-- ───────────── PANEL CONJOINT ───────────── -->
-      <div id="pi-panel-conjoint" style="display:none">
-        @include('abf.partials._profil-investisseur-questions', ['role' => 'conjoint'])
-      </div>
+          <!-- Onglets Client / Conjoint (masqués si individuel) -->
+          <div id="pi-person-tabs" style="display:none">
+            <button class="pi-person-tab active" id="pi-tab-client"   onclick="switchPiTab('client',this)">CLIENT</button>
+            <button class="pi-person-tab"        id="pi-tab-conjoint" onclick="switchPiTab('conjoint',this)">CONJOINT</button>
+          </div>
+
+          <!-- ───────────── PANEL CLIENT ───────────── -->
+          <div id="pi-panel-client">
+            @include('abf.partials._profil-investisseur-questions', ['role' => 'client'])
+          </div>
+
+          <!-- ───────────── PANEL CONJOINT ───────────── -->
+          <div id="pi-panel-conjoint" style="display:none">
+            @include('abf.partials._profil-investisseur-questions', ['role' => 'conjoint'])
+          </div>
+
+        </div><!-- /questionnaire -->
+
+        <!-- ── Résultats (droite, sticky) ── -->
+        <div style="width:280px;flex-shrink:0;position:sticky;top:80px">
+
+          <!-- Résultat Client -->
+          <div class="pi-result-card">
+            <div class="pi-result-header" id="pi-result-header-client">Résultat — Client</div>
+            <div class="pi-result-body">
+              <div>
+                <div class="pi-result-score">
+                  <span id="pi-score-client">0</span>
+                  <span>/ 160 pts</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Profil d'investisseur</div>
+                <div class="pi-result-profil" id="pi-profil-client">—</div>
+              </div>
+              <div class="pi-result-grille">
+                <div><strong>Grille :</strong></div>
+                <div>🛡️ Prudent — 8 à 25 pts</div>
+                <div>⚖️ Modéré — 26 à 55 pts</div>
+                <div>🔄 Équilibré — 56 à 90 pts</div>
+                <div>📈 Croissance — 91 à 120 pts</div>
+                <div>🚀 Audacieux — 121 à 160 pts</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Résultat Conjoint (caché par défaut) -->
+          <div class="pi-result-card" id="pi-result-conjoint" style="display:none;margin-top:16px">
+            <div class="pi-result-header" id="pi-result-header-conjoint">Résultat — Conjoint(e)</div>
+            <div class="pi-result-body">
+              <div>
+                <div class="pi-result-score">
+                  <span id="pi-score-conjoint">0</span>
+                  <span>/ 160 pts</span>
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Profil d'investisseur</div>
+                <div class="pi-result-profil" id="pi-profil-conjoint">—</div>
+              </div>
+              <div class="pi-result-grille">
+                <div><strong>Grille :</strong></div>
+                <div>🛡️ Prudent — 8 à 25 pts</div>
+                <div>⚖️ Modéré — 26 à 55 pts</div>
+                <div>🔄 Équilibré — 56 à 90 pts</div>
+                <div>📈 Croissance — 91 à 120 pts</div>
+                <div>🚀 Audacieux — 121 à 160 pts</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /résultats -->
+
+      </div><!-- /flex -->
 
     </div>

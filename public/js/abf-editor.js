@@ -95,6 +95,7 @@
   let _conseils = null; // null = non initialisé, sera copié depuis _CONSEILS_DEFAULTS au premier usage
   let _rapportSelectedPhoto = null;
   const _moisNoms = ['','Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  let _mgResumeData = { client: null, conjoint: null };
   const _mgCoveragePresets = {
     aucun:     { traitement:0,    equipement:0,    adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
     base:      { traitement:5000, equipement:5000, adaptation:0,     vehicule:0,    transport:0,    'aide-domicile':0,    'soins-professionnel':0, 'medicaments-rec':0 },
@@ -141,6 +142,9 @@
     if(btn) btn.classList.add('active');
     // update current index
     current = pages.indexOf(id);
+    // Masquer le bouton Précédent sur la première page
+    const prevBtn = document.getElementById('btn-prev');
+    if (prevBtn) prevBtn.style.visibility = current === 0 ? 'hidden' : '';
     if (id === 'objectifs') renderObjectives();
     if (id === 'actifs-passifs') updateApSidebar();
     if (id === 'revenu-epargne') updateReSidebar();
@@ -653,6 +657,14 @@
       set('ap-conjoint-vn',      fmt(jvn),          colorVn(jvn));
       set('ap-conjoint-actifs',  fmt(conjointActifs));
       set('ap-conjoint-passifs', fmt(conjointPassifs));
+    }
+    // Bloc Couple
+    const coupleBlock = document.getElementById('ap-couple-block');
+    if (coupleBlock) coupleBlock.style.display = conjoint ? 'block' : 'none';
+    if (conjoint) {
+      set('ap-couple-vn',      fmt(vn),          colorVn(vn));
+      set('ap-couple-actifs',  fmt(totalActifs));
+      set('ap-couple-passifs', fmt(totalPassifs));
     }
   }
   function apAddToList(listId, type, propText, valeurText, subText, valeurNum, owner, modalType, formJson, partClient, partConjoint) {
@@ -1530,7 +1542,22 @@
         const allNet = clientNetAnnuel + conjNetAnnuel;
         setDonut('re-conjoint-donut-arc', conjNetAnnuel, allNet || 1);
         setDonut('re-client-donut-arc',   clientNetAnnuel, allNet || 1);
+        // Bloc Couple
+        const coupleBlock = document.getElementById('re-couple-block');
+        if (coupleBlock) coupleBlock.style.display = 'block';
+        const coupleNetDisp  = (clientNetAnnuel + conjNetAnnuel) / divisor;
+        const coupleEpDisp   = (clientEpargneAnnuel + conjointEpargneAnnuel) / divisor;
+        const coupleDepDisp  = Math.max(0, coupleNetDisp - coupleEpDisp);
+        const coupleEl = id => document.getElementById(id);
+        if (coupleEl('re-couple-net'))      coupleEl('re-couple-net').textContent      = fmtMoney(coupleNetDisp);
+        if (coupleEl('re-couple-epargne'))  coupleEl('re-couple-epargne').textContent  = fmtMoney(coupleEpDisp);
+        if (coupleEl('re-couple-depenses')) coupleEl('re-couple-depenses').textContent = fmtMoney(coupleDepDisp);
       }
+    }
+    // Masquer bloc couple si pas de conjoint
+    if (!conjointPrenom) {
+      const cb = document.getElementById('re-couple-block');
+      if (cb) cb.style.display = 'none';
     }
 
     // Auto-calcul droits de cotisation
@@ -2094,8 +2121,22 @@
 
   function profilInvestisseurInit() {
     const isCouple = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    const cPrenom  = document.getElementById('client-prenom')?.value   || 'Client';
+    const jPrenom  = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
     const tabs = document.getElementById('pi-person-tabs');
     if (tabs) tabs.style.display = isCouple ? 'block' : 'none';
+    // Noms dans les onglets
+    const tabC = document.getElementById('pi-tab-client');
+    const tabJ = document.getElementById('pi-tab-conjoint');
+    if (tabC) tabC.textContent = cPrenom.toUpperCase();
+    if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
+    // Titres des cartes résultat + visibilité conjoint
+    const hdrC = document.getElementById('pi-result-header-client');
+    const hdrJ = document.getElementById('pi-result-header-conjoint');
+    if (hdrC) hdrC.textContent = 'Résultat — ' + cPrenom;
+    if (hdrJ) hdrJ.textContent = 'Résultat — ' + jPrenom;
+    const conjResult = document.getElementById('pi-result-conjoint');
+    if (conjResult) conjResult.style.display = isCouple ? 'block' : 'none';
     // Recalculer les scores affichés
     piCalcScore('client');
     if (isCouple) piCalcScore('conjoint');
@@ -2264,7 +2305,13 @@
     const ecart = (actifsTotal + marge) - objectif;
 
     const card = document.getElementById('fu-resume-card');
-    if (card) card.style.display = 'block';
+    if (card) {
+      card.style.display = 'block';
+      // Titre du résumé : "Couple" si conjoint actif
+      const isCouple = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+      const hdr = card.querySelector('.card-header');
+      if (hdr) hdr.textContent = isCouple ? 'Résumé — Couple' : 'Résumé';
+    }
     const el = (id) => document.getElementById(id);
     if (el('fu-r-objectif')) el('fu-r-objectif').textContent = fmtMoney(objectif);
     if (el('fu-r-actifs'))   el('fu-r-actifs').textContent   = fmtMoney(actifsTotal);
@@ -4471,6 +4518,11 @@
     // Noms
     const cPrenom = document.getElementById('client-prenom')?.value || 'le client';
     const jPrenom = document.getElementById('conjoint-prenom')?.value || 'le conjoint';
+    // Onglets avec vrais prénoms
+    const tabC = document.getElementById('mg-tab-client');
+    const tabJ = document.getElementById('mg-tab-conjoint');
+    if (tabC) tabC.textContent = cPrenom.toUpperCase();
+    if (tabJ) tabJ.textContent = jPrenom.toUpperCase();
     ['c','j'].forEach((k, i) => {
       const nom = i === 0 ? cPrenom : jPrenom;
       const el = document.getElementById(`mg-rr-client-label-${k}`);
@@ -4614,36 +4666,49 @@
     const manqueMg = Math.max(0, grandTotal - couvertureMg);
     const pctCouv  = grandTotal > 0 ? Math.min(100, Math.round(couvertureMg / grandTotal * 100)) : 0;
 
-    // ── Résumé (mise à jour avec couverture) ──
+    // ── Stocker les données pour le résumé combiné ──
+    _mgResumeData[role] = { grandTotal, manqueMg, montantCible, duree, totalDep, aidantCout, couvertureMg };
+
+    // ── Résumé (toujours mis à jour) ──
     const resumeEl = document.getElementById('mg-resume-body');
-    if (resumeEl && document.getElementById('mg-panel-' + role)?.style.display !== 'none') {
-      resumeEl.innerHTML = `
-        <div style="font-size:13px">
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Remplacement du revenu</span>
-            <strong>${fmtMoney(montantCible * duree)}</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Dépenses supplémentaires</span>
-            <strong>${fmtMoney(totalDep)}</strong>
-          </div>
-          ${aidantCout > 0 ? `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Revenu de l'aidant</span>
-            <strong>${fmtMoney(aidantCout)}</strong>
-          </div>` : ''}
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Total estimé</span>
-            <strong style="color:var(--gold)">${fmtMoney(grandTotal)}</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border)">
-            <span style="color:var(--muted)">Assurance MG</span>
-            <strong style="color:var(--navy)">${fmtMoney(couvertureMg)}</strong>
-          </div>
-          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px">
-            <span style="font-weight:700;color:var(--navy)">Manque à gagner</span>
-            <strong style="color:${manqueMg > 0 ? '#ef4444' : '#22c55e'};font-size:15px">${fmtMoney(manqueMg)}</strong>
-          </div>
-        </div>`;
+    if (resumeEl) {
+      const isCouple = document.getElementById('conjoint')?.checked;
+      const cPr = document.getElementById('client-prenom')?.value   || 'Client';
+      const jPr = document.getElementById('conjoint-prenom')?.value || 'Conjoint(e)';
+      const row = (label, val, bold, extra='') =>
+        `<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">${label}</span><strong${extra}>${val}</strong></div>`;
+      const sectionTitle = name =>
+        `<div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--navy);padding:8px 0 3px;letter-spacing:.5px">${name}</div>`;
+      const manqueRow = (val) =>
+        `<div style="display:flex;justify-content:space-between;padding:7px 0 5px;border-top:2px solid var(--border);margin-top:2px"><span style="font-weight:700;color:var(--navy)">Manque à gagner</span><strong style="color:${val>0?'#ef4444':'#22c55e'};font-size:14px">${fmtMoney(val)}</strong></div>`;
+      const renderPerson = (d) => d ? (
+        row('Remplacement du revenu', fmtMoney(d.montantCible * d.duree)) +
+        row('Dépenses supplémentaires', fmtMoney(d.totalDep)) +
+        (d.aidantCout > 0 ? row("Revenu de l'aidant", fmtMoney(d.aidantCout)) : '') +
+        row('Total estimé', fmtMoney(d.grandTotal), true, ' style="color:var(--gold)"') +
+        row('Assurance MG', fmtMoney(d.couvertureMg), true, ' style="color:var(--navy)"') +
+        manqueRow(d.manqueMg)
+      ) : '';
+
+      let html = '<div style="font-size:13px">';
+      if (isCouple && _mgResumeData.client && _mgResumeData.conjoint) {
+        const dc = _mgResumeData.client, dj = _mgResumeData.conjoint;
+        const coupleTotal  = dc.grandTotal   + dj.grandTotal;
+        const coupleMG     = dc.couvertureMg + dj.couvertureMg;
+        const coupleManque = dc.manqueMg     + dj.manqueMg;
+        html += sectionTitle(cPr) + renderPerson(dc);
+        html += sectionTitle(jPr) + renderPerson(dj);
+        html += sectionTitle('Couple');
+        html += row('Total estimé', fmtMoney(coupleTotal), true, ' style="color:var(--gold)"');
+        html += row('Assurance MG', fmtMoney(coupleMG),   true, ' style="color:var(--navy)"');
+        html += manqueRow(coupleManque);
+      } else {
+        const d = _mgResumeData[role];
+        if (d) { html += renderPerson(d); }
+        else { html += '<span style="color:var(--muted)">Complétez les informations pour voir le résumé.</span>'; }
+      }
+      html += '</div>';
+      resumeEl.innerHTML = html;
     }
 
     // ── Recommandations Maladie grave ──

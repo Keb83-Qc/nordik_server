@@ -324,6 +324,12 @@
     .calc-tab:last-child { border-right:none; }
     .calc-tab.active { background:var(--navy);color:white; }
 
+    /* Toggle brut/net buttons */
+    .toggle-btn { padding:5px 14px;font-size:12px;font-weight:600;border:1px solid var(--border);background:white;cursor:pointer;color:var(--muted);transition:all .15s; }
+    .toggle-btn:first-child { border-radius:6px 0 0 6px; }
+    .toggle-btn:last-child { border-radius:0 6px 6px 0;border-left:none; }
+    .toggle-btn.active { background:var(--navy);color:white;border-color:var(--navy); }
+
     /* $ / % suffix inputs */
     .input-sfx { position:relative;display:flex;align-items:center; }
     .input-sfx input { padding-right:26px; }

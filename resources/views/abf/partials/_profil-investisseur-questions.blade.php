@@ -147,27 +147,4 @@
   </div>
 @endforeach
 
-<!-- ── Résultat ────────────────────────────────────────────────────── -->
-<div class="pi-result-card">
-  <div class="pi-result-header">Résultat — {{ $role === 'client' ? 'Vous' : 'Votre conjoint(e)' }}</div>
-  <div class="pi-result-body">
-    <div>
-      <div class="pi-result-score">
-        <span id="pi-score-{{ $r }}">0</span>
-        <span>/ 160 pts</span>
-      </div>
-    </div>
-    <div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px">Profil d'investisseur</div>
-      <div class="pi-result-profil" id="pi-profil-{{ $r }}">—</div>
-    </div>
-    <div class="pi-result-grille">
-      <div><strong>Grille de référence :</strong></div>
-      <div>🛡️ Prudent — 8 à 25 pts</div>
-      <div>⚖️ Modéré — 26 à 55 pts</div>
-      <div>🔄 Équilibré — 56 à 90 pts</div>
-      <div>📈 Croissance — 91 à 120 pts</div>
-      <div>🚀 Audacieux — 121 à 160 pts</div>
-    </div>
-  </div>
-</div>
+{{-- Résultat déplacé dans la colonne droite de _page-profil-investisseur.blade.php --}}

@@ -221,7 +221,7 @@
 
 <!-- BOTTOM BAR -->
 <div class="bottom-bar">
-  <button class="btn btn-secondary" onclick="goPrev()">← Précédent</button>
+  <button id="btn-prev" class="btn btn-secondary" onclick="goPrev()">← Précédent</button>
   <button class="btn btn-primary" onclick="goNext()">Suivant →</button>
 </div>
 
