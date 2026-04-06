@@ -345,7 +345,7 @@
                     <div class="row">
                         <div class="col form-group">
                             <label class="form-label required">État civil</label>
-                            <select class="form-select" id="conjoint-etat-civil">
+                            <select class="form-select" id="conjoint-etat-civil" onchange="syncClientInfo()">
                                 <option value="">Sélectionnez…</option>
                                 <option>Marié(e)</option>
                                 <option>Célibataire</option>
@@ -428,17 +428,17 @@
                         <div class="row">
                             <div class="col form-group" style="max-width:120px">
                                 <label class="form-label">N° civique</label>
-                                <input class="form-input" type="text" id="conjoint-addr-civique" />
+                                <input class="form-input" type="text" id="conjoint-addr-civique" oninput="syncClientInfo()" />
                             </div>
                             <div class="col form-group">
                                 <label class="form-label">Rue</label>
-                                <input class="form-input" type="text" id="conjoint-addr-rue" />
+                                <input class="form-input" type="text" id="conjoint-addr-rue" oninput="syncClientInfo()" />
                             </div>
                         </div>
                         <div class="row">
                             <div class="col form-group">
                                 <label class="form-label">Type d'unité</label>
-                                <select class="form-select" id="conjoint-addr-type-unite">
+                                <select class="form-select" id="conjoint-addr-type-unite" onchange="syncClientInfo()">
                                     <option value="">—</option>
                                     <option>Appartement</option>
                                     <option>Suite</option>
@@ -448,21 +448,21 @@
                             </div>
                             <div class="col form-group" style="max-width:100px">
                                 <label class="form-label">Numéro</label>
-                                <input class="form-input" type="text" id="conjoint-addr-numero" />
+                                <input class="form-input" type="text" id="conjoint-addr-numero" oninput="syncClientInfo()" />
                             </div>
                             <div class="col form-group">
                                 <label class="form-label">Case postale</label>
-                                <input class="form-input" type="text" id="conjoint-addr-case" placeholder="—" />
+                                <input class="form-input" type="text" id="conjoint-addr-case" placeholder="—" oninput="syncClientInfo()" />
                             </div>
                         </div>
                         <div class="row" style="margin-bottom:0">
                             <div class="col form-group">
                                 <label class="form-label">Ville</label>
-                                <input class="form-input" type="text" id="conjoint-addr-ville" />
+                                <input class="form-input" type="text" id="conjoint-addr-ville" oninput="syncClientInfo()" />
                             </div>
                             <div class="col form-group">
                                 <label class="form-label">Province</label>
-                                <select class="form-select" id="conjoint-addr-province">
+                                <select class="form-select" id="conjoint-addr-province" onchange="syncClientInfo()">
                                     <option value="">—</option>
                                     <option>Alberta</option>
                                     <option>Colombie-Britannique</option>
@@ -483,7 +483,7 @@
                                 <label class="form-label">Code postal</label>
                                 <input class="form-input" type="text" id="conjoint-addr-postal"
                                     placeholder="A1A 1A1" maxlength="7"
-                                    oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v" />
+                                    oninput="const v=this.value.replace(/[^a-zA-Z0-9]/g,'').toUpperCase().slice(0,6);this.value=v.length>3?v.slice(0,3)+' '+v.slice(3):v;syncClientInfo()" />
                             </div>
                             <div class="col form-group">
                                 <label class="form-label">Pays</label>

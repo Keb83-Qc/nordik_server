@@ -44,8 +44,8 @@
   // ──────────────────────────────────────────────────────────────────
 
   const pages = [
-    'infos-perso','objectifs','actifs-passifs','revenu-epargne',
-    'profil-investisseur','fonds-urgence','deces','invalidite','maladie-grave',
+    'infos-perso','objectifs','profil-investisseur','actifs-passifs','revenu-epargne',
+    'fonds-urgence','deces','invalidite','maladie-grave',
     'projets','retraite','recommandations','rapport'
   ];
   let current = 0;
@@ -108,11 +108,26 @@
     const clientEC = document.getElementById('client-etat-civil');
     const conjointEC = document.getElementById('conjoint-etat-civil');
     if (clientEC && conjointEC) conjointEC.value = clientEC.value;
-    // Adresse : sync champ par champ
+    // Adresse : sync champ par champ (client → conjoint)
     const addrFields = ['civique','rue','type-unite','numero','case','ville','province','postal'];
     addrFields.forEach(f => {
       const src = document.getElementById('client-addr-' + f);
       const dst = document.getElementById('conjoint-addr-' + f);
+      if (src && dst) dst.value = src.value;
+    });
+  }
+
+  function syncClientInfo() {
+    if (!document.getElementById('conjoint')?.checked) return;
+    // État civil : même valeur que le conjoint (conjoint → client)
+    const conjointEC = document.getElementById('conjoint-etat-civil');
+    const clientEC = document.getElementById('client-etat-civil');
+    if (conjointEC && clientEC) clientEC.value = conjointEC.value;
+    // Adresse : sync champ par champ (conjoint → client)
+    const addrFields = ['civique','rue','type-unite','numero','case','ville','province','postal'];
+    addrFields.forEach(f => {
+      const src = document.getElementById('conjoint-addr-' + f);
+      const dst = document.getElementById('client-addr-' + f);
       if (src && dst) dst.value = src.value;
     });
   }
@@ -4154,9 +4169,14 @@
     const navItems = document.querySelectorAll('.nav-item');
     if (savedPage && pages.includes(savedPage)) {
       const savedIdx = pages.indexOf(savedPage);
-      // Déverrouiller toutes les pages visitées (jusqu'à la dernière enregistrée)
+      // Calculer l'index le plus loin atteint (parmi done_pages + savedIdx)
+      const doneIndices = [...donePagesSet].map(p => pages.indexOf(p)).filter(i => i >= 0);
+      const maxDoneIdx = doneIndices.length > 0 ? Math.max(...doneIndices) : -1;
+      // Déverrouiller jusqu'à max(savedIdx, maxDoneIdx+1) pour permettre la continuation
+      const unlockUpTo = Math.max(savedIdx, maxDoneIdx + 1);
       navItems.forEach((el, i) => {
-        if (i <= savedIdx) el.classList.remove('locked');
+        // Déverrouiller toutes les pages déjà faites + jusqu'au point de continuation
+        if (i <= unlockUpTo || donePagesSet.has(pages[i])) el.classList.remove('locked');
         if (donePagesSet.has(pages[i])) el.classList.add('done');
       });
     } else {

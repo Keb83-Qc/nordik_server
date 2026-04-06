@@ -66,14 +66,14 @@
             <button class="nav-item locked" onclick="goTo('objectifs',this)">
                 <span class="dot"></span> Objectifs
             </button>
+            <button class="nav-item locked" onclick="goTo('profil-investisseur',this)">
+                <span class="dot"></span> Profil d'investisseur
+            </button>
             <button class="nav-item locked" onclick="goTo('actifs-passifs',this)">
                 <span class="dot"></span> Bilan Financier (actifs et passifs)
             </button>
             <button class="nav-item locked" onclick="goTo('revenu-epargne',this)">
                 <span class="dot"></span> Revenu et épargne
-            </button>
-            <button class="nav-item locked" onclick="goTo('profil-investisseur',this)">
-                <span class="dot"></span> Profil d'investisseur
             </button>
             <button class="nav-item locked" onclick="goTo('fonds-urgence',this)">
                 <span class="dot"></span> Fonds d'urgence
