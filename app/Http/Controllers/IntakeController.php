@@ -76,6 +76,23 @@ class IntakeController extends Controller
         return view('intake.merci', compact('advisor', 'intake'));
     }
 
+    // ─── HELPERS ─────────────────────────────────────────────────────────────
+
+    /**
+     * Génère un code d'accès 6 caractères sans caractères ambigus.
+     * Exclut : 0/O, 1/I/L pour éviter les confusions visuelles dans les emails.
+     */
+    private static function generateAccessCode(): string
+    {
+        $chars = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+        $code = '';
+        for ($i = 0; $i < 6; $i++) {
+            if ($i === 3) $code .= '-';
+            $code .= $chars[random_int(0, strlen($chars) - 1)];
+        }
+        return $code;
+    }
+
     // ─── AUTH ─────────────────────────────────────────────────────────────────
 
     /**
@@ -102,7 +119,7 @@ class IntakeController extends Controller
         $intake = AbfIntake::create([
             'advisor_user_id'   => $advisor->id,
             'token'             => Str::uuid()->toString(),
-            'access_code'       => strtoupper(Str::random(3) . '-' . Str::random(3)),
+            'access_code'       => self::generateAccessCode(),
             'client_first_name' => $request->client_first_name,
             'client_last_name'  => $request->client_last_name,
             'client_email'      => $request->client_email,
