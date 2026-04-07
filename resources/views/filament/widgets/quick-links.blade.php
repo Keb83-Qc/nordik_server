@@ -50,7 +50,7 @@
                     'roles' => ['conseiller', 'admin', 'super_admin', 'marketing'],
                 ],
                 [
-                    'label' => 'Soumission Auto',
+                    'label' => 'Soumission',
                     'href' => '/espace-conseiller/submissions', // ✅ ton lien
                     'icon' => 'truck',
                     'color' => 'text-lime-400',

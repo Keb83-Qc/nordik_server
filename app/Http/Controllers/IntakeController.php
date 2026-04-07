@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\IntakeInviteMail;
 use App\Models\AbfIntake;
+use App\Models\SystemLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -31,11 +32,22 @@ class IntakeController extends Controller
             return view('intake.merci', compact('advisor', 'intake'));
         }
 
-        // La session sert de vérification rapide, mais le status 'in_progress'
-        // est la source de vérité : si le code a déjà été validé (même depuis
-        // un autre appareil ou après expiration de session), le wizard s'affiche.
-        $verified = session("intake_verified_{$token}", false)
-            || $intake->status === 'in_progress';
+        $sessionKey    = "intake_verified_{$token}";
+        $sessionValue  = session($sessionKey, false);
+        $statusOk      = $intake->status === 'in_progress';
+        $verified      = $sessionValue || $statusOk;
+
+        SystemLog::record('debug', "[intake.show] token={$token}", [
+            'intake_id'     => $intake->id,
+            'status'        => $intake->status,
+            'session_key'   => $sessionKey,
+            'session_value' => $sessionValue,
+            'status_ok'     => $statusOk,
+            'verified'      => $verified,
+            'session_id'    => session()->getId(),
+            'ip'            => request()->ip(),
+            'user_agent'    => mb_substr(request()->userAgent() ?? '', 0, 200),
+        ], SystemLog::SOURCE_PUBLIC);
 
         return view('intake.show', compact('advisor', 'intake', 'verified'));
     }
@@ -50,11 +62,22 @@ class IntakeController extends Controller
             ->where('advisor_user_id', $advisor->id)
             ->firstOrFail();
 
-        if (strtoupper(trim($request->access_code)) !== strtoupper($intake->access_code)) {
+        $entered = strtoupper(trim($request->access_code ?? ''));
+        $stored  = strtoupper($intake->access_code);
+
+        if ($entered !== $stored) {
+            SystemLog::record('warning', "[intake.verify] code incorrect token={$token}", [
+                'intake_id'    => $intake->id,
+                'entered_len'  => strlen($entered),
+                'stored_len'   => strlen($stored),
+                'ip'           => request()->ip(),
+                'user_agent'   => mb_substr(request()->userAgent() ?? '', 0, 200),
+            ], SystemLog::SOURCE_PUBLIC);
+
             $msg = match($intake->locale) {
-                'en' => 'Invalid access code. Please check the code in your email.',
-                'es' => 'Código de acceso incorrecto. Verifique el código en su correo.',
-                'ht' => 'Kòd aksè a pa bon. Verifye kòd la nan imèl ou.',
+                'en'    => 'Invalid access code. Please check the code in your email.',
+                'es'    => 'Código de acceso incorrecto. Verifique el código en su correo.',
+                'ht'    => 'Kòd aksè a pa bon. Verifye kòd la nan imèl ou.',
                 default => 'Code d\'accès incorrect. Vérifiez le code dans votre courriel.',
             };
             return back()->withErrors(['access_code' => $msg]);
@@ -63,9 +86,19 @@ class IntakeController extends Controller
         session(["intake_verified_{$token}" => true]);
 
         // Marquer en cours si encore pending
+        $statusBefore = $intake->status;
         if ($intake->status === 'pending') {
             $intake->update(['status' => 'in_progress']);
         }
+
+        SystemLog::record('info', "[intake.verify] code accepté token={$token}", [
+            'intake_id'      => $intake->id,
+            'status_before'  => $statusBefore,
+            'status_after'   => $intake->fresh()->status,
+            'session_id'     => session()->getId(),
+            'ip'             => request()->ip(),
+            'user_agent'     => mb_substr(request()->userAgent() ?? '', 0, 200),
+        ], SystemLog::SOURCE_PUBLIC);
 
         return redirect()->route('intake.show', [
             'advisorSlug' => $advisorSlug,
