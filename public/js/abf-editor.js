@@ -171,12 +171,236 @@
   }
 
   function terminer() {
+    // Sauvegarder d'abord, puis ouvrir le modal Note de rencontre
+    if (window.ABF_SAVE_URL) {
+      autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, false);
+    }
+    setTimeout(() => openMeetingNoteModal(), 400);
+  }
+
+  // ── Note de rencontre ────────────────────────────────────────────────────
+
+  let _meetingPersonnes = [];
+
+  function openMeetingNoteModal() {
+    // Réinitialiser le formulaire
+    const typeInputs = document.querySelectorAll('input[name="meeting-type"]');
+    typeInputs.forEach(r => { r.checked = r.value === 'virtuel'; });
+    const lieuWrap = document.getElementById('meeting-lieu-wrap');
+    const lieu = document.getElementById('meeting-lieu');
+    if (lieuWrap) lieuWrap.style.display = 'none';
+    if (lieu) lieu.value = '';
+    const noteLibre = document.getElementById('meeting-note-libre');
+    if (noteLibre) noteLibre.value = '';
+    const addForm = document.getElementById('meeting-add-form');
+    if (addForm) addForm.style.display = 'none';
+    const addNom = document.getElementById('meeting-add-nom');
+    if (addNom) addNom.value = '';
+
+    // Afficher étape 1, cacher étape 2
+    const form = document.getElementById('meeting-form');
+    const result = document.getElementById('meeting-result');
+    if (form) form.style.display = '';
+    if (result) result.style.display = 'none';
+
+    // Pré-remplir les personnes : conseiller + client + conjoint
+    _meetingPersonnes = [];
+
+    const advisorName = (window.ABF_ADVISOR_NAME || '').trim();
+    if (advisorName) {
+      _meetingPersonnes.push({ role: 'Conseiller', nom: advisorName, removable: false });
+    }
+
+    const cPrenom = (document.getElementById('client-prenom')?.value || '').trim();
+    const cNom    = (document.getElementById('client-nom')?.value || '').trim();
+    const clientName = [cPrenom, cNom].filter(Boolean).join(' ');
+    if (clientName) {
+      _meetingPersonnes.push({ role: 'Client', nom: clientName, removable: false });
+    }
+
+    const hasSpouse = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    if (hasSpouse) {
+      const jPrenom = (document.getElementById('conjoint-prenom')?.value || '').trim();
+      const jNom    = (document.getElementById('conjoint-nom')?.value || '').trim();
+      const conjointName = [jPrenom, jNom].filter(Boolean).join(' ');
+      if (conjointName) {
+        _meetingPersonnes.push({ role: 'Conjoint(e)', nom: conjointName, removable: false });
+      }
+    }
+
+    renderMeetingPersonnes();
+
+    // Afficher le modal
+    const modal = document.getElementById('modal-meeting-note');
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeMeetingNoteModal() {
+    const modal = document.getElementById('modal-meeting-note');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+
+  function meetingTypeChange() {
+    const val = document.querySelector('input[name="meeting-type"]:checked')?.value;
+    const lieuWrap = document.getElementById('meeting-lieu-wrap');
+    if (lieuWrap) lieuWrap.style.display = val === 'presentiel' ? '' : 'none';
+  }
+
+  function renderMeetingPersonnes() {
+    const container = document.getElementById('meeting-personnes-list');
+    if (!container) return;
+    container.innerHTML = '';
+    _meetingPersonnes.forEach((p, idx) => {
+      const pill = document.createElement('span');
+      pill.style.cssText = 'display:inline-flex;align-items:center;gap:5px;background:#f0f3fa;border:1px solid var(--border);border-radius:20px;padding:4px 10px 4px 12px;font-size:12px;font-weight:600;color:var(--navy)';
+      const label = document.createElement('span');
+      label.textContent = p.role ? p.role + ' — ' + p.nom : p.nom;
+      pill.appendChild(label);
+      if (p.removable !== false) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = '×';
+        btn.style.cssText = 'background:none;border:none;cursor:pointer;font-size:15px;line-height:1;color:var(--muted);padding:0 0 0 2px';
+        btn.onclick = () => removeMeetingPerson(idx);
+        pill.appendChild(btn);
+      }
+      container.appendChild(pill);
+    });
+  }
+
+  function confirmAddMeetingPerson() {
+    const roleEl = document.getElementById('meeting-add-role');
+    const nomEl  = document.getElementById('meeting-add-nom');
+    const role = roleEl?.value || 'Autre';
+    const nom  = (nomEl?.value || '').trim();
+    if (!nom) {
+      if (nomEl) { nomEl.focus(); nomEl.style.borderColor = 'red'; }
+      return;
+    }
+    if (nomEl) nomEl.style.borderColor = '';
+    _meetingPersonnes.push({ role, nom, removable: true });
+    renderMeetingPersonnes();
+    if (nomEl) nomEl.value = '';
+    const addForm = document.getElementById('meeting-add-form');
+    if (addForm) addForm.style.display = 'none';
+  }
+
+  function removeMeetingPerson(idx) {
+    _meetingPersonnes.splice(idx, 1);
+    renderMeetingPersonnes();
+  }
+
+  function generateMeetingNote() {
+    const type = document.querySelector('input[name="meeting-type"]:checked')?.value || 'virtuel';
+    const lieu = (document.getElementById('meeting-lieu')?.value || '').trim();
+    const noteLibre = (document.getElementById('meeting-note-libre')?.value || '').trim();
+
+    // Formatage de la date
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('fr-CA', { year:'numeric', month:'long', day:'numeric' });
+
+    const lines = [];
+    lines.push('═══════════════════════════════════════════════════════');
+    lines.push('  NOTE DE RENCONTRE — ANALYSE DE BILAN FINANCIER');
+    lines.push('═══════════════════════════════════════════════════════');
+    lines.push('');
+    lines.push('Date          : ' + dateStr);
+    lines.push('Type          : ' + (type === 'virtuel' ? 'Virtuel' : 'Présentiel' + (lieu ? ' — ' + lieu : '')));
+    lines.push('');
+
+    // Personnes présentes
+    lines.push('PERSONNES PRÉSENTES');
+    lines.push('───────────────────────────────────────────────────────');
+    _meetingPersonnes.forEach(p => {
+      lines.push('  • ' + (p.role ? p.role + ' : ' + p.nom : p.nom));
+    });
+    lines.push('');
+
+    // Recommandations
+    const catLabels = {
+      'deces':         'Décès',
+      'invalidite':    'Invalidité',
+      'maladie-grave': 'Maladie grave',
+      'fonds-urgence': 'Fonds d\'urgence',
+      'retraite':      'Retraite',
+      'conseils':      'Conseils',
+    };
+    const hasRecom = Object.values(_recomItems).some(arr => arr && arr.length > 0);
+    if (hasRecom) {
+      lines.push('RECOMMANDATIONS');
+      lines.push('───────────────────────────────────────────────────────');
+      Object.entries(catLabels).forEach(([cat, label]) => {
+        const items = _recomItems[cat] || [];
+        if (!items.length) return;
+        lines.push('');
+        lines.push('  [' + label.toUpperCase() + ']');
+        items.forEach(item => {
+          const text = (item.text || '').trim();
+          if (text) {
+            text.split('\n').forEach((l, i) => {
+              lines.push((i === 0 ? '  • ' : '    ') + l);
+            });
+          }
+        });
+      });
+      lines.push('');
+    }
+
+    // Note libre
+    if (noteLibre) {
+      lines.push('NOTES COMPLÉMENTAIRES');
+      lines.push('───────────────────────────────────────────────────────');
+      noteLibre.split('\n').forEach(l => lines.push('  ' + l));
+      lines.push('');
+    }
+
+    lines.push('═══════════════════════════════════════════════════════');
+
+    const noteText = lines.join('\n');
+
+    // Sauvegarder dans le payload
+    if (typeof _abfPayloadExtra === 'undefined') window._abfPayloadExtra = {};
+    window._abfPayloadExtra.meetingNote = noteText;
+
+    // Afficher l'étape 2
+    const output = document.getElementById('meeting-note-output');
+    if (output) output.value = noteText;
+    const form = document.getElementById('meeting-form');
+    const result = document.getElementById('meeting-result');
+    if (form) form.style.display = 'none';
+    if (result) result.style.display = '';
+  }
+
+  function copyMeetingNote() {
+    const output = document.getElementById('meeting-note-output');
+    if (!output) return;
+    navigator.clipboard.writeText(output.value).then(() => {
+      const btn = document.getElementById('btn-copy-note');
+      if (btn) {
+        const orig = btn.innerHTML;
+        btn.textContent = '✓ Copié !';
+        btn.style.background = '#16a34a';
+        setTimeout(() => { btn.innerHTML = orig; btn.style.background = ''; }, 2000);
+      }
+    }).catch(() => {
+      // Fallback si clipboard API non disponible
+      output.select();
+      document.execCommand('copy');
+    });
+  }
+
+  function terminerApresNote() {
+    closeMeetingNoteModal();
     if (window.ABF_SAVE_URL) {
       autoSave(window.ABF_RECORD_ID, window.ABF_SAVE_URL, window.ABF_CSRF_TOKEN, false);
     }
     setTimeout(() => {
       window.location.href = window.ABF_LANDING_URL || '/conseiller/bilan';
-    }, 900);
+    }, 600);
   }
 
   function validateCurrentPage() {
@@ -3831,6 +4055,7 @@
           return secs;
         })(),
         photo: typeof _rapportSelectedPhoto !== 'undefined' ? _rapportSelectedPhoto : null,
+        meeting_note: window._abfPayloadExtra?.meetingNote || null,
       },
       hypotheses: typeof hypotheses !== 'undefined' ? { ...hypotheses } : { evClient: 94, evConj: 96 },
       objectifs: JSON.parse(JSON.stringify(objState)),
@@ -4220,6 +4445,10 @@
         const cb = document.getElementById(`rapport-sec-${id}`);
         if (cb && !cb.disabled) cb.checked = !!checked;
       });
+    }
+    if (p.rapport?.meeting_note) {
+      if (typeof window._abfPayloadExtra === 'undefined') window._abfPayloadExtra = {};
+      window._abfPayloadExtra.meetingNote = p.rapport.meeting_note;
     }
     if (p.rapport?.photo) {
       _rapportSelectedPhoto = p.rapport.photo;

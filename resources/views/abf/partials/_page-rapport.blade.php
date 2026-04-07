@@ -227,3 +227,129 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- ═══ MODAL : Note de rencontre ═══════════════════════════════════════ -->
+<div id="modal-meeting-note" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(14,16,48,.55);align-items:center;justify-content:center">
+  <div style="background:white;border-radius:14px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.28);margin:20px">
+
+    <!-- En-tête -->
+    <div style="padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;z-index:1">
+      <div>
+        <h4 style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Note de rencontre</h4>
+        <p style="font-size:12px;color:var(--muted);margin:4px 0 0">Complétez les informations avant de terminer l'ABF.</p>
+      </div>
+      <button onclick="closeMeetingNoteModal()" style="background:none;border:none;font-size:22px;color:var(--muted);cursor:pointer;padding:0 4px;line-height:1">×</button>
+    </div>
+
+    <!-- ── ÉTAPE 1 : Formulaire ─────────────────────────────────────── -->
+    <div id="meeting-form" style="padding:20px 24px">
+
+      <!-- Type de rencontre -->
+      <div class="form-group">
+        <label class="form-label" style="font-size:13px;font-weight:700;color:var(--navy)">Type de rencontre</label>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <label class="fu-radio-pill">
+            <input type="radio" name="meeting-type" value="virtuel" checked onchange="meetingTypeChange()"/> Virtuel
+          </label>
+          <label class="fu-radio-pill">
+            <input type="radio" name="meeting-type" value="presentiel" onchange="meetingTypeChange()"/> Présentiel
+          </label>
+        </div>
+      </div>
+
+      <!-- Lieu (présentiel seulement) -->
+      <div id="meeting-lieu-wrap" class="form-group" style="display:none">
+        <label class="form-label">Lieu de la rencontre</label>
+        <input class="form-input" id="meeting-lieu" type="text" placeholder="Ex : Bureaux Nordik, Montréal"/>
+      </div>
+
+      <!-- Personnes présentes -->
+      <div class="form-group" style="margin-top:4px">
+        <label class="form-label" style="font-size:13px;font-weight:700;color:var(--navy)">Personnes présentes</label>
+        <div id="meeting-personnes-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;min-height:36px">
+          <!-- Rempli par JS -->
+        </div>
+
+        <!-- Formulaire d'ajout -->
+        <div id="meeting-add-form" style="display:none;margin-top:12px;background:#f8f9fd;border-radius:8px;padding:12px 14px">
+          <div style="display:grid;grid-template-columns:160px 1fr;gap:10px;align-items:end">
+            <div>
+              <label class="form-label" style="font-size:11px">Rôle</label>
+              <select class="form-select" id="meeting-add-role">
+                <option value="Enfant">Enfant</option>
+                <option value="Ami(e)">Ami(e)</option>
+                <option value="Avocat(e)">Avocat(e)</option>
+                <option value="Comptable">Comptable</option>
+                <option value="Notaire">Notaire</option>
+                <option value="Autre">Autre</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px">Nom</label>
+              <input class="form-input" id="meeting-add-nom" type="text" placeholder="Prénom Nom"
+                onkeydown="if(event.key==='Enter'){event.preventDefault();confirmAddMeetingPerson();}"/>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-primary btn-sm" onclick="confirmAddMeetingPerson()">Ajouter</button>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('meeting-add-form').style.display='none'">Annuler</button>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="document.getElementById('meeting-add-form').style.display='';document.getElementById('meeting-add-nom').focus()">
+          <svg viewBox="0 0 26 24" width="13" height="13" fill="currentColor"><path d="M18 13.5h-4.5v4.5h-3v-4.5h-4.5v-3h4.5v-4.5h3v4.5h4.5v3z"/></svg>
+          Ajouter une personne
+        </button>
+      </div>
+
+      <!-- Note libre -->
+      <div class="form-group" style="margin-top:4px">
+        <label class="form-label" style="font-size:13px;font-weight:700;color:var(--navy)">
+          Note libre <span style="font-weight:400;color:var(--muted)">(facultatif)</span>
+        </label>
+        <textarea class="form-input" id="meeting-note-libre" rows="3" style="resize:vertical;margin-top:6px"
+          placeholder="Observations, points à suivre, engagements pris…"></textarea>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px;padding-top:16px;border-top:1px solid var(--border)">
+        <button class="btn btn-secondary" onclick="closeMeetingNoteModal()">Annuler</button>
+        <button class="btn btn-primary" onclick="generateMeetingNote()">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          Créer la note et terminer
+        </button>
+      </div>
+    </div><!-- /meeting-form -->
+
+    <!-- ── ÉTAPE 2 : Note générée ───────────────────────────────────── -->
+    <div id="meeting-result" style="display:none;padding:20px 24px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+        <div style="width:32px;height:32px;border-radius:50%;background:#dcfce7;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg viewBox="0 0 24 24" fill="#16a34a" width="18" height="18"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:14px;color:var(--navy)">Note créée avec succès</div>
+          <div style="font-size:12px;color:var(--muted)">Sauvegardée dans le dossier ABF. Copiez-la pour la coller dans votre outil.</div>
+        </div>
+      </div>
+
+      <!-- Texte de la note -->
+      <div style="position:relative">
+        <textarea id="meeting-note-output" rows="16" readonly
+          style="width:100%;font-family:monospace;font-size:12px;line-height:1.6;background:#f8f9fd;border:1px solid var(--border);border-radius:8px;padding:14px;resize:none;color:var(--text)"></textarea>
+        <button onclick="copyMeetingNote()" id="btn-copy-note"
+          style="position:absolute;top:8px;right:8px;background:var(--navy);color:white;border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:5px">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+          Copier
+        </button>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;margin-top:16px">
+        <button class="btn btn-primary" onclick="terminerApresNote()">
+          Fermer et terminer →
+        </button>
+      </div>
+    </div><!-- /meeting-result -->
+
+  </div>
+</div>
