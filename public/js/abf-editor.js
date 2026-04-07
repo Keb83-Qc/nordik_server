@@ -2682,7 +2682,7 @@
       if (depHdrJ)    depHdrJ.textContent = conjointPrenom;
       // Mettre à jour l'en-tête de carte
       const hdr = document.getElementById('deces-dep-header');
-      if (hdr) hdr.textContent = 'Dépenses prévues en cas de décès';
+      if (hdr) hdr.textContent = 'Dépenses anticipées en cas de décès de';
 
       // Pre-populate conjoint dep list if empty
       const conjList = document.getElementById('deces-dep-list-conjoint');
