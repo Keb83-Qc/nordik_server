@@ -33,8 +33,8 @@
 
 <!-- Modal: Projet -->
 <div id="modal-projet" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(14,16,48,.45);align-items:center;justify-content:center">
-  <div style="background:white;border-radius:12px;width:100%;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;margin:20px">
-    <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+  <div style="background:white;border-radius:12px;width:100%;max-width:540px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:visible;margin:20px">
+    <div style="padding:18px 24px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;border-radius:12px 12px 0 0;overflow:hidden">
       <h4 id="modal-projet-title" style="font-size:16px;font-weight:700;color:var(--navy);margin:0">Nouveau projet</h4>
       <button onclick="closeProjetModal()" style="background:none;border:none;font-size:20px;color:var(--muted);cursor:pointer;padding:0 4px">×</button>
     </div>

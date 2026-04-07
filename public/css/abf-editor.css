@@ -559,7 +559,7 @@
     .fu-actif-valeur { font-weight:600;color:var(--text); }
     .abf-tooltip-wrap { position:relative;display:inline-flex;align-items:center; }
     .abf-tooltip-icon { display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:50%;background:var(--navy);color:white;font-size:10px;font-weight:700;cursor:default;user-select:none;font-style:normal; }
-    .abf-tooltip-box { display:none;position:absolute;left:20px;top:-8px;z-index:200;background:#1b1b2e;color:white;font-size:12px;font-weight:400;border-radius:8px;padding:10px 14px;width:280px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none; }
+    .abf-tooltip-box { display:none;position:absolute;left:20px;top:-8px;z-index:9999;background:#1b1b2e;color:white;font-size:12px;font-weight:400;border-radius:8px;padding:10px 14px;width:280px;line-height:1.5;box-shadow:0 4px 16px rgba(0,0,0,.3);pointer-events:none; }
     .abf-tooltip-wrap:hover .abf-tooltip-box { display:block; }
     .deces-person-tab { background:none;border:none;border-bottom:3px solid transparent;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s; }
     .deces-person-tab.active { border-bottom-color:var(--navy);color:var(--navy); }
