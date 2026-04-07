@@ -62,6 +62,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         'booking_url',
         'last_login',
         'must_change_password',
+        'show_on_equipe',
         'accepts_leads',
         'lead_weight',
         'leads_received_cycle',
@@ -80,6 +81,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         'last_login'            => 'datetime',
         'must_change_password'  => 'boolean',
         'languages'             => 'array', // Crucial pour le Select multiple
+        'show_on_equipe'        => 'boolean',
         'accepts_leads'         => 'boolean',
         'lead_weight'           => 'integer',
         'leads_received_cycle'  => 'integer',

@@ -250,6 +250,11 @@ class UserResource extends Resource
                                         ->label('Code conseiller')
                                         ->maxLength(50),
 
+                                    Forms\Components\Toggle::make('show_on_equipe')
+                                        ->label('Visible sur la page Équipe')
+                                        ->helperText('Afficher ce conseiller sur la page publique /equipe')
+                                        ->default(true),
+
                                     Forms\Components\Toggle::make('accepts_leads')
                                         ->label('Reçoit des leads')
                                         ->helperText('Active la réception de soumissions via la rotation automatique')
@@ -354,6 +359,19 @@ class UserResource extends Resource
                     ->toggleable()
                     ->wrap(false)
                     ->size('sm'),
+
+                Tables\Columns\IconColumn::make('show_on_equipe')
+                    ->label('Page Équipe')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-eye')
+                    ->falseIcon('heroicon-o-eye-slash')
+                    ->trueColor('success')
+                    ->falseColor('gray')
+                    ->tooltip(fn ($record) => $record->show_on_equipe
+                        ? 'Visible sur la page /equipe'
+                        : 'Masqué de la page /equipe'
+                    )
+                    ->toggleable(),
 
                 Tables\Columns\IconColumn::make('accepts_leads')
                     ->label('Leads')

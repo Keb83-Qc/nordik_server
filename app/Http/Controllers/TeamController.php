@@ -25,6 +25,7 @@ class TeamController extends Controller
                 ->whereNotNull('city')
                 ->where('city', '!=', '')
                 ->where('position', '!=', 0)
+                ->where('show_on_equipe', true)
                 ->whereHas('role', fn($q) => $q->where('name', 'not like', '%Candidat%'))
                 ->distinct()
                 ->orderBy('city')
@@ -33,6 +34,7 @@ class TeamController extends Controller
             // Membres
             $query = User::with(['title', 'role'])
                 ->where('position', '!=', 0)
+                ->where('show_on_equipe', true)
                 ->whereHas('role', fn($q) => $q->where('name', 'not like', '%Candidat%'));
 
             if ($ville !== '') {
