@@ -3117,16 +3117,26 @@
     return pv;
   }
 
+  let _decesDepAnchorBtn = null;
+
+  function _decesDepReposition() {
+    const dd = document.getElementById('deces-dep-dd');
+    if (!dd || dd.style.display === 'none' || !_decesDepAnchorBtn) return;
+    const r = _decesDepAnchorBtn.getBoundingClientRect();
+    dd.style.top  = (r.bottom + 4) + 'px';
+    dd.style.left = r.left + 'px';
+  }
+
   function toggleDecesDep() {
     const dd = document.getElementById('deces-dep-dd');
     if (!dd) return;
     const wasOpen = dd.style.display === 'block';
-    document.querySelectorAll('#deces-dep-dd').forEach(d => d.style.display = 'none');
+    dd.style.display = 'none';
     if (!wasOpen) {
-      const btn = event.currentTarget;
-      const r = btn.getBoundingClientRect();
+      _decesDepAnchorBtn = event.currentTarget;
+      const r = _decesDepAnchorBtn.getBoundingClientRect();
       dd.style.position = 'fixed';
-      dd.style.top = (r.bottom + 4) + 'px';
+      dd.style.top  = (r.bottom + 4) + 'px';
       dd.style.left = r.left + 'px';
       dd.style.display = 'block';
     }
@@ -3381,13 +3391,16 @@
     body.innerHTML = html;
   }
 
-  // Close dropdown on outside click
+  // Ferme le dropdown dépenses au clic extérieur
   document.addEventListener('click', e => {
     const dd = document.getElementById('deces-dep-dd');
     if (dd && !e.target.closest('#deces-dep-dd') && !e.target.closest('button[onclick*="toggleDecesDep"]')) {
       dd.style.display = 'none';
     }
   });
+
+  // Repositionne le dropdown au scroll pour qu'il suive le bouton
+  document.addEventListener('scroll', _decesDepReposition, true);
 
   /* ── Icônes SVG partagées ───────────────────────────────── */
   const iconEdit = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="15" height="15" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>`;
