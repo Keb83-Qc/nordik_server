@@ -31,6 +31,7 @@ class FullPageCache
         'consent.*',
         'abf.*',
         'access.*',
+        'intake.*',
     ];
 
     /** Préfixes d'URI exclus */

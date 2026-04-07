@@ -11,11 +11,12 @@ define('LARAVEL_START', microtime(true));
 // ──────────────────────────────────────────────────────────
 if (
     ($_SERVER['REQUEST_METHOD'] ?? '') === 'GET'
-    && !isset($_COOKIE[session_name()])  // Pas de session active → visiteur anonyme
+    && !isset($_COOKIE['laravel_session'])  // Cookie de session Laravel (pas PHPSESSID natif PHP)
     && !str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/admin')
     && !str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/abf')
     && !str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/conseiller')
     && !str_starts_with($_SERVER['REQUEST_URI'] ?? '', '/livewire')
+    && !str_contains($_SERVER['REQUEST_URI'] ?? '', '/intake/')  // Pages intake : état dynamique
 ) {
     $uri = strtok($_SERVER['REQUEST_URI'] ?? '/', '?'); // ignore query string
     $cacheKey = trim($uri, '/');

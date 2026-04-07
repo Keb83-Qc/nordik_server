@@ -22,6 +22,7 @@ class PublicPageCache
         'quote.*',
         'consent.*',
         'abf.*',
+        'intake.*',
     ];
 
     public function handle(Request $request, Closure $next): Response
