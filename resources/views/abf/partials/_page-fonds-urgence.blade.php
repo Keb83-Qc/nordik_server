@@ -225,36 +225,64 @@
 
             <!-- ── Résumé individuel ── -->
             <div id="fu-resume-individuel" style="display:none">
-              <table style="width:100%;border-collapse:collapse;font-size:12px">
-                <thead>
-                  <tr style="background:#f8f9fb;border-bottom:1px solid var(--border)">
-                    <th style="padding:8px 10px;text-align:left;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px"></th>
-                    <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Objectif</th>
-                    <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Couvert</th>
-                    <th style="padding:8px 10px;text-align:right;font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Écart</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:9px 10px;font-weight:600;color:var(--navy)" id="fu-ri-label-c">Client</td>
-                    <td style="padding:9px 10px;text-align:right;font-size:11px" id="fu-ri-obj-c">—</td>
-                    <td style="padding:9px 10px;text-align:right;font-size:11px" id="fu-ri-couv-c">0 $</td>
-                    <td style="padding:9px 10px;text-align:right;font-weight:700" id="fu-ri-ecart-c">—</td>
-                  </tr>
-                  <tr style="border-bottom:1px solid var(--border)">
-                    <td style="padding:9px 10px;font-weight:600;color:#b07c10" id="fu-ri-label-j">Conjoint</td>
-                    <td style="padding:9px 10px;text-align:right;font-size:11px" id="fu-ri-obj-j">—</td>
-                    <td style="padding:9px 10px;text-align:right;font-size:11px" id="fu-ri-couv-j">0 $</td>
-                    <td style="padding:9px 10px;text-align:right;font-weight:700" id="fu-ri-ecart-j">—</td>
+
+              {{-- Bloc client --}}
+              <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px" id="fu-ri-label-c">Client</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <tr>
+                    <td style="padding:3px 0;color:var(--muted)">Objectif</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-obj-c">—</td>
                   </tr>
                   <tr>
-                    <td style="padding:9px 10px;font-weight:700;font-size:11px">Total</td>
-                    <td style="padding:9px 10px;text-align:right;font-weight:600;font-size:11px" id="fu-ri-obj-total">—</td>
-                    <td style="padding:9px 10px;text-align:right;font-weight:600;font-size:11px" id="fu-ri-couv-total">0 $</td>
-                    <td style="padding:9px 10px;text-align:right;font-weight:700;font-size:14px" id="fu-ri-ecart-total">—</td>
+                    <td style="padding:3px 0;color:var(--muted)">Couvert</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-couv-c">0 $</td>
                   </tr>
-                </tbody>
-              </table>
+                  <tr>
+                    <td style="padding:3px 0;font-weight:700">Écart</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:700;font-size:13px;white-space:nowrap" id="fu-ri-ecart-c">—</td>
+                  </tr>
+                </table>
+              </div>
+
+              {{-- Bloc conjoint --}}
+              <div style="padding:10px 14px;border-bottom:1px solid var(--border)">
+                <div style="font-size:11px;font-weight:700;color:#b07c10;text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px" id="fu-ri-label-j">Conjoint</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <tr>
+                    <td style="padding:3px 0;color:var(--muted)">Objectif</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-obj-j">—</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:3px 0;color:var(--muted)">Couvert</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-couv-j">0 $</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:3px 0;font-weight:700">Écart</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:700;font-size:13px;white-space:nowrap" id="fu-ri-ecart-j">—</td>
+                  </tr>
+                </table>
+              </div>
+
+              {{-- Total --}}
+              <div style="padding:10px 14px;background:#f8f9fb">
+                <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px">Total couple</div>
+                <table style="width:100%;border-collapse:collapse;font-size:12px">
+                  <tr>
+                    <td style="padding:3px 0;color:var(--muted)">Objectif</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-obj-total">—</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:3px 0;color:var(--muted)">Couvert</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:600;white-space:nowrap" id="fu-ri-couv-total">0 $</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:3px 0;font-weight:700">Écart</td>
+                    <td style="padding:3px 0;text-align:right;font-weight:700;font-size:14px;white-space:nowrap" id="fu-ri-ecart-total">—</td>
+                  </tr>
+                </table>
+              </div>
+
               <div style="padding:12px 14px;border-top:1px solid var(--border)">
                 <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:6px">
                   <span>Couverture totale</span><span id="fu-ri-pct">0 %</span>

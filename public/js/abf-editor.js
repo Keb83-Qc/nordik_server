@@ -2676,10 +2676,13 @@
 
     let objC = 0, objJ = 0;
     if (type === 'income') {
-      objC = months * getRevenusByOwner('client', true).total / 12;
-      objJ = isCouple ? months * getRevenusByOwner('conjoint', true).total / 12 : 0;
-      const cC = document.getElementById('fu-income-cible-c'); if (cC) cC.textContent = fmtMoney(objC);
-      const cJ = document.getElementById('fu-income-cible-j'); if (cJ) cJ.textContent = fmtMoney(objJ);
+      const mensuelC = getRevenusByOwner('client', true).total / 12;
+      const mensuelJ = isCouple ? getRevenusByOwner('conjoint', true).total / 12 : 0;
+      objC = months * mensuelC;
+      objJ = months * mensuelJ;
+      // Afficher le revenu MENSUEL (base fixe, indépendante du nb de mois)
+      const cC = document.getElementById('fu-income-cible-c'); if (cC) cC.textContent = fmtMoney(mensuelC) + '/mois';
+      const cJ = document.getElementById('fu-income-cible-j'); if (cJ) cJ.textContent = fmtMoney(mensuelJ) + '/mois';
     } else if (type === 'expenses') {
       objC = p$(v$('fu-dep-mensuel-c')) * (parseFloat(v$('fu-months-dep-c')) || 3);
       objJ = isCouple ? p$(v$('fu-dep-mensuel-j')) * (parseFloat(v$('fu-months-dep-j')) || 3) : 0;
