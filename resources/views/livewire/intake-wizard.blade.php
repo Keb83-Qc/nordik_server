@@ -36,7 +36,7 @@
                 <label class="form-label">{{ $this->t('field.prenom') }} *</label>
                 <input type="text" class="form-control" wire:model="prenom"
                        name="intake_prenom"
-                       autocomplete="given-name"
+                       autocomplete="off"
                        placeholder="{{ $this->t('ph.prenom') }}" required>
                 @error('prenom')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
@@ -44,7 +44,7 @@
                 <label class="form-label">{{ $this->t('field.nom') }} *</label>
                 <input type="text" class="form-control" wire:model="nom"
                        name="intake_nom"
-                       autocomplete="family-name"
+                       autocomplete="off"
                        placeholder="{{ $this->t('ph.nom') }}" required>
                 @error('nom')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>

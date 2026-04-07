@@ -435,6 +435,19 @@ class IntakeWizard extends Component
             'payload'     => $this->buildPartialPayload(),
         ]);
 
+        // Mode test : log complet des réponses
+        try {
+            $modeTest = filter_var(AbfParameter::getValue('intake', 'mode_test', false), FILTER_VALIDATE_BOOLEAN);
+            if ($modeTest) {
+                \App\Models\SystemLog::record('info', '[intake.test] Réponses complètes — ' . $this->prenom . ' ' . $this->nom, [
+                    'intake_id'   => $intake->id,
+                    'abf_case_id' => $case->id,
+                    'advisor'     => $intake->advisor->first_name . ' ' . $intake->advisor->last_name,
+                    'reponses'    => $this->buildPartialPayload(),
+                ], \App\Models\SystemLog::SOURCE_PUBLIC);
+            }
+        } catch (\Throwable) {}
+
         // Notifier le conseiller
         $this->notifyAdvisor($intake, $case);
 

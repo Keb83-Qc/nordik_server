@@ -171,7 +171,8 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
             'celi_plafonds'         => $celiPlafonds,
 
             // Formulaire client (intake)
-            'intake_steps'   => json_decode($p['intake']['steps_enabled'] ?? '["adresse","famille","revenus","epargne","actifs","dettes","retraite","objectifs"]', true) ?? [],
+            'intake_steps'     => json_decode($p['intake']['steps_enabled'] ?? '["adresse","famille","revenus","epargne","actifs","dettes","retraite","objectifs"]', true) ?? [],
+            'intake_mode_test' => filter_var($p['intake']['mode_test'] ?? false, FILTER_VALIDATE_BOOLEAN),
 
             // SV
             'sv_max_65_74'   => $p['sv']['max_mensuel_65_74']  ?? '727.67',
@@ -696,6 +697,15 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                             ->columns(1)
                                             ->gridDirection('row'),
                                     ]),
+                                Section::make('Mode test')
+                                    ->description('Quand activé, les réponses complètes du client sont enregistrées dans les logs système à la soumission. À désactiver après validation.')
+                                    ->schema([
+                                        \Filament\Forms\Components\Toggle::make('intake_mode_test')
+                                            ->label('Activer le mode test')
+                                            ->helperText('Les données du formulaire client seront visibles dans Logs Système → source "public" après chaque soumission.')
+                                            ->onColor('warning')
+                                            ->offColor('gray'),
+                                    ]),
                             ]),
                     ])
                     ->persistTabInQueryString()
@@ -791,6 +801,7 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
         // Formulaire client (intake)
         $intakeSteps = array_values(array_filter($state['intake_steps'] ?? [], fn($s) => is_string($s)));
         $this->saveParam('intake', 'steps_enabled', json_encode($intakeSteps), 'Sections du formulaire client', 'json');
+        $this->saveParam('intake', 'mode_test', $state['intake_mode_test'] ? '1' : '0', 'Mode test (log des réponses)', 'boolean');
 
         // SV
         $this->saveParam('sv', 'max_mensuel_65_74',  $state['sv_max_65_74']    ?? '');
