@@ -81,15 +81,16 @@
     /* ── SECTION ─────────────────────────────────────────── */
     .card {
       background: var(--white); border: 1px solid var(--border);
-      border-radius: 10px; margin-bottom: 20px; overflow: hidden;
+      border-radius: 10px; margin-bottom: 20px; overflow: visible;
     }
     .card-header {
       padding: 12px 20px; background: #f8f9fd;
       border-bottom: 1px solid var(--border);
       font-size: 13px; font-weight: 700; color: var(--navy);
       letter-spacing: .3px;
+      border-radius: 10px 10px 0 0;
     }
-    .card-body { padding: 20px; }
+    .card-body { padding: 20px; border-radius: 0 0 10px 10px; }
 
     /* ── GRID ────────────────────────────────────────────── */
     .row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -222,7 +223,7 @@
     .rec-icon svg { width: 18px; height: 18px; fill: white; }
 
     /* ── OBJECTIFS ───────────────────────────────────────── */
-    .obj-category { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .obj-category { background: var(--white); border: 1px solid var(--border); border-radius: 10px; overflow: visible; }
     .obj-cat-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 13px 18px; cursor: pointer; user-select: none;
