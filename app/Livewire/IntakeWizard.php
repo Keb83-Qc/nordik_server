@@ -121,7 +121,7 @@ class IntakeWizard extends Component
 
     // ─── Steps ordonnés ───────────────────────────────────────────────────────
 
-    protected array $allSteps = [
+    public array $allSteps = [
         'identite', 'adresse', 'famille', 'conjoint',
         'revenus', 'autres_revenus', 'epargne',
         'actifs', 'dettes',

@@ -30,7 +30,18 @@
     {{-- ─── ÉTAPES ────────────────────────────────────────────────────────── --}}
 
     @if($step === 'identite')
-        {{-- autocomplete="off" sur le form pour éviter que le navigateur remplisse l'adresse dans les champs prénom/nom --}}
+        {{--
+            Honeypots cachés : Chrome remplit les PREMIERS champs correspondants trouvés
+            dans le DOM. Ces champs invisibles absorbent l'autofill avant les vrais champs.
+        --}}
+        <div aria-hidden="true" style="position:absolute;left:-9999px;height:0;overflow:hidden" tabindex="-1">
+            <input type="text"  name="hp_given_name"    autocomplete="given-name">
+            <input type="text"  name="hp_family_name"   autocomplete="family-name">
+            <input type="email" name="hp_email"         autocomplete="email">
+            <input type="tel"   name="hp_tel"           autocomplete="tel">
+            <input type="text"  name="hp_street"        autocomplete="street-address">
+            <input type="text"  name="hp_postal"        autocomplete="postal-code">
+        </div>
         <div class="row g-3" autocomplete="off">
             <div class="col-12 col-sm-6">
                 <label class="form-label">{{ $this->t('field.prenom') }} *</label>
@@ -82,7 +93,7 @@
                 <label class="form-label">{{ $this->t('field.courriel') }} *</label>
                 <input type="email" class="form-control" wire:model="courriel"
                        name="intake_courriel"
-                       autocomplete="email"
+                       autocomplete="off"
                        placeholder="{{ $this->t('ph.courriel') }}" required>
                 @error('courriel')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
@@ -90,7 +101,7 @@
                 <label class="form-label">{{ $this->t('field.cellulaire') }} *</label>
                 <input type="tel" class="form-control" wire:model="cellulaire"
                        name="intake_cellulaire"
-                       autocomplete="tel"
+                       autocomplete="off"
                        placeholder="{{ $this->t('ph.cellulaire') }}" required>
                 @error('cellulaire')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
             </div>
