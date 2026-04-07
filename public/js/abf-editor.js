@@ -2466,142 +2466,278 @@
 
   /* ── Fonds d'urgence ── */
   const FU_ELIGIBLE_TYPES = ['Compte bancaire','CELI','Non enregistré'];
+  let _fuMode = 'familial';
+
+  function fuModeChange(mode) {
+    _fuMode = mode;
+    const isFam = mode === 'familial';
+
+    // Boutons toggle
+    const btnFam = document.getElementById('fu-btn-familial');
+    const btnInd = document.getElementById('fu-btn-individuel');
+    if (btnFam) { btnFam.style.background = isFam ? 'var(--navy)' : 'white'; btnFam.style.color = isFam ? 'white' : 'var(--muted)'; }
+    if (btnInd) { btnInd.style.background = !isFam ? 'var(--navy)' : 'white'; btnInd.style.color = !isFam ? 'white' : 'var(--muted)'; }
+
+    // Contenu
+    const famContent = document.getElementById('fu-mode-familial-content');
+    const indContent = document.getElementById('fu-mode-individuel-content');
+    if (famContent) famContent.style.display = isFam ? 'block' : 'none';
+    if (indContent) indContent.style.display = !isFam ? 'block' : 'none';
+
+    // Résumé
+    const resFam = document.getElementById('fu-resume-familial');
+    const resInd = document.getElementById('fu-resume-individuel');
+    if (resFam) resFam.style.display = isFam ? '' : 'none';
+    if (resInd) resInd.style.display = !isFam ? '' : 'none';
+
+    // Noms dans les labels
+    const cPrenom = getClientPrenom()  || 'Client';
+    const jPrenom = getConjointPrenom() || 'Conjoint';
+    const isCouple = !!document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    [['fu-exp-label-c','fu-amt-label-c','fu-ind-title-c','fu-ri-label-c','fu-income-name-c'], cPrenom].forEach(() => {});
+    ['fu-exp-label-c','fu-amt-label-c','fu-ind-title-c','fu-ri-label-c','fu-income-name-c'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = cPrenom;
+    });
+    ['fu-exp-label-j','fu-amt-label-j','fu-ind-title-j','fu-ri-label-j','fu-income-name-j'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = jPrenom;
+    });
+
+    // Colonne conjoint visible seulement si couple
+    ['fu-ind-conjoint-col','fu-exp-conjoint-wrap','fu-amt-conjoint-wrap','fu-income-conj-part'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = isCouple ? '' : 'none';
+    });
+
+    fuTypeChange();
+    fuRenderActifs();
+  }
 
   function fuTypeChange() {
     const type = document.querySelector('input[name="fu-type"]:checked')?.value || 'income';
-    document.getElementById('fu-row-income').style.display   = type === 'income'   ? 'flex' : 'none';
-    document.getElementById('fu-row-expenses').style.display = type === 'expenses' ? 'flex' : 'none';
-    document.getElementById('fu-row-amount').style.display   = type === 'amount'   ? 'flex' : 'none';
+    const mode = _fuMode;
+    const isFam = mode === 'familial';
+
+    const show = (id, visible) => { const el = document.getElementById(id); if (el) el.style.display = visible ? 'flex' : 'none'; };
+
+    show('fu-row-income',             type === 'income');
+    show('fu-row-expenses-familial',  type === 'expenses' && isFam);
+    show('fu-row-expenses-individuel',type === 'expenses' && !isFam);
+    show('fu-row-amount-familial',    type === 'amount'   && isFam);
+    show('fu-row-amount-individuel',  type === 'amount'   && !isFam);
+
+    const lblFam = document.getElementById('fu-income-label-familial');
+    const lblInd = document.getElementById('fu-income-label-individuel');
+    if (lblFam) lblFam.style.display = (type === 'income' && isFam)  ? '' : 'none';
+    if (lblInd) lblInd.style.display = (type === 'income' && !isFam) ? '' : 'none';
+
     fuCalc();
   }
 
-  function fuRenderActifs() {
-    const body = document.getElementById('fu-actifs-body');
+  // ── Icône reset partagée ──
+  const _fuResetSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="18" height="18" fill="currentColor"><path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM17.93 15.82l-2.109 2.109-3.82-3.82-3.82 3.82-2.109-2.109 3.82-3.82-3.82-3.82 2.109-2.109 3.82 3.82 3.82-3.82 2.109 2.109-3.82 3.82 3.82 3.82z"/></svg>`;
+
+  function _fuRenderActifsTable(body, items, showOwner) {
     if (!body) return;
-    const ownerLabel = o => {
-      if (o === 'conjoint') return getConjointPrenom() || 'Conjoint';
-      if (o === 'both') return getClientPrenom() + ' & ' + (getConjointPrenom() || 'Conjoint');
-      return getClientPrenom();
-    };
-    const items = [];
-    document.querySelectorAll('#actifs-list [data-aptype]').forEach(el => {
-      const type = el.dataset.aptype || '';
-      if (!FU_ELIGIBLE_TYPES.includes(type)) return;
-      const valeur = parseFloat(el.dataset.valeur) || 0;
-      items.push({ nom: type, valeur, owner: ownerLabel(el.dataset.owner || 'client') });
-    });
     if (items.length === 0) {
       body.style.padding = '';
-      body.innerHTML = '<p style="font-size:13px;color:var(--muted)">Aucun compte bancaire, CELI ou placement non enregistré disponible. <a href="#" onclick="goTo(\'actifs-passifs\',document.querySelectorAll(\'.nav-item\')[2]);return false;">Ajouter un actif.</a></p>';
+      body.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:14px">Aucun actif éligible (compte bancaire, CELI, non enregistré).</p>';
       return;
     }
     body.style.padding = '0';
+    const ownerCol = showOwner
+      ? '<th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Propriétaire</th>'
+      : '';
     body.innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:13px">
         <thead>
           <tr style="background:#f8f9fb;border-bottom:2px solid var(--border)">
             <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Description</th>
-            <th style="padding:10px 14px;text-align:left;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Propriétaire</th>
+            ${ownerCol}
             <th style="padding:10px 14px;text-align:right;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Valeur</th>
-            <th style="padding:10px 14px;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Montant alloué</th>
+            <th style="padding:10px 14px;font-weight:600;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.4px">Alloué</th>
           </tr>
         </thead>
         <tbody>
           ${items.map(it => `
           <tr style="border-bottom:1px solid var(--border)">
             <td style="padding:10px 14px">${it.nom}</td>
-            <td style="padding:10px 14px;color:var(--muted)">${it.owner}</td>
+            ${showOwner ? `<td style="padding:10px 14px;color:var(--muted)">${it.ownerLabel}</td>` : ''}
             <td style="padding:10px 14px;text-align:right;font-weight:600">${fmtMoney(it.valeur)}</td>
             <td style="padding:10px 14px">
               <div style="display:flex;align-items:center;gap:6px">
-                <div class="input-sfx" style="flex:1;max-width:140px">
+                <div class="input-sfx" style="flex:1;max-width:130px">
                   <input class="form-input fu-alloc-input" type="text" value="0" oninput="fuCalc()" style="padding-right:28px"/>
                   <span class="sfx">$</span>
                 </div>
                 <button onclick="this.closest('tr').querySelector('.fu-alloc-input').value='0';fuCalc()"
                   style="background:none;border:none;cursor:pointer;color:var(--muted);flex-shrink:0;padding:2px;line-height:1;display:flex;align-items:center" title="Effacer">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 24" width="18" height="18" fill="currentColor">
-                    <path d="M12 0q-2.484 0-4.676 0.938t-3.82 2.566-2.566 3.82-0.938 4.676 0.938 4.676 2.566 3.82 3.82 2.566 4.676 0.938 4.676-0.938 3.82-2.566 2.566-3.82 0.938-4.676-0.938-4.676-2.566-3.82-3.82-2.566-4.676-0.938zM17.93 15.82l-2.109 2.109-3.82-3.82-3.82 3.82-2.109-2.109 3.82-3.82-3.82-3.82 2.109-2.109 3.82 3.82 3.82-3.82 2.109 2.109-3.82 3.82 3.82 3.82z"/>
-                  </svg>
+                  ${_fuResetSvg}
                 </button>
               </div>
             </td>
           </tr>`).join('')}
         </tbody>
       </table>`;
+  }
+
+  function fuRenderActifs() {
+    const ownerLabel = o => {
+      if (o === 'conjoint') return getConjointPrenom() || 'Conjoint';
+      if (o === 'both')     return (getClientPrenom() || 'Client') + ' & ' + (getConjointPrenom() || 'Conjoint');
+      return getClientPrenom() || 'Client';
+    };
+
+    const allItems = [];
+    document.querySelectorAll('#actifs-list [data-aptype]').forEach(el => {
+      const type = el.dataset.aptype || '';
+      if (!FU_ELIGIBLE_TYPES.includes(type)) return;
+      const valeur = parseFloat(el.dataset.valeur) || 0;
+      const owner  = el.dataset.owner || 'client';
+      allItems.push({ nom: type, valeur, owner, ownerLabel: ownerLabel(owner) });
+    });
+
+    if (_fuMode === 'familial') {
+      _fuRenderActifsTable(document.getElementById('fu-actifs-body'), allItems, true);
+    } else {
+      const clientItems  = allItems.filter(it => it.owner === 'client' || it.owner === 'both');
+      const conjItems    = allItems.filter(it => it.owner === 'conjoint' || it.owner === 'both');
+      _fuRenderActifsTable(document.getElementById('fu-actifs-body-c'), clientItems, false);
+      _fuRenderActifsTable(document.getElementById('fu-actifs-body-j'), conjItems,   false);
+    }
     fuCalc();
   }
 
   function fuCalc() {
-    const type = document.querySelector('input[name="fu-type"]:checked')?.value || 'income';
+    const type     = document.querySelector('input[name="fu-type"]:checked')?.value || 'income';
+    const isCouple = !!document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
+    if (type === 'none') return;
+
+    if (_fuMode === 'familial') {
+      _fuCalcFamilial(type, isCouple);
+    } else {
+      _fuCalcIndividuel(type, isCouple);
+    }
+  }
+
+  function _fuCalcFamilial(type, isCouple) {
+    const p$ = val => parseFloat((val || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const v$ = id  => document.getElementById(id)?.value || '0';
     let objectif = 0;
 
-    if (type === 'none') {
-      return;
-    } else if (type === 'amount') {
-      objectif = parseFloat((document.getElementById('fu-montant-fixe')?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    if (type === 'amount') {
+      objectif = p$(v$('fu-montant-fixe'));
     } else if (type === 'income') {
-      const months = parseFloat(document.getElementById('fu-months')?.value || '3') || 3;
-      // Revenu net : somme du net par propriétaire (via computeImpot)
-      const annuelNet = getRevenusByOwner('client', true).total + getRevenusByOwner('conjoint', true).total;
-      const base = annuelNet / 12;
-      objectif = months * base;
+      const months   = parseFloat(v$('fu-months')) || 3;
+      const netTotal = getRevenusByOwner('client', true).total + (isCouple ? getRevenusByOwner('conjoint', true).total : 0);
+      objectif = months * netTotal / 12;
       const cible = document.getElementById('fu-montant-cible-income');
       if (cible) cible.textContent = fmtMoney(objectif);
     } else {
-      // expenses: montant mensuel saisi × mois saisis
-      const depMensuel = parseFloat((document.getElementById('fu-dep-mensuel')?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
-      const months = parseFloat(document.getElementById('fu-months-dep')?.value || '3') || 3;
-      objectif = depMensuel * months;
+      const dep    = p$(v$('fu-dep-mensuel'));
+      const months = parseFloat(v$('fu-months-dep')) || 3;
+      objectif = dep * months;
       const cible = document.getElementById('fu-montant-cible-dep');
       if (cible) cible.textContent = fmtMoney(objectif);
     }
 
-    // Somme des montants alloués saisis
     let actifsTotal = 0;
     document.querySelectorAll('#fu-actifs-body .fu-alloc-input').forEach(inp => {
       actifsTotal += parseFloat((inp.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
     });
-
     const marge = parseFloat((document.getElementById('fu-marge')?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
     const ecart = (actifsTotal + marge) - objectif;
 
-    const card = document.getElementById('fu-resume-card');
-    if (card) {
-      card.style.display = 'block';
-      // Titre du résumé : "Couple" si conjoint actif
-      const isCouple = document.querySelector('input[name="plan"][value="conjoint"]')?.checked;
-      const hdr = card.querySelector('.card-header');
-      if (hdr) hdr.textContent = isCouple ? 'Résumé — Couple' : 'Résumé';
-    }
-    const el = (id) => document.getElementById(id);
+    const el = id => document.getElementById(id);
+    if (el('fu-resume-title')) el('fu-resume-title').textContent = isCouple ? 'Résumé — Couple' : 'Résumé';
     if (el('fu-r-objectif')) el('fu-r-objectif').textContent = fmtMoney(objectif);
     if (el('fu-r-actifs'))   el('fu-r-actifs').textContent   = fmtMoney(actifsTotal);
     if (el('fu-r-marge'))    el('fu-r-marge').textContent    = fmtMoney(marge);
-    if (el('fu-r-ecart')) {
-      el('fu-r-ecart').textContent = (ecart >= 0 ? '+' : '') + fmtMoney(ecart);
-      el('fu-r-ecart').style.color = ecart >= 0 ? '#22c55e' : '#ef4444';
-    }
-    // Barre de couverture : rouge → or → vert
-    const pct = objectif > 0 ? Math.min(100, Math.round((actifsTotal + marge) / objectif * 100)) : 0;
-    const barColor = pct >= 100 ? '#22c55e' : pct >= 50 ? 'var(--gold)' : '#ef4444';
-    const pctEl = el('fu-r-pct'), barEl = el('fu-r-bar');
-    if (pctEl) pctEl.textContent = pct + ' %';
-    if (barEl) { barEl.style.width = pct + '%'; barEl.style.background = barColor; }
+    if (el('fu-r-ecart'))  { el('fu-r-ecart').textContent = (ecart >= 0 ? '+' : '') + fmtMoney(ecart); el('fu-r-ecart').style.color = ecart >= 0 ? '#22c55e' : '#ef4444'; }
 
-    // ── Recommandations Fonds urgence ──
-    recomUpdatePanel('fonds-urgence',
-      {
-        pct,
-        besoinsRows: [{ label: 'Objectif fonds urgence', value: fmtMoney(objectif) }],
-        disponibleRows: [
-          { label: 'Actifs alloués',  value: fmtMoney(actifsTotal) },
-          ...(marge > 0 ? [{ label: 'Marge de crédit', value: fmtMoney(marge) }] : []),
-        ],
-        manque: Math.max(0, -ecart),
-      },
-      null
-    );
+    const pct      = objectif > 0 ? Math.min(100, Math.round((actifsTotal + marge) / objectif * 100)) : 0;
+    const barColor = pct >= 100 ? '#22c55e' : pct >= 50 ? 'var(--gold)' : '#ef4444';
+    if (el('fu-r-pct')) el('fu-r-pct').textContent = pct + ' %';
+    if (el('fu-r-bar')) { el('fu-r-bar').style.width = pct + '%'; el('fu-r-bar').style.background = barColor; }
+
+    recomUpdatePanel('fonds-urgence', {
+      pct,
+      besoinsRows:    [{ label: 'Objectif fonds urgence', value: fmtMoney(objectif) }],
+      disponibleRows: [
+        { label: 'Actifs alloués', value: fmtMoney(actifsTotal) },
+        ...(marge > 0 ? [{ label: 'Marge de crédit', value: fmtMoney(marge) }] : []),
+      ],
+      manque: Math.max(0, -ecart),
+    }, null);
+  }
+
+  function _fuCalcIndividuel(type, isCouple) {
+    const p$ = val => parseFloat((val || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const v$ = id  => document.getElementById(id)?.value || '0';
+    const months = parseFloat(v$('fu-months')) || 3;
+
+    let objC = 0, objJ = 0;
+    if (type === 'income') {
+      objC = months * getRevenusByOwner('client', true).total / 12;
+      objJ = isCouple ? months * getRevenusByOwner('conjoint', true).total / 12 : 0;
+      const cC = document.getElementById('fu-income-cible-c'); if (cC) cC.textContent = fmtMoney(objC);
+      const cJ = document.getElementById('fu-income-cible-j'); if (cJ) cJ.textContent = fmtMoney(objJ);
+    } else if (type === 'expenses') {
+      objC = p$(v$('fu-dep-mensuel-c')) * (parseFloat(v$('fu-months-dep-c')) || 3);
+      objJ = isCouple ? p$(v$('fu-dep-mensuel-j')) * (parseFloat(v$('fu-months-dep-j')) || 3) : 0;
+      const cC = document.getElementById('fu-montant-cible-dep-c'); if (cC) cC.textContent = fmtMoney(objC);
+      const cJ = document.getElementById('fu-montant-cible-dep-j'); if (cJ) cJ.textContent = fmtMoney(objJ);
+    } else {
+      objC = p$(v$('fu-montant-fixe-c'));
+      objJ = isCouple ? p$(v$('fu-montant-fixe-j')) : 0;
+    }
+
+    let actifsC = 0, actifsJ = 0;
+    document.querySelectorAll('#fu-actifs-body-c .fu-alloc-input').forEach(inp => { actifsC += p$(inp.value); });
+    document.querySelectorAll('#fu-actifs-body-j .fu-alloc-input').forEach(inp => { actifsJ += p$(inp.value); });
+    const margeC = p$(v$('fu-marge-c'));
+    const margeJ = p$(v$('fu-marge-j'));
+    const couvC  = actifsC + margeC;
+    const couvJ  = actifsJ + margeJ;
+    const ecartC = couvC - objC;
+    const ecartJ = couvJ - objJ;
+    const objT   = objC + objJ;
+    const couvT  = couvC + couvJ;
+    const ecartT = couvT - objT;
+
+    const el = id => document.getElementById(id);
+    const setEcart = (id, ecart) => {
+      const e = el(id); if (!e) return;
+      e.textContent  = (ecart >= 0 ? '+' : '') + fmtMoney(ecart);
+      e.style.color  = ecart >= 0 ? '#22c55e' : '#ef4444';
+    };
+    if (el('fu-ri-obj-c'))        el('fu-ri-obj-c').textContent        = fmtMoney(objC);
+    if (el('fu-ri-couv-c'))       el('fu-ri-couv-c').textContent       = fmtMoney(couvC);
+    setEcart('fu-ri-ecart-c', ecartC);
+    if (el('fu-ri-obj-j'))        el('fu-ri-obj-j').textContent        = isCouple ? fmtMoney(objJ)  : '—';
+    if (el('fu-ri-couv-j'))       el('fu-ri-couv-j').textContent       = isCouple ? fmtMoney(couvJ) : '—';
+    if (isCouple) setEcart('fu-ri-ecart-j', ecartJ);
+    if (el('fu-ri-obj-total'))    el('fu-ri-obj-total').textContent    = fmtMoney(objT);
+    if (el('fu-ri-couv-total'))   el('fu-ri-couv-total').textContent   = fmtMoney(couvT);
+    setEcart('fu-ri-ecart-total', ecartT);
+
+    const pct      = objT > 0 ? Math.min(100, Math.round(couvT / objT * 100)) : 0;
+    const barColor = pct >= 100 ? '#22c55e' : pct >= 50 ? 'var(--gold)' : '#ef4444';
+    if (el('fu-ri-pct')) el('fu-ri-pct').textContent = pct + ' %';
+    if (el('fu-ri-bar')) { el('fu-ri-bar').style.width = pct + '%'; el('fu-ri-bar').style.background = barColor; }
+
+    const cPrenom = getClientPrenom()  || 'Client';
+    const jPrenom = getConjointPrenom() || 'Conjoint';
+    recomUpdatePanel('fonds-urgence', {
+      pct,
+      besoinsRows: [
+        { label: 'Objectif ' + cPrenom, value: fmtMoney(objC) },
+        ...(isCouple ? [{ label: 'Objectif ' + jPrenom, value: fmtMoney(objJ) }] : []),
+      ],
+      disponibleRows: [
+        { label: 'Actifs + marge ' + cPrenom, value: fmtMoney(couvC) },
+        ...(isCouple ? [{ label: 'Actifs + marge ' + jPrenom, value: fmtMoney(couvJ) }] : []),
+      ],
+      manque: Math.max(0, -ecartT),
+    }, null);
   }
 
   /* ── DÉCÈS ── */
@@ -4040,6 +4176,17 @@
         actifs:         typeof _retraiteActifs         !== 'undefined' ? _retraiteActifs         : [],
       },
       projets: typeof _projets !== 'undefined' ? _projets : [],
+      fondsUrgence: {
+        mode:        _fuMode,
+        type:        document.querySelector('input[name="fu-type"]:checked')?.value || 'income',
+        months:      v('fu-months'),
+        // familial
+        depMensuel:  v('fu-dep-mensuel'),   monthsDep:  v('fu-months-dep'),   montantFixe:  v('fu-montant-fixe'),   marge:  v('fu-marge'),
+        // individuel client
+        depMensuelC: v('fu-dep-mensuel-c'), monthsDepC: v('fu-months-dep-c'), montantFixeC: v('fu-montant-fixe-c'), margeC: v('fu-marge-c'),
+        // individuel conjoint
+        depMensuelJ: v('fu-dep-mensuel-j'), monthsDepJ: v('fu-months-dep-j'), montantFixeJ: v('fu-montant-fixe-j'), margeJ: v('fu-marge-j'),
+      },
       profil_investisseur: {
         client:   gatherProfilInvestisseur('client'),
         conjoint: gatherProfilInvestisseur('conjoint'),
@@ -4417,6 +4564,20 @@
     if (Array.isArray(p.projets)) {
       _projets = p.projets;
       try { projetsRender(); } catch(e) { console.warn('projetsRender error', e); }
+    }
+
+    // Fonds d'urgence
+    if (p.fondsUrgence) {
+      const fu = p.fondsUrgence;
+      const sv = (id, val) => { const el = document.getElementById(id); if (el && val !== undefined && val !== null) el.value = val; };
+      const sr = (name, val) => { if (!val) return; const el = document.querySelector(`input[name="${name}"][value="${val}"]`); if (el) el.checked = true; };
+      sr('fu-type', fu.type);
+      sv('fu-months', fu.months);
+      sv('fu-dep-mensuel',   fu.depMensuel);   sv('fu-months-dep',  fu.monthsDep);  sv('fu-montant-fixe',  fu.montantFixe);  sv('fu-marge',  fu.marge);
+      sv('fu-dep-mensuel-c', fu.depMensuelC);  sv('fu-months-dep-c',fu.monthsDepC); sv('fu-montant-fixe-c',fu.montantFixeC); sv('fu-marge-c',fu.margeC);
+      sv('fu-dep-mensuel-j', fu.depMensuelJ);  sv('fu-months-dep-j',fu.monthsDepJ); sv('fu-montant-fixe-j',fu.montantFixeJ); sv('fu-marge-j',fu.margeJ);
+      _fuMode = fu.mode || 'familial';
+      try { fuModeChange(_fuMode); } catch(e) { console.warn('fuModeChange error', e); }
     }
 
     // Profil investisseur
