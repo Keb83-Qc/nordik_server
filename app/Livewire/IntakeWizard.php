@@ -161,21 +161,42 @@ class IntakeWizard extends Component
                     ));
                 }
             }
-        } catch (\Throwable) {
-            // Garde les steps par défaut si la table n'existe pas encore
+        } catch (\Throwable $e) {
+            \App\Models\SystemLog::record('warning', '[IntakeWizard.mount] AbfParameter::allAsMap() a échoué', [
+                'intake_id' => $intakeId,
+                'error'     => $e->getMessage(),
+                'trace'     => mb_substr($e->getTraceAsString(), 0, 500),
+            ], \App\Models\SystemLog::SOURCE_PUBLIC);
         }
 
         // Pré-remplir depuis les données partiellement sauvegardées
-        $intake = AbfIntake::find($intakeId);
-        if ($intake && $intake->payload) {
-            $this->hydrateFromPayload($intake->payload);
-        }
+        try {
+            $intake = AbfIntake::find($intakeId);
+            if ($intake && $intake->payload) {
+                $this->hydrateFromPayload($intake->payload);
+            }
 
-        // Pré-remplir prénom/nom depuis l'intake si connu
-        if ($intake) {
-            if ($this->prenom === '' && $intake->client_first_name) $this->prenom = $intake->client_first_name;
-            if ($this->nom   === '' && $intake->client_last_name)  $this->nom    = $intake->client_last_name;
-            if ($this->courriel === '' && $intake->client_email)   $this->courriel = $intake->client_email;
+            // Pré-remplir prénom/nom depuis l'intake si connu
+            if ($intake) {
+                if ($this->prenom === '' && $intake->client_first_name) $this->prenom = $intake->client_first_name;
+                if ($this->nom   === '' && $intake->client_last_name)  $this->nom    = $intake->client_last_name;
+                if ($this->courriel === '' && $intake->client_email)   $this->courriel = $intake->client_email;
+            }
+
+            \App\Models\SystemLog::record('debug', '[IntakeWizard.mount] composant monté', [
+                'intake_id'    => $intakeId,
+                'intake_found' => $intake !== null,
+                'has_payload'  => $intake && !empty($intake->payload),
+                'steps'        => $this->allSteps,
+            ], \App\Models\SystemLog::SOURCE_PUBLIC);
+
+        } catch (\Throwable $e) {
+            \App\Models\SystemLog::record('error', '[IntakeWizard.mount] erreur hydratation', [
+                'intake_id' => $intakeId,
+                'error'     => $e->getMessage(),
+                'trace'     => mb_substr($e->getTraceAsString(), 0, 500),
+            ], \App\Models\SystemLog::SOURCE_PUBLIC);
+            throw $e;
         }
     }
 
