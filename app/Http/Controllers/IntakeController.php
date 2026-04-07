@@ -31,7 +31,11 @@ class IntakeController extends Controller
             return view('intake.merci', compact('advisor', 'intake'));
         }
 
-        $verified = session("intake_verified_{$token}", false);
+        // La session sert de vérification rapide, mais le status 'in_progress'
+        // est la source de vérité : si le code a déjà été validé (même depuis
+        // un autre appareil ou après expiration de session), le wizard s'affiche.
+        $verified = session("intake_verified_{$token}", false)
+            || $intake->status === 'in_progress';
 
         return view('intake.show', compact('advisor', 'intake', 'verified'));
     }
@@ -47,7 +51,13 @@ class IntakeController extends Controller
             ->firstOrFail();
 
         if (strtoupper(trim($request->access_code)) !== strtoupper($intake->access_code)) {
-            return back()->withErrors(['access_code' => __('intake.wrong_code', [], $intake->locale)]);
+            $msg = match($intake->locale) {
+                'en' => 'Invalid access code. Please check the code in your email.',
+                'es' => 'Código de acceso incorrecto. Verifique el código en su correo.',
+                'ht' => 'Kòd aksè a pa bon. Verifye kòd la nan imèl ou.',
+                default => 'Code d\'accès incorrect. Vérifiez le code dans votre courriel.',
+            };
+            return back()->withErrors(['access_code' => $msg]);
         }
 
         session(["intake_verified_{$token}" => true]);
