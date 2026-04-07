@@ -9,7 +9,7 @@ class DeeplTranslator
 {
     public function __construct(protected ?string $key = null)
     {
-        $this->key = $this->key ?? config('services.deepl.key') ?? env('DEEPL_API_KEY');
+        $this->key = $this->key ?? config('services.deepl.key');
     }
 
     private function baseUrl(): string

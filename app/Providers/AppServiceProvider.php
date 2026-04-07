@@ -20,6 +20,8 @@ use App\Models\Slide;
 use App\Observers\ClearPageCacheObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Settings\MailSettings;
+use App\Settings\SmtpSettings;
+use App\Settings\IntegrationSettings;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -57,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
         // même pour afficher une simple page. Maintenant, ça ne charge que
         // quand on accède réellement à mail.submission_broker_to.
         $this->app->booted(function () {
+            // ── MailSettings (destinataires soumissions) ──────────────────────
             try {
                 /** @var MailSettings $mail */
                 $mail = app(MailSettings::class);
@@ -75,6 +78,45 @@ class AppServiceProvider extends ServiceProvider
                 if (! empty($fallback)) {
                     config(['mail.submission_broker_to' => $fallback]);
                 }
+            }
+
+            // ── SmtpSettings → override config mail.mailers.smtp.* ───────────
+            try {
+                /** @var SmtpSettings $smtp */
+                $smtp = app(SmtpSettings::class);
+
+                config([
+                    'mail.default'                     => $smtp->mailer,
+                    'mail.mailers.smtp.host'            => $smtp->host,
+                    'mail.mailers.smtp.port'            => $smtp->port,
+                    'mail.mailers.smtp.username'        => $smtp->username,
+                    'mail.mailers.smtp.password'        => $smtp->password,
+                    'mail.mailers.smtp.encryption'      => $smtp->encryption,
+                    'mail.from.address'                 => $smtp->from_address,
+                    'mail.from.name'                    => $smtp->from_name,
+                ]);
+            } catch (\Throwable) {
+                // DB not ready yet — config/mail.php .env fallback stays active
+            }
+
+            // ── IntegrationSettings → override zoho.* / services.deepl.* ────
+            try {
+                /** @var IntegrationSettings $integrations */
+                $integrations = app(IntegrationSettings::class);
+
+                config([
+                    'services.deepl.key'                   => $integrations->deepl_api_key,
+                    'services.deepl.url'                   => $integrations->deepl_api_url,
+                    'zoho.auth.client_id'                  => $integrations->zoho_client_id,
+                    'zoho.auth.client_secret'              => $integrations->zoho_client_secret,
+                    'zoho.auth.refresh_token'              => $integrations->zoho_refresh_token,
+                    'zoho.auth.accounts_url'               => $integrations->zoho_accounts_url,
+                    'zoho.people.base_url'                 => $integrations->zoho_people_base_url,
+                    'zoho.people.records_path'             => $integrations->zoho_people_records_path,
+                    'mail.insurance_broker_email'          => $integrations->insurance_broker_email,
+                ]);
+            } catch (\Throwable) {
+                // DB not ready yet — .env fallback stays active
             }
         });
 
