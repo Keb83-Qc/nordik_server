@@ -5743,9 +5743,55 @@
   /* ════════════════════════════════════════════════════════
      PROJETS
   ════════════════════════════════════════════════════════ */
+  const _projetsSuggestions = [
+    'Achat ou construction de propriété secondaire',
+    'Rénovations majeures',
+    'Achat de véhicule',
+    'Voyage important',
+    'Démarrage / achat d\'entreprise',
+    'Autre projet',
+  ];
+
+  function _projetsSetDescription(desc) {
+    const sel   = document.getElementById('projet-description-select');
+    const autre = document.getElementById('projet-description-autre');
+    if (_projetsSuggestions.includes(desc) && desc !== 'Autre projet') {
+      sel.value = desc;
+      autre.style.display = 'none';
+      autre.value = '';
+    } else if (desc) {
+      // Valeur libre (ancienne donnée ou saisie manuelle)
+      sel.value = 'Autre projet';
+      autre.style.display = 'block';
+      autre.value = desc;
+    } else {
+      sel.value = '';
+      autre.style.display = 'none';
+      autre.value = '';
+    }
+  }
+
+  function _projetsGetDescription() {
+    const sel   = document.getElementById('projet-description-select');
+    const autre = document.getElementById('projet-description-autre');
+    if (sel.value === 'Autre projet') return autre.value.trim();
+    return sel.value;
+  }
+
+  function projetsOnDescriptionChange(sel) {
+    const autre = document.getElementById('projet-description-autre');
+    if (sel.value === 'Autre projet') {
+      autre.style.display = 'block';
+      autre.focus();
+    } else {
+      autre.style.display = 'none';
+      autre.value = '';
+    }
+  }
+
   function projetsAdd() {
     document.getElementById('projet-edit-id').value = '';
-    document.getElementById('projet-description').value = '';
+    _projetsSetDescription('');
     document.getElementById('projet-montant').value = '';
     document.getElementById('projet-mois').value = '1';
     document.getElementById('projet-annee').value = '';
@@ -5761,13 +5807,13 @@
   }
 
   function saveProjet() {
-    const desc    = document.getElementById('projet-description').value.trim();
+    const desc    = _projetsGetDescription();
     const montant = parseFloat(String(document.getElementById('projet-montant').value||'0').replace(/\s/g,'').replace(',','.')) || 0;
     const mois    = parseInt(document.getElementById('projet-mois').value) || 1;
     const annee   = document.getElementById('projet-annee').value.trim();
     const notes   = document.getElementById('projet-notes').value.trim();
     const celiapp = document.getElementById('projet-celiapp').checked;
-    if (!desc) { showToast('Veuillez saisir une description'); return; }
+    if (!desc) { showToast('Veuillez choisir ou saisir une description'); return; }
 
     const id = document.getElementById('projet-edit-id').value;
     const uid = id || (Date.now().toString(36) + Math.random().toString(36).slice(2));
@@ -5796,7 +5842,7 @@
     const p = _projets.find(x => x.id === id);
     if (!p) return;
     document.getElementById('projet-edit-id').value = p.id;
-    document.getElementById('projet-description').value = p.desc || '';
+    _projetsSetDescription(p.desc || '');
     document.getElementById('projet-montant').value     = p.montant || '';
     document.getElementById('projet-mois').value        = p.mois || '1';
     document.getElementById('projet-annee').value       = p.annee || '';

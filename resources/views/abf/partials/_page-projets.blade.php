@@ -58,7 +58,18 @@
       <!-- Description -->
       <div class="form-group">
         <label class="form-label">Description du projet</label>
-        <input class="form-input" id="projet-description" type="text" placeholder="ex. Achat d'un véhicule, rénovations, voyage…"/>
+        <select class="form-select" id="projet-description-select" onchange="projetsOnDescriptionChange(this)">
+          <option value="">— Choisir un type de projet —</option>
+          <option value="Achat ou construction de propriété secondaire">Achat ou construction de propriété secondaire</option>
+          <option value="Rénovations majeures">Rénovations majeures</option>
+          <option value="Achat de véhicule">Achat de véhicule</option>
+          <option value="Voyage important">Voyage important</option>
+          <option value="Démarrage / achat d'entreprise">Démarrage / achat d'entreprise</option>
+          <option value="Autre projet">Autre projet</option>
+        </select>
+        <input class="form-input" id="projet-description-autre" type="text"
+               placeholder="Décrivez votre projet…"
+               style="display:none;margin-top:8px"/>
       </div>
 
       <div class="row">
