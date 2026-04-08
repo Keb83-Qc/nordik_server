@@ -83,7 +83,11 @@ class ConnectionLogResource extends Resource
                 ->rows(10)
                 ->readOnly()
                 ->extraAttributes(['class' => 'font-mono'])
-                ->formatStateUsing(fn($state) => json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)),
+                ->afterStateHydrated(fn($component, $state) =>
+                    $component->state(is_array($state)
+                        ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+                        : $state)
+                ),
         ]);
     }
 
