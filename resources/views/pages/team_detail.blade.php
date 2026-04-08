@@ -23,9 +23,8 @@ $display_role = $decoded[$lang] ?? ($decoded['fr'] ?? $member->title->name);
 else {
 $display_role = $member->title->name;
 }
-}
 // Si pas de titre, on prend le rôle système
-elseif ($member->role) {
+} elseif ($member->role) {
 $display_role = ucfirst($member->role->name);
 }
 @endphp
