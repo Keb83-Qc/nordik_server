@@ -77,16 +77,22 @@ class ConnectionLogResource extends Resource
                     ->readOnly(),
             ]),
 
-            Forms\Components\Textarea::make('context')
+            Forms\Components\Placeholder::make('context_display')
                 ->label('Détails (JSON)')
                 ->columnSpanFull()
-                ->rows(10)
-                ->readOnly()
-                ->extraAttributes(['class' => 'font-mono'])
-                ->afterStateHydrated(fn($component, $state) =>
-                    $component->state(is_array($state)
-                        ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
-                        : $state)
+                ->content(fn($record): \Illuminate\Support\HtmlString =>
+                    new \Illuminate\Support\HtmlString(
+                        '<pre style="font-family:monospace;font-size:.85rem;line-height:1.6;'
+                        . 'padding:1rem;border-radius:.5rem;overflow:auto;white-space:pre-wrap;word-break:break-all;'
+                        . 'background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08)">'
+                        . htmlspecialchars(
+                            json_encode(
+                                $record?->context,
+                                JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                            ) ?? '—'
+                        )
+                        . '</pre>'
+                    )
                 ),
         ]);
     }
