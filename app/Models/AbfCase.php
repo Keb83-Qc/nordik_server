@@ -18,7 +18,7 @@ class AbfCase extends Model
         return LogOptions::defaults()
             ->logOnly(['client_first_name', 'client_last_name', 'status', 'advisor_user_id'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('abf_case');
     }
 

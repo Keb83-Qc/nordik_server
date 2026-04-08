@@ -15,7 +15,7 @@ class TauxCommission extends Model
         return LogOptions::defaults()
             ->logOnly(['company', 'type_placement', 'option_nom', 'taux_mensuel', 'taux_initial'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('taux_commission');
     }
 

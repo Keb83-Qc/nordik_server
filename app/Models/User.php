@@ -26,7 +26,7 @@ class User extends Authenticatable implements HasName, FilamentUser
         return LogOptions::defaults()
             ->logOnly(['first_name', 'last_name', 'email', 'role_id', 'is_active', 'advisor_code'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('user');
     }
 

@@ -34,7 +34,7 @@ class ExcludedPhone extends Model
         return LogOptions::defaults()
             ->logOnly(['phone', 'reason', 'notes', 'expires_at'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('excluded_phone');
     }
 

@@ -18,7 +18,7 @@ class QuotePortal extends Model
         return LogOptions::defaults()
             ->logOnly(['name', 'slug', 'type', 'is_active', 'primary_color', 'secondary_color', 'advisor_code'])
             ->logOnlyDirty()
-            ->dontSubmitEmptyLogs()
+            ->dontLogEmptyChanges()
             ->useLogName('quote_portal');
     }
 
