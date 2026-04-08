@@ -26,6 +26,9 @@ Schedule::command('zoho:sync')
     ->withoutOverlapping()
     ->runInBackground();
 
+// Sitemap : chaque lundi à 4h
+Schedule::command('sitemap:generate')->weeklyOn(1, '04:00')->withoutOverlapping();
+
 // Backup DB : chaque nuit à 3h
 Schedule::command('backup:clean')->dailyAt('03:00')->withoutOverlapping();
 Schedule::command('backup:run')->dailyAt('03:15')->withoutOverlapping();
