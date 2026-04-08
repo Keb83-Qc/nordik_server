@@ -9,8 +9,10 @@ use App\Filament\Widgets\LatestWikiWidget;
 use App\Filament\Widgets\LinksWidget;
 use App\Filament\Widgets\QuickLinks;
 use App\Filament\Widgets\WelcomeOverview;
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Forms\Components\Section;
+use Leandrocfe\FilamentApexCharts\FilamentApexChartsPlugin;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -145,6 +147,7 @@ class AdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make(),
                 SpatieLaravelTranslatablePlugin::make()
                     ->defaultLocales($this->filamentLocales()),
+                FilamentApexChartsPlugin::make(),
             ])
 
             ->authMiddleware([

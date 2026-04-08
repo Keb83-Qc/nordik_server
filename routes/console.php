@@ -25,3 +25,7 @@ Schedule::command('zoho:sync')
     ->dailyAt('02:00')
     ->withoutOverlapping()
     ->runInBackground();
+
+// Backup DB : chaque nuit à 3h
+Schedule::command('backup:clean')->dailyAt('03:00')->withoutOverlapping();
+Schedule::command('backup:run')->dailyAt('03:15')->withoutOverlapping();

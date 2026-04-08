@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
@@ -39,6 +40,13 @@ class AppServiceProvider extends ServiceProvider
 
         Gate::before(function ($user, $ability) {
             return $user->hasRole('super_admin') ? true : null;
+        });
+
+        // Language Switch : fr + en, visible dans le panel
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch
+                ->locales(['fr', 'en'])
+                ->visible(insidePanels: true, outsidePanels: false);
         });
 
         // Invalide le cache HTML de page quand du contenu public change
