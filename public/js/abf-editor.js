@@ -2912,9 +2912,12 @@
     const isCouple2 = document.getElementById('conjoint')?.checked;
     const clientBirthYear  = parseInt(document.getElementById('client-naissance-annee')?.value) || 0;
     const conjBirthYear    = parseInt(document.getElementById('conjoint-naissance-annee')?.value) || 0;
+    const currentYear      = new Date().getFullYear();
     const renteC = document.getElementById('deces-rente-conjoint-c');
     const renteJ = document.getElementById('deces-rente-conjoint-j');
     rcUpdatePanelHelpers(); // show/hide invalide vs rente-defunt inputs
+
+    // ── Rente de conjoint survivant ──────────────────────────────────────────
     if (renteC && (!parseFloat(renteC.value) || parseFloat(renteC.value) === 0)) {
       const defC = parseFloat((document.getElementById('deces-rente-defunt-c')?.value||'0').replace(/\s/g,'').replace(',','.')) || 0;
       const invC = document.getElementById('deces-invalide-c')?.checked || false;
@@ -2926,6 +2929,49 @@
       const invJ = document.getElementById('deces-invalide-j')?.checked || false;
       const sugg = clientBirthYear ? getRenteConjSuggestion(clientBirthYear, survivorHasChildren('client'), invJ, defJ) * 12 : 0;
       if (sugg) renteJ.value = Math.round(sugg).toLocaleString('fr-CA');
+    }
+
+    // ── Rente d'orphelin RRQ ─────────────────────────────────────────────────
+    // Montant mensuel par enfant (config ou 282,79 $ par défaut)
+    const orphelinMensuel = parseFloat(String(window.ABF_PARAMS?.rrq?.orphelin_mensuel ?? '282.79').replace(/\s/g,'').replace(',','.')) || 282.79;
+    let nbOrphelins = 0;
+    document.querySelectorAll('#enfants-list .enfant-item').forEach(el => {
+      const annee = parseInt(el.dataset.enfAnnee || '0');
+      if (!annee) return;
+      const age = currentYear - annee;
+      if (age < 18) nbOrphelins++;
+    });
+    const orphelinAnnuel = Math.round(nbOrphelins * orphelinMensuel * 12);
+    // Même montant pour les deux panels (s'applique dans les deux scénarios de décès)
+    ['c', 'j'].forEach(sfx => {
+      const el = document.getElementById(`deces-orphelin-${sfx}`);
+      if (el && (!parseFloat(el.value) || parseFloat(el.value) === 0)) {
+        el.value = orphelinAnnuel > 0 ? orphelinAnnuel.toLocaleString('fr-CA') : '0';
+      }
+    });
+
+    // ── Sécurité de la vieillesse (SV/OAS) ──────────────────────────────────
+    // Panel-C : client décède → survivant = conjoint
+    // Panel-J : conjoint décède → survivant = client
+    const svMensuel65_74 = parseFloat(String(window.ABF_PARAMS?.oas?.mensuel_65_74 ?? '727.67').replace(/\s/g,'').replace(',','.')) || 727.67;
+    const svMensuel75    = parseFloat(String(window.ABF_PARAMS?.oas?.mensuel_75_plus ?? '800.44').replace(/\s/g,'').replace(',','.')) || 800.44;
+    const getSvAnnuel = birthYear => {
+      if (!birthYear) return 0;
+      const age = currentYear - birthYear;
+      if (age < 65) return 0;
+      return Math.round((age >= 75 ? svMensuel75 : svMensuel65_74) * 12);
+    };
+    // Panel-C (client meurt → survivant = conjoint)
+    const svC = document.getElementById('deces-sv-c');
+    if (svC && (!parseFloat(svC.value) || parseFloat(svC.value) === 0)) {
+      const v = isCouple2 ? getSvAnnuel(conjBirthYear) : 0;
+      svC.value = v > 0 ? v.toLocaleString('fr-CA') : '0';
+    }
+    // Panel-J (conjoint meurt → survivant = client)
+    const svJ = document.getElementById('deces-sv-j');
+    if (svJ && (!parseFloat(svJ.value) || parseFloat(svJ.value) === 0)) {
+      const v = getSvAnnuel(clientBirthYear);
+      svJ.value = v > 0 ? v.toLocaleString('fr-CA') : '0';
     }
 
     decesCalc();
@@ -3232,10 +3278,18 @@
     // Survivor's income auto-computed — include emploi (survivor is alive and working)
     // Only in Familial mode (shown as auto-card); Individuel = 0 (manual entry only)
     const dispo = (isFamilial && isCouple) ? getRevenusByOwner(survivorOwner, isNet, false).total : 0;
-    const autres    = parseFloat((document.getElementById(`deces-autres-revenus-${sfx}`)?.value  || '0').replace(/\s/g,'').replace(',','.')) || 0;
-    const disponible = dispo + autres;
-    // Revenu annuel manquant = revenu visé pour 1 an
-    const manquantAnnuel = revenuVise;
+    const autres = parseFloat((document.getElementById(`deces-autres-revenus-${sfx}`)?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+
+    // Revenus gouvernementaux périodiques (annuels) — réduisent le capital à remplacer
+    const renteConjAnnuel  = parseFloat((document.getElementById(`deces-rente-conjoint-${sfx}`)?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const renteOrphelinAnnuel = parseFloat((document.getElementById(`deces-orphelin-${sfx}`)?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+    const svAnnuel         = parseFloat((document.getElementById(`deces-sv-${sfx}`)?.value || '0').replace(/\s/g,'').replace(',','.')) || 0;
+
+    // Total des revenus disponibles annuels (emploi survivant + gouv + autres)
+    const disponibleAnnuel = dispo + autres + renteConjAnnuel + renteOrphelinAnnuel + svAnnuel;
+
+    // Revenu annuel manquant = max(0, revenu visé − revenus disponibles)
+    const manquantAnnuel = Math.max(0, revenuVise - disponibleAnnuel);
     const duree = parseFloat(document.getElementById(`deces-rr-duree-${sfx}`)?.value || '10') || 10;
     const taux  = parseFloat((document.getElementById(`deces-rr-taux-${sfx}`)?.value || '3.70').replace(',','.')) / 100 || 0;
     const inflation = parseFloat((document.getElementById('vd-inflation')?.value || '2,10').replace(',','.')) / 100 || 0;
@@ -4109,6 +4163,9 @@
       enfants, revenus, actifs, passifs, legal,
       deces: {
         rrq_client: v('deces-rrq-client'), rrq_conjoint: v('deces-rrq-conjoint'),
+        rente_conjoint_c: v('deces-rente-conjoint-c'), rente_conjoint_j: v('deces-rente-conjoint-j'),
+        orphelin_c: v('deces-orphelin-c'), orphelin_j: v('deces-orphelin-j'),
+        sv_c: v('deces-sv-c'), sv_j: v('deces-sv-j'),
         autres_revenus_c: v('deces-autres-revenus-c'), autres_revenus_j: v('deces-autres-revenus-j'),
         rr_pct_c: v('deces-rr-pct-c'), rr_pct_j: v('deces-rr-pct-j'),
         rr_duree_c: v('deces-rr-duree-c'), rr_duree_j: v('deces-rr-duree-j'),
@@ -4395,6 +4452,9 @@
     // Décès — champs simples
     const dd = p.deces || {};
     sv('deces-rrq-client', dd.rrq_client); sv('deces-rrq-conjoint', dd.rrq_conjoint);
+    sv('deces-rente-conjoint-c', dd.rente_conjoint_c); sv('deces-rente-conjoint-j', dd.rente_conjoint_j);
+    sv('deces-orphelin-c', dd.orphelin_c); sv('deces-orphelin-j', dd.orphelin_j);
+    sv('deces-sv-c', dd.sv_c); sv('deces-sv-j', dd.sv_j);
     sv('deces-autres-revenus-c', dd.autres_revenus_c); sv('deces-autres-revenus-j', dd.autres_revenus_j);
     sv('deces-rr-pct-c', dd.rr_pct_c); sv('deces-rr-pct-j', dd.rr_pct_j);
     sv('deces-rr-duree-c', dd.rr_duree_c); sv('deces-rr-duree-j', dd.rr_duree_j);

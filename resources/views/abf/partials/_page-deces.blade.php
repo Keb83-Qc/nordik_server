@@ -220,6 +220,33 @@
                                 Revenus disponibles</div>
                             <div style="background:#f8f9fd;border-radius:6px;padding:10px 14px;margin-bottom:16px">
                                 <div id="deces-revenu-dispo-auto-c"></div>
+                                {{-- Rente de conjoint survivant RRQ (auto-suggérée, modifiable) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-top:1px solid #e9eaf3">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Rente conjoint survivant
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">Rente de conjoint survivant RRQ/RPC — montant annuel estimé selon l'âge du survivant. Modifiable.</span></span>
+                                    </span>
+                                    <div style="display:flex;align-items:center;gap:4px">
+                                        <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-rente-conjoint-c" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                        <button onclick="resetRenteConj('c')" title="Re-suggérer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:1px 3px;line-height:1" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--muted)'">↺</button>
+                                    </div>
+                                </div>
+                                {{-- Rente d'orphelin RRQ (auto-calculée, modifiable) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Rente d'orphelin RRQ
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">282,79 $/mois × nb d'enfants de moins de 18 ans. Calculé automatiquement selon la liste des enfants. Montant annuel.</span></span>
+                                    </span>
+                                    <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-orphelin-c" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                </div>
+                                {{-- Sécurité de la vieillesse (auto si survivant ≥ 65 ans) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Sécurité de la vieillesse
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">SV du survivant : 727,67 $/mois (65-74 ans) ou 800,44 $/mois (75+). 0 $ si moins de 65 ans. Montant annuel.</span></span>
+                                    </span>
+                                    <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-sv-c" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                </div>
                                 <div
                                     style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
                                     <span>Autres revenus</span>
@@ -294,6 +321,33 @@
                                 Revenus disponibles</div>
                             <div style="background:#f8f9fd;border-radius:6px;padding:10px 14px;margin-bottom:16px">
                                 <div id="deces-revenu-dispo-auto-j"></div>
+                                {{-- Rente de conjoint survivant RRQ (panel conjoint) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px;border-top:1px solid #e9eaf3">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Rente conjoint survivant
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">Rente de conjoint survivant RRQ/RPC — montant annuel estimé. Modifiable.</span></span>
+                                    </span>
+                                    <div style="display:flex;align-items:center;gap:4px">
+                                        <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-rente-conjoint-j" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                        <button onclick="resetRenteConj('j')" title="Re-suggérer" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:1px 3px;line-height:1" onmouseover="this.style.color='var(--navy)'" onmouseout="this.style.color='var(--muted)'">↺</button>
+                                    </div>
+                                </div>
+                                {{-- Rente d'orphelin RRQ (panel conjoint) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Rente d'orphelin RRQ
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">282,79 $/mois × nb d'enfants de moins de 18 ans. Montant annuel.</span></span>
+                                    </span>
+                                    <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-orphelin-j" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                </div>
+                                {{-- Sécurité de la vieillesse (panel conjoint) --}}
+                                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
+                                    <span style="display:flex;align-items:center;gap:4px">
+                                        Sécurité de la vieillesse
+                                        <span class="abf-tooltip-wrap"><span class="abf-tooltip-icon">&#9432;</span><span class="abf-tooltip-box">SV du survivant : 727,67 $/mois (65-74 ans) ou 800,44 $/mois (75+). Montant annuel.</span></span>
+                                    </span>
+                                    <div class="input-sfx" style="max-width:130px"><input class="form-input" id="deces-sv-j" type="text" value="0" oninput="decesCalc()" /><span class="sfx">$/an</span></div>
+                                </div>
                                 <div
                                     style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;font-size:13px">
                                     <span>Autres revenus</span>
