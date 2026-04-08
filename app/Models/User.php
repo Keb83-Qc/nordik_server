@@ -12,7 +12,7 @@ use Filament\Panel;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
 use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use App\Models\Employee;
 use App\Models\Role;
 use App\Notifications\ResetPasswordNotification;
