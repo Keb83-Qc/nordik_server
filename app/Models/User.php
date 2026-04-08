@@ -11,7 +11,7 @@ use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
-use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Support\LogOptions;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use App\Models\Employee;
 use App\Models\Role;
