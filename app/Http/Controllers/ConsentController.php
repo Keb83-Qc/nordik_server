@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Language;
 use App\Models\QuoteType;
 use App\Models\User;
 use App\Enums\UserRole;
