@@ -89,6 +89,12 @@
     <FilesMatch "\.html$">
         Header set Cache-Control "no-cache, must-revalidate"
     </FilesMatch>
+
+    # CORS pour les polices — autorise les 3 domaines vipgpi.* à se croiser
+    # Nécessaire quand APP_URL diffère du domaine visiteur (.ca / .net / .com)
+    <FilesMatch "\.(woff|woff2|ttf|otf|eot)$">
+        Header set Access-Control-Allow-Origin "*"
+    </FilesMatch>
 </IfModule>
 
 # ──────────────────────────────────────────────────

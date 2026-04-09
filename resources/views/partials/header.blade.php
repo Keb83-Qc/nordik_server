@@ -77,8 +77,9 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 
-    {{-- CSS local en premier (évite le FOUC) --}}
-    <link rel="stylesheet" href="assets/css/fonts.css">
+    {{-- CSS local en premier (évite le FOUC) — asset() garantit le bon domaine selon APP_URL --}}
+    @php $fontsCssVer = @filemtime(public_path('assets/css/fonts.css')) ?: '1'; @endphp
+    <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}?v={{ $fontsCssVer }}">
 
     {{-- Bootstrap + Font Awesome depuis CDN --}}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -88,7 +89,7 @@
 
     {{-- CSS principal — version basée sur la date de modification du fichier (évite le rechargement inutile) --}}
     @php $vipCssVer = @filemtime(public_path('assets/css/vip.css')) ?: '1'; @endphp
-    <link rel="stylesheet" href="assets/css/vip.css?v={{ $vipCssVer }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/vip.css') }}?v={{ $vipCssVer }}">
 
     {{-- Preload de l'image hero (LCP) sur la page d'accueil uniquement --}}
     @if (request()->routeIs('home') && isset($slides) && $slides->isNotEmpty())
