@@ -248,6 +248,144 @@
             passive: true
         });
     })();
+
+    {{-- Web Vitals: suivi LCP/CLS/INP/FCP/TTFB vers SystemLog --}}
+        <
+        script >
+        (function() {
+            var endpoint = '{{ route('log-web-vitals') }}';
+            var token = document.querySelector('meta[name="csrf-token"]')?.content;
+            if (!token || !('PerformanceObserver' in window)) return;
+
+            var sent = new Set();
+
+            function rating(metric, value) {
+                if (metric === 'LCP') return value <= 2500 ? 'good' : value <= 4000 ? 'needs-improvement' : 'poor';
+                if (metric === 'INP') return value <= 200 ? 'good' : value <= 500 ? 'needs-improvement' : 'poor';
+                if (metric === 'CLS') return value <= 0.1 ? 'good' : value <= 0.25 ? 'needs-improvement' : 'poor';
+                if (metric === 'FCP') return value <= 1800 ? 'good' : value <= 3000 ? 'needs-improvement' : 'poor';
+                if (metric === 'TTFB') return value <= 800 ? 'good' : value <= 1800 ? 'needs-improvement' : 'poor';
+                return 'unknown';
+            }
+
+            function send(metric, value, delta, id) {
+                var key = metric + ':' + id;
+                if (sent.has(key)) return;
+                sent.add(key);
+
+                var payload = {
+                    _token: token,
+                    metric: metric,
+                    value: Number(value || 0),
+                    delta: Number(delta || 0),
+                    id: String(id || ''),
+                    rating: rating(metric, Number(value || 0)),
+                    navigationType: performance.getEntriesByType('navigation')?.[0]?.type || '',
+                    url: window.location.href
+                };
+
+                var body = JSON.stringify(payload);
+                if (navigator.sendBeacon) {
+                    var blob = new Blob([body], {
+                        type: 'application/json'
+                    });
+                    navigator.sendBeacon(endpoint, blob);
+                    return;
+                }
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body,
+                    keepalive: true
+                }).catch(function() {});
+            }
+
+            // LCP
+            (function() {
+                var lcp;
+                var po = new PerformanceObserver(function(entryList) {
+                    var entries = entryList.getEntries();
+                    lcp = entries[entries.length - 1];
+                });
+                po.observe({
+                    type: 'largest-contentful-paint',
+                    buffered: true
+                });
+                document.addEventListener('visibilitychange', function() {
+                    if (document.visibilityState === 'hidden' && lcp) {
+                        send('LCP', lcp.startTime, 0, lcp.id || 'lcp');
+                        po.disconnect();
+                    }
+                }, {
+                    once: true
+                });
+            })();
+
+            // CLS
+            (function() {
+                var cls = 0;
+                var po = new PerformanceObserver(function(entryList) {
+                    entryList.getEntries().forEach(function(entry) {
+                        if (!entry.hadRecentInput) cls += entry.value;
+                    });
+                });
+                po.observe({
+                    type: 'layout-shift',
+                    buffered: true
+                });
+                document.addEventListener('visibilitychange', function() {
+                    if (document.visibilityState === 'hidden') {
+                        send('CLS', cls, 0, 'cls');
+                        po.disconnect();
+                    }
+                }, {
+                    once: true
+                });
+            })();
+
+            // INP (Event Timing)
+            (function() {
+                var maxInp = 0;
+                var po = new PerformanceObserver(function(entryList) {
+                    entryList.getEntries().forEach(function(entry) {
+                        if (entry.interactionId && entry.duration > maxInp) {
+                            maxInp = entry.duration;
+                        }
+                    });
+                });
+                try {
+                    po.observe({
+                        type: 'event',
+                        durationThreshold: 40,
+                        buffered: true
+                    });
+                    document.addEventListener('visibilitychange', function() {
+                        if (document.visibilityState === 'hidden') {
+                            if (maxInp > 0) send('INP', maxInp, 0, 'inp');
+                            po.disconnect();
+                        }
+                    }, {
+                        once: true
+                    });
+                } catch (e) {
+                    // API non supportée sur certains navigateurs
+                }
+            })();
+
+            // FCP + TTFB
+            (function() {
+                var paint = performance.getEntriesByName('first-contentful-paint')[0];
+                if (paint) send('FCP', paint.startTime, 0, 'fcp');
+
+                var nav = performance.getEntriesByType('navigation')[0];
+                if (nav) send('TTFB', nav.responseStart, 0, 'ttfb');
+            })();
+        })();
 </script>
 
 

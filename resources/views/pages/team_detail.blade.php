@@ -108,7 +108,8 @@ if ($member->title) {
                                 <i class="fas fa-calendar-check me-2"></i> {{ __('team_detail.book_appointment') }}
                             </a>
                         @else
-                            <a href="{{ url('/contact') }}" class="btn btn-dark w-100 shadow-sm fw-bold py-2">
+                            <a href="{{ route('contact', ['locale' => app()->getLocale()]) }}"
+                                class="btn btn-dark w-100 shadow-sm fw-bold py-2">
                                 <i class="fas fa-paper-plane me-2"></i> {{ __('team_detail.send_message') }}
                             </a>
                         @endif
@@ -132,7 +133,8 @@ if ($member->title) {
                     </div>
 
                     <div class="mt-5 pt-4 border-top">
-                        <a href="{{ url('/equipe') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                        <a href="{{ route('equipe', ['locale' => app()->getLocale()]) }}"
+                            class="btn btn-outline-secondary rounded-pill px-4">
                             <i class="fas fa-arrow-left me-2"></i> {{ __('team_detail.back_to_team') }}
                         </a>
                     </div>
@@ -146,15 +148,15 @@ if ($member->title) {
 {{-- Schema.org --}}
 <script type="application/ld+json">
     {
-        "@context": "https://schema.org",
-        "@type": "Person",
+        "@@context": "https://schema.org",
+        "@@type": "Person",
         "name": "{{ $full_name }}",
         "jobTitle": "{{ $display_role }}",
         "image": "{{ $imgSrc }}",
         "email": "{{ $member->email ?? '' }}",
         "telephone": "{{ $member->phone ?? '' }}",
         "worksFor": {
-            "@type": "FinancialService",
+            "@@type": "FinancialService",
             "name": "VIP GPI Services Financiers",
             "url": "{{ url('/') }}"
         }
