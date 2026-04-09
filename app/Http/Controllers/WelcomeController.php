@@ -8,13 +8,37 @@ use Illuminate\Support\Facades\Cache;
 
 class WelcomeController extends Controller
 {
+    /**
+     * Route /{locale}/ — page de sélection de langue (landing).
+     *
+     * Raccourci session : si le visiteur a déjà choisi sa langue (welcome_seen = true)
+     * ET qu'il n'arrive PAS depuis le domaine racine (/), on le renvoie directement
+     * sur le home. Sinon, on affiche toujours la landing.
+     */
     public function index(Request $request)
     {
-        // si déjà choisi, on skip
-        if (session()->has('locale') && session('welcome_seen') === true) {
+        // Si arrivé depuis la route racine "/" on ne skip jamais la landing
+        $fromRoot = $request->headers->get('referer') === null
+            && $request->getPathInfo() === '/';
+
+        if (! $fromRoot && session()->has('locale') && session('welcome_seen') === true) {
             return redirect()->route('home', ['locale' => session('locale')]);
         }
 
+        return $this->renderLanding($request);
+    }
+
+    /**
+     * Route / — toujours afficher la landing, peu importe la session.
+     * Évite que les visiteurs récurrents soient silencieusement renvoyés sur home.
+     */
+    public function root(Request $request)
+    {
+        return $this->renderLanding($request);
+    }
+
+    private function renderLanding(Request $request): \Illuminate\View\View
+    {
         // Utilise le cache Language (1h) — évite une requête DB brute à chaque visite
         $activeCodes = Language::activeCodes();
 
@@ -28,7 +52,11 @@ class WelcomeController extends Controller
         $detected = $this->detectBestLocale($request->getLanguages(), $activeCodes)
             ?? Language::defaultCode();
 
-        // Render landing in detected language (no session write yet)
+        // Respecte la session si l'utilisateur a déjà choisi sa langue
+        if (session()->has('locale') && in_array(session('locale'), $activeCodes, true)) {
+            $detected = session('locale');
+        }
+
         app()->setLocale($detected);
 
         return view('landing', [

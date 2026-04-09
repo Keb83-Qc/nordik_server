@@ -125,52 +125,13 @@ Route::post('/log-web-vitals', function (Request $request) {
 })->middleware('throttle:30,1')->name('log-web-vitals');
 
 /**
- * 1) Redirige / vers /{locale} (locale déterminée par middleware/service)
- *    NB: ici on met une route simple qui appelle une route localisée.
+ * 1) Route racine / — affiche toujours la landing page.
+ *    Peu importe si le visiteur a déjà choisi une langue, on lui montre
+ *    la landing (sélecteur de langue). C'est le point d'entrée du site.
+ *    Le middleware set-locale n'est pas nécessaire ici (WelcomeController
+ *    gère la détection de langue lui-même).
  */
-Route::get('/', function (Request $request) {
-    // 1) Si l'utilisateur a déjà choisi une langue, on respecte son choix
-    if (session()->has('locale')) {
-        return redirect('/' . session('locale'), 302);
-    }
-
-    // 2) Langues actives en DB
-    $active = Language::activeCodes(); // ex: ['fr', 'en', 'es']
-
-    // 3) Détection navigateur
-    // Renvoie ex: ['fr_CA', 'fr', 'en_US', 'en']
-    $preferred = $request->getLanguages();
-
-    $picked = null;
-
-    foreach ($preferred as $lang) {
-        $lang = strtolower(str_replace('_', '-', $lang)); // ex: fr-ca
-
-        // match exact (fr-ca)
-        if (in_array($lang, $active, true)) {
-            $picked = $lang;
-            break;
-        }
-
-        // match base (fr)
-        $base = explode('-', $lang)[0];
-        if (in_array($base, $active, true)) {
-            $picked = $base;
-            break;
-        }
-    }
-
-    // 4) fallback
-    $picked ??= Language::defaultCode() ?? config('app.fallback_locale', 'fr');
-
-    // Option : set session locale automatiquement
-    if ($picked) {
-        session(['locale' => $picked]);
-        return redirect("/{$picked}", 302);
-    }
-
-    return redirect('/fr', 302); // ou return view('landing');
-});
+Route::get('/', [WelcomeController::class, 'root'])->name('root');
 
 /**
  * 2) Switch langue (optionnel)
