@@ -19,6 +19,7 @@ use App\Models\PublicServiceCategory;
 use App\Models\Service;
 use App\Models\Slide;
 use App\Observers\ClearPageCacheObserver;
+use App\Observers\ClearMenuCacheObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Settings\MailSettings;
 use App\Settings\SmtpSettings;
@@ -65,6 +66,9 @@ class AppServiceProvider extends ServiceProvider
         Service::observe(ClearPageCacheObserver::class);
         Partner::observe(ClearPageCacheObserver::class);
         Employee::observe(ClearPageCacheObserver::class);
+
+        // Invalide le cache HTML + les clés menu quand les items de menu changent
+        MenuItem::observe(ClearMenuCacheObserver::class);
 
         Paginator::useBootstrapFive();
 

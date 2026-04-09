@@ -48,7 +48,7 @@ class PageController extends Controller
 
         return view('pages.construction', [
             'header_title' => $title,
-            'header_bg' => asset('assets/img/construction/canvas.png'),
+            'header_bg' => asset('assets/img/header/canvas.png'),
         ]);
     }
 
