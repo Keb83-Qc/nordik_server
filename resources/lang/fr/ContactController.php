@@ -8,7 +8,7 @@ return [
 
     // Messages Flash
     'success_sent' => 'Votre message a été envoyé avec succès !',
-    'error_send'   => 'Une erreur est survenue lors de l'envoi. Veuillez réessayer ou nous contacter directement.',
+    'error_send'   => 'Une erreur est survenue lors de l\'envoi. Veuillez réessayer ou nous contacter directement.',
 
     // Objets par défaut (Logique dynamique)
     'subject_with_pricing' => 'Demande de cotation (Avec Tarification)',
