@@ -249,9 +249,7 @@
         });
     })();
 
-    {{-- Web Vitals: suivi LCP/CLS/INP/FCP/TTFB vers SystemLog --}}
-        <
-        script >
+    // Web Vitals: suivi LCP/CLS/INP/FCP/TTFB vers SystemLog
         (function() {
             var endpoint = '{{ route('log-web-vitals') }}';
             var token = document.querySelector('meta[name="csrf-token"]')?.content;
