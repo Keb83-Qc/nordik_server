@@ -115,7 +115,11 @@ class IntakeWizard extends Component
     public string $regime_retraite_client    = '';
     public string $regime_retraite_conjoint  = '';
 
-    // ─── Step 16 : Profil d'investisseur ──────────────────────────────────────
+    // ─── Step 16 : Habitudes de vie (tabac) ───────────────────────────────────
+    public string $tabac_client   = '';   // 'oui' | 'non' | ''
+    public string $tabac_conjoint = '';
+
+    // ─── Step 17 : Profil d'investisseur ──────────────────────────────────────
     public string $profil_risque   = '';
     public string $profil_horizon  = '';
 
@@ -127,7 +131,7 @@ class IntakeWizard extends Component
         'actifs', 'dettes',
         'assurance_vie', 'assurance_invalidite', 'assurance_mg',
         'fonds_urgence', 'retraite', 'objectifs',
-        'profil_investisseur',
+        'sante', 'profil_investisseur',
     ];
 
     private const STEP_ORDER = [
@@ -136,7 +140,7 @@ class IntakeWizard extends Component
         'actifs', 'dettes',
         'assurance_vie', 'assurance_invalidite', 'assurance_mg',
         'fonds_urgence', 'retraite', 'objectifs',
-        'profil_investisseur',
+        'sante', 'profil_investisseur',
     ];
 
     // ─── Mount ────────────────────────────────────────────────────────────────
@@ -290,6 +294,9 @@ class IntakeWizard extends Component
             'objectifs' => $this->validate([
                 'age_retraite' => 'nullable|integer|min:50|max:90',
             ]),
+            'sante' => $this->validate([
+                'tabac_client' => 'required|in:oui,non',
+            ]),
             'profil_investisseur' => $this->validate([
                 'profil_risque'  => 'required|in:prudent,modere,equilibre,croissance,audacieux',
                 'profil_horizon' => 'required|in:court,moyen,long',
@@ -385,6 +392,9 @@ class IntakeWizard extends Component
             'rev_retraite_conj_mensuel'  => $this->rev_retraite_conj_mensuel,
             'regime_retraite_client'     => $this->regime_retraite_client,
             'regime_retraite_conjoint'   => $this->regime_retraite_conjoint,
+            // sante / tabac
+            'tabac_client'   => $this->tabac_client,
+            'tabac_conjoint' => $this->tabac_conjoint,
             // profil investisseur
             'profil_risque'  => $this->profil_risque,
             'profil_horizon' => $this->profil_horizon,
@@ -680,6 +690,7 @@ class IntakeWizard extends Component
                 'courriel'       => $this->courriel,
                 'cellulaire'     => $this->cellulaire,
                 'telephone'      => '',
+                'tabac'          => $this->tabac_client,
             ],
             'has_spouse' => $hasSpouse,
             'conjoint' => $hasSpouse ? [
@@ -691,6 +702,7 @@ class IntakeWizard extends Component
                 'ddn_annee'  => $this->conj_ddn_annee,
                 'courriel'   => $this->conj_courriel,
                 'etat_civil' => $this->etat_civil,
+                'tabac'      => $this->tabac_conjoint,
             ] : [],
             'enfants' => $enfants,
             'revenus' => $revenus,

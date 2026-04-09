@@ -4,8 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AbfRecommendationResource\Pages;
 use App\Models\AbfRecommendation;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -83,10 +83,15 @@ class AbfRecommendationResource extends Resource
                 ->hiddenOn('create')
                 ->columnSpanFull(),
 
-            Textarea::make('text')
+            RichEditor::make('text')
                 ->label('Texte de la recommandation')
                 ->required()
-                ->rows(5)
+                ->toolbarButtons([
+                    'bold', 'italic', 'underline',
+                    'bulletList', 'orderedList',
+                    'link', 'blockquote',
+                    'undo', 'redo',
+                ])
                 ->columnSpanFull(),
 
             Toggle::make('checked_by_default')
@@ -103,7 +108,8 @@ class AbfRecommendationResource extends Resource
                 ->label('Ordre d\'affichage')
                 ->numeric()
                 ->default(0)
-                ->minValue(0),
+                ->minValue(0)
+                ->hiddenOn('create'),
 
         ])->columns(2);
     }
@@ -135,6 +141,7 @@ class AbfRecommendationResource extends Resource
 
                 TextColumn::make('text')
                     ->label('Texte')
+                    ->formatStateUsing(fn (?string $state) => strip_tags($state ?? ''))
                     ->limit(80)
                     ->color('gray')
                     ->tooltip(fn (TextColumn $column): ?string => strlen($column->getState() ?? '') > 80 ? $column->getState() : null),

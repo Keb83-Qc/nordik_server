@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\EncryptedJsonCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,7 +25,7 @@ class Submission extends Model
     ];
 
     protected $casts = [
-        'data'              => 'array',
+        'data'              => EncryptedJsonCast::class,
         'is_phone_excluded' => 'boolean',
     ];
 

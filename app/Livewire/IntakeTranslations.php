@@ -22,6 +22,7 @@ class IntakeTranslations
         'step.retraite'             => ['fr' => 'Objectifs de retraite',       'en' => 'Retirement goals',           'es' => 'Objetivos de jubilación',    'ht' => 'Objektif retrèt'],
         'step.objectifs'            => ['fr' => 'Vos objectifs',               'en' => 'Your goals',                 'es' => 'Sus objetivos',              'ht' => 'Objektif ou yo'],
         'step.profil_investisseur'  => ['fr' => 'Profil d\'investisseur',      'en' => 'Investor profile',           'es' => 'Perfil de inversión',        'ht' => 'Pwofil envestisè'],
+        'step.sante'                => ['fr' => 'Habitudes de vie',            'en' => 'Lifestyle',                  'es' => 'Hábitos de vida',            'ht' => 'Abitid lavi'],
 
         // Navigation
         'nav.next'    => ['fr' => 'Suivant',   'en' => 'Next',   'es' => 'Siguiente', 'ht' => 'Swivan'],
@@ -144,7 +145,27 @@ class IntakeTranslations
         'field.regime_retraite_client'    => ['fr' => 'Rente mensuelle régime employeur — vous ($)', 'en' => 'Employer pension monthly benefit — you ($)', 'es' => 'Renta mensual régimen de empleador — usted ($)', 'ht' => 'Rèt mansyèl régim travay — ou ($)'],
         'field.regime_retraite_conjoint'  => ['fr' => 'Rente mensuelle régime employeur — conjoint(e) ($)', 'en' => 'Employer pension monthly benefit — spouse ($)', 'es' => 'Renta mensual régimen de empleador — cónyuge ($)', 'ht' => 'Rèt mansyèl régim travay — konjwen ($)'],
 
-        // ── Profil d'investisseur ─────────────────────────────────────────────────
+        // ── Habitudes de vie / Tabac ─────────────────────────────────────────────
+        'info.sante'                => [
+            'fr' => 'Ces informations permettent à votre conseiller d\'évaluer l\'admissibilité et le coût des produits d\'assurance.',
+            'en' => 'This information helps your advisor assess eligibility and cost of insurance products.',
+            'es' => 'Esta información ayuda a su asesor a evaluar la elegibilidad y el costo de los productos de seguro.',
+            'ht' => 'Enfòmasyon sa yo ede konseyè ou evalye elijibilite ak pri pwodwi asirans.',
+        ],
+        'field.tabac_client'  => [
+            'fr' => 'Consommez-vous du tabac ou des produits de vapotage? (vous)',
+            'en' => 'Do you use tobacco or vaping products? (you)',
+            'es' => '¿Consume tabaco o productos de vapeo? (usted)',
+            'ht' => 'Eske ou itilize tabak ou pwodwi vaporizasyon? (ou)',
+        ],
+        'field.tabac_conjoint' => [
+            'fr' => 'Consommez-vous du tabac ou des produits de vapotage? (conjoint·e)',
+            'en' => 'Do you use tobacco or vaping products? (spouse)',
+            'es' => '¿Consume tabaco o productos de vapeo? (cónyuge)',
+            'ht' => 'Eske konjwen ou itilize tabak ou pwodwi vaporizasyon?',
+        ],
+
+        // ── Profil d'investisseur ─────────────────────────────────────────────
         'info.profil_investisseur'        => ['fr' => 'Ces informations aident votre conseiller à vous proposer une stratégie de placement adaptée à votre situation.', 'en' => 'This information helps your advisor propose an investment strategy tailored to your situation.', 'es' => 'Esta información ayuda a su asesor a proponer una estrategia de inversión adecuada.', 'ht' => 'Enfòmasyon sa yo ede konseyè ou pwpoze estrateji envestisman ki adapte.'],
         'field.profil_risque'             => ['fr' => 'Quelle est votre tolérance au risque?', 'en' => 'What is your risk tolerance?', 'es' => '¿Cuál es su tolerancia al riesgo?', 'ht' => 'Ki tolerans ou pou risk?'],
         'field.profil_horizon'            => ['fr' => 'Quel est votre horizon de placement?', 'en' => 'What is your investment horizon?', 'es' => '¿Cuál es su horizonte de inversión?', 'ht' => 'Ki orizon envestisman ou?'],

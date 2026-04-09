@@ -624,6 +624,41 @@
             @endif
         </div>
 
+    @elseif($step === 'sante')
+        <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.sante') }}</p>
+        <div class="row g-4">
+            <div class="col-12">
+                <label class="form-label fw-semibold">{{ $this->t('field.tabac_client') }} *</label>
+                <div class="d-flex gap-3 mt-1">
+                    <label class="intake-pill {{ $tabac_client === 'non' ? 'active' : '' }}">
+                        <input type="radio" wire:model.live="tabac_client" value="non" style="display:none">
+                        {{ $this->t('no') }}
+                    </label>
+                    <label class="intake-pill {{ $tabac_client === 'oui' ? 'active' : '' }}" style="{{ $tabac_client === 'oui' ? 'border-color:#dc3545;background:#fff1f2;color:#dc3545;' : '' }}">
+                        <input type="radio" wire:model.live="tabac_client" value="oui" style="display:none">
+                        {{ $this->t('yes') }}
+                    </label>
+                </div>
+                @error('tabac_client')<div class="text-danger small mt-1">{{ $message }}</div>@enderror
+            </div>
+
+            @if($hasSpouse)
+            <div class="col-12">
+                <label class="form-label fw-semibold">{{ $this->t('field.tabac_conjoint') }}</label>
+                <div class="d-flex gap-3 mt-1">
+                    <label class="intake-pill {{ $tabac_conjoint === 'non' ? 'active' : '' }}">
+                        <input type="radio" wire:model.live="tabac_conjoint" value="non" style="display:none">
+                        {{ $this->t('no') }}
+                    </label>
+                    <label class="intake-pill {{ $tabac_conjoint === 'oui' ? 'active' : '' }}" style="{{ $tabac_conjoint === 'oui' ? 'border-color:#dc3545;background:#fff1f2;color:#dc3545;' : '' }}">
+                        <input type="radio" wire:model.live="tabac_conjoint" value="oui" style="display:none">
+                        {{ $this->t('yes') }}
+                    </label>
+                </div>
+            </div>
+            @endif
+        </div>
+
     @elseif($step === 'profil_investisseur')
         <p class="text-muted mb-3" style="font-size:13px;">{{ $this->t('info.profil_investisseur') }}</p>
         <div class="row g-3">
