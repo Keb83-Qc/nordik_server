@@ -20,8 +20,8 @@
     // URL canonique : $seo_canonical ou URL courante sans query string
     $canonical = $seo_canonical ?? url()->current();
 
-    // Locales supportées pour hreflang
-    $supportedLocales = ['fr', 'en', 'es', 'ht'];
+    // Locales supportées pour hreflang — lues depuis la table languages (avec cache 1h)
+    $supportedLocales = \App\Models\Language::activeCodes();
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">

@@ -3,14 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Models\Language;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class SitemapController extends Controller
 {
-    /** Locales disponibles sur le site */
-    private const LOCALES = ['fr', 'en', 'es', 'ht'];
-
     /** Pages statiques avec leur priorité */
     private const STATIC_PAGES = [
         ''        => ['priority' => '1.0', 'changefreq' => 'weekly'],
@@ -22,27 +20,27 @@ class SitemapController extends Controller
 
     public function index(): Response
     {
-        $appUrl = rtrim(config('app.url'), '/');
+        $appUrl  = rtrim(config('app.url'), '/');
+        $locales = Language::activeCodes(); // depuis la table languages, mis en cache 1h
 
         // Pages statiques localisées
         $staticUrls = [];
         foreach (self::STATIC_PAGES as $page => $meta) {
-            foreach (self::LOCALES as $locale) {
+            foreach ($locales as $locale) {
                 $path = $page ? "/{$locale}/{$page}" : "/{$locale}";
                 $staticUrls[] = array_merge($meta, ['loc' => $appUrl . $path]);
             }
         }
 
-        // Conseillers (URL sans locale — redirigent vers /fr/conseiller/{slug})
+        // Conseillers — une URL par locale
         $members = DB::table('users')
-            ->whereNotNull('slug')
             ->whereNotNull('slug')
             ->where('slug', '!=', '')
             ->get(['slug', 'updated_at']);
 
         $memberUrls = [];
         foreach ($members as $m) {
-            foreach (self::LOCALES as $locale) {
+            foreach ($locales as $locale) {
                 $memberUrls[] = [
                     'loc'        => $appUrl . "/{$locale}/conseiller/{$m->slug}",
                     'priority'   => '0.7',
@@ -52,7 +50,8 @@ class SitemapController extends Controller
             }
         }
 
-        // Articles de blog (slugs traduits)
+        // Articles de blog publiés avec slugs traduits
+        $defaultLocale = Language::defaultCode();
         $posts = BlogPost::select('slug', 'updated_at')
             ->where('status', 'published')
             ->latest()
@@ -60,9 +59,9 @@ class SitemapController extends Controller
 
         $postUrls = [];
         foreach ($posts as $post) {
-            foreach (self::LOCALES as $locale) {
+            foreach ($locales as $locale) {
                 $slug = $post->getTranslation('slug', $locale, false)
-                    ?? $post->getTranslation('slug', 'fr', false)
+                    ?? $post->getTranslation('slug', $defaultLocale, false)
                     ?? null;
                 if (!$slug) {
                     continue;
@@ -77,11 +76,7 @@ class SitemapController extends Controller
         }
 
         return response()
-            ->view('sitemap', [
-                'staticUrls' => $staticUrls,
-                'memberUrls' => $memberUrls,
-                'postUrls'   => $postUrls,
-            ])
+            ->view('sitemap', compact('staticUrls', 'memberUrls', 'postUrls'))
             ->header('Content-Type', 'text/xml');
     }
 }

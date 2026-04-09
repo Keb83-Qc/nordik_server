@@ -9,10 +9,10 @@ use App\Enums\UserRole;
 
 class ConsentController extends Controller
 {
-    /** Locales supportées — source unique de vérité (lues depuis la config) */
+    /** Locales supportées — lues depuis la table languages (avec cache) */
     private function supportedLocales(): array
     {
-        return config('app.supported_locales', ['fr', 'en', 'ht', 'es']);
+        return Language::activeCodes();
     }
 
     private function applyLocale(string $locale): string

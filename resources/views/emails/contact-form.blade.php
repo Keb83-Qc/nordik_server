@@ -21,6 +21,6 @@
     <div style="margin-top:24px;padding:16px 20px;background:#f8f9fd;border-left:4px solid #c9a227;border-radius:4px;font-size:14px;color:#374151;line-height:1.7;white-space:pre-wrap">{{ $messageBody }}</div>
 
     <p style="margin-top:24px;font-size:12px;color:#9ca3af">
-        Ce message a été envoyé depuis le formulaire de contact du site vipgpi.net.
+        Ce message a été envoyé depuis le formulaire de contact du site {{ parse_url(config('app.url'), PHP_URL_HOST) }}.
     </p>
 </x-email.layout>
