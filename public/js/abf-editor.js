@@ -5720,15 +5720,15 @@
       sv:  { full: 'Sécurité de la vieillesse',  short: 'SV',  color: '#b45309', bg: '#fef3c7' },
     };
     el.innerHTML = `
-      <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed">
         <thead>
           <tr style="background:linear-gradient(180deg,#f8f9fd,#f2f4fa);border-bottom:1px solid var(--border)">
-            <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Programme</th>
-            <th style="text-align:right;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Revenu</th>
-            <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Fréquence</th>
-            <th style="text-align:right;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Indexation</th>
-            <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Début</th>
-            <th style="padding:10px 12px 10px 4px;width:72px"></th>
+            <th style="text-align:left;padding:10px 12px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:92px">Prog.</th>
+            <th style="text-align:right;padding:10px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Revenu</th>
+            <th style="text-align:left;padding:10px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:64px">Fréq.</th>
+            <th style="text-align:right;padding:10px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:56px">Index.</th>
+            <th style="text-align:left;padding:10px 8px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;width:54px">Début</th>
+            <th style="padding:10px 8px 10px 4px;width:64px"></th>
           </tr>
         </thead>
         <tbody>
@@ -5737,30 +5737,27 @@
             const isModified = !!r.userModified;
             const autoVal    = typeof r._auto === 'number' ? r._auto : 0;
             const badge = isModified
-              ? `<span title="Valeur modifiée manuellement — auto: ${fmtMoney(autoVal)} $/mois" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;text-transform:uppercase;letter-spacing:.03em">✎ Modifié</span>`
-              : `<span title="Calculé automatiquement depuis le revenu" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534;text-transform:uppercase;letter-spacing:.03em">⚡ Auto</span>`;
+              ? `<span title="Valeur modifiée manuellement — auto: ${fmtMoney(autoVal)}/mois" style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:9px;font-weight:700;background:#fef3c7;color:#92400e;text-transform:uppercase;letter-spacing:.03em">✎&nbsp;Modifié</span>`
+              : `<span title="Calculé automatiquement depuis le revenu" style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:999px;font-size:9px;font-weight:700;background:#dcfce7;color:#166534;text-transform:uppercase;letter-spacing:.03em">⚡&nbsp;Auto</span>`;
             const resetBtn = isModified
-              ? `<button onclick="resetRetraiteRegPub('${role}',${i})" title="Réinitialiser à la valeur calculée (${fmtMoney(autoVal)} $/mois)" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:4px 6px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg></button>`
+              ? `<button onclick="resetRetraiteRegPub('${role}',${i})" title="Réinitialiser à la valeur calculée (${fmtMoney(autoVal)}/mois)" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:3px 5px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg></button>`
               : '';
             return `
             <tr style="border-bottom:1px solid var(--border);${isModified ? 'background:#fffbeb' : ''}">
-              <td style="padding:12px 16px">
-                <div style="display:flex;align-items:center;gap:10px">
-                  <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:${meta.bg};color:${meta.color};font-size:11px;font-weight:800;letter-spacing:.02em;flex-shrink:0">${meta.short}</span>
-                  <div style="min-width:0">
-                    <div style="color:var(--text);font-weight:600;font-size:13px;line-height:1.2">${meta.full}</div>
-                    <div style="margin-top:3px">${badge}</div>
-                  </div>
+              <td style="padding:10px 12px">
+                <div style="display:flex;align-items:center;gap:6px" title="${meta.full}">
+                  <span style="display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:${meta.bg};color:${meta.color};font-size:10px;font-weight:800;letter-spacing:.02em;flex-shrink:0">${meta.short}</span>
+                  ${badge}
                 </div>
               </td>
-              <td style="padding:12px 12px;text-align:right;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums">${r.montant > 0 ? fmtMoney(r.montant) + ' $' : '<span style="color:var(--muted);font-weight:400">—</span>'}</td>
-              <td style="padding:12px 12px;color:var(--muted);font-size:12px">${r.frequence === 'mensuel' ? 'Mensuelle' : 'Annuelle'}</td>
-              <td style="padding:12px 12px;text-align:right;color:var(--muted);font-size:12px">${r.indexe ? inflation + '\u00a0%' : '—'}</td>
-              <td style="padding:12px 12px;color:var(--muted);font-size:12px">${r.debut || '65'} ans</td>
-              <td style="padding:12px 10px 12px 4px">
-                <div style="display:flex;gap:4px;justify-content:flex-end">
+              <td style="padding:10px 8px;text-align:right;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;white-space:nowrap">${r.montant > 0 ? fmtMoney(r.montant) : '<span style="color:var(--muted);font-weight:400">—</span>'}</td>
+              <td style="padding:10px 8px;color:var(--muted);font-size:12px">${r.frequence === 'mensuel' ? 'Mens.' : 'Ann.'}</td>
+              <td style="padding:10px 8px;text-align:right;color:var(--muted);font-size:12px;white-space:nowrap">${r.indexe ? inflation + '\u00a0%' : '—'}</td>
+              <td style="padding:10px 8px;color:var(--muted);font-size:12px;white-space:nowrap">${r.debut || '65'}&nbsp;ans</td>
+              <td style="padding:10px 8px 10px 4px">
+                <div style="display:flex;gap:3px;justify-content:flex-end">
                   ${resetBtn}
-                  <button onclick="openRetraiteRegPubModal('${role}',${i})" title="Modifier" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:4px 6px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">${iconEdit}</button>
+                  <button onclick="openRetraiteRegPubModal('${role}',${i})" title="Modifier" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:3px 5px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">${iconEdit}</button>
                 </div>
               </td>
             </tr>`;

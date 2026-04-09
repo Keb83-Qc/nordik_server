@@ -5,7 +5,7 @@
     <div style="display:flex;gap:20px;align-items:start">
 
         <!-- ══ Colonne principale ══════════════════════════════════════════ -->
-        <div style="flex:1;min-width:0">
+        <div style="flex:1 1 0%;min-width:0;max-width:100%;overflow:hidden">
 
             <!-- ── 1. Moment de la retraite ─────────────────────────────── -->
             <div class="card" style="margin-bottom:16px">
@@ -119,10 +119,10 @@
                         </div>
                     </div>
 
-                    <div id="retraite-obj-two-col" style="display:grid;grid-template-columns:1fr;gap:20px">
+                    <div id="retraite-obj-two-col" style="display:grid;grid-template-columns:1fr;gap:20px;align-items:start">
 
                         <!-- Panel client -->
-                        <div id="retraite-obj-panel-client">
+                        <div id="retraite-obj-panel-client" style="min-width:0">
                             <div id="retraite-obj-hdr-c"
                                 style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center">
                             </div>
@@ -172,7 +172,7 @@
                         </div>
 
                         <!-- Panel conjoint -->
-                        <div id="retraite-obj-panel-conjoint" style="display:none">
+                        <div id="retraite-obj-panel-conjoint" style="display:none;min-width:0">
                             <div id="retraite-obj-hdr-j"
                                 style="font-size:13px;font-weight:700;color:white;background:var(--gold);border-radius:6px;padding:7px 12px;margin-bottom:12px;text-align:center">
                             </div>
@@ -338,13 +338,13 @@
                 </div>
                 <div style="padding:0">
                     <div id="retraite-regpub-two-col" style="display:grid;grid-template-columns:1fr;gap:0;padding:0">
-                        <div id="retraite-regpub-panel-client">
+                        <div id="retraite-regpub-panel-client" style="min-width:0;overflow:hidden">
                             <div id="retraite-regpub-hdr-c"
                                 style="display:none;font-size:13px;font-weight:700;color:white;background:var(--navy);padding:7px 16px;text-align:center">
                             </div>
                             <div id="retraite-regpub-table-client"></div>
                         </div>
-                        <div id="retraite-regpub-panel-conjoint" style="display:none">
+                        <div id="retraite-regpub-panel-conjoint" style="display:none;min-width:0;overflow:hidden">
                             <div id="retraite-regpub-hdr-j"
                                 style="font-size:13px;font-weight:700;color:white;background:var(--gold);padding:7px 16px;text-align:center">
                             </div>
