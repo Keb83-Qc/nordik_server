@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Casts\EncryptedJsonCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +24,9 @@ class Submission extends Model
     ];
 
     protected $casts = [
-        'data'              => EncryptedJsonCast::class,
+        // data: 'array' — le chiffrement nécessite une migration de colonne json→longtext
+        // avant de pouvoir activer EncryptedJsonCast ici.
+        'data'              => 'array',
         'is_phone_excluded' => 'boolean',
     ];
 

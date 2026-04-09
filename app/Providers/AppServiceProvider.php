@@ -40,8 +40,14 @@ class AppServiceProvider extends ServiceProvider
         // Sans ce fix, asset('assets/css/fonts.css') génère https://vipgpi.ca/... sur TOUS les domaines,
         // ce qui provoque des erreurs CORS quand les polices sont demandées depuis vipgpi.net.
         if (! $this->app->runningInConsole()) {
-            $requestRoot = $this->app['request']->getSchemeAndHttpHost();
-            URL::forceRootUrl($requestRoot);
+            try {
+                $requestRoot = $this->app['request']->getSchemeAndHttpHost();
+                if ($requestRoot) {
+                    URL::forceRootUrl($requestRoot);
+                }
+            } catch (\Throwable) {
+                // Requête pas encore disponible — APP_URL utilisé comme fallback
+            }
         }
 
         // Force HTTPS en production pour que les URLs générées soient sécurisées
