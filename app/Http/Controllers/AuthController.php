@@ -34,7 +34,7 @@ class AuthController extends Controller
 
         if (!Auth::attempt($credentials)) {
             return back()
-                ->withErrors(['email' => 'Identifiants invalides.'])
+                ->withErrors(['email' => __('auth.failed')])
                 ->onlyInput('email');
         }
 
@@ -50,7 +50,7 @@ class AuthController extends Controller
 
             return redirect()
                 ->route('login', ['locale' => app()->getLocale()])
-                ->withErrors(['email' => 'Votre compte est en attente de validation.']);
+                ->withErrors(['email' => __('auth.pending_validation')]);
         }
 
         $isAdmin = method_exists($user, 'hasAnyRole')

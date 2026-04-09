@@ -1,28 +1,34 @@
 <?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-    <url>
-        <loc>{{ url('/') }}</loc>
-        <priority>1.0</priority>
-        <changefreq>weekly</changefreq>
-    </url>
-    <url>
-        <loc>{{ url('/about') }}</loc>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{{ url('/contact') }}</loc>
-        <priority>0.8</priority>
-    </url>
-    <url>
-        <loc>{{ url('/equipe') }}</loc>
-        <priority>0.9</priority>
-        <changefreq>weekly</changefreq>
-    </url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    @foreach($members as $m)
+    {{-- ── Pages statiques ─────────────────────────────────────────── --}}
+    @foreach($staticUrls as $url)
     <url>
-        <loc>{{ url('/conseiller/' . $m->slug) }}</loc>
-        <priority>0.8</priority>
+        <loc>{{ $url['loc'] }}</loc>
+        <priority>{{ $url['priority'] }}</priority>
+        @if(!empty($url['changefreq']))<changefreq>{{ $url['changefreq'] }}</changefreq>@endif
     </url>
     @endforeach
+
+    {{-- ── Conseillers ─────────────────────────────────────────────── --}}
+    @foreach($memberUrls as $url)
+    <url>
+        <loc>{{ $url['loc'] }}</loc>
+        <priority>{{ $url['priority'] }}</priority>
+        @if(!empty($url['changefreq']))<changefreq>{{ $url['changefreq'] }}</changefreq>@endif
+        @if(!empty($url['lastmod']))<lastmod>{{ $url['lastmod'] }}</lastmod>@endif
+    </url>
+    @endforeach
+
+    {{-- ── Articles de blog ────────────────────────────────────────── --}}
+    @foreach($postUrls as $url)
+    <url>
+        <loc>{{ $url['loc'] }}</loc>
+        <priority>{{ $url['priority'] }}</priority>
+        @if(!empty($url['changefreq']))<changefreq>{{ $url['changefreq'] }}</changefreq>@endif
+        @if(!empty($url['lastmod']))<lastmod>{{ $url['lastmod'] }}</lastmod>@endif
+    </url>
+    @endforeach
+
 </urlset>

@@ -1,10 +1,72 @@
+@php
+    $locale        = app()->getLocale();
+    $siteName      = 'VIP GPI Services Financiers';
+    $appUrl        = rtrim(config('app.url'), '/');
+
+    // Titre : priorité à $seo_title, sinon $header_title nettoyé, sinon nom du site
+    $rawTitle = $seo_title ?? (isset($header_title) ? strip_tags((string) $header_title) : null);
+    $pageTitle = $rawTitle ? $rawTitle . ' | ' . $siteName : $siteName;
+
+    // Description : priorité à $seo_description, sinon $header_subtitle, sinon défaut
+    $pageDesc = $seo_description
+        ?? (isset($header_subtitle) ? Str::limit(strip_tags((string) $header_subtitle), 155) : null)
+        ?? __('seo.default_description', [], $locale);
+
+    // Image OG : priorité à $seo_image, sinon image de fond, sinon logo
+    $ogImage = $seo_image
+        ?? ($header_bg ?? null)
+        ?? asset('assets/img/header/VIP_Logo_Gold_Gradient10.png');
+
+    // URL canonique : $seo_canonical ou URL courante sans query string
+    $canonical = $seo_canonical ?? url()->current();
+
+    // Locales supportées pour hreflang
+    $supportedLocales = ['fr', 'en', 'es', 'ht'];
+@endphp
 <!DOCTYPE html>
-<html lang="{{ app()->getLocale() }}">
+<html lang="{{ $locale }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    {{-- ── Titre de la page ─────────────────────────────────────────── --}}
+    <title>{{ $pageTitle }}</title>
+
+    {{-- ── SEO de base ──────────────────────────────────────────────── --}}
+    <meta name="description" content="{{ $pageDesc }}">
+    <meta name="robots" content="{{ $seo_robots ?? 'index, follow' }}">
+    <link rel="canonical" href="{{ $canonical }}">
+
+    {{-- ── Open Graph (Facebook / LinkedIn) ────────────────────────── --}}
+    <meta property="og:type"        content="{{ $og_type ?? 'website' }}">
+    <meta property="og:url"         content="{{ $canonical }}">
+    <meta property="og:title"       content="{{ $rawTitle ?? $siteName }}">
+    <meta property="og:description" content="{{ $pageDesc }}">
+    <meta property="og:image"       content="{{ $ogImage }}">
+    <meta property="og:site_name"   content="{{ $siteName }}">
+    <meta property="og:locale"      content="{{ $locale }}_CA">
+
+    {{-- ── Twitter Card ─────────────────────────────────────────────── --}}
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="{{ $rawTitle ?? $siteName }}">
+    <meta name="twitter:description" content="{{ $pageDesc }}">
+    <meta name="twitter:image"       content="{{ $ogImage }}">
+
+    {{-- ── hreflang multilingue ────────────────────────────────────── --}}
+    @foreach($supportedLocales as $lang)
+        @php
+            try {
+                $hrefUrl = preg_replace('#^(https?://[^/]+)/[a-z]{2}(/)#', '$1/' . $lang . '$2',
+                    preg_replace('#^(https?://[^/]+)$#', '$1/' . $lang, $canonical));
+            } catch (\Throwable $e) {
+                $hrefUrl = $canonical;
+            }
+        @endphp
+        <link rel="alternate" hreflang="{{ $lang }}" href="{{ $hrefUrl }}">
+    @endforeach
+    <link rel="alternate" hreflang="x-default" href="{{ preg_replace('#^(https?://[^/]+)/[a-z]{2}(/|$)#', '$1/fr$2', $canonical) }}">
 
     <link rel="icon" type="image/x-icon" href="{{ asset('assets/img/header/favicon.ico') }}">
 
