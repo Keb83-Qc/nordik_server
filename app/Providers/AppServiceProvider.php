@@ -20,6 +20,7 @@ use App\Models\Service;
 use App\Models\Slide;
 use App\Observers\ClearPageCacheObserver;
 use App\Observers\ClearMenuCacheObserver;
+use App\Observers\ClearPartnerCacheObserver;
 use Illuminate\Support\Facades\Cache;
 use App\Settings\MailSettings;
 use App\Settings\SmtpSettings;
@@ -64,7 +65,8 @@ class AppServiceProvider extends ServiceProvider
         Slide::observe(ClearPageCacheObserver::class);
         HomepageStat::observe(ClearPageCacheObserver::class);
         Service::observe(ClearPageCacheObserver::class);
-        Partner::observe(ClearPageCacheObserver::class);
+        // Partner a son propre observer pour vider aussi le cache applicatif partners_visible
+        Partner::observe(ClearPartnerCacheObserver::class);
         Employee::observe(ClearPageCacheObserver::class);
 
         // Invalide le cache HTML + les clés menu quand les items de menu changent

@@ -63,7 +63,7 @@ class PageController extends Controller
         return view('pages.partenaires', [
             'header_title' => $title,
             'header_subtitle' => $desc,
-            'header_bg' => asset('assets/img/partenaires/background-partenaires.jpg'),
+            'header_bg' => asset('assets/img/header/canvas.png'),
             'partners' => $partners,
         ]);
     }
