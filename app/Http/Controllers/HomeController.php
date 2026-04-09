@@ -13,16 +13,12 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // 1. Vérification de l'intro
         if (!session()->has('welcome_seen')) {
             return redirect()->route('landing');
         }
 
         $currentLocale = app()->getLocale();
-        $title = ($currentLocale === 'en') ? "Home - VIP GPI" : "Accueil - VIP GPI";
 
-        // Toutes les données de la page d'accueil mises en cache 30 min
-        // (contenu rarement modifié — gain majeur sur le temps de chargement)
         $homeData = Cache::remember("home_data_{$currentLocale}", 1800, function () {
             return [
                 'testimonials' => Testimonial::orderBy('created_at', 'desc')->get(),
@@ -33,6 +29,10 @@ class HomeController extends Controller
             ];
         });
 
-        return view('home', array_merge($homeData, compact('title')));
+        return view('home', array_merge($homeData, [
+            'seo_title'       => __('seo.home_title'),
+            'seo_description' => __('seo.default_description'),
+            'og_type'         => 'website',
+        ]));
     }
 }

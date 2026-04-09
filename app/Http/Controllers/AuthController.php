@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Message; // <--- INDISPENSABLE pour la messagerie
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Enums\UserRole;
 
 class AuthController extends Controller
 {
@@ -43,7 +44,7 @@ class AuthController extends Controller
         /** @var \App\Models\User $user */
         $user = Auth::user();
 
-        if ((int) ($user->role_id ?? 0) === 6) {
+        if ((int) ($user->role_id ?? 0) === UserRole::PENDING) {
             Auth::logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
@@ -55,7 +56,7 @@ class AuthController extends Controller
 
         $isAdmin = method_exists($user, 'hasAnyRole')
             ? $user->hasAnyRole(['admin', 'super_admin'])
-            : in_array((int) ($user->role_id ?? 0), [1, 2], true);
+            : in_array((int) ($user->role_id ?? 0), UserRole::ADMIN_ROLES, true);
 
         $isAbf = method_exists($user, 'hasRole')
             ? $user->hasRole('abf')
@@ -109,12 +110,12 @@ class AuthController extends Controller
                     'email'      => $request->email,
                     'phone'      => $request->phone,
                     'password'   => Hash::make($password),
-                    'role_id'    => 6,
+                    'role_id'    => UserRole::PENDING,
                     'position'   => 0,
                 ]);
 
                 // 3. ENVOI DU MESSAGE AUX SUPER ADMINS ET ADMINS
-                $recipient = User::whereIn('role_id', [1, 2])
+                $recipient = User::whereIn('role_id', UserRole::ADMIN_ROLES)
                     ->orderBy('role_id')
                     ->orderBy('id')
                     ->first();

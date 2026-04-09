@@ -6,6 +6,7 @@ return [
     'meta_title' => 'Kontak - VIP GPI',
 
     'success_sent' => 'Mesaj ou a ale avèk siksè!',
+    'error_send'   => 'Yon erè te fèt pandan yo t`ap voye mesaj la. Tanpri eseye ankò.',
 
     'subject_with_pricing' => 'Demann pou pri (Avèk Evalyasyon Pri)',
     'subject_without_pricing' => 'Demann pou pri (San Evalyasyon Pri)',

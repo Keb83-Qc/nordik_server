@@ -18,6 +18,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ConsentController;
 use App\Http\Controllers\PortalController;
 use App\Http\Controllers\QuoteController;
+use App\Http\Controllers\LegalController;
 use App\Http\Controllers\AbfPdfController;
 use App\Http\Controllers\AbfEditorController;
 use App\Http\Controllers\TwoFactorController;
@@ -258,6 +259,10 @@ Route::prefix('{locale}')
         Route::get('/article/{post}', [BlogController::class, 'show'])
             ->where(['post' => '[a-z0-9\-]+'])
             ->name('blog.show');
+
+        // Pages légales
+        Route::get('/politique-confidentialite', [LegalController::class, 'privacy'])->name('legal.privacy');
+        Route::get('/termes-conditions',         [LegalController::class, 'terms'])->name('legal.terms');
 
         // Contact
         Route::get('/contact', [ContactController::class, 'index'])->name('contact');

@@ -5,16 +5,34 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\QuoteType;
 use App\Models\User;
+use App\Enums\UserRole;
 
 class ConsentController extends Controller
 {
+    /** Locales supportées — source unique de vérité (lues depuis la config) */
+    private function supportedLocales(): array
+    {
+        return config('app.supported_locales', ['fr', 'en', 'ht', 'es']);
+    }
+
+    private function applyLocale(string $locale): string
+    {
+        if (in_array($locale, $this->supportedLocales(), true)) {
+            session(['locale' => $locale]);
+            app()->setLocale($locale);
+            return $locale;
+        }
+
+        $fallback = config('app.fallback_locale', 'fr');
+        session(['locale' => $fallback]);
+        app()->setLocale($fallback);
+        return $fallback;
+    }
+
     // --- 1. CHANGER LA LANGUE ---
     public function switchLanguage($locale, $advisorCode = null)
     {
-        if (in_array($locale, ['fr', 'en', 'ht', 'es'], true)) {
-            session(['locale' => $locale]);
-            app()->setLocale($locale);
-        }
+        $locale = $this->applyLocale($locale);
 
         return redirect()->route('consent.show', ['locale' => $locale, 'code' => $advisorCode]);
     }
@@ -22,26 +40,16 @@ class ConsentController extends Controller
     // --- 2. AFFICHER LA PAGE ---
     public function show(string $locale, ?string $advisorCode = null)
     {
-        if (in_array($locale, ['fr', 'en', 'ht', 'es'], true)) {
-            session(['locale' => $locale]);
-            app()->setLocale($locale);
-        } else {
-            $locale = config('app.fallback_locale', 'fr');
-            session(['locale' => $locale]);
-            app()->setLocale($locale);
-        }
+        $locale = $this->applyLocale($locale);
 
-        $advisor = User::where('advisor_code', $advisorCode)->first();
-
-        if (! $advisor) {
-            $advisor = User::where('role_id', 1)->orderBy('id')->first();
-        }
+        $advisor = User::where('advisor_code', $advisorCode)->first()
+            ?? User::where('role_id', UserRole::ADMIN)->orderBy('id')->first();
 
         abort_if(! $advisor, 404);
 
         session([
             'current_advisor_code' => $advisor->advisor_code,
-            'has_consented' => false,
+            'has_consented'        => false,
         ]);
 
         $advisorName  = $advisor->first_name . ' ' . $advisor->last_name;
@@ -55,18 +63,12 @@ class ConsentController extends Controller
     // --- 3. ACCEPTER LE CONSENTEMENT ---
     public function accept(Request $request, string $locale)
     {
-        if (in_array($locale, ['fr', 'en', 'ht', 'es'], true)) {
-            session(['locale' => $locale]);
-            app()->setLocale($locale);
-        }
-
+        $this->applyLocale($locale);
         session(['has_consented' => true]);
 
         $typeSlug = (string) $request->input('quote_type', '');
 
-        $exists = QuoteType::active()
-            ->where('slug', $typeSlug)
-            ->exists();
+        $exists = QuoteType::active()->where('slug', $typeSlug)->exists();
 
         if ($exists) {
             return redirect()->route('quote.chat', ['locale' => $locale, 'typeSlug' => $typeSlug]);

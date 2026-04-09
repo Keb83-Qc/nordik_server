@@ -118,9 +118,12 @@
                     {{ __('footer.rights_reserved') }}
                 </div>
                 <div class="col-md-6 text-center text-md-end">
-                    <a href="#"
+                    @php
+                        $locale = app()->getLocale();
+                    @endphp
+                    <a href="{{ route('legal.privacy', ['locale' => $locale]) }}"
                         class="text-decoration-none text-muted small me-3 hover-white">{{ __('footer.privacy') }}</a>
-                    <a href="#"
+                    <a href="{{ route('legal.terms', ['locale' => $locale]) }}"
                         class="text-decoration-none text-muted small hover-white">{{ __('footer.terms') }}</a>
                 </div>
             </div>

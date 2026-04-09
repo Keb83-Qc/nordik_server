@@ -85,6 +85,12 @@ return [
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
+    | Locales actives sur le site public — utilisées pour le routage, les
+    | hreflang, le sitemap et la validation des paramètres de langue.
+    */
+    'supported_locales' => ['fr', 'en', 'es', 'ht'],
+
+    /*
     |--------------------------------------------------------------------------
     | Encryption Key
     |--------------------------------------------------------------------------

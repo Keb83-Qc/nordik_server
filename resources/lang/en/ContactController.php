@@ -8,6 +8,7 @@ return [
 
     // Flash Messages
     'success_sent' => 'Your message has been sent successfully!',
+    'error_send'   => 'An error occurred while sending your message. Please try again or contact us directly.',
 
     // Default Subjects
     'subject_with_pricing' => 'Quote Request (With Pricing)',
