@@ -146,7 +146,7 @@
         }
 
         /* 3. Sur Ordinateur (Écrans larges > 992px) */
-        @media (min-width: 992px) {
+        @@media (min-width: 992px) {
             .footer-eagle {
                 /* État initial sur PC : Déjà grossi à 1.25 */
                 transform: scale(1.25);
