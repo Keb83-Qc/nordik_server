@@ -5290,6 +5290,10 @@
     retraiteRenderPersonTabs('retraite-rpd-tabs', 'retraite-rpd-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRpdTab');
     retraiteRenderPersonTabs('retraite-retraits-tabs', 'retraite-retraits-panel-', hasSpouse, cPrenom, jPrenom, 'switchRetraiteRetraitsTab');
 
+    // Calcul automatique des prestations RRQ/SV à partir des revenus saisis.
+    // Les entrées modifiées manuellement (userModified = true) sont préservées.
+    _retraiteApplyAutoRegPub();
+
     // Init render des nouvelles sections
     retraiteRenderRegPub('client');
     retraiteRenderRegPub('conjoint');
@@ -5633,36 +5637,134 @@
 
   // ── Régimes publics ───────────────────────────────────────────────────
 
+  // Constantes officielles 2025 (RRQ/QPP et SV/OAS)
+  const RETRAITE_REGPUB_CONST = {
+    MGA_2025:        71300,      // Maximum des gains admissibles RRQ 2025
+    RRQ_MAX_MENSUEL: 1433.00,    // Rente RRQ maximale mensuelle à 65 ans (2025)
+    SV_MENSUEL_65:   727.67,     // SV/OAS mensuel 65-74 ans (2025)
+    SV_MENSUEL_75:   800.44,     // SV/OAS mensuel 75+ ans (2025)
+  };
+
+  // Calcule les montants auto suggérés (RRQ + SV) pour un rôle donné.
+  // RRQ : proportionnel au revenu (25% ~= ratio revenu/MGA × rente max).
+  // SV  : montant fixe selon l'âge estimé à 65+ (727,67 $ par défaut).
+  function _retraiteComputeAutoRegPub(role) {
+    const revenuAnnuel = _retraiteGetRevenu(role) || 0;
+    const C = RETRAITE_REGPUB_CONST;
+    // Constantes : lues depuis ABF_PARAMS (group "rrq") si disponibles,
+    // sinon fallback sur les valeurs 2025 hardcodées.
+    const P = (window.ABF_PARAMS && window.ABF_PARAMS.rrq) || {};
+    const _num = (v, def) => {
+      const n = parseFloat(String(v ?? '').replace(/\s/g,'').replace(',','.'));
+      return Number.isFinite(n) && n > 0 ? n : def;
+    };
+    const mga     = _num(P.mga,          C.MGA_2025);
+    const rrqMax  = _num(P.rente_max_65, C.RRQ_MAX_MENSUEL);
+    const sv65    = _num(P.sv_mensuel_65,C.SV_MENSUEL_65);
+    // Âge de début SV de l'entrée courante — si 75+, on utilise le taux bonifié
+    const entries = _retraiteRegimesPublics[role] || [];
+    const svEntry = entries.find(x => x.id === 'sv');
+    const svAge   = parseInt(svEntry?.debut || 65);
+    const sv75    = _num(P.sv_mensuel_75,C.SV_MENSUEL_75);
+    const svMensuel = svAge >= 75 ? sv75 : sv65;
+    // RRQ : ratio revenu cotisable vs MGA × rente max 65 ans
+    const revenuCotisable = Math.min(revenuAnnuel, mga);
+    const rrqMensuel = revenuAnnuel > 0
+      ? Math.round((revenuCotisable / mga) * rrqMax * 100) / 100
+      : 0;
+    return { rrq: rrqMensuel, sv: svMensuel };
+  }
+
+  // Applique les montants auto aux entrées RRQ/SV qui n'ont PAS été modifiées
+  // manuellement par l'utilisateur. Met à jour le cache `_auto` sur chaque entrée.
+  function _retraiteApplyAutoRegPub() {
+    ['client','conjoint'].forEach(role => {
+      const list = _retraiteRegimesPublics[role] || [];
+      const auto = _retraiteComputeAutoRegPub(role);
+      list.forEach(entry => {
+        const autoVal = auto[entry.id];
+        if (typeof autoVal !== 'number') return;
+        entry._auto = autoVal;
+        if (!entry.userModified) {
+          entry.montant   = autoVal;
+          entry.frequence = 'mensuel';
+        }
+      });
+    });
+  }
+
+  // Bouton réinitialisation : remet le montant auto et efface le flag modifié
+  function resetRetraiteRegPub(role, idx) {
+    const entry = (_retraiteRegimesPublics[role] || [])[idx];
+    if (!entry) return;
+    if (typeof entry._auto !== 'number') {
+      const auto = _retraiteComputeAutoRegPub(role);
+      entry._auto = auto[entry.id] || 0;
+    }
+    entry.montant       = entry._auto;
+    entry.frequence     = 'mensuel';
+    entry.userModified  = false;
+    retraiteRenderRegPub(role);
+    retraiteCalc();
+  }
+
   function retraiteRenderRegPub(role) {
     const el = document.getElementById(`retraite-regpub-table-${role}`);
     if (!el) return;
+    // S'assurer qu'on a toujours un cache auto à jour pour affichage
+    _retraiteApplyAutoRegPub();
     const list = _retraiteRegimesPublics[role] || [];
     const inflation = (window.ABF_PARAMS?.hypotheses?.inflation ?? 2.10).toLocaleString('fr-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const FULL_LABELS = { rrq: 'Régime de rentes du Québec (RRQ)', sv: 'Sécurité de la vieillesse (SV)' };
+    const META = {
+      rrq: { full: 'Régime de rentes du Québec', short: 'RRQ', color: '#1e3a8a', bg: '#eef2ff' },
+      sv:  { full: 'Sécurité de la vieillesse',  short: 'SV',  color: '#b45309', bg: '#fef3c7' },
+    };
     el.innerHTML = `
       <table style="width:100%;border-collapse:collapse;font-size:13px">
         <thead>
-          <tr style="background:#f8f9fd;border-bottom:1px solid var(--border)">
-            <th style="text-align:left;padding:8px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Type</th>
-            <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Revenu</th>
-            <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Fréquence</th>
-            <th style="text-align:right;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Indexation</th>
-            <th style="text-align:left;padding:8px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Début</th>
-            <th style="padding:8px 12px 8px 4px;width:36px"></th>
+          <tr style="background:linear-gradient(180deg,#f8f9fd,#f2f4fa);border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:10px 16px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Programme</th>
+            <th style="text-align:right;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Revenu</th>
+            <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Fréquence</th>
+            <th style="text-align:right;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Indexation</th>
+            <th style="text-align:left;padding:10px 12px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em">Début</th>
+            <th style="padding:10px 12px 10px 4px;width:72px"></th>
           </tr>
         </thead>
         <tbody>
-          ${list.map((r, i) => `
-          <tr style="border-bottom:1px solid var(--border)">
-            <td style="padding:11px 16px;color:var(--text)">${FULL_LABELS[r.id] || r.label || r.id}</td>
-            <td style="padding:11px 12px;text-align:right;font-weight:600;color:var(--navy)">${r.montant > 0 ? fmtMoney(r.montant) + ' $' : '<span style="color:var(--muted);font-weight:400">0 $</span>'}</td>
-            <td style="padding:11px 12px;color:var(--muted)">${r.frequence === 'mensuel' ? 'Mensuelle' : 'Annuelle'}</td>
-            <td style="padding:11px 12px;text-align:right;color:var(--muted)">${r.indexe ? inflation + '\u00a0%' : '—'}</td>
-            <td style="padding:11px 12px;color:var(--muted)">${r.debut || '65'} ans</td>
-            <td style="padding:11px 4px 11px 4px">
-              <button onclick="openRetraiteRegPubModal('${role}',${i})" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:4px;display:flex;align-items:center">${iconEdit}</button>
-            </td>
-          </tr>`).join('')}
+          ${list.map((r, i) => {
+            const meta = META[r.id] || { full: r.label || r.id, short: '?', color: 'var(--muted)', bg: '#f1f5f9' };
+            const isModified = !!r.userModified;
+            const autoVal    = typeof r._auto === 'number' ? r._auto : 0;
+            const badge = isModified
+              ? `<span title="Valeur modifiée manuellement — auto: ${fmtMoney(autoVal)} $/mois" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;text-transform:uppercase;letter-spacing:.03em">✎ Modifié</span>`
+              : `<span title="Calculé automatiquement depuis le revenu" style="display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534;text-transform:uppercase;letter-spacing:.03em">⚡ Auto</span>`;
+            const resetBtn = isModified
+              ? `<button onclick="resetRetraiteRegPub('${role}',${i})" title="Réinitialiser à la valeur calculée (${fmtMoney(autoVal)} $/mois)" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:4px 6px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 10 9 10"/></svg></button>`
+              : '';
+            return `
+            <tr style="border-bottom:1px solid var(--border);${isModified ? 'background:#fffbeb' : ''}">
+              <td style="padding:12px 16px">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:50%;background:${meta.bg};color:${meta.color};font-size:11px;font-weight:800;letter-spacing:.02em;flex-shrink:0">${meta.short}</span>
+                  <div style="min-width:0">
+                    <div style="color:var(--text);font-weight:600;font-size:13px;line-height:1.2">${meta.full}</div>
+                    <div style="margin-top:3px">${badge}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="padding:12px 12px;text-align:right;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums">${r.montant > 0 ? fmtMoney(r.montant) + ' $' : '<span style="color:var(--muted);font-weight:400">—</span>'}</td>
+              <td style="padding:12px 12px;color:var(--muted);font-size:12px">${r.frequence === 'mensuel' ? 'Mensuelle' : 'Annuelle'}</td>
+              <td style="padding:12px 12px;text-align:right;color:var(--muted);font-size:12px">${r.indexe ? inflation + '\u00a0%' : '—'}</td>
+              <td style="padding:12px 12px;color:var(--muted);font-size:12px">${r.debut || '65'} ans</td>
+              <td style="padding:12px 10px 12px 4px">
+                <div style="display:flex;gap:4px;justify-content:flex-end">
+                  ${resetBtn}
+                  <button onclick="openRetraiteRegPubModal('${role}',${i})" title="Modifier" style="background:none;border:1px solid var(--border);border-radius:6px;cursor:pointer;color:var(--muted);padding:4px 6px;display:flex;align-items:center" onmouseover="this.style.color='var(--navy)';this.style.borderColor='var(--navy)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">${iconEdit}</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
   }
@@ -5684,6 +5786,18 @@
     const idx2 = r.indexe !== false ? 'oui' : 'non';
     const radEl = document.querySelector(`input[name="retraite-regpub-indexe"][value="${idx2}"]`);
     if (radEl) radEl.checked = true;
+    // Info "Auto" : montant suggéré + bouton réinitialiser dans le modal
+    const hintEl  = document.getElementById('retraite-regpub-auto-hint');
+    const resetEl = document.getElementById('retraite-regpub-reset-btn');
+    const autoVal = typeof r._auto === 'number' ? r._auto : 0;
+    if (hintEl) {
+      hintEl.innerHTML = `Valeur calculée automatiquement : <strong>${fmtMoney(autoVal)} $/mois</strong>`
+        + (r.userModified ? ' <span style="color:#b45309;font-weight:600">(actuellement modifiée)</span>' : ' <span style="color:#166534;font-weight:600">(actuellement utilisée)</span>');
+    }
+    if (resetEl) {
+      resetEl.style.display = r.userModified ? '' : 'none';
+      resetEl.onclick = () => { resetRetraiteRegPub(role, idx); closeRetraiteRegPubModal(); };
+    }
     document.getElementById('modal-retraite-regpub').style.display = 'flex';
   }
 
@@ -5701,7 +5815,12 @@
     if (!_retraiteRegimesPublics[role]) return;
     const existing = _retraiteRegimesPublics[role][idx];
     if (!existing) return;
-    _retraiteRegimesPublics[role][idx] = { ...existing, montant, frequence: freq, debut, indexe };
+    // Compare avec la valeur auto normalisée en mensuel pour décider si
+    // l'utilisateur a vraiment modifié la valeur ou non.
+    const autoMonthly = typeof existing._auto === 'number' ? existing._auto : 0;
+    const montantMonthly = freq === 'mensuel' ? montant : montant / 12;
+    const userModified = Math.abs(montantMonthly - autoMonthly) > 0.5;
+    _retraiteRegimesPublics[role][idx] = { ...existing, montant, frequence: freq, debut, indexe, userModified };
     retraiteRenderRegPub(role);
     closeRetraiteRegPubModal();
     retraiteCalc();
