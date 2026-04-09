@@ -33,6 +33,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // ── Multi-domaine : asset() / url() / route() utilisent le domaine réel de la requête ──
+        // Le serveur a APP_URL=vipgpi.ca, mais le site répond aussi sur vipgpi.net et vipgpi.com.
+        // Sans ce fix, asset('assets/css/fonts.css') génère https://vipgpi.ca/... sur TOUS les domaines,
+        // ce qui provoque des erreurs CORS quand les polices sont demandées depuis vipgpi.net.
+        if (! $this->app->runningInConsole()) {
+            $requestRoot = $this->app['request']->getSchemeAndHttpHost();
+            URL::forceRootUrl($requestRoot);
+        }
+
         // Force HTTPS en production pour que les URLs générées soient sécurisées
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
