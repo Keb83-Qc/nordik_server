@@ -24,7 +24,6 @@ use App\Http\Controllers\AbfEditorController;
 use App\Http\Controllers\TwoFactorController;
 use App\Http\Controllers\ServicePublicController;
 use App\Models\Language;
-use App\Http\Controllers\AccessRequestController;
 use App\Http\Controllers\IntakeController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -161,57 +160,23 @@ Route::get('/switch-language/{locale}', function (Request $request, string $loca
     ->name('switch.language');
 
 /**
- * 3) LEGACY: anciens liens sans locale → 301 vers version localisée
- *    IMPORTANT: destination doit être une string, donc on passe par Route::get + redirect()
+ * 3) LEGACY: anciens liens sans locale → redirigés automatiquement
+ *    par le middleware `redirect-to-locale` (voir app/Http/Middleware/RedirectToLocale.php).
+ *    Plus besoin de routes hardcodées ici.
  */
-Route::middleware('set-locale')->group(function () {
-    // pages simples
-    // Route::get('/home', fn() => redirect('/' . app()->getLocale() . '/home', 301));
-    Route::get('/about', fn() => redirect('/' . app()->getLocale() . '/about', 301));
-    Route::get('/management', fn() => redirect('/' . app()->getLocale() . '/management', 301));
-    Route::get('/equipe', fn() => redirect('/' . app()->getLocale() . '/equipe', 301));
-    Route::get('/evenements', fn() => redirect('/' . app()->getLocale() . '/evenements', 301));
-    Route::get('/blog', fn() => redirect('/' . app()->getLocale() . '/blog', 301));
-    Route::get('/contact', fn() => redirect('/' . app()->getLocale() . '/contact', 301));
-    Route::get('/login', fn() => redirect('/' . app()->getLocale() . '/login', 301));
-    Route::get('/partenaires', fn() => redirect('/' . app()->getLocale() . '/partenaires', 301));
-    Route::get('/carrieres', fn() => redirect('/' . app()->getLocale() . '/carrieres', 301));
-    Route::get('/construction', fn() => redirect('/' . app()->getLocale() . '/construction', 301));
-
-    // dynamiques legacy
-    Route::get(
-        '/conseiller/{slug}',
-        fn($slug) => redirect('/' . app()->getLocale() . "/conseiller/{$slug}", 301),
-    );
-    Route::get('/article/{slug}', function (string $slug) {
-        $locale = session('locale') ?? (\App\Models\Language::defaultCode() ?? 'fr');
-        return redirect("/{$locale}/article/{$slug}", 301);
-    });
-
-    Route::get(
-        '/consentement/{code?}',
-        fn($code = null) => redirect(
-            '/' . app()->getLocale() . '/consentement/' . ($code ?? ''),
-            301,
-        ),
-    );
-});
 
 /**
- * 4) SITE LOCALISÉ: TOUTES les pages vivent ici et “fonctionnent pareil”
+ * 4) SITE LOCALISÉ: TOUTES les pages vivent ici et "fonctionnent pareil"
  */
 Route::prefix('{locale}')
     ->where(['locale' => '[a-zA-Z]{2,5}'])
     ->middleware(['set-locale'])
     ->group(function () {
-        Route::get('/espace-conseiller', fn(string $locale) => redirect('/espace-conseiller', 302));
-        Route::get('/admin', fn(string $locale) => redirect('/espace-conseiller', 302));
-        Route::get('/conseiller', fn(string $locale) => redirect('/espace-conseiller', 302));
-        Route::get('/abf', fn(string $locale) => redirect('/abf', 302));
-
-        Route::get('/admin', fn() => redirect('/espace-conseiller'));
-        Route::get('/conseiller', fn() => redirect('/espace-conseiller'));
-        Route::get('/abf', fn() => redirect('/abf'));
+        // Raccourcis vers l'espace privé (toujours hors locale)
+        Route::get('/espace-conseiller', fn() => redirect('/espace-conseiller', 302));
+        Route::get('/admin',             fn() => redirect('/espace-conseiller', 302));
+        Route::get('/conseiller',        fn() => redirect('/espace-conseiller', 302));
+        Route::get('/abf',               fn() => redirect('/abf', 302));
 
         Route::get('/demande-acces', function (string $locale) {
             return redirect()->route('login', [

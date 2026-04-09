@@ -20,9 +20,16 @@ return Application::configure(basePath: dirname(__DIR__))
         );
 
         $middleware->alias([
-            'set-locale' => \App\Http\Middleware\SetLocale::class,
-             'setlocale'  => \App\Http\Middleware\SetLocale::class,
-            '2fa'        => \App\Http\Middleware\TwoFactorAuth::class,
+            'set-locale'         => \App\Http\Middleware\SetLocale::class,
+            'setlocale'          => \App\Http\Middleware\SetLocale::class,
+            '2fa'                => \App\Http\Middleware\TwoFactorAuth::class,
+            'redirect-to-locale' => \App\Http\Middleware\RedirectToLocale::class,
+        ]);
+
+        // S'exécute AVANT le routing : redirige les URLs sans préfixe locale
+        // vers leur équivalent /{locale}/... (remplace ~30 routes legacy hardcodées).
+        $middleware->web(prepend: [
+            \App\Http\Middleware\RedirectToLocale::class,
         ]);
 
         // Applique les headers de sécurité + cache sur toutes les requêtes web
