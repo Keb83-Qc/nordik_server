@@ -8,7 +8,7 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"> -->
-    <link rel="stylesheet" href="{{ asset('assets/css/fonts.css') }}">
+    <link rel="stylesheet" href="assets/css/fonts.css">
 
     <style>
         :root {
@@ -62,7 +62,7 @@
             position: fixed;
             inset: 0;
             z-index: -7;
-            background-image:url("{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}");
+            background-image: url("assets/img/VIP_Logo_Gold_Gradient10.png");
             background-repeat: no-repeat;
             background-position: center;
             background-size: 56%;
@@ -674,14 +674,14 @@
 <body class="d-flex justify-content-center align-items-center">
 
     @php
-    $next = '/home';
+        $next = '/home';
 
-    $links = [
-    'fr' => url("/switch-language/fr?next={$next}"),
-    'en' => url("/switch-language/en?next={$next}"),
-    'ht' => url("/switch-language/ht?next={$next}"),
-    'es' => url("/switch-language/es?next={$next}"),
-    ];
+        $links = [
+            'fr' => url("/switch-language/fr?next={$next}"),
+            'en' => url("/switch-language/en?next={$next}"),
+            'ht' => url("/switch-language/ht?next={$next}"),
+            'es' => url("/switch-language/es?next={$next}"),
+        ];
     @endphp
 
     <div class="bg-wrap"></div>

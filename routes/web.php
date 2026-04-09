@@ -103,6 +103,28 @@ Route::post('/log-js-error', function (Request $request) {
 })->middleware('throttle:10,1')->name('log-js-error');
 
 /**
+ * Récepteur Web Vitals (LCP / CLS / INP / FCP / TTFB)
+ * CSRF + rate-limit pour limiter l'abus.
+ */
+Route::post('/log-web-vitals', function (Request $request) {
+    $metric = Str::limit((string) $request->input('metric', 'unknown'), 24);
+    $value = (float) $request->input('value', 0);
+    $rating = Str::limit((string) $request->input('rating', 'unknown'), 16);
+
+    SystemLog::record('info', "[WebVital] {$metric}", [
+        'metric' => $metric,
+        'value' => $value,
+        'rating' => $rating,
+        'delta' => (float) $request->input('delta', 0),
+        'id' => Str::limit((string) $request->input('id', ''), 120),
+        'nav_type' => Str::limit((string) $request->input('navigationType', ''), 40),
+        'url' => Str::limit((string) $request->input('url', ''), 300),
+    ]);
+
+    return response()->json(['ok' => true]);
+})->middleware('throttle:30,1')->name('log-web-vitals');
+
+/**
  * 1) Redirige / vers /{locale} (locale déterminée par middleware/service)
  *    NB: ici on met une route simple qui appelle une route localisée.
  */
