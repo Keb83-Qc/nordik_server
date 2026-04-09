@@ -27,7 +27,7 @@ class AccessRequestController extends Controller
             "Nouvelle demande d'accès:\n\nNom: {$request->name}\nEmail: {$request->email}\nTéléphone: {$request->phone}",
             function ($message) {
                 $message->to(app(EmailSettings::class)->security_access_request_to)
-                    ->subject(‘Nouvelle demande d\’accès’);
+                    ->subject("Nouvelle demande d’accès");
             }
         );
 
