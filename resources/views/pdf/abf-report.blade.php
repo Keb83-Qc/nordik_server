@@ -87,8 +87,19 @@
             /* A4 */
         }
 
+        .cover-photo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 210mm;
+            height: 297mm;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
         .cover-bg {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
@@ -273,6 +284,9 @@
 
 <body>
     @php
+    $sections = (array) ($sections ?? []);
+    $sec = fn($k, $def = true) => (bool) ($sections[$k] ?? $def);
+
     $payload = (array) ($case->payload ?? []);
     $client = (array) data_get($payload, 'client', []);
     $spouse = (array) data_get($payload, 'spouse', []);
@@ -407,7 +421,10 @@
      COVER (PAGE 1)
      ====================== --}}
     <div class="cover">
-        <div class="cover-bg"></div>
+        @if($coverPhoto ?? null)
+        <img class="cover-photo" src="{{ $coverPhoto }}" alt="">
+        @endif
+        <div class="cover-bg" style="{{ ($coverPhoto ?? null) ? 'background:rgba(14,16,48,.72)' : '' }}"></div>
         <div class="cover-inner">
             @if($logo)
             <img class="cover-logo" src="{{ $logo }}" alt="Logo VIP">
@@ -880,6 +897,7 @@
 
     <div class="page-break"></div>
 
+    @if($sec('lifeInsurance') || $sec('disability') || $sec('seriousIllness'))
     {{-- ======================
      ASSURANCES
      ====================== --}}
@@ -972,7 +990,9 @@
     </table>
     @endif
     @endforeach
+    @endif {{-- /sec lifeInsurance|disability|seriousIllness --}}
 
+    @if($sec('lifeInsurance'))
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1017,7 +1037,9 @@
     <p class="small muted" style="margin-top:6mm;">
         * Les résultats ci-dessus sont calculés à partir des hypothèses et des informations fournies. Ils doivent être validés et ajustés selon la situation réelle.
     </p>
+    @endif {{-- /sec lifeInsurance --}}
 
+    @if($sec('dashboard'))
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1066,7 +1088,9 @@
     @else
     <p class="muted">Le questionnaire du profil d'investisseur n'a pas encore été complété.</p>
     @endif
+    @endif {{-- /sec dashboard --}}
 
+    @if($sec('recommendations'))
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1086,7 +1110,9 @@
         Cette analyse est basée sur les informations fournies par le client et sur les hypothèses retenues à la date du rapport.
         Les recommandations ne constituent pas une garantie de rendement ni de résultat futur.
     </p>
+    @endif {{-- /sec recommendations --}}
 
+    @if($sec('deliveryConfirmation', false))
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1118,6 +1144,149 @@
             @endif
         </tbody>
     </table>
+    @endif {{-- /sec deliveryConfirmation --}}
+
+    @php
+    $retData         = (array) data_get($payload, 'retraite', []);
+    $regPubClient    = (array) data_get($retData, 'regimesPublics.client', []);
+    $regPubConjoint  = (array) data_get($retData, 'regimesPublics.conjoint', []);
+    $rpdList         = (array) data_get($retData, 'rpd', []);
+    $retraitsList    = (array) data_get($retData, 'retraits', []);
+    $retAgeClient    = (int) ($retData['ageClient'] ?? 65);
+    $retAgeConjoint  = (int) ($retData['ageConjoint'] ?? 65);
+
+    $fmtFreq = fn($f) => match($f) {
+        'mensuel'   => '/mois',
+        'annuel'    => '/an',
+        'bimensuel' => '/2 sem.',
+        default     => '',
+    };
+    $toAnnual = function($montant, $freq) {
+        return match($freq ?? 'mensuel') {
+            'mensuel'   => (float)$montant * 12,
+            'bimensuel' => (float)$montant * 26,
+            default     => (float)$montant,
+        };
+    };
+    @endphp
+
+    @if($sec('annex', false) && $sec('retirementIncome', false))
+    <div class="page-break"></div>
+
+    {{-- ======================
+     ANNEXE : REVENUS DE RETRAITE
+     ====================== --}}
+    <h1>Annexe — Revenus de retraite</h1>
+    <p class="muted small">Estimations basées sur les informations fournies. Les montants des régimes publics sont indexés.</p>
+
+    @foreach([['role'=>'client','label'=>$clientName,'age'=>$retAgeClient,'pub'=>$regPubClient],
+              ($hasSpouse ? ['role'=>'conjoint','label'=>$spouseName,'age'=>$retAgeConjoint,'pub'=>$regPubConjoint] : null)] as $_block)
+    @if($_block === null) @continue @endif
+    <h2>{{ $_block['label'] }} — retraite à {{ $_block['age'] }} ans</h2>
+    <table class="simple">
+        <thead>
+            <tr>
+                <th>Source de revenu</th>
+                <th style="width:20%;">Montant</th>
+                <th style="width:18%;">Fréquence</th>
+                <th style="width:20%;">Âge de début</th>
+                <th style="width:20%;">Annuel estimé</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($_block['pub'] as $_r)
+            <tr>
+                <td>{{ $_r['label'] ?? $_r['id'] ?? '—' }}</td>
+                <td>{{ $money($_r['montant'] ?? 0) }}</td>
+                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
+                <td>{{ $_r['debut'] ?? 65 }} ans</td>
+                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+            </tr>
+            @endforeach
+            @foreach($rpdList as $_r)
+            @if(($_r['role'] ?? '') === $_block['role'])
+            <tr>
+                <td>{{ $_r['nom'] ?? 'Régime privé' }}</td>
+                <td>{{ $money($_r['montant'] ?? 0) }}</td>
+                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
+                <td>{{ $_r['debut'] ?? '—' }} ans</td>
+                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @foreach($retraitsList as $_r)
+            @if(($_r['role'] ?? '') === $_block['role'])
+            <tr>
+                <td>{{ $_r['desc'] ?? $_r['type'] ?? 'Retrait' }}</td>
+                <td>{{ $money($_r['montant'] ?? 0) }}</td>
+                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
+                <td>{{ $_r['debut'] ?? '—' }}</td>
+                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+            </tr>
+            @endif
+            @endforeach
+            @php
+            $totalAnnuel = collect($_block['pub'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
+                + collect($rpdList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
+                + collect($retraitsList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'));
+            @endphp
+            <tr class="grand-total">
+                <td colspan="4">Total annuel estimé</td>
+                <td>{{ $money($totalAnnuel) }}</td>
+            </tr>
+        </tbody>
+    </table>
+    @endforeach
+    @endif {{-- /sec retirementIncome --}}
+
+    @if($sec('annex', false) && $sec('investmentProjection', false))
+    @php
+    $currentAge   = $age($client['birth_date'] ?? null) ?? 40;
+    $targetAge    = $retAgeClient ?: 65;
+    $years        = max(1, $targetAge - $currentAge);
+    $currentValue = $assetTotal;
+    $annualSavings= (float) data_get($client, 'jobs.0.annual_income', 0) * 0.10; // 10% savings assumption
+    $rate         = (float) (data_get($payload, 'hypotheses.return_rate', 5) ?: 5) / 100;
+    $projRows     = [];
+    $v = $currentValue;
+    for ($y = 1; $y <= min($years, 40); $y++) {
+        $v = ($v + $annualSavings) * (1 + $rate);
+        if ($y % 5 === 0 || $y === 1 || $y === $years) {
+            $projRows[] = ['age' => $currentAge + $y, 'an' => $y, 'valeur' => $v];
+        }
+    }
+    @endphp
+    <div class="page-break"></div>
+
+    {{-- ======================
+     ANNEXE : ÉVOLUTION DES PLACEMENTS
+     ====================== --}}
+    <h1>Annexe — Évolution des placements</h1>
+    <p class="muted small">
+        Projection basée sur une valeur initiale de {{ $money($currentValue) }},
+        des cotisations annuelles estimées de {{ $money($annualSavings) }}
+        et un taux de rendement hypothétique de {{ number_format($rate * 100, 1) }}% par année.
+        Ces projections sont indicatives et ne constituent pas une garantie.
+    </p>
+    <table class="simple">
+        <thead>
+            <tr>
+                <th style="width:20%;">Âge</th>
+                <th style="width:20%;">Années</th>
+                <th>Valeur projetée</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($projRows as $_row)
+            <tr @if($_row['age'] >= $targetAge) class="total-row" @endif>
+                <td>{{ $_row['age'] }} ans</td>
+                <td>{{ $_row['an'] }} an{{ $_row['an'] > 1 ? 's' : '' }}</td>
+                <td>{{ $money($_row['valeur']) }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @endif {{-- /sec investmentProjection --}}
 
 </body>
 

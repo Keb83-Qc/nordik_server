@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Models\AbfParameter;
 use Filament\Forms;
 use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -658,7 +659,63 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                     ]),
                             ]),
 
-                        // ── Tab 7: Formulaire client ───────────────────────────
+                        // ── Tab 7: Photos de couverture ────────────────────────
+                        Tabs\Tab::make('Photos de couverture')
+                            ->icon('heroicon-o-photo')
+                            ->schema([
+                                Section::make('Gestion des photos de couverture ABF')
+                                    ->description('Téléversez une image JPEG/PNG pour chaque type de couverture. Résolution recommandée : 900×1200 px minimum. La photo sélectionnée sera intégrée dans le PDF en pleine page.')
+                                    ->schema([
+                                        \Filament\Forms\Components\Grid::make(3)->schema([
+
+                                            // ── Neutre
+                                            Section::make('Neutre 1')->schema([
+                                                FileUpload::make('cover_neutre_1')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-neutre-1.jpg'),
+                                            ]),
+                                            Section::make('Neutre 2')->schema([
+                                                FileUpload::make('cover_neutre_2')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-neutre-2.jpg'),
+                                            ]),
+                                            Section::make('Neutre 3')->schema([
+                                                FileUpload::make('cover_neutre_3')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-neutre-3.jpg'),
+                                            ]),
+
+                                            // ── Couple avec enfants
+                                            Section::make('Couple avec enfants 1')->schema([
+                                                FileUpload::make('cover_couple_enfants_1')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-couple-enfants-1.jpg'),
+                                            ]),
+                                            Section::make('Couple avec enfants 2')->schema([
+                                                FileUpload::make('cover_couple_enfants_2')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-couple-enfants-2.jpg'),
+                                            ]),
+
+                                            // ── Couple sans enfants
+                                            Section::make('Couple sans enfants 1')->schema([
+                                                FileUpload::make('cover_couple_sans_enfants_1')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-couple-sans-enfants-1.jpg'),
+                                            ]),
+                                            Section::make('Couple sans enfants 2')->schema([
+                                                FileUpload::make('cover_couple_sans_enfants_2')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-couple-sans-enfants-2.jpg'),
+                                            ]),
+
+                                            // ── Homme seul
+                                            Section::make('Homme seul 1')->schema([
+                                                FileUpload::make('cover_homme_1')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-homme-1.jpg'),
+                                            ]),
+                                            Section::make('Homme seul 2')->schema([
+                                                FileUpload::make('cover_homme_2')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-homme-2.jpg'),
+                                            ]),
+
+                                            // ── Femme seule
+                                            Section::make('Femme seule 1')->schema([
+                                                FileUpload::make('cover_femme_1')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-femme-1.jpg'),
+                                            ]),
+                                            Section::make('Femme seule 2')->schema([
+                                                FileUpload::make('cover_femme_2')->label('')->disk('abf_covers')->acceptedFileTypes(['image/jpeg','image/png','image/webp'])->image()->imagePreviewHeight('100')->maxSize(4096)->getUploadedFileNameForStorageUsing(fn() => 'couv-femme-2.jpg'),
+                                            ]),
+
+                                        ]),
+                                    ]),
+                            ]),
+
+                        // ── Tab 8: Formulaire client ───────────────────────────
                         Tabs\Tab::make('Formulaire client')
                             ->icon('heroicon-o-clipboard-document-list')
                             ->schema([

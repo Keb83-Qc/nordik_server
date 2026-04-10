@@ -1355,6 +1355,23 @@
   // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => renderObjectives());
 
+  /* ── CELIAPP : masquer si prêt hypothécaire présent ─────────── */
+  function updateCeliappVisibility() {
+    const hasMortgage = [...document.querySelectorAll('#passifs-list [data-aptype]')]
+      .some(el => el.dataset.aptype === 'Prêt hypothécaire');
+    const row = document.getElementById('tr-celiapp-row');
+    if (row) row.style.display = hasMortgage ? 'none' : '';
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const passifsList = document.getElementById('passifs-list');
+    if (passifsList) {
+      new MutationObserver(updateCeliappVisibility)
+        .observe(passifsList, { childList: true, subtree: false });
+    }
+    updateCeliappVisibility();
+  });
+
   /* ── REVENU ET ÉPARGNE ───────────────────────────────── */
 
   let reTabMode = 'annuel'; // 'annuel' | 'mensuel'
@@ -4736,6 +4753,7 @@
       if (typeof decesCalc === 'function') decesCalc();
       if (typeof invaliditeCalc === 'function') invaliditeCalc();
       if (typeof updateEpargneSection === 'function') updateEpargneSection();
+      if (typeof updateCeliappVisibility === 'function') updateCeliappVisibility();
     }, 100);
   }
 

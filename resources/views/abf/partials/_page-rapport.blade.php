@@ -151,17 +151,22 @@
               ['file'=>'couv-femme-1.jpg',               'categorie'=>'Femme seule'],
               ['file'=>'couv-femme-2.jpg',               'categorie'=>'Femme seule'],
             ] as $idx => $photo)
+            @php $photoExists = file_exists(public_path('assets/img/abf-covers/' . $photo['file'])); @endphp
             <div
               class="rapport-photo-item"
               data-categorie="{{ $photo['categorie'] }}"
               data-file="{{ $photo['file'] }}"
               onclick="rapportSelectPhoto(this)"
               style="position:relative;cursor:pointer;border-radius:8px;overflow:hidden;border:2px solid var(--border);aspect-ratio:4/3;background:#f0f3fa;display:flex;align-items:center;justify-content:center;transition:border-color .15s">
-              <!-- Placeholder: remplacer par <img> quand les photos existent -->
-              <div style="text-align:center;padding:8px;opacity:.4">
-                <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--navy)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                <div style="font-size:9px;color:var(--muted);margin-top:4px">{{ $photo['categorie'] }}</div>
-              </div>
+              @if($photoExists)
+                <img src="{{ asset('assets/img/abf-covers/' . $photo['file']) }}" alt="{{ $photo['categorie'] }}"
+                  style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" loading="lazy">
+              @else
+                <div style="text-align:center;padding:8px;opacity:.4">
+                  <svg viewBox="0 0 24 24" width="24" height="24" fill="var(--navy)"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                  <div style="font-size:9px;color:var(--muted);margin-top:4px">{{ $photo['categorie'] }}</div>
+                </div>
+              @endif
               <!-- Overlay "sélectionné" -->
               <div class="rapport-photo-check" style="display:none;position:absolute;inset:0;background:rgba(14,16,48,.5);align-items:center;justify-content:center">
                 <svg viewBox="0 0 24 24" width="28" height="28" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>

@@ -21,9 +21,18 @@ class AbfPdfController extends Controller
             $last     = data_get($abfCase->payload, 'client.last_name', '');
             $filename = 'abf-' . Str::slug(trim($first . ' ' . $last)) . '-' . $abfCase->id . '.pdf';
 
+            $sections   = (array) data_get($abfCase->payload, 'rapport.sections', []);
+            $photoFile  = data_get($abfCase->payload, 'rapport.photo');
+            $photoPath  = $photoFile ? public_path('assets/img/abf-covers/' . basename((string) $photoFile)) : null;
+            $coverPhoto = ($photoPath && file_exists($photoPath))
+                ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($photoPath))
+                : null;
+
             $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.abf-report', [
-                'case'    => $abfCase,
-                'results' => $results,
+                'case'       => $abfCase,
+                'results'    => $results,
+                'sections'   => $sections,
+                'coverPhoto' => $coverPhoto,
             ]);
 
             Log::channel('daily')->info('ABF PDF généré', [

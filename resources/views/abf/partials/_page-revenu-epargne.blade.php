@@ -211,7 +211,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            <tr>
+                            <tr id="tr-celiapp-row">
                                 <td>Droits CELIAPP inutilisés</td>
                                 <td>
                                     <div class="dc-input-cell">

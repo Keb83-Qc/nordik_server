@@ -47,6 +47,14 @@ return [
             'report' => false,
         ],
 
+        'abf_covers' => [
+            'driver'     => 'local',
+            'root'       => public_path('assets/img/abf-covers'),
+            'url'        => rtrim(env('APP_URL', 'http://localhost'), '/').'/assets/img/abf-covers',
+            'visibility' => 'public',
+            'throw'      => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

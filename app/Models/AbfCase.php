@@ -54,6 +54,11 @@ class AbfCase extends Model
 
     public function resolveRouteBinding($value, $field = null): ?self
     {
+        // ID numérique brut (ex: depuis ABF_PDF_URL)
+        if (ctype_digit((string) $value)) {
+            return static::findOrFail((int) $value);
+        }
+
         // Format "nouveau-{id}" → résolution par ID
         if (preg_match('/^nouveau-(\d+)$/', $value, $m)) {
             return static::where('id', $m[1])->firstOrFail();
