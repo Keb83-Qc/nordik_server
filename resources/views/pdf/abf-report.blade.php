@@ -1343,11 +1343,14 @@
     <h1>Confirmation de remise</h1>
     <p style="margin-bottom:6mm;">Je, soussigné(e), confirme avoir reçu et pris connaissance du document « Votre portrait financier » préparé par <strong>VIP Gestion de patrimoine et investissements inc.</strong> en date du {{ $docDate }}, ainsi que des hypothèses et des informations qui y sont contenues.</p>
 
-    @foreach(array_filter([
-        ['name' => $clientName, 'show' => true],
-        ['name' => $spouseName, 'show' => $hasSpouse],
-        ['name' => $advisorName ?? '', 'show' => !empty($advisorName ?? ''), 'role' => 'Conseiller'],
-    ], fn($r) => $r['show']) as $sig)
+    @php
+    $signataires = array_values(array_filter([
+        ['name' => $clientName,          'show' => true,                          'role' => ''],
+        ['name' => $spouseName,          'show' => $hasSpouse,                    'role' => ''],
+        ['name' => $advisorName ?? '',   'show' => !empty($advisorName ?? ''),    'role' => 'Conseiller'],
+    ], fn($r) => $r['show']));
+    @endphp
+    @foreach($signataires as $sig)
     <table class="simple" style="margin-bottom:8mm;">
         <tbody>
             <tr>
@@ -1403,8 +1406,13 @@
     <h1>Annexe — Revenus de retraite</h1>
     <p class="muted small">Estimations basées sur les informations fournies. Les montants des régimes publics sont indexés.</p>
 
-    @foreach([['role'=>'client','label'=>$clientName,'age'=>$retAgeClient,'pub'=>$regPubClient],
-              ($hasSpouse ? ['role'=>'conjoint','label'=>$spouseName,'age'=>$retAgeConjoint,'pub'=>$regPubConjoint] : null)] as $_block)
+    @php
+    $retireBlocks = array_filter([
+        ['role' => 'client',  'label' => $clientName,  'age' => $retAgeClient,  'pub' => $regPubClient],
+        $hasSpouse ? ['role' => 'conjoint', 'label' => $spouseName, 'age' => $retAgeConjoint, 'pub' => $regPubConjoint] : null,
+    ]);
+    @endphp
+    @foreach($retireBlocks as $_block)
     @if($_block === null) @continue @endif
     <h2>{{ $_block['label'] }} — retraite à {{ $_block['age'] }} ans</h2>
     <table class="simple">
