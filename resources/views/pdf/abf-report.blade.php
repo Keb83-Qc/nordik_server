@@ -578,6 +578,17 @@
     ];
 
     $prot = (array) data_get($payload, 'protections_details', []);
+
+    // Pre-computed section flags (Blade cannot parse single quotes inside directives)
+    $ownersList        = ['client', 'spouse', 'joint'];
+    $showAssurances    = $sec('lifeInsurance') || $sec('disability') || $sec('seriousIllness');
+    $showDeathBudget   = $sec('lifeInsurance');
+    $showDashboard     = $sec('dashboard');
+    $showReco          = $sec('recommendations');
+    $hasAdvisorNotes   = !blank(data_get($payload, 'advisor_notes'));
+    $showDelivery      = $sec('deliveryConfirmation', false);
+    $showRetIncome     = $sec('annex', false) && $sec('retirementIncome', false);
+    $showInvProjection = $sec('annex', false) && $sec('investmentProjection', false);
     @endphp
 
     {{-- ======================
@@ -939,7 +950,7 @@
 
     @php $byOwner = collect($assets)->groupBy(fn($a) => $a['owner'] ?? 'client'); @endphp
 
-    @foreach(['client','spouse','joint'] as $owner)
+    @foreach($ownersList as $owner)
     @php
     if ($owner === 'spouse' && ! $hasSpouse) continue;
     $rows = (array) ($byOwner[$owner] ?? []);
@@ -986,7 +997,7 @@
 
     @php $liabsByOwner = collect($liabs)->groupBy(fn($l) => $l['owner'] ?? 'client'); @endphp
 
-    @foreach(['client','spouse','joint'] as $owner)
+    @foreach($ownersList as $owner)
     @php
     if ($owner === 'spouse' && ! $hasSpouse) continue;
     $rows = (array) ($liabsByOwner[$owner] ?? []);
@@ -1087,7 +1098,7 @@
 
     <div class="page-break"></div>
 
-    @if($sec('lifeInsurance') || $sec('disability') || $sec('seriousIllness'))
+    @if($showAssurances)
     {{-- ======================
      ASSURANCES
      ====================== --}}
@@ -1182,7 +1193,7 @@
     @endforeach
     @endif {{-- /sec lifeInsurance|disability|seriousIllness --}}
 
-    @if($sec('lifeInsurance'))
+    @if($showDeathBudget)
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1252,7 +1263,7 @@
     </div>
     @endif {{-- /sec lifeInsurance --}}
 
-    @if($sec('dashboard'))
+    @if($showDashboard)
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1291,7 +1302,8 @@
     $currentSection = null;
     @endphp
     @foreach($ipQuestions as $key => $q)
-    @if($q['section'] !== $currentSection)
+    @php $sectionChanged = $q['section'] !== $currentSection; @endphp
+    @if($sectionChanged)
     @php $currentSection = $q['section']; @endphp
     <h2>{{ $currentSection }}</h2>
     @endif
@@ -1314,7 +1326,7 @@
     @endif
     @endif {{-- /sec dashboard --}}
 
-    @if($sec('recommendations'))
+    @if($showReco)
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1322,7 +1334,7 @@
      ====================== --}}
     <h1>Notes / recommandations</h1>
 
-    @if(!blank(data_get($payload,'advisor_notes')))
+    @if($hasAdvisorNotes)
     <h2>Notes du conseiller</h2>
     <p>{!! nl2br(e((string) data_get($payload,'advisor_notes'))) !!}</p>
     @else
@@ -1334,7 +1346,7 @@
     </div>
     @endif {{-- /sec recommendations --}}
 
-    @if($sec('deliveryConfirmation', false))
+    @if($showDelivery)
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1397,7 +1409,7 @@
     };
     @endphp
 
-    @if($sec('annex', false) && $sec('retirementIncome', false))
+    @if($showRetIncome)
     <div class="page-break"></div>
 
     {{-- ======================
@@ -1436,7 +1448,8 @@
             </tr>
             @endforeach
             @foreach($rpdList as $_r)
-            @if(($_r['role'] ?? '') === $_block['role'])
+            @php $rpdMatch = ($_r['role'] ?? '') === $_block['role']; @endphp
+            @if($rpdMatch)
             <tr>
                 <td>{{ $_r['nom'] ?? 'Régime privé' }}</td>
                 <td>{{ $money($_r['montant'] ?? 0) }}</td>
@@ -1447,7 +1460,8 @@
             @endif
             @endforeach
             @foreach($retraitsList as $_r)
-            @if(($_r['role'] ?? '') === $_block['role'])
+            @php $retraitMatch = ($_r['role'] ?? '') === $_block['role']; @endphp
+            @if($retraitMatch)
             <tr>
                 <td>{{ $_r['desc'] ?? $_r['type'] ?? 'Retrait' }}</td>
                 <td>{{ $money($_r['montant'] ?? 0) }}</td>
@@ -1471,7 +1485,7 @@
     @endforeach
     @endif {{-- /sec retirementIncome --}}
 
-    @if($sec('annex', false) && $sec('investmentProjection', false))
+    @if($showInvProjection)
     @php
     $currentAge   = $age($client['birth_date'] ?? null) ?? 40;
     $targetAge    = $retAgeClient ?: 65;
