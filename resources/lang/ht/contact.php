@@ -13,5 +13,6 @@ return [
     'coordinates_title' => 'Kote nou ye ak Nimewo nou',
     'address_label' => 'Adrès',
     'address_text' => '2990 av. Pierre-Péladeau, suite 400,<br>Laval, QC H7T 3B3',
-    'email_label' => 'Imèl',
+    'email_label' => 'Email',
+    'map_title'   => 'Kote VIP GPI — 2990 av. Pierre-Péladeau, Laval',
 ];

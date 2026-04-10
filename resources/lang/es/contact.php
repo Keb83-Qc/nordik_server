@@ -13,5 +13,6 @@ return [
     'coordinates_title' => 'Nuestra Información de Contacto',
     'address_label' => 'Dirección',
     'address_text' => '2990 av. Pierre-Péladeau, suite 400,<br>Laval, QC H7T 3B3',
-    'email_label' => 'Correo electrónico',
+    'email_label' => 'Email',
+    'map_title'   => 'Ubicación VIP GPI — 2990 av. Pierre-Péladeau, Laval',
 ];

@@ -75,6 +75,20 @@
                 </div>
             </div>
         </div>
+
+        {{-- Google Maps --}}
+        <div class="mt-5">
+            <iframe
+                src="https://maps.google.com/maps?q=2990+av.+Pierre-Péladeau+suite+400+Laval+QC+H7T+3B3&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                width="100%"
+                height="380"
+                style="border:0;border-radius:12px;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="{{ __('contact.map_title', [], app()->getLocale()) ?? 'Localisation VIP GPI' }}">
+            </iframe>
+        </div>
     </div>
 </section>
 

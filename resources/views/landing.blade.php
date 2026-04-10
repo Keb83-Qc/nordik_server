@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VIP GPI — Landing</title>
+    <title>VIP GPI — Gestion de Patrimoine &amp; Investissements | Services Financiers à Laval</title>
+    <meta name="description" content="VIP GPI, cabinet en services financiers à Laval, Québec. Assurances vie, invalidité, maladie grave, épargne, placements et prêts hypothécaires. Conseil personnalisé pour particuliers et entreprises.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ url('/') }}">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"> -->
@@ -693,8 +696,9 @@
         <div class="film-burn"></div>
 
         <div class="inner">
+            <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0">VIP GPI — Gestion de Patrimoine &amp; Investissements Inc. — Services Financiers à Laval, Québec</h1>
             <div class="d-flex justify-content-center">
-                <img src="{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI" class="logo">
+                <img src="{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI — Gestion de Patrimoine et Investissements" class="logo">
             </div>
 
             {{-- Badge son (déclenché au clic) --}}
