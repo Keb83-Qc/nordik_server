@@ -130,9 +130,7 @@ Route::post('/log-web-vitals', function (Request $request) {
  *    Le middleware set-locale n'est pas nécessaire ici (WelcomeController
  *    gère la détection de langue lui-même).
  */
-Route::get('/', function () {
-    return 'ROOT OK';
-})->name('root');
+Route::get('/fr', [WelcomeController::class, 'root'])->name('root');
 
 /**
  * 2) Switch langue (optionnel)
