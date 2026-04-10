@@ -6,243 +6,322 @@
     <title>Votre portrait financier</title>
 
     <style>
-        /* ============
-           PRINT SETUP
-           ============ */
+        /* =============================================
+           PAGE SETUP
+           ============================================= */
         @page {
-            margin: 28mm 18mm 22mm 18mm;
+            margin: 30mm 18mm 20mm 18mm;
         }
-
-        /* Cover full bleed */
         @page :first {
             margin: 0mm;
         }
 
-        /* ============
-           VIP PALETTE
-           ============ */
-        /* VIP Navy / Gold */
-        /* Navy: #0E1030  Deep: #090A1F  Gold: #C9A050  GoldLight: #E6C885 */
-        /* Paper (gold tint): #FBF6EA  Border: #EAD9B6 */
-        /* Text: #0B0D2A  Muted: #6B7280 */
-
+        /* =============================================
+           BASE
+           ============================================= */
         body {
             font-family: DejaVu Sans, sans-serif;
-            font-size: 11.5px;
-            color: #0B0D2A;
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-family: DejaVu Serif, serif;
-            font-weight: 500;
-            color: #0E1030;
-            margin: 0;
-        }
-
-        h1 {
-            font-size: 34px;
-            margin-top: 6mm;
-            margin-bottom: 10mm;
-        }
-
-        h2 {
-            font-size: 18px;
-            margin-top: 8mm;
-            margin-bottom: 3mm;
-        }
-
-        h3 {
-            font-size: 14px;
-            margin-top: 6mm;
-            margin-bottom: 2mm;
+            font-size: 10.5px;
+            color: #1A1C2E;
+            line-height: 1.5;
         }
 
         p {
-            margin: 0 0 8px 0;
-            line-height: 1.45;
+            margin: 0 0 6px 0;
+            line-height: 1.5;
         }
 
-        .page-break {
-            page-break-after: always;
+        .page-break { page-break-after: always; }
+        .muted      { color: #6B7280; }
+        .small      { font-size: 9.5px; }
+        .strong     { font-weight: 700; }
+
+        /* =============================================
+           SECTION HEADINGS
+           ============================================= */
+        h1 {
+            font-family: DejaVu Serif, serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: #FFFFFF;
+            background-color: #0E1030;
+            margin: 0 0 6mm 0;
+            padding: 5mm 6mm 5mm 8mm;
+            border-left: 5px solid #C9A050;
+            page-break-after: avoid;
         }
 
-        .muted {
+        h2 {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #0E1030;
+            margin: 6mm 0 2mm 0;
+            padding: 0 0 3px 8px;
+            border-left: 3px solid #C9A050;
+            page-break-after: avoid;
+        }
+
+        h3 {
+            font-family: DejaVu Sans, sans-serif;
+            font-size: 10.5px;
+            font-weight: 700;
             color: #6B7280;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin: 4mm 0 2mm 0;
+            page-break-after: avoid;
         }
 
-        .small {
-            font-size: 10px;
-        }
-
-        /* ============
-           COVER
-           ============ */
-        .cover {
-            position: relative;
-            height: 297mm;
-            /* A4 */
-            width: 210mm;
-            /* A4 */
-        }
-
-        .cover-photo {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 210mm;
-            height: 297mm;
-            object-fit: cover;
-            object-position: center;
-            display: block;
-        }
-
-        .cover-bg {
-            position: absolute;
+        /* =============================================
+           HEADER / FOOTER (page 2+)
+           ============================================= */
+        .header {
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: linear-gradient(180deg, #0E1030 0%, #090A1F 100%);
-        }
-
-        .cover-inner {
-            position: relative;
-            padding: 34mm 18mm 22mm 18mm;
+            height: 14mm;
+            background: #0E1030;
+            padding: 0 18mm;
+            font-size: 9px;
             color: #FFFFFF;
         }
-
-        .cover-logo {
-            position: absolute;
-            right: 18mm;
-            top: 22mm;
-            width: 40mm;
-            height: auto;
-        }
-
-        .cover-title {
-            font-family: DejaVu Serif, serif;
-            font-size: 46px;
-            line-height: 1.02;
-            margin-top: 30mm;
-            color: #FFFFFF;
-        }
-
-        .cover-underline {
-            width: 70%;
-            height: 2px;
-            margin-top: 10px;
-            background: linear-gradient(90deg, #C9A050 0%, #E6C885 50%, #C9A050 100%);
-        }
-
-        .cover-names {
-            margin-top: 10px;
-            font-size: 12px;
-            opacity: 0.95;
-        }
-
-        .cover-conf {
-            position: absolute;
-            left: 18mm;
-            right: 18mm;
-            bottom: 18mm;
-            font-size: 9.5px;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .cover-conf .title {
-            color: #C9A050;
-            font-weight: 700;
-            letter-spacing: .3px;
-            margin-bottom: 6px;
-        }
-
-        /* ============
-           HEADER / FOOTER (from page 2)
-           ============ */
-        .header {
-            position: fixed;
-            top: 12mm;
-            left: 18mm;
-            right: 18mm;
-            height: 10mm;
-            font-size: 10px;
-            color: #0E1030;
-        }
-
         .header .left {
             float: left;
+            line-height: 14mm;
             font-weight: 700;
-            letter-spacing: .3px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-
         .header .right {
             float: right;
-            font-weight: 700;
+            line-height: 14mm;
             color: #C9A050;
+            font-weight: 700;
+        }
+        .header-logo {
+            float: right;
+            height: 8mm;
+            margin-top: 3mm;
+            margin-left: 6mm;
         }
 
         .footer {
             position: fixed;
-            bottom: 10mm;
-            left: 18mm;
-            right: 18mm;
-            height: 10mm;
-            font-size: 10px;
-            color: #6B7280;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 12mm;
+            background: #F8F5EE;
+            border-top: 2px solid #C9A050;
+            padding: 0 18mm;
+            font-size: 9px;
         }
-
         .footer .left {
             float: left;
-            font-weight: 700;
-            color: #0E1030;
-            letter-spacing: .2px;
+            line-height: 12mm;
+            color: #6B7280;
         }
-
         .footer .right {
             float: right;
+            line-height: 12mm;
+            color: #0E1030;
+            font-weight: 700;
+        }
+        .pagenum:before { content: counter(page); }
+
+        /* =============================================
+           COVER PAGE
+           ============================================= */
+        .cover {
+            position: relative;
+            height: 297mm;
+            width: 210mm;
+            overflow: hidden;
+        }
+        .cover-photo {
+            position: absolute;
+            top: 0; left: 0;
+            width: 210mm;
+            height: 297mm;
+            object-fit: cover;
+            object-position: center;
+        }
+        .cover-bg {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(160deg, #090A1F 0%, #0E1030 55%, #1A1040 100%);
+        }
+        .cover-inner {
+            position: relative;
+            height: 297mm;
+            padding: 0 18mm;
+            color: #FFFFFF;
+        }
+        .cover-header {
+            padding-top: 14mm;
+            padding-bottom: 10mm;
+            border-bottom: 1px solid rgba(201,160,80,.35);
+        }
+        .cover-logo-img {
+            height: 12mm;
+            width: auto;
+        }
+        .cover-body {
+            padding-top: 28mm;
+        }
+        .cover-label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #C9A050;
+            margin-bottom: 4mm;
+        }
+        .cover-title {
+            font-family: DejaVu Serif, serif;
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.05;
+            color: #FFFFFF;
+        }
+        .cover-gold-bar {
+            width: 18mm;
+            height: 3px;
+            background-color: #C9A050;
+            margin: 6mm 0;
+        }
+        .cover-subtitle {
+            font-size: 12px;
+            color: rgba(255,255,255,.75);
+            margin-bottom: 10mm;
+        }
+        .cover-client-block {
+            margin-top: 12mm;
+            padding: 5mm 6mm;
+            border-left: 3px solid #C9A050;
+            background: rgba(255,255,255,.06);
+        }
+        .cover-client-label {
+            font-size: 8.5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255,255,255,.55);
+            margin-bottom: 2mm;
+        }
+        .cover-client-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFFFFF;
+            line-height: 1.3;
+        }
+        .cover-date-block {
+            margin-top: 6mm;
+            font-size: 10px;
+            color: rgba(255,255,255,.65);
+        }
+        .cover-footer-band {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 5mm 18mm;
+            background: rgba(9,10,31,.85);
+            border-top: 1px solid rgba(201,160,80,.25);
+        }
+        .cover-footer-conf {
+            font-size: 8px;
+            color: rgba(255,255,255,.55);
+            line-height: 1.5;
+        }
+        .cover-footer-conf strong {
+            color: #C9A050;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 2px;
+            letter-spacing: .5px;
         }
 
-        .pagenum:before {
-            content: counter(page);
-        }
-
-        /* ============
+        /* =============================================
            TABLES
-           ============ */
+           ============================================= */
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 4mm;
         }
 
-        .compare thead th,
-        .simple thead th {
+        /* --- Tableau comparatif (client / conjoint) --- */
+        .compare thead tr {
+            background: #0E1030;
+        }
+        .compare thead th {
+            font-size: 10px;
             font-weight: 700;
-            color: #0E1030;
-            padding: 6px 8px;
-            border-bottom: 2px solid #C9A050;
+            color: #FFFFFF;
+            padding: 5px 8px;
             text-align: left;
         }
-
-        .compare tbody td,
-        .simple tbody td {
-            padding: 8px 8px;
+        .compare thead th:first-child {
+            background: #1A234A;
+        }
+        .compare tbody tr:nth-child(even) td {
+            background: #F8F5EE;
+        }
+        .compare tbody td {
+            padding: 6px 8px;
             border-bottom: 1px solid #EAD9B6;
             vertical-align: top;
+            font-size: 10.5px;
         }
-
         .compare tbody td:first-child {
-            width: 34%;
-            color: #0B0D2A;
+            width: 36%;
+            color: #6B7280;
+            font-size: 10px;
         }
 
-        .total-row td {
-            background: #FBF6EA;
+        /* --- Tableau simple (listes) --- */
+        .simple thead tr {
+            background: #F8F5EE;
+            border-bottom: 2px solid #C9A050;
+        }
+        .simple thead th {
+            font-size: 10px;
             font-weight: 700;
+            color: #0E1030;
+            padding: 5px 8px;
+            text-align: left;
+        }
+        .simple tbody tr:nth-child(even) td {
+            background: #FDFCF8;
+        }
+        .simple tbody td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #EAD9B6;
+            vertical-align: top;
+            font-size: 10.5px;
         }
 
-        /* Premium total */
+        /* Ligne de sous-total */
+        .subtotal-row td {
+            background: #F0EBE0;
+            font-weight: 700;
+            font-size: 10px;
+            color: #0E1030;
+            border-top: 1px solid #C9A050;
+        }
+
+        /* Ligne de total général */
+        .total-row td {
+            background: #0E1030;
+            color: #C9A050;
+            font-weight: 700;
+            font-size: 10.5px;
+            border-bottom: none;
+        }
+
+        /* Ligne grand total (alias) */
         .grand-total td {
             background: #0E1030;
             color: #C9A050;
@@ -250,34 +329,118 @@
             border-bottom: none;
         }
 
-        /* TOC */
-        .toc h1 {
-            margin-top: 40mm;
+        /* =============================================
+           STAT CARDS (budget décès, etc.)
+           ============================================= */
+        .stat-grid {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 4mm 0;
+            margin-bottom: 4mm;
         }
-
-        .toc-item {
-            border-bottom: 1px solid #EAD9B6;
-            padding: 10px 0;
+        .stat-card {
+            padding: 4mm 5mm;
+            border: 1px solid #EAD9B6;
+            border-top: 3px solid #C9A050;
+            background: #FDFCF8;
+            vertical-align: top;
         }
-
-        .toc-item .name {
-            float: left;
+        .stat-card.danger {
+            border-top-color: #DC2626;
         }
-
-        .toc-item .page {
-            float: right;
+        .stat-card.success {
+            border-top-color: #16A34A;
+        }
+        .stat-card-label {
+            font-size: 8.5px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #6B7280;
+            margin-bottom: 2mm;
+        }
+        .stat-card-value {
+            font-size: 16px;
+            font-weight: 700;
             color: #0E1030;
         }
-
-        .clearfix:after {
-            content: "";
-            display: block;
-            clear: both;
+        .stat-card-sub {
+            font-size: 9px;
+            color: #6B7280;
+            margin-top: 1mm;
         }
 
-        /* Optional: section spacing on page */
-        .section-gap {
-            margin-top: 4mm;
+        /* =============================================
+           BADGE / PILL
+           ============================================= */
+        .badge {
+            display: inline;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            letter-spacing: .3px;
+        }
+        .badge-navy   { background: #0E1030; color: #FFFFFF; }
+        .badge-gold   { background: #FBF6EA; color: #C9A050; border: 1px solid #C9A050; }
+        .badge-green  { background: #DCFCE7; color: #15803D; }
+        .badge-red    { background: #FEE2E2; color: #DC2626; }
+        .badge-gray   { background: #F3F4F6; color: #6B7280; }
+
+        /* =============================================
+           INFO BOX
+           ============================================= */
+        .info-box {
+            background: #F8F5EE;
+            border-left: 3px solid #C9A050;
+            padding: 3mm 4mm;
+            margin: 3mm 0 4mm 0;
+            font-size: 10px;
+            color: #6B7280;
+        }
+
+        /* =============================================
+           TABLE OF CONTENTS
+           ============================================= */
+        .toc-section {
+            margin-top: 8mm;
+        }
+        .toc-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #EAD9B6;
+        }
+        .toc-num {
+            float: left;
+            width: 6mm;
+            font-size: 9px;
+            color: #C9A050;
+            font-weight: 700;
+        }
+        .toc-name {
+            margin-left: 8mm;
+            font-size: 11px;
+            color: #1A1C2E;
+        }
+        .toc-dots {
+            float: right;
+            color: #EAD9B6;
+        }
+        .clearfix:after { content: ""; display: block; clear: both; }
+
+        /* =============================================
+           MISC
+           ============================================= */
+        .section-gap   { margin-top: 4mm; }
+        .divider {
+            border: none;
+            border-top: 1px solid #EAD9B6;
+            margin: 4mm 0;
+        }
+        .advisor-sig-line {
+            border-top: 1px solid #0E1030;
+            margin-top: 14mm;
+            padding-top: 2mm;
+            font-size: 9px;
+            color: #6B7280;
         }
     </style>
 </head>
@@ -424,28 +587,54 @@
         @if($coverPhoto ?? null)
         <img class="cover-photo" src="{{ $coverPhoto }}" alt="">
         @endif
-        <div class="cover-bg" style="{{ ($coverPhoto ?? null) ? 'background:rgba(14,16,48,.72)' : '' }}"></div>
+        <div class="cover-bg" style="{{ ($coverPhoto ?? null) ? ‘background:rgba(9,10,31,.78)’ : ‘’ }}"></div>
         <div class="cover-inner">
-            @if($logo)
-            <img class="cover-logo" src="{{ $logo }}" alt="Logo VIP">
-            @endif
 
-            <div class="cover-title">
-                Votre portrait<br>financier
-                <div class="cover-underline"></div>
-            </div>
-
-            <div class="cover-names">
-                {{ $clientName }}@if($hasSpouse)<br>{{ $spouseName }}@endif
-            </div>
-
-            <div class="cover-conf">
-                <div class="title">AVIS DE CONFIDENTIALITÉ</div>
-                <div>
-                    Le contenu de ce document est strictement confidentiel. Il est interdit de copier, de faire suivre ou
-                    d’utiliser les informations qu’il contient sans autorisation.
+            {{-- En-tête : logo + nom firme --}}
+            <div class="cover-header clearfix">
+                @if($logo)
+                <img class="cover-logo-img" src="{{ $logo }}" alt="VIP GPI" style="float:left">
+                @endif
+                <div style="float:right;text-align:right;padding-top:1mm">
+                    <div style="font-size:9px;color:rgba(255,255,255,.5);letter-spacing:.5px">VIP GESTION DE PATRIMOINE</div>
+                    <div style="font-size:8px;color:#C9A050;letter-spacing:.3px">ET INVESTISSEMENTS INC.</div>
                 </div>
             </div>
+
+            {{-- Corps principal --}}
+            <div class="cover-body">
+                <div class="cover-label">Analyse des besoins financiers</div>
+                <div class="cover-title">Votre portrait<br>financier</div>
+                <div class="cover-gold-bar"></div>
+                <div class="cover-subtitle">Préparé le {{ $docDate }}</div>
+
+                {{-- Bloc client --}}
+                <div class="cover-client-block">
+                    <div class="cover-client-label">Préparé pour</div>
+                    <div class="cover-client-name">{{ $clientName }}</div>
+                    @if($hasSpouse)
+                    <div class="cover-client-name" style="font-size:14px;opacity:.85;margin-top:1mm">{{ $spouseName }}</div>
+                    @endif
+                </div>
+
+                @php
+                $advisorName = auth()->user()?->name ?? data_get($case->advisor, ‘name’, ‘’);
+                @endphp
+                @if($advisorName)
+                <div class="cover-date-block">
+                    Conseiller&nbsp;: <strong style="color:rgba(255,255,255,.85)">{{ $advisorName }}</strong>
+                </div>
+                @endif
+            </div>
+
+            {{-- Pied de page couverture --}}
+            <div class="cover-footer-band">
+                <div class="cover-footer-conf">
+                    <strong>DOCUMENT CONFIDENTIEL</strong>
+                    Ce document est strictement confidentiel. Il est réservé à l’usage exclusif du ou des destinataires désignés. Toute reproduction, distribution ou utilisation non autorisée est interdite.
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -454,58 +643,48 @@
     {{-- ======================
      HEADER / FOOTER (PAGE 2+)
      ====================== --}}
-    <div class="header">
-        <div class="left">VOTRE PORTRAIT FINANCIER</div>
-        <div class="right">{{ mb_strtoupper($docDate) }}</div>
+    <div class="header clearfix">
+        @if($logo)
+        <img class="header-logo" src="{{ $logo }}" alt="VIP GPI">
+        @endif
+        <div class="left">Portrait financier &mdash; {{ $clientName }}@if($hasSpouse) &amp; {{ $spouseName }}@endif</div>
+        <div class="right">{{ $docDate }}</div>
     </div>
-    <div class="footer">
-        <div class="left">vipgpi</div>
-        <div class="right"><span class="pagenum"></span></div>
+    <div class="footer clearfix">
+        <div class="left">VIP Gestion de patrimoine et investissements inc.</div>
+        <div class="right">Page&nbsp;<span class="pagenum"></span></div>
     </div>
 
     {{-- ======================
      TOC
      ====================== --}}
-    <div class="toc">
-        <div style="margin-top:18mm;"></div>
-        <h1>Table des matières</h1>
+    <h1>Table des matières</h1>
 
+    <div class="toc-section">
+        @php
+        $tocItems = [
+            [‘Informations personnelles’,  true],
+            [‘Placements & actifs’,        true],
+            [‘Dettes & passifs’,           true],
+            [‘Bilan financier’,            true],
+            [‘Assurances’,                 $sec(‘lifeInsurance’) || $sec(‘disability’) || $sec(‘seriousIllness’)],
+            [‘Budget au décès’,            $sec(‘lifeInsurance’)],
+            [‘Profil d\’investisseur’,     $sec(‘dashboard’)],
+            [‘Notes / recommandations’,    $sec(‘recommendations’)],
+            [‘Accusé de réception’,        $sec(‘deliveryConfirmation’, false)],
+            [‘Annexe — Revenus de retraite’, $sec(‘annex’, false) && $sec(‘retirementIncome’, false)],
+            [‘Annexe — Évolution des placements’, $sec(‘annex’, false) && $sec(‘investmentProjection’, false)],
+        ];
+        $n = 1;
+        @endphp
+        @foreach($tocItems as [$name, $show])
+        @if($show)
         <div class="toc-item clearfix">
-            <div class="name">Informations personnelles</div>
-            <div class="page">—</div>
+            <span class="toc-num">{{ $n++ }}</span>
+            <span class="toc-name">{{ $name }}</span>
         </div>
-        <div class="toc-item clearfix">
-            <div class="name">Placements & actifs</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Dettes & passifs</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Bilan financier</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Assurances</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Budget au décès</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Profil d'investisseur</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Notes / recommandations</div>
-            <div class="page">—</div>
-        </div>
-        <div class="toc-item clearfix">
-            <div class="name">Accusé de réception</div>
-            <div class="page">—</div>
-        </div>
+        @endif
+        @endforeach
     </div>
 
     <div class="page-break"></div>
@@ -772,15 +951,15 @@
     <table class="simple">
         <thead>
             <tr>
-                <th style="width:22%;">Type</th>
+                <th style="width:26%;">Type</th>
                 <th>Description</th>
-                <th style="width:18%;">Valeur</th>
+                <th style="width:20%;">Valeur</th>
             </tr>
         </thead>
         <tbody>
             @foreach($grouped as $type => $rows2)
-            <tr class="total-row">
-                <td colspan="3">{{ $assetType[$type] ?? $type }}</td>
+            <tr style="background:#F0EBE0;">
+                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#0E1030;padding:4px 8px;border-bottom:1px solid #C9A050;">{{ $assetType[$type] ?? $type }}</td>
             </tr>
             @foreach($rows2 as $aRow)
             <tr>
@@ -789,15 +968,9 @@
                 <td>{{ $money($aRow['value'] ?? 0) }}</td>
             </tr>
             @endforeach
-            <tr class="total-row">
-                <td>Total</td>
-                <td></td>
-                <td>{{ $money(collect($rows2)->sum(fn($r)=> (float) ($r['value'] ?? 0))) }}</td>
-            </tr>
             @endforeach
             <tr class="grand-total">
-                <td>Total</td>
-                <td></td>
+                <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
                 <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r['value'] ?? 0))) }}</td>
             </tr>
         </tbody>
@@ -832,8 +1005,8 @@
         </thead>
         <tbody>
             @foreach($grouped as $type => $rows2)
-            <tr class="total-row">
-                <td colspan="3">{{ $liabType[$type] ?? $type }}</td>
+            <tr style="background:#FEF2F2;">
+                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#DC2626;padding:4px 8px;border-bottom:1px solid #FECACA;">{{ $liabType[$type] ?? $type }}</td>
             </tr>
             @foreach($rows2 as $lRow)
             <tr>
@@ -842,15 +1015,9 @@
                 <td>{{ $money($lRow['balance'] ?? 0) }}</td>
             </tr>
             @endforeach
-            <tr class="total-row">
-                <td>Total</td>
-                <td></td>
-                <td>{{ $money(collect($rows2)->sum(fn($r)=> (float) ($r['balance'] ?? 0))) }}</td>
-            </tr>
             @endforeach
             <tr class="grand-total">
-                <td>Total</td>
-                <td></td>
+                <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
                 <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r['balance'] ?? 0))) }}</td>
             </tr>
         </tbody>
@@ -864,12 +1031,32 @@
      ====================== --}}
     <h1>Bilan financier</h1>
 
-    <table class="simple">
+    {{-- Stat cards résumé --}}
+    <table class="stat-grid">
+        <tr>
+            <td class="stat-card success" style="width:33%">
+                <div class="stat-card-label">Total des actifs</div>
+                <div class="stat-card-value">{{ $money($assetTotal) }}</div>
+            </td>
+            <td class="stat-card danger" style="width:33%">
+                <div class="stat-card-label">Total des passifs</div>
+                <div class="stat-card-value">{{ $money($liabTotal) }}</div>
+            </td>
+            <td class="stat-card" style="width:33%;border-top-color:{{ $netTotal >= 0 ? '#16A34A' : '#DC2626' }}">
+                <div class="stat-card-label">Valeur nette</div>
+                <div class="stat-card-value" style="color:{{ $netTotal >= 0 ? '#16A34A' : '#DC2626' }}">{{ $money($netTotal) }}</div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>Par propriétaire</h2>
+    <table class="compare">
         <thead>
             <tr>
                 <th></th>
                 <th>{{ $clientName }}</th>
                 @if($hasSpouse)<th>{{ $spouseName }}</th>@endif
+                @if($hasSpouse)<th>Commun</th>@endif
                 <th>Total</th>
             </tr>
         </thead>
@@ -878,18 +1065,21 @@
                 <td>Actifs</td>
                 <td>{{ $money($assetSums['client'] ?? 0) }}</td>
                 @if($hasSpouse)<td>{{ $money($assetSums['spouse'] ?? 0) }}</td>@endif
+                @if($hasSpouse)<td>{{ $money($assetSums['joint'] ?? 0) }}</td>@endif
                 <td>{{ $money($assetTotal) }}</td>
             </tr>
             <tr>
                 <td>Passifs</td>
                 <td>{{ $money($liabSums['client'] ?? 0) }}</td>
                 @if($hasSpouse)<td>{{ $money($liabSums['spouse'] ?? 0) }}</td>@endif
+                @if($hasSpouse)<td>{{ $money($liabSums['joint'] ?? 0) }}</td>@endif
                 <td>{{ $money($liabTotal) }}</td>
             </tr>
             <tr class="grand-total">
-                <td>Net</td>
+                <td>Valeur nette</td>
                 <td>{{ $money(($assetSums['client'] ?? 0) - ($liabSums['client'] ?? 0)) }}</td>
                 @if($hasSpouse)<td>{{ $money(($assetSums['spouse'] ?? 0) - ($liabSums['spouse'] ?? 0)) }}</td>@endif
+                @if($hasSpouse)<td>{{ $money(($assetSums['joint'] ?? 0) - ($liabSums['joint'] ?? 0)) }}</td>@endif
                 <td>{{ $money($netTotal) }}</td>
             </tr>
         </tbody>
@@ -1002,6 +1192,29 @@
 
     @php $db = (array) data_get($results, 'death_budget.per_person', []); @endphp
 
+    {{-- Stat cards résumé --}}
+    <table class="stat-grid">
+        <tr>
+            <td class="stat-card" style="width:{{ $hasSpouse ? '50%' : '100%' }}">
+                <div class="stat-card-label">{{ $clientName }} — Besoin additionnel</div>
+                <div class="stat-card-value {{ data_get($db,'client.e.additional_need',0) > 0 ? 'danger' : '' }}">
+                    {{ $money(data_get($db,'client.e.additional_need', 0)) }}
+                </div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,'client.d.capital_required', 0)) }}</div>
+            </td>
+            @if($hasSpouse)
+            <td class="stat-card">
+                <div class="stat-card-label">{{ $spouseName }} — Besoin additionnel</div>
+                <div class="stat-card-value {{ data_get($db,'spouse.e.additional_need',0) > 0 ? 'danger' : '' }}">
+                    {{ $money(data_get($db,'spouse.e.additional_need', 0)) }}
+                </div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,'spouse.d.capital_required', 0)) }}</div>
+            </td>
+            @endif
+        </tr>
+    </table>
+
+    <h2>Détail du calcul</h2>
     <table class="compare">
         <thead>
             <tr>
@@ -1012,31 +1225,31 @@
         </thead>
         <tbody>
             <tr>
-                <td>Liquidités nettes au décès (B1-B2)</td>
+                <td>Liquidités nettes au décès</td>
                 <td>{{ $money(data_get($db,'client.b.net_liquidities', 0)) }}</td>
                 @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.b.net_liquidities', 0)) }}</td>@endif
             </tr>
             <tr>
-                <td>Revenu mensuel à combler (C2-C3)</td>
+                <td>Revenu mensuel à combler</td>
                 <td>{{ $money(data_get($db,'client.c.monthly_gap', 0)) }}</td>
                 @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.c.monthly_gap', 0)) }}</td>@endif
             </tr>
             <tr>
-                <td>Capital requis (D)</td>
+                <td>Capital requis</td>
                 <td>{{ $money(data_get($db,'client.d.capital_required', 0)) }}</td>
                 @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.d.capital_required', 0)) }}</td>@endif
             </tr>
             <tr class="total-row">
-                <td>Besoin d'assurance additionnel (E)</td>
+                <td>Besoin d'assurance additionnel</td>
                 <td>{{ $money(data_get($db,'client.e.additional_need', 0)) }}</td>
                 @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.e.additional_need', 0)) }}</td>@endif
             </tr>
         </tbody>
     </table>
 
-    <p class="small muted" style="margin-top:6mm;">
-        * Les résultats ci-dessus sont calculés à partir des hypothèses et des informations fournies. Ils doivent être validés et ajustés selon la situation réelle.
-    </p>
+    <div class="info-box">
+        Les résultats sont calculés à partir des hypothèses et des informations fournies. Ils doivent être validés selon la situation réelle du client.
+    </div>
     @endif {{-- /sec lifeInsurance --}}
 
     @if($sec('dashboard'))
@@ -1048,18 +1261,29 @@
     <h1>Profil d'investisseur</h1>
 
     @if($ipFilled)
-    {{-- Score badge --}}
-    <table class="simple" style="margin-bottom:6mm;">
-        <tbody>
-            <tr>
-                <td style="width:50%;"><strong>Score total</strong></td>
-                <td>{{ $ipScore }} / 160</td>
-            </tr>
-            <tr>
-                <td><strong>Profil déterminé</strong></td>
-                <td><strong>{{ $ipProfile }}</strong></td>
-            </tr>
-        </tbody>
+    {{-- Stat card profil --}}
+    @php
+    $profileColor = match(true) {
+        $ipScore <= 25  => '#3B82F6',
+        $ipScore <= 55  => '#22C55E',
+        $ipScore <= 90  => '#C9A050',
+        $ipScore <= 120 => '#F97316',
+        default         => '#EF4444',
+    };
+    @endphp
+    <table class="stat-grid">
+        <tr>
+            <td class="stat-card" style="width:50%;border-top-color:{{ $profileColor }}">
+                <div class="stat-card-label">Profil d'investisseur</div>
+                <div class="stat-card-value">{{ $ipProfile }}</div>
+                <div class="stat-card-sub">Score&nbsp;: {{ $ipScore }} / 160</div>
+            </td>
+            <td style="width:50%;padding-left:4mm;vertical-align:middle">
+                <div class="info-box" style="margin:0">
+                    Ce profil détermine l'allocation d'actifs recommandée selon la tolérance au risque, l'horizon de placement et la situation financière du client.
+                </div>
+            </td>
+        </tr>
     </table>
 
     {{-- Questions par section --}}
@@ -1105,11 +1329,9 @@
     <p class="muted">Aucune note du conseiller.</p>
     @endif
 
-    <h2>Avis de non-responsabilité</h2>
-    <p class="muted">
-        Cette analyse est basée sur les informations fournies par le client et sur les hypothèses retenues à la date du rapport.
-        Les recommandations ne constituent pas une garantie de rendement ni de résultat futur.
-    </p>
+    <div class="info-box">
+        <strong>Avis de non-responsabilité :</strong> Cette analyse est basée sur les informations fournies par le client et sur les hypothèses retenues à la date du rapport. Les recommandations ne constituent pas une garantie de rendement ni de résultat futur.
+    </div>
     @endif {{-- /sec recommendations --}}
 
     @if($sec('deliveryConfirmation', false))
@@ -1118,32 +1340,34 @@
     {{-- ======================
      ACCUSÉ
      ====================== --}}
-    <h1>Accusé de réception</h1>
-    <p>Je confirme avoir pris connaissance du présent document « Votre portrait financier » et des hypothèses utilisées.</p>
+    <h1>Confirmation de remise</h1>
+    <p style="margin-bottom:6mm;">Je, soussigné(e), confirme avoir reçu et pris connaissance du document « Votre portrait financier » préparé par <strong>VIP Gestion de patrimoine et investissements inc.</strong> en date du {{ $docDate }}, ainsi que des hypothèses et des informations qui y sont contenues.</p>
 
-    <table class="simple" style="margin-top:10mm;">
-        <thead>
-            <tr>
-                <th style="width:40%;">Signature</th>
-                <th style="width:30%;">Nom</th>
-                <th style="width:30%;">Date</th>
-            </tr>
-        </thead>
+    @foreach(array_filter([
+        ['name' => $clientName, 'show' => true],
+        ['name' => $spouseName, 'show' => $hasSpouse],
+        ['name' => $advisorName ?? '', 'show' => !empty($advisorName ?? ''), 'role' => 'Conseiller'],
+    ], fn($r) => $r['show']) as $sig)
+    <table class="simple" style="margin-bottom:8mm;">
         <tbody>
             <tr>
-                <td style="height:18mm;"></td>
-                <td>{{ $clientName }}</td>
-                <td>{{ $docDate }}</td>
+                <td style="width:45%;height:16mm;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm;font-size:9px;color:#6B7280">
+                    Signature {{ $sig['role'] ?? '' }}
+                </td>
+                <td style="width:5%;"></td>
+                <td style="width:30%;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm">
+                    <div style="font-size:9px;color:#6B7280">Nom</div>
+                    <div style="font-size:11px;font-weight:700;color:#0E1030">{{ $sig['name'] }}</div>
+                </td>
+                <td style="width:5%;"></td>
+                <td style="width:15%;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm">
+                    <div style="font-size:9px;color:#6B7280">Date</div>
+                    <div style="font-size:10px;color:#0E1030">{{ $docDate }}</div>
+                </td>
             </tr>
-            @if($hasSpouse)
-            <tr>
-                <td style="height:18mm;"></td>
-                <td>{{ $spouseName }}</td>
-                <td>{{ $docDate }}</td>
-            </tr>
-            @endif
         </tbody>
     </table>
+    @endforeach
     @endif {{-- /sec deliveryConfirmation --}}
 
     @php

@@ -17,9 +17,18 @@ class AbfPdfController extends Controller
             $calculator = app(AbfCaseCalculator::class);
             $results    = $calculator->calculate($abfCase->payload ?? []);
 
-            $first    = data_get($abfCase->payload, 'client.first_name', 'client');
-            $last     = data_get($abfCase->payload, 'client.last_name', '');
-            $filename = 'abf-' . Str::slug(trim($first . ' ' . $last)) . '-' . $abfCase->id . '.pdf';
+            $clientFirst  = data_get($abfCase->payload, 'client.first_name', '');
+            $clientLast   = data_get($abfCase->payload, 'client.last_name', 'Client');
+            $hasSpousePdf = (bool) data_get($abfCase->payload, 'has_spouse', false);
+            $spouseFirst  = $hasSpousePdf ? data_get($abfCase->payload, 'spouse.first_name', '') : '';
+            $spouseLast   = $hasSpousePdf ? data_get($abfCase->payload, 'spouse.last_name', '') : '';
+
+            $clientPart = Str::slug(trim($clientLast . ' ' . $clientFirst), '_');
+            $spousePart = ($hasSpousePdf && ($spouseLast || $spouseFirst))
+                ? '_' . Str::slug(trim($spouseLast . ' ' . $spouseFirst), '_')
+                : '';
+            $datePart  = now()->format('Y-m-d');
+            $filename  = 'ABF_' . $clientPart . $spousePart . '_' . $datePart . '.pdf';
 
             $sections   = (array) data_get($abfCase->payload, 'rapport.sections', []);
             $photoFile  = data_get($abfCase->payload, 'rapport.photo');
