@@ -732,6 +732,58 @@ html:not(.dark) .fi-page-header header.fi-header{
 .dark .fi-dialog-header{
     background: linear-gradient(135deg, rgba(201,160,80,.09) 0%, rgba(201,160,80,.03) 100%) !important;
 }
+
+/* =============================================================================
+   RESPONSIVE MOBILE
+   ============================================================================= */
+@media (max-width: 767px){
+
+    /* Réduction des paddings principaux */
+    .fi-main,
+    .fi-page-body{
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* Prévenir le débordement horizontal */
+    .fi-page,
+    .fi-page-header,
+    .fi-page-body,
+    .fi-main,
+    .fi-main-ctn,
+    .fi-container,
+    .fi-section,
+    .fi-card,
+    .fi-ta-ctn,
+    .fi-fo-component-ctn{
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    /* Colonnes de formulaire en une seule colonne sur mobile */
+    .fi-fo-grid-ctn{
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Tables: texte plus petit et cellules compactes */
+    .fi-ta-header-cell,
+    .fi-ta-cell{
+        font-size: 0.73rem !important;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+    }
+
+    /* Topbar: réduire le padding */
+    .fi-topbar{
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    /* Sidebar: s'assurer qu'elle couvre tout sur mobile */
+    .fi-sidebar{
+        z-index: 50 !important;
+    }
+}
 </style>
 HTML;
     }

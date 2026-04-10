@@ -1,12 +1,11 @@
 <!-- TOP BAR -->
 <div class="topbar">
     <div class="topbar-logo">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="6" fill="#C9A050" />
-            <text x="16" y="22" text-anchor="middle" font-size="14" font-weight="800" fill="#0E1030"
-                font-family="sans-serif">VG</text>
-        </svg>
-        <span>VIP GPI — ABF</span>
+        <img src="{{ asset('assets/img/VIP_Logo_Gold_Gradient10.png') }}" alt="VIP GPI" />
+        <div class="topbar-brand">
+            <span class="topbar-brand-name">VIP Gestion De Patrimoine Et Investissements Inc.</span>
+            <span class="topbar-brand-sub">Analyse des besoins Financiers</span>
+        </div>
     </div>
     <div class="topbar-right">
         <span id="abf-topbar-date"></span>

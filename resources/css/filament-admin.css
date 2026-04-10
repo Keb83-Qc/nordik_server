@@ -38,6 +38,56 @@ FULL SCREEN GLOBAL
 }
 
 /* =============================================================================
+RESPONSIVE MOBILE
+============================================================================= */
+@media (max-width: 767px) {
+
+    .fi-main,
+    .fi-page-body {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .fi-page,
+    .fi-page-header,
+    .fi-page-body,
+    .fi-main,
+    .fi-main-ctn,
+    .fi-container,
+    .fi-section,
+    .fi-card,
+    .fi-ta-ctn,
+    .fi-fo-component-ctn {
+        min-width: 0 !important;
+        overflow-x: hidden !important;
+    }
+
+    .fi-ta-header-cell,
+    .fi-ta-cell {
+        font-size: 0.75rem !important;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+    }
+
+    .fi-header {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+    }
+
+    .fi-header-heading {
+        font-size: 1.1rem !important;
+    }
+
+    .fi-fo-grid-ctn {
+        grid-template-columns: 1fr !important;
+    }
+
+    .fi-fo-field-wrp {
+        min-width: 0 !important;
+    }
+}
+
+/* =============================================================================
 THEME / GLOBAL
 ============================================================================= */
 .fi-sidebar-header {

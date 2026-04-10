@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (\Illuminate\Foundation\Configuration\Middleware $middleware) {
+        // Routes de diagnostic envoyées via sendBeacon (pas de support custom headers)
+        $middleware->validateCsrfTokens(except: [
+            'log-web-vitals',
+            'log-js-error',
+        ]);
+
         $middleware->redirectGuestsTo(
             fn(\Illuminate\Http\Request $request) => route('login', ['locale' => app()->getLocale()])
         );
