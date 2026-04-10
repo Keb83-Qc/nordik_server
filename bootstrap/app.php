@@ -29,8 +29,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // S'exécute AVANT le routing : redirige les URLs sans préfixe locale
         // vers leur équivalent /{locale}/... (remplace ~30 routes legacy hardcodées).
         $middleware->web(prepend: [
-            // \App\Http\Middleware\RedirectToLocale::class,
+            \App\Http\Middleware\RedirectToLocale::class,
         ]);
+
         // Applique les headers de sécurité + cache sur toutes les requêtes web
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
