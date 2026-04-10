@@ -233,30 +233,36 @@ class SystemLogResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_logs')
-                    ->label('Vider l\'historique')
+                    ->label('Vider l\'historique système')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer les logs de cet onglet ?')
-                    ->modalDescription('Cette action est irréversible. Seuls les logs de l\'onglet actif seront supprimés.')
+                    ->modalHeading('Vider l\'historique système')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs système de l\'onglet actif seront supprimés.')
                     ->modalSubmitActionLabel('Oui, supprimer')
                     ->action(function (\Livewire\Component $livewire) {
-                        $tab   = $livewire->activeTab ?? 'tous';
-                        $query = SystemLog::query();
+                        $tab = $livewire->activeTab ?? 'tous';
 
-                        match ($tab) {
-                            'info'   => $query->where('level', 'info')->where('message', 'not like', '[WebVital]%'),
-                            'update' => $query->where('level', 'update'),
-                            'error'  => $query->where('level', 'error'),
-                            'fatal'  => $query->where('level', 'fatal'),
-                            default  => $query->where('source', 'not like', 'email_%')
-                                              ->whereNotIn('level', ['login', 'login_fail']),
-                        };
-
-                        $query->delete();
+                        if ($tab === 'info') {
+                            SystemLog::where('level', 'info')
+                                ->where('message', 'not like', '[WebVital]%')
+                                ->delete();
+                        } elseif ($tab === 'update') {
+                            SystemLog::where('level', 'update')->delete();
+                        } elseif ($tab === 'error') {
+                            SystemLog::where('level', 'error')->delete();
+                        } elseif ($tab === 'fatal') {
+                            SystemLog::where('level', 'fatal')->delete();
+                        } else {
+                            // Onglet "tous" : uniquement les logs système (exclut emails, connexions, webvitals)
+                            SystemLog::where('source', 'not like', 'email_%')
+                                ->whereNotIn('level', ['login', 'login_fail'])
+                                ->where('message', 'not like', '[WebVital]%')
+                                ->delete();
+                        }
 
                         \Filament\Notifications\Notification::make()
-                            ->title('Historique vidé avec succès')
+                            ->title('Historique système vidé avec succès')
                             ->success()
                             ->send();
                     }),

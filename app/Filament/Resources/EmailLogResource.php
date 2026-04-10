@@ -205,24 +205,23 @@ class EmailLogResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_email_logs')
-                    ->label('Vider l\'historique')
+                    ->label('Vider l\'historique des emails')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer les logs de cet onglet ?')
-                    ->modalDescription('Cette action est irréversible. Seuls les logs de l\'onglet actif seront supprimés.')
+                    ->modalHeading('Vider l\'historique des emails')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs d\'email de l\'onglet actif seront supprimés.')
                     ->modalSubmitActionLabel('Oui, supprimer')
                     ->action(function (\Livewire\Component $livewire) {
-                        $tab   = $livewire->activeTab ?? 'tous';
-                        $query = SystemLog::query();
+                        $tab = $livewire->activeTab ?? 'tous';
 
-                        if ($tab === 'tous') {
-                            $query->where('source', 'like', 'email_%');
+                        $allowedSources = ['email_internal','email_partner','email_security','email_abf','email_alert','email_advisor'];
+
+                        if (in_array($tab, $allowedSources, true)) {
+                            SystemLog::where('source', $tab)->delete();
                         } else {
-                            $query->where('source', $tab);
+                            SystemLog::where('source', 'like', 'email_%')->delete();
                         }
-
-                        $query->delete();
 
                         \Filament\Notifications\Notification::make()
                             ->title('Logs email vidés avec succès')

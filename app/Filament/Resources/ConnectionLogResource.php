@@ -206,24 +206,23 @@ class ConnectionLogResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_connection_logs')
-                    ->label('Vider l\'historique')
+                    ->label('Vider l\'historique des connexions')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer les logs de cet onglet ?')
-                    ->modalDescription('Cette action est irréversible. Seuls les logs de l\'onglet actif seront supprimés.')
+                    ->modalHeading('Vider l\'historique des connexions')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs de connexion de l\'onglet actif seront supprimés.')
                     ->modalSubmitActionLabel('Oui, supprimer')
                     ->action(function (\Livewire\Component $livewire) {
-                        $tab   = $livewire->activeTab ?? 'toutes';
-                        $query = SystemLog::query();
+                        $tab = $livewire->activeTab ?? 'toutes';
 
-                        match ($tab) {
-                            'reussies' => $query->where('level', 'login'),
-                            'echouees' => $query->where('level', 'login_fail'),
-                            default    => $query->whereIn('level', ['login', 'login_fail']),
-                        };
-
-                        $query->delete();
+                        if ($tab === 'reussies') {
+                            SystemLog::where('level', 'login')->delete();
+                        } elseif ($tab === 'echouees') {
+                            SystemLog::where('level', 'login_fail')->delete();
+                        } else {
+                            SystemLog::whereIn('level', ['login', 'login_fail'])->delete();
+                        }
 
                         \Filament\Notifications\Notification::make()
                             ->title('Logs de connexion vidés avec succès')

@@ -200,22 +200,24 @@ class WebVitalLogResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_webvitals')
-                    ->label('Vider l\'historique')
+                    ->label('Vider l\'historique des Web Vitals')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer tous les logs Web Vitals ?')
-                    ->modalDescription('Cette action est irréversible. Tous les logs Web Vitals seront supprimés.')
+                    ->modalHeading('Vider l\'historique des Web Vitals')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs Web Vitals de l\'onglet actif seront supprimés.')
                     ->modalSubmitActionLabel('Oui, supprimer')
                     ->action(function (\Livewire\Component $livewire) {
-                        $tab   = $livewire->activeTab ?? 'tous';
-                        $query = SystemLog::where('message', 'like', '[WebVital]%');
+                        $tab            = $livewire->activeTab ?? 'tous';
+                        $allowedMetrics = ['lcp', 'inp', 'cls', 'fcp', 'ttfb'];
 
-                        if ($tab !== 'tous') {
-                            $query->whereJsonContains('context->metric', strtoupper($tab));
+                        if (in_array($tab, $allowedMetrics, true)) {
+                            SystemLog::where('message', 'like', '[WebVital]%')
+                                ->whereJsonContains('context->metric', strtoupper($tab))
+                                ->delete();
+                        } else {
+                            SystemLog::where('message', 'like', '[WebVital]%')->delete();
                         }
-
-                        $query->delete();
 
                         \Filament\Notifications\Notification::make()
                             ->title('Logs Web Vitals vidés avec succès')
