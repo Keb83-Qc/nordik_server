@@ -9,19 +9,15 @@ use Illuminate\Support\Facades\Cache;
 class WelcomeController extends Controller
 {
     /**
-     * Route /{locale}/ — page de sélection de langue (landing).
+     * Route /{locale}/ — landing localisée.
      *
-     * Raccourci session : si le visiteur a déjà choisi sa langue (welcome_seen = true)
-     * ET qu'il n'arrive PAS depuis le domaine racine (/), on le renvoie directement
-     * sur le home. Sinon, on affiche toujours la landing.
+     * Si le visiteur a déjà choisi sa langue (welcome_seen), on le renvoie
+     * directement sur le home. La route racine / utilise root() qui affiche
+     * toujours la landing.
      */
     public function index(Request $request)
     {
-        // Si arrivé depuis la route racine "/" on ne skip jamais la landing
-        $fromRoot = $request->headers->get('referer') === null
-            && $request->getPathInfo() === '/';
-
-        if (! $fromRoot && session()->has('locale') && session('welcome_seen') === true) {
+        if (session()->has('locale') && session('welcome_seen') === true) {
             return redirect()->route('home', ['locale' => session('locale')]);
         }
 
@@ -35,6 +31,33 @@ class WelcomeController extends Controller
     public function root(Request $request)
     {
         return $this->renderLanding($request);
+    }
+
+    /**
+     * GET /switch-language/{locale}?next=...
+     * Change la locale en session et redirige vers la page demandée.
+     */
+    public function switchLanguage(Request $request, string $locale)
+    {
+        $active = Language::activeCodes();
+        if (! in_array($locale, $active, true)) {
+            $locale = Language::defaultCode();
+        }
+
+        session(['locale' => $locale, 'welcome_seen' => true]);
+        session()->save();
+
+        $next = $request->query('next');
+        if (is_string($next) && $next !== '') {
+            $next = '/' . ltrim($next, '/');
+            $next = preg_replace('#^/[a-zA-Z]{2,5}(/|$)#', '/', $next);
+            if ($next === '/') {
+                $next = '/home';
+            }
+            return redirect("/{$locale}{$next}");
+        }
+
+        return redirect("/{$locale}/home");
     }
 
     private function renderLanding(Request $request): \Illuminate\View\View

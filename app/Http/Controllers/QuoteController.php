@@ -27,6 +27,11 @@ class QuoteController extends Controller
         ]);
     }
 
+    public function success(): View
+    {
+        return view('quote.success');
+    }
+
     private function resolveComponent(string $typeSlug): string
     {
         $class = 'App\\Livewire\\Quote' . Str::studly($typeSlug) . 'Chat';

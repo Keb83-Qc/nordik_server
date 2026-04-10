@@ -72,6 +72,19 @@ class AuthController extends Controller
     }
 
     /**
+     * Déconnexion (site public + pages 2FA).
+     * Les panels Filament gèrent leur propre logout via LogoutController.
+     */
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('root');
+    }
+
+    /**
      * Gère l'inscription AJAX et envoie le message interne
      */
     public function registerAjax(Request $request)
