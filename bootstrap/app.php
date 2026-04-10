@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (\Illuminate\Foundation\Configuration\Middleware $middleware) {
         $middleware->redirectGuestsTo(
-            fn (\Illuminate\Http\Request $request) => route('login', ['locale' => app()->getLocale()])
+            fn(\Illuminate\Http\Request $request) => route('login', ['locale' => app()->getLocale()])
         );
 
         $middleware->alias([
@@ -29,9 +29,8 @@ return Application::configure(basePath: dirname(__DIR__))
         // S'exécute AVANT le routing : redirige les URLs sans préfixe locale
         // vers leur équivalent /{locale}/... (remplace ~30 routes legacy hardcodées).
         $middleware->web(prepend: [
-            \App\Http\Middleware\RedirectToLocale::class,
+            // \App\Http\Middleware\RedirectToLocale::class,
         ]);
-
         // Applique les headers de sécurité + cache sur toutes les requêtes web
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
@@ -47,7 +46,8 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 // ── 404 / Modèle introuvable ────────────────────────────────────────
                 // On log uniquement les 404 du site public (pas le panel admin — trop de bruit)
-                if ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+                if (
+                    $e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
                     || $e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException
                 ) {
                     if ($source === SystemLog::SOURCE_PUBLIC) {
@@ -87,10 +87,10 @@ return Application::configure(basePath: dirname(__DIR__))
                     if (!empty($recipients)) {
                         Mail::raw(
                             "[VIP GPI] Erreur PHP détectée\n\n"
-                            . "Message : " . $e->getMessage() . "\n"
-                            . "Fichier  : " . $e->getFile() . ':' . $e->getLine() . "\n"
-                            . "URL      : " . request()->fullUrl() . "\n\n"
-                            . mb_substr($e->getTraceAsString(), 0, 800),
+                                . "Message : " . $e->getMessage() . "\n"
+                                . "Fichier  : " . $e->getFile() . ':' . $e->getLine() . "\n"
+                                . "URL      : " . request()->fullUrl() . "\n\n"
+                                . mb_substr($e->getTraceAsString(), 0, 800),
                             fn($m) => $m->to($recipients)->subject('[VIP GPI] 🚨 Erreur critique')
                         );
                     }
