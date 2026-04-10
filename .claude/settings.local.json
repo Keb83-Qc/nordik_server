@@ -184,7 +184,12 @@
       "Bash(dir D:vipgpi_canordik_serverdatabasemigrations /B /O:N)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(echo \"DONE EXIT:$?\")",
-      "Bash(php composer.phar install --no-interaction)"
+      "Bash(php composer.phar install --no-interaction)",
+      "Bash(ls D:/vipgpi_ca/nordik_server/public/assets/*.png)",
+      "Bash(npm run:*)",
+      "Bash(./node_modules/.bin/vite build:*)",
+      "Bash(grep '\"\\\\\\\\*\"' D:/vipgpi_ca/nordik_server/composer.json)",
+      "Bash(grep -n '$results\\\\|$case\\\\|@section\\\\|@foreach\\\\|@if' D:/vipgpi_ca/nordik_server/resources/views/pdf/abf-report.blade.php)"
     ]
   }
 }
