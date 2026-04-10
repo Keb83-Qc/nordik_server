@@ -734,6 +734,17 @@ html:not(.dark) .fi-page-header header.fi-header{
 }
 
 /* =============================================================================
+   TOGGLE / SWITCH — fix visuel (overflow-x: hidden sur les conteneurs peut
+   clipper la transition du thumb)
+   ============================================================================= */
+.fi-toggle,
+.fi-fo-toggle,
+[role="switch"],
+label:has([role="switch"]){
+    overflow: visible !important;
+}
+
+/* =============================================================================
    RESPONSIVE MOBILE
    ============================================================================= */
 @media (max-width: 767px){
@@ -745,7 +756,7 @@ html:not(.dark) .fi-page-header header.fi-header{
         padding-right: 0.5rem !important;
     }
 
-    /* Prévenir le débordement horizontal */
+    /* Prévenir le débordement horizontal — on exclut les toggles */
     .fi-page,
     .fi-page-header,
     .fi-page-body,
@@ -757,7 +768,7 @@ html:not(.dark) .fi-page-header header.fi-header{
     .fi-ta-ctn,
     .fi-fo-component-ctn{
         min-width: 0 !important;
-        overflow-x: hidden !important;
+        overflow-x: clip !important;
     }
 
     /* Colonnes de formulaire en une seule colonne sur mobile */

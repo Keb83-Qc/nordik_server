@@ -691,6 +691,9 @@ class AbfConfigPage extends Page implements Forms\Contracts\HasForms
                                                 'retraite'            => '🌅 Retraite (âge visé, objectif de revenus)',
                                                 'objectifs'           => '🎯 Objectifs et projets de vie',
 
+                                                // Santé
+                                                'sante'               => '🚬 Usage du tabac (santé)',
+
                                                 // Profil
                                                 'profil_investisseur' => '📊 Profil d\'investisseur (tolérance au risque)',
                                             ])
