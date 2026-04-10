@@ -101,7 +101,7 @@ class SystemLogResource extends Resource
                     })
                     ->sortable(),
 
-                // Niveau (danger / warning / info / login / etc.)
+                // Niveau
                 Tables\Columns\TextColumn::make('level')
                     ->label('Niveau')
                     ->badge()
@@ -166,7 +166,6 @@ class SystemLogResource extends Resource
             ->defaultSort('created_at', 'desc')
             ->recordAction('view')
             ->filters([
-                // Filtre par source
                 Tables\Filters\SelectFilter::make('source')
                     ->label('Source')
                     ->options([
@@ -176,7 +175,6 @@ class SystemLogResource extends Resource
                         'api'    => '🔌 API',
                     ]),
 
-                // Filtre par niveau
                 Tables\Filters\SelectFilter::make('level')
                     ->label('Niveau')
                     ->options([
@@ -188,7 +186,6 @@ class SystemLogResource extends Resource
                         'update'     => 'Mise à jour',
                     ]),
 
-                // Filtre par période
                 Tables\Filters\Filter::make('today')
                     ->label("Aujourd'hui seulement")
                     ->query(fn($query) => $query->whereDate('created_at', today())),
@@ -204,13 +201,35 @@ class SystemLogResource extends Resource
                     ->label('JSON')
                     ->icon('heroicon-o-code-bracket')
                     ->modalHeading('Détails Techniques')
-                    ->modalContent(fn($record) => new \Illuminate\Support\HtmlString(
-                        '<pre style="white-space: pre-wrap; font-size: 0.85em; background: #f3f4f6; padding: 10px; border-radius: 8px;">' .
-                            json_encode($record->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) .
-                            '</pre>'
-                    ))
+                    ->modalContent(function ($record): \Illuminate\Support\HtmlString {
+                        $copyId   = 'logcopy-' . $record->id;
+                        $jsonText = json_encode($record->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                        $fullText = $record->message . "\n\n" . $jsonText;
+
+                        return new \Illuminate\Support\HtmlString(
+                            '<div x-data="{copied: false}">'
+                            . '<textarea id="' . $copyId . '" style="position:absolute;left:-9999px;width:1px;height:1px" readonly>' . htmlspecialchars($fullText) . '</textarea>'
+
+                            . '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+                            . '<span style="font-size:.82rem;font-weight:600;opacity:.7">Message + contexte JSON</span>'
+                            . '<button type="button"'
+                            . ' x-on:click="navigator.clipboard.writeText(document.getElementById(\'' . $copyId . '\').value).then(() => { copied=true; setTimeout(()=>copied=false,2500) })"'
+                            . ' style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid rgba(201,160,80,.45);background:rgba(201,160,80,.12);color:#c9a050;transition:background .15s"'
+                            . ' x-on:mouseover="$el.style.background=\'rgba(201,160,80,.22)\'"'
+                            . ' x-on:mouseout="$el.style.background=\'rgba(201,160,80,.12)\'">'
+                            . '<span x-show="!copied">📋 Copier</span>'
+                            . '<span x-show="copied" style="color:#22c55e">✓ Copié !</span>'
+                            . '</button>'
+                            . '</div>'
+
+                            . '<pre style="white-space:pre-wrap;font-size:.82em;background:rgba(0,0,0,.04);padding:14px;border-radius:10px;overflow:auto;max-height:460px;line-height:1.55;margin:0;border:1px solid rgba(0,0,0,.07)">'
+                            . htmlspecialchars($jsonText)
+                            . '</pre>'
+                            . '</div>'
+                        );
+                    })
                     ->modalSubmitAction(false)
-                    ->modalCancelAction(false),
+                    ->modalCancelActionLabel('Fermer'),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_logs')
@@ -218,11 +237,23 @@ class SystemLogResource extends Resource
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer tous les logs ?')
-                    ->modalDescription('Cette action est irréversible. Tout l\'historique système sera effacé.')
-                    ->modalSubmitActionLabel('Oui, tout supprimer')
-                    ->action(function () {
-                        SystemLog::truncate();
+                    ->modalHeading('Supprimer les logs de cet onglet ?')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs de l\'onglet actif seront supprimés.')
+                    ->modalSubmitActionLabel('Oui, supprimer')
+                    ->action(function (\Livewire\Component $livewire) {
+                        $tab   = $livewire->activeTab ?? 'tous';
+                        $query = SystemLog::query();
+
+                        match ($tab) {
+                            'info'   => $query->where('level', 'info')->where('message', 'not like', '[WebVital]%'),
+                            'update' => $query->where('level', 'update'),
+                            'error'  => $query->where('level', 'error'),
+                            'fatal'  => $query->where('level', 'fatal'),
+                            default  => $query->where('source', 'not like', 'email_%')
+                                              ->whereNotIn('level', ['login', 'login_fail']),
+                        };
+
+                        $query->delete();
 
                         \Filament\Notifications\Notification::make()
                             ->title('Historique vidé avec succès')

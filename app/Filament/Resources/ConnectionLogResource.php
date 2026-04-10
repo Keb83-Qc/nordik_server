@@ -172,18 +172,58 @@ class ConnectionLogResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\Action::make('copier')
+                    ->label('Copier')
+                    ->icon('heroicon-o-clipboard-document')
+                    ->color('gray')
+                    ->modalHeading('Copier le log')
+                    ->modalContent(function ($record): \Illuminate\Support\HtmlString {
+                        $copyId   = 'conncopy-' . $record->id;
+                        $jsonText = json_encode($record->context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+                        $fullText = $record->message . "\n\n" . $jsonText;
+
+                        return new \Illuminate\Support\HtmlString(
+                            '<div x-data="{copied: false}">'
+                            . '<textarea id="' . $copyId . '" style="position:absolute;left:-9999px;width:1px;height:1px" readonly>' . htmlspecialchars($fullText) . '</textarea>'
+                            . '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+                            . '<span style="font-size:.82rem;font-weight:600;opacity:.7">Message + contexte JSON</span>'
+                            . '<button type="button"'
+                            . ' x-on:click="navigator.clipboard.writeText(document.getElementById(\'' . $copyId . '\').value).then(() => { copied=true; setTimeout(()=>copied=false,2500) })"'
+                            . ' style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:1px solid rgba(201,160,80,.45);background:rgba(201,160,80,.12);color:#c9a050">'
+                            . '<span x-show="!copied">📋 Copier</span>'
+                            . '<span x-show="copied" style="color:#22c55e">✓ Copié !</span>'
+                            . '</button>'
+                            . '</div>'
+                            . '<pre style="white-space:pre-wrap;font-size:.82em;background:rgba(0,0,0,.04);padding:14px;border-radius:10px;overflow:auto;max-height:420px;line-height:1.55;margin:0;border:1px solid rgba(0,0,0,.07)">'
+                            . htmlspecialchars($jsonText)
+                            . '</pre>'
+                            . '</div>'
+                        );
+                    })
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Fermer'),
             ])
             ->headerActions([
                 Tables\Actions\Action::make('clear_connection_logs')
-                    ->label('Vider les logs connexion')
+                    ->label('Vider l\'historique')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Supprimer tous les logs de connexion ?')
-                    ->modalDescription('Cette action est irréversible.')
-                    ->modalSubmitActionLabel('Oui, tout supprimer')
-                    ->action(function () {
-                        SystemLog::whereIn('level', ['login', 'login_fail'])->delete();
+                    ->modalHeading('Supprimer les logs de cet onglet ?')
+                    ->modalDescription('Cette action est irréversible. Seuls les logs de l\'onglet actif seront supprimés.')
+                    ->modalSubmitActionLabel('Oui, supprimer')
+                    ->action(function (\Livewire\Component $livewire) {
+                        $tab   = $livewire->activeTab ?? 'toutes';
+                        $query = SystemLog::query();
+
+                        match ($tab) {
+                            'reussies' => $query->where('level', 'login'),
+                            'echouees' => $query->where('level', 'login_fail'),
+                            default    => $query->whereIn('level', ['login', 'login_fail']),
+                        };
+
+                        $query->delete();
 
                         \Filament\Notifications\Notification::make()
                             ->title('Logs de connexion vidés avec succès')

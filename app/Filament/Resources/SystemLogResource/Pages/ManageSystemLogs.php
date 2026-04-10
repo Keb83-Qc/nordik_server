@@ -4,7 +4,7 @@ namespace App\Filament\Resources\SystemLogResource\Pages;
 
 use App\Filament\Resources\SystemLogResource;
 use Filament\Resources\Pages\ManageRecords;
-use Filament\Resources\Components\Tab; // <--- Import Important
+use Filament\Resources\Components\Tab;
 use Illuminate\Database\Eloquent\Builder;
 
 class ManageSystemLogs extends ManageRecords
@@ -14,14 +14,17 @@ class ManageSystemLogs extends ManageRecords
     public function getTabs(): array
     {
         return [
-            // Tous les logs système (exclut emails et connexions)
+            // Tous les logs système (exclut emails, connexions et webvitals)
             'tous' => Tab::make('Tous')
                 ->query(fn(Builder $query) => $query
                     ->where('source', 'not like', 'email_%')
-                    ->whereNotIn('level', ['login', 'login_fail'])),
+                    ->whereNotIn('level', ['login', 'login_fail'])
+                    ->where('message', 'not like', '[WebVital]%')),
 
             'info' => Tab::make('Infos')
-                ->query(fn(Builder $query) => $query->where('level', 'info'))
+                ->query(fn(Builder $query) => $query
+                    ->where('level', 'info')
+                    ->where('message', 'not like', '[WebVital]%'))
                 ->icon('heroicon-m-information-circle')
                 ->badgeColor('info'),
 
