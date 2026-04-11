@@ -9,12 +9,7 @@
         /* =============================================
            PAGE SETUP
            ============================================= */
-        @page {
-            margin: 30mm 18mm 20mm 18mm;
-        }
-        @page :first {
-            margin: 0mm;
-        }
+        /* Margins controlled by mPDF constructor + <pagebreak> tags */
 
         /* =============================================
            BASE
@@ -31,7 +26,7 @@
             line-height: 1.5;
         }
 
-        .page-break { page-break-after: always; }
+        /* Page breaks handled by mPDF <pagebreak /> tags */
         .muted      { color: #6B7280; }
         .small      { font-size: 9.5px; }
         .strong     { font-weight: 700; }
@@ -77,15 +72,13 @@
            HEADER / FOOTER (page 2+)
            ============================================= */
         .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            width: 100%;
             height: 14mm;
             background: #0E1030;
-            padding: 0 18mm;
+            padding: 0 2mm;
             font-size: 9px;
             color: #FFFFFF;
+            overflow: hidden;
         }
         .header .left {
             float: left;
@@ -108,15 +101,13 @@
         }
 
         .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
+            width: 100%;
             height: 12mm;
             background: #F8F5EE;
             border-top: 2px solid #C9A050;
-            padding: 0 18mm;
+            padding: 0 2mm;
             font-size: 9px;
+            overflow: hidden;
         }
         .footer .left {
             float: left;
@@ -129,7 +120,7 @@
             color: #0E1030;
             font-weight: 700;
         }
-        .pagenum:before { content: counter(page); }
+        /* Page numbers use mPDF {PAGENO} placeholder */
 
         /* =============================================
            COVER PAGE
@@ -150,8 +141,10 @@
         }
         .cover-bg {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(160deg, #090A1F 0%, #0E1030 55%, #1A1040 100%);
+            top: 0; left: 0;
+            width: 210mm;
+            height: 297mm;
+            background: #0E1030;
         }
         .cover-inner {
             position: relative;
@@ -591,6 +584,24 @@
     $showInvProjection = $sec('annex', false) && $sec('investmentProjection', false);
     @endphp
 
+    {{-- ====== mPDF: running header & footer (not rendered inline) ====== --}}
+    <htmlpageheader name="main-header">
+        <div class="header">
+            @if($logo)
+            <img class="header-logo" src="{{ $logo }}" alt="VIP GPI">
+            @endif
+            <div class="left">Portrait financier &mdash; {{ $clientName }}@if($hasSpouse) &amp; {{ $spouseName }}@endif</div>
+            <div class="right">{{ $docDate }}</div>
+        </div>
+    </htmlpageheader>
+
+    <htmlpagefooter name="main-footer">
+        <div class="footer">
+            <div class="left">VIP Gestion de patrimoine et investissements inc.</div>
+            <div class="right">Page&nbsp;{PAGENO}</div>
+        </div>
+    </htmlpagefooter>
+
     {{-- ======================
      COVER (PAGE 1)
      ====================== --}}
@@ -649,22 +660,9 @@
         </div>
     </div>
 
-    <div class="page-break"></div>
-
-    {{-- ======================
-     HEADER / FOOTER (PAGE 2+)
-     ====================== --}}
-    <div class="header clearfix">
-        @if($logo)
-        <img class="header-logo" src="{{ $logo }}" alt="VIP GPI">
-        @endif
-        <div class="left">Portrait financier &mdash; {{ $clientName }}@if($hasSpouse) &amp; {{ $spouseName }}@endif</div>
-        <div class="right">{{ $docDate }}</div>
-    </div>
-    <div class="footer clearfix">
-        <div class="left">VIP Gestion de patrimoine et investissements inc.</div>
-        <div class="right">Page&nbsp;<span class="pagenum"></span></div>
-    </div>
+    <pagebreak odd-header-name="main-header" odd-footer-name="main-footer"
+               margin-top="30" margin-bottom="20" margin-left="18" margin-right="18"
+               margin-header="3" margin-footer="3" />
 
     {{-- ======================
      TOC
@@ -698,7 +696,7 @@
         @endforeach
     </div>
 
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      INFORMATIONS PERSONNELLES
@@ -941,7 +939,7 @@
     </table>
     @endif
 
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      PLACEMENTS & ACTIFS
@@ -988,7 +986,7 @@
     </table>
     @endforeach
 
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      DETTES & PASSIFS
@@ -1035,7 +1033,7 @@
     </table>
     @endforeach
 
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      BILAN FINANCIER
@@ -1096,7 +1094,7 @@
         </tbody>
     </table>
 
-    <div class="page-break"></div>
+    <pagebreak />
 
     @if($showAssurances)
     {{-- ======================
@@ -1194,7 +1192,7 @@
     @endif {{-- /sec lifeInsurance|disability|seriousIllness --}}
 
     @if($showDeathBudget)
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      BUDGET AU DÉCÈS
@@ -1264,7 +1262,7 @@
     @endif {{-- /sec lifeInsurance --}}
 
     @if($showDashboard)
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      PROFIL INVESTISSEUR
@@ -1327,7 +1325,7 @@
     @endif {{-- /sec dashboard --}}
 
     @if($showReco)
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      NOTES / RECO
@@ -1347,7 +1345,7 @@
     @endif {{-- /sec recommendations --}}
 
     @if($showDelivery)
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      ACCUSÉ
@@ -1410,7 +1408,7 @@
     @endphp
 
     @if($showRetIncome)
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      ANNEXE : REVENUS DE RETRAITE
@@ -1502,7 +1500,7 @@
         }
     }
     @endphp
-    <div class="page-break"></div>
+    <pagebreak />
 
     {{-- ======================
      ANNEXE : ÉVOLUTION DES PLACEMENTS

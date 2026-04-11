@@ -12,7 +12,7 @@
         "php": "^8.2",
         "awcodes/filament-tiptap-editor": "^3.5",
         "bacon/bacon-qr-code": "^3.1",
-        "barryvdh/laravel-dompdf": "^3.0",
+        "mpdf/mpdf": "^8.2",
         "bezhansalleh/filament-language-switch": "^3.1",
         "bezhansalleh/filament-shield": "^3.9",
         "filament/filament": "^3.2",

@@ -6,6 +6,8 @@ use App\Models\AbfCase;
 use App\Services\AbfCaseCalculator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Mpdf\Mpdf;
+use Mpdf\Output\Destination;
 
 class AbfPdfController extends Controller
 {
@@ -37,12 +39,32 @@ class AbfPdfController extends Controller
                 ? 'data:image/jpeg;base64,' . base64_encode(file_get_contents($photoPath))
                 : null;
 
-            $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.abf-report', [
+            $html = view('pdf.abf-report', [
                 'case'       => $abfCase,
                 'results'    => $results,
                 'sections'   => $sections,
                 'coverPhoto' => $coverPhoto,
+            ])->render();
+
+            $tempDir = storage_path('app/mpdf');
+            if (!is_dir($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            $mpdf = new Mpdf([
+                'mode'          => 'utf-8',
+                'format'        => 'A4',
+                'margin_top'    => 0,
+                'margin_bottom' => 0,
+                'margin_left'   => 0,
+                'margin_right'  => 0,
+                'margin_header' => 0,
+                'margin_footer' => 0,
+                'default_font'  => 'dejavusans',
+                'tempDir'       => $tempDir,
             ]);
+
+            $mpdf->WriteHTML($html);
 
             Log::channel('daily')->info('ABF PDF généré', [
                 'case_id'  => $abfCase->id,
@@ -50,7 +72,10 @@ class AbfPdfController extends Controller
                 'filename' => $filename,
             ]);
 
-            return $pdf->download($filename);
+            return response($mpdf->Output($filename, Destination::STRING_RETURN), 200, [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+            ]);
 
         } catch (\Throwable $e) {
             Log::channel('daily')->error('ABF PDF — erreur de génération', [
