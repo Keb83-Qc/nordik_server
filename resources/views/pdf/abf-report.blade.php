@@ -533,6 +533,11 @@
     $assetTotal = array_sum($assetSums);
     $liabTotal = array_sum($liabSums);
     $netTotal = $assetTotal - $liabTotal;
+    $netColor = $netTotal >= 0 ? '#16A34A' : '#DC2626';
+
+    // ── Helpers Blade-safe (pas de single-quotes dans les expressions {{ }}) ──
+    $yesNo = fn($v) => (bool) $v ? 'Oui' : 'Non';
+    $dash  = "\xE2\x80\x94"; // em-dash —
 
     // ── Profil investisseur ──────────────────────────────────────────────
     $ip = (array) data_get($payload, 'investor_profile', []);
@@ -609,7 +614,7 @@
         @if($coverPhoto ?? null)
         <img class="cover-photo" src="{{ $coverPhoto }}" alt="">
         @endif
-        <div class="cover-bg" style="{{ ($coverPhoto ?? null) ? ‘background:rgba(9,10,31,.78)’ : ‘’ }}"></div>
+        <div class="cover-bg" @if($coverPhoto ?? null) style="background:rgba(9,10,31,.78)" @endif></div>
         <div class="cover-inner">
 
             {{-- En-tête : logo + nom firme --}}
@@ -716,14 +721,14 @@
             <tr>
                 <td>Date de naissance</td>
                 <td>
-                    {{ $client['birth_date'] ?? '—' }}
+                    {{ $client['birth_date'] ?? $dash }}
                     @if($age($client['birth_date'] ?? null) !== null)
                     <span class="muted">({{ $age($client['birth_date'] ?? null) }} ans)</span>
                     @endif
                 </td>
                 @if($hasSpouse)
                 <td>
-                    {{ $spouse['birth_date'] ?? '—' }}
+                    {{ $spouse['birth_date'] ?? $dash }}
                     @if($age($spouse['birth_date'] ?? null) !== null)
                     <span class="muted">({{ $age($spouse['birth_date'] ?? null) }} ans)</span>
                     @endif
@@ -739,14 +744,14 @@
                 <td>Tabagisme</td>
                 <td>
                     {{ $smokerLabel($client['smoker_status'] ?? null) }}
-                    @if(($client['smoker_status'] ?? null) === 'smoker' && !blank($client['smoker_since'] ?? null))
+                    @if(($client["smoker_status"] ?? null) === "smoker" && !blank($client["smoker_since"] ?? null))
                     <span class="muted">({{ $client['smoker_since'] }})</span>
                     @endif
                 </td>
                 @if($hasSpouse)
                 <td>
                     {{ $smokerLabel($spouse['smoker_status'] ?? null) }}
-                    @if(($spouse['smoker_status'] ?? null) === 'smoker' && !blank($spouse['smoker_since'] ?? null))
+                    @if(($spouse["smoker_status"] ?? null) === "smoker" && !blank($spouse["smoker_since"] ?? null))
                     <span class="muted">({{ $spouse['smoker_since'] }})</span>
                     @endif
                 </td>
@@ -754,20 +759,20 @@
             </tr>
             <tr>
                 <td>Adresse (principale)</td>
-                <td>{{ $client['address'] ?? '—' }} @if(!blank($client['postal_code'] ?? null))<span class="muted">{{ $client['postal_code'] }}</span>@endif</td>
+                <td>{{ $client['address'] ?? $dash }} @if(!blank($client['postal_code'] ?? null))<span class="muted">{{ $client['postal_code'] }}</span>@endif</td>
                 @if($hasSpouse)
-                <td>{{ $spouse['address'] ?? '—' }} @if(!blank($spouse['postal_code'] ?? null))<span class="muted">{{ $spouse['postal_code'] }}</span>@endif</td>
+                <td>{{ $spouse['address'] ?? $dash }} @if(!blank($spouse['postal_code'] ?? null))<span class="muted">{{ $spouse['postal_code'] }}</span>@endif</td>
                 @endif
             </tr>
             <tr>
                 <td>Téléphone (domicile)</td>
-                <td>{{ $client['home_phone'] ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ $spouse['home_phone'] ?? '—' }}</td>@endif
+                <td>{{ $client['home_phone'] ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ $spouse['home_phone'] ?? $dash }}</td>@endif
             </tr>
             <tr>
                 <td>Courriel (principal)</td>
-                <td>{{ $client['email'] ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ $spouse['email'] ?? '—' }}</td>@endif
+                <td>{{ $client['email'] ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ $spouse['email'] ?? $dash }}</td>@endif
             </tr>
             <tr>
                 <td>Statut au Canada</td>
@@ -777,20 +782,20 @@
             <tr>
                 <td>NAS</td>
                 <td>
-                    @php $hs = data_get($client, 'has_sin'); @endphp
-                    {{ $hs === null ? '—' : ((bool) $hs ? 'Oui' : 'Non') }}
+                    @php $hs = data_get($client, "has_sin"); $hsText = $hs === null ? $dash : $yesNo($hs); @endphp
+                    {{ $hsText }}
                 </td>
                 @if($hasSpouse)
                 <td>
-                    @php $hs2 = data_get($spouse, 'has_sin'); @endphp
-                    {{ $hs2 === null ? '—' : ((bool) $hs2 ? 'Oui' : 'Non') }}
+                    @php $hs2 = data_get($spouse, "has_sin"); $hs2Text = $hs2 === null ? $dash : $yesNo($hs2); @endphp
+                    {{ $hs2Text }}
                 </td>
                 @endif
             </tr>
             <tr>
                 <td>Travaille au Canada depuis</td>
-                <td>{{ $client['work_in_canada_since'] ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ $spouse['work_in_canada_since'] ?? '—' }}</td>@endif
+                <td>{{ $client['work_in_canada_since'] ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ $spouse['work_in_canada_since'] ?? $dash }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -807,18 +812,18 @@
         <tbody>
             <tr>
                 <td>Titre</td>
-                <td>{{ data_get($client,'jobs.0.occupation') ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ data_get($spouse,'jobs.0.occupation') ?? '—' }}</td>@endif
+                <td>{{ data_get($client,"jobs.0.occupation") ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ data_get($spouse,"jobs.0.occupation") ?? $dash }}</td>@endif
             </tr>
             <tr>
                 <td>Entreprise</td>
-                <td>{{ data_get($client,'jobs.0.employer') ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ data_get($spouse,'jobs.0.employer') ?? '—' }}</td>@endif
+                <td>{{ data_get($client,"jobs.0.employer") ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ data_get($spouse,"jobs.0.employer") ?? $dash }}</td>@endif
             </tr>
             <tr>
                 <td>Depuis</td>
-                <td>{{ $client['employment_since'] ?? '—' }}</td>
-                @if($hasSpouse)<td>{{ $spouse['employment_since'] ?? '—' }}</td>@endif
+                <td>{{ $client['employment_since'] ?? $dash }}</td>
+                @if($hasSpouse)<td>{{ $spouse['employment_since'] ?? $dash }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -835,18 +840,18 @@
         <tbody>
             <tr>
                 <td>Revenu d'emploi (annuel)</td>
-                <td>{{ $money(data_get($client,'jobs.0.annual_income', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,'jobs.0.annual_income', 0)) }}</td>@endif
+                <td>{{ $money(data_get($client,"jobs.0.annual_income", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($spouse,"jobs.0.annual_income", 0)) }}</td>@endif
             </tr>
             <tr>
                 <td>Autres revenus (annuels)</td>
-                <td>{{ $money(data_get($client,'other_income_annual', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,'other_income_annual', 0)) }}</td>@endif
+                <td>{{ $money(data_get($client,"other_income_annual", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($spouse,"other_income_annual", 0)) }}</td>@endif
             </tr>
             <tr>
                 <td>Autres revenus (mensuels)</td>
-                <td>{{ $money(data_get($client,'other_income_monthly', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,'other_income_monthly', 0)) }}</td>@endif
+                <td>{{ $money(data_get($client,"other_income_monthly", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($spouse,"other_income_monthly", 0)) }}</td>@endif
             </tr>
             <tr class="small">
                 <td colspan="{{ $hasSpouse ? 3 : 2 }}" class="muted">* Montants bruts selon les informations fournies.</td>
@@ -877,12 +882,13 @@
             $dep = ['full'=>'Totale','partial'=>'Partielle','none'=>'Aucune'][$d['financial_dependency'] ?? ''] ?? '—';
             @endphp
             <tr>
-                <td>{{ $d['name'] ?? '—' }}</td>
-                <td>{{ $d['birth_date'] ?? '—' }}</td>
-                <td>{{ $a === null ? '—' : ($a . ' ans') }}</td>
+                <td>{{ $d['name'] ?? $dash }}</td>
+                <td>{{ $d['birth_date'] ?? $dash }}</td>
+                @php $ageText = $a === null ? $dash : ($a . " ans"); @endphp
+                <td>{{ $ageText }}</td>
                 <td>{{ $rel }}</td>
                 <td>{{ $dep }}</td>
-                <td>{{ (bool) ($d['same_contact_as_client'] ?? false) ? 'Oui' : 'Non' }}</td>
+                <td>{{ $yesNo($d["same_contact_as_client"] ?? false) }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -901,18 +907,18 @@
         <tbody>
             <tr>
                 <td>Testament</td>
-                <td>{{ (bool) data_get($client,'legal.will_exists', false) ? 'Oui' : 'Non' }}</td>
-                @if($hasSpouse)<td>{{ (bool) data_get($spouse,'legal.will_exists', false) ? 'Oui' : 'Non' }}</td>@endif
+                <td>{{ $yesNo(data_get($client,"legal.will_exists", false)) }}</td>
+                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.will_exists", false)) }}</td>@endif
             </tr>
             <tr>
                 <td>Mandat en cas d'inaptitude (QC)</td>
-                <td>{{ (bool) data_get($client,'legal.mandate_incapacity_exists', false) ? 'Oui' : 'Non' }}</td>
-                @if($hasSpouse)<td>{{ (bool) data_get($spouse,'legal.mandate_incapacity_exists', false) ? 'Oui' : 'Non' }}</td>@endif
+                <td>{{ $yesNo(data_get($client,"legal.mandate_incapacity_exists", false)) }}</td>
+                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.mandate_incapacity_exists", false)) }}</td>@endif
             </tr>
             <tr>
                 <td>Procuration (hors QC)</td>
-                <td>{{ (bool) data_get($client,'legal.power_of_attorney_exists', false) ? 'Oui' : 'Non' }}</td>
-                @if($hasSpouse)<td>{{ (bool) data_get($spouse,'legal.power_of_attorney_exists', false) ? 'Oui' : 'Non' }}</td>@endif
+                <td>{{ $yesNo(data_get($client,"legal.power_of_attorney_exists", false)) }}</td>
+                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.power_of_attorney_exists", false)) }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -932,7 +938,8 @@
             @foreach($goalsSelected as $k)
             <tr>
                 <td style="width:35%;">{{ $goalsLabels[$k] ?? $k }}</td>
-                <td>{{ trim((string) ($goalsAnswers[$k] ?? '')) ?: '—' }}</td>
+                <td>@php $goalText = trim((string) ($goalsAnswers[$k] ?? "")) ?: $dash; @endphp
+                {{ $goalText }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -973,14 +980,14 @@
             @foreach($rows2 as $aRow)
             <tr>
                 <td class="muted">{{ $assetType[$type] ?? $type }}</td>
-                <td>{{ $aRow['description'] ?? '—' }}</td>
+                <td>{{ $aRow['description'] ?? $dash }}</td>
                 <td>{{ $money($aRow['value'] ?? 0) }}</td>
             </tr>
             @endforeach
             @endforeach
             <tr class="grand-total">
                 <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
-                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r['value'] ?? 0))) }}</td>
+                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r["value"] ?? 0))) }}</td>
             </tr>
         </tbody>
     </table>
@@ -1020,14 +1027,14 @@
             @foreach($rows2 as $lRow)
             <tr>
                 <td class="muted">{{ $liabType[$type] ?? $type }}</td>
-                <td>{{ $lRow['creditor'] ?? '—' }}</td>
+                <td>{{ $lRow['creditor'] ?? $dash }}</td>
                 <td>{{ $money($lRow['balance'] ?? 0) }}</td>
             </tr>
             @endforeach
             @endforeach
             <tr class="grand-total">
                 <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
-                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r['balance'] ?? 0))) }}</td>
+                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r["balance"] ?? 0))) }}</td>
             </tr>
         </tbody>
     </table>
@@ -1051,9 +1058,9 @@
                 <div class="stat-card-label">Total des passifs</div>
                 <div class="stat-card-value">{{ $money($liabTotal) }}</div>
             </td>
-            <td class="stat-card" style="width:33%;border-top-color:{{ $netTotal >= 0 ? '#16A34A' : '#DC2626' }}">
+            <td class="stat-card" style="width:33%;border-top-color:{{ $netColor }}">
                 <div class="stat-card-label">Valeur nette</div>
-                <div class="stat-card-value" style="color:{{ $netTotal >= 0 ? '#16A34A' : '#DC2626' }}">{{ $money($netTotal) }}</div>
+                <div class="stat-card-value" style="color:{{ $netColor }}">{{ $money($netTotal) }}</div>
             </td>
         </tr>
     </table>
@@ -1135,8 +1142,8 @@
         <tbody>
             @foreach($life as $r)
             <tr>
-                <td>{{ $r['provider'] ?? '—' }}</td>
-                <td>{{ $r['contract_type'] ?? '—' }}</td>
+                <td>{{ $r['provider'] ?? $dash }}</td>
+                <td>{{ $r['contract_type'] ?? $dash }}</td>
                 <td>{{ $money($r['death_capital'] ?? 0) }}</td>
                 <td>{{ $money($r['annual_premium'] ?? 0) }}</td>
             </tr>
@@ -1158,7 +1165,7 @@
         <tbody>
             @foreach($ci as $r)
             <tr>
-                <td>{{ $r['provider'] ?? '—' }}</td>
+                <td>{{ $r['provider'] ?? $dash }}</td>
                 <td>{{ $money($r['insured_capital'] ?? 0) }}</td>
                 <td>{{ $money($r['premium'] ?? 0) }}</td>
             </tr>
@@ -1180,7 +1187,7 @@
         <tbody>
             @foreach($dis as $r)
             <tr>
-                <td>{{ $r['provider'] ?? '—' }}</td>
+                <td>{{ $r['provider'] ?? $dash }}</td>
                 <td>{{ $money($r['monthly_income'] ?? 0) }}</td>
                 <td>{{ $money($r['premium'] ?? 0) }}</td>
             </tr>
@@ -1204,20 +1211,23 @@
     {{-- Stat cards résumé --}}
     <table class="stat-grid">
         <tr>
-            <td class="stat-card" style="width:{{ $hasSpouse ? '50%' : '100%' }}">
+            @php $dbWidth = $hasSpouse ? "50%" : "100%"; @endphp
+            <td class="stat-card" style="width:{{ $dbWidth }}">
                 <div class="stat-card-label">{{ $clientName }} — Besoin additionnel</div>
-                <div class="stat-card-value {{ data_get($db,'client.e.additional_need',0) > 0 ? 'danger' : '' }}">
-                    {{ $money(data_get($db,'client.e.additional_need', 0)) }}
+                @php $dbClientDanger = data_get($db,"client.e.additional_need",0) > 0 ? "danger" : ""; @endphp
+                <div class="stat-card-value {{ $dbClientDanger }}">
+                    {{ $money(data_get($db,"client.e.additional_need", 0)) }}
                 </div>
-                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,'client.d.capital_required', 0)) }}</div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,"client.d.capital_required", 0)) }}</div>
             </td>
             @if($hasSpouse)
             <td class="stat-card">
                 <div class="stat-card-label">{{ $spouseName }} — Besoin additionnel</div>
-                <div class="stat-card-value {{ data_get($db,'spouse.e.additional_need',0) > 0 ? 'danger' : '' }}">
-                    {{ $money(data_get($db,'spouse.e.additional_need', 0)) }}
+                @php $dbSpouseDanger = data_get($db,"spouse.e.additional_need",0) > 0 ? "danger" : ""; @endphp
+                <div class="stat-card-value {{ $dbSpouseDanger }}">
+                    {{ $money(data_get($db,"spouse.e.additional_need", 0)) }}
                 </div>
-                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,'spouse.d.capital_required', 0)) }}</div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,"spouse.d.capital_required", 0)) }}</div>
             </td>
             @endif
         </tr>
@@ -1235,23 +1245,23 @@
         <tbody>
             <tr>
                 <td>Liquidités nettes au décès</td>
-                <td>{{ $money(data_get($db,'client.b.net_liquidities', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.b.net_liquidities', 0)) }}</td>@endif
+                <td>{{ $money(data_get($db,"client.b.net_liquidities", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.b.net_liquidities", 0)) }}</td>@endif
             </tr>
             <tr>
                 <td>Revenu mensuel à combler</td>
-                <td>{{ $money(data_get($db,'client.c.monthly_gap', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.c.monthly_gap', 0)) }}</td>@endif
+                <td>{{ $money(data_get($db,"client.c.monthly_gap", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.c.monthly_gap", 0)) }}</td>@endif
             </tr>
             <tr>
                 <td>Capital requis</td>
-                <td>{{ $money(data_get($db,'client.d.capital_required', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.d.capital_required', 0)) }}</td>@endif
+                <td>{{ $money(data_get($db,"client.d.capital_required", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.d.capital_required", 0)) }}</td>@endif
             </tr>
             <tr class="total-row">
                 <td>Besoin d'assurance additionnel</td>
-                <td>{{ $money(data_get($db,'client.e.additional_need', 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,'spouse.e.additional_need', 0)) }}</td>@endif
+                <td>{{ $money(data_get($db,"client.e.additional_need", 0)) }}</td>
+                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.e.additional_need", 0)) }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -1365,7 +1375,7 @@
         <tbody>
             <tr>
                 <td style="width:45%;height:16mm;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm;font-size:9px;color:#6B7280">
-                    Signature {{ $sig['role'] ?? '' }}
+                    Signature {{ $sig["role"] ?? "" }}
                 </td>
                 <td style="width:5%;"></td>
                 <td style="width:30%;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm">
@@ -1436,36 +1446,36 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($_block['pub'] as $_r)
+            @foreach($_block["pub"] as $_r)
             <tr>
-                <td>{{ $_r['label'] ?? $_r['id'] ?? '—' }}</td>
+                <td>{{ $_r['label'] ?? $_r['id'] ?? $dash }}</td>
                 <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
+                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
                 <td>{{ $_r['debut'] ?? 65 }} ans</td>
-                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
             </tr>
             @endforeach
             @foreach($rpdList as $_r)
-            @php $rpdMatch = ($_r['role'] ?? '') === $_block['role']; @endphp
+            @php $rpdMatch = ($_r["role"] ?? "") === $_block["role"]; @endphp
             @if($rpdMatch)
             <tr>
-                <td>{{ $_r['nom'] ?? 'Régime privé' }}</td>
+                <td>{{ $_r["nom"] ?? "Régime privé" }}</td>
                 <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
-                <td>{{ $_r['debut'] ?? '—' }} ans</td>
-                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
+                <td>{{ $_r['debut'] ?? $dash }} ans</td>
+                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
             </tr>
             @endif
             @endforeach
             @foreach($retraitsList as $_r)
-            @php $retraitMatch = ($_r['role'] ?? '') === $_block['role']; @endphp
+            @php $retraitMatch = ($_r["role"] ?? "") === $_block["role"]; @endphp
             @if($retraitMatch)
             <tr>
-                <td>{{ $_r['desc'] ?? $_r['type'] ?? 'Retrait' }}</td>
+                <td>{{ $_r["desc"] ?? $_r["type"] ?? "Retrait" }}</td>
                 <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r['frequence'] ?? 'mensuel') }}</td>
-                <td>{{ $_r['debut'] ?? '—' }}</td>
-                <td>{{ $money($toAnnual($_r['montant'] ?? 0, $_r['frequence'] ?? 'mensuel')) }}</td>
+                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
+                <td>{{ $_r['debut'] ?? $dash }}</td>
+                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
             </tr>
             @endif
             @endforeach
@@ -1489,7 +1499,7 @@
     $targetAge    = $retAgeClient ?: 65;
     $years        = max(1, $targetAge - $currentAge);
     $currentValue = $assetTotal;
-    $annualSavings= (float) data_get($client, 'jobs.0.annual_income', 0) * 0.10; // 10% savings assumption
+    $annualSavings= (float) data_get($client, 'jobs.0.annual_income", 0) * 0.10; // 10% savings assumption
     $rate         = (float) (data_get($payload, 'hypotheses.return_rate', 5) ?: 5) / 100;
     $projRows     = [];
     $v = $currentValue;
@@ -1522,10 +1532,10 @@
         </thead>
         <tbody>
             @foreach($projRows as $_row)
-            <tr @if($_row['age'] >= $targetAge) class="total-row" @endif>
-                <td>{{ $_row['age'] }} ans</td>
-                <td>{{ $_row['an'] }} an{{ $_row['an'] > 1 ? 's' : '' }}</td>
-                <td>{{ $money($_row['valeur']) }}</td>
+            <tr @if($_row["age"] >= $targetAge) class="total-row" @endif>
+                <td>{{ $_row["age"] }} ans</td>
+                <td>{{ $_row["an"] }} an{{ $_row["an"] > 1 ? "s" : "" }}</td>
+                <td>{{ $money($_row["valeur"]) }}</td>
             </tr>
             @endforeach
         </tbody>
