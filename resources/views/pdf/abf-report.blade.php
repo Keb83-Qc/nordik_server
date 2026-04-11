@@ -439,7 +439,7 @@
 </head>
 
 <body>
-    @php
+    <?php
     $sections = (array) ($sections ?? []);
     $sec = fn($k, $def = true) => (bool) ($sections[$k] ?? $def);
 
@@ -587,7 +587,7 @@
     $showDelivery      = $sec('deliveryConfirmation', false);
     $showRetIncome     = $sec('annex', false) && $sec('retirementIncome', false);
     $showInvProjection = $sec('annex', false) && $sec('investmentProjection', false);
-    @endphp
+    ?>
 
     {{-- ====== mPDF: running header & footer (not rendered inline) ====== --}}
     <htmlpageheader name="main-header">
@@ -644,9 +644,9 @@
                     @endif
                 </div>
 
-                @php
+                <?php
                 $advisorName = auth()->user()?->name ?? data_get($case->advisor, ‘name’, ‘’);
-                @endphp
+                ?>
                 @if($advisorName)
                 <div class="cover-date-block">
                     Conseiller&nbsp;: <strong style="color:rgba(255,255,255,.85)">{{ $advisorName }}</strong>
@@ -675,7 +675,7 @@
     <h1>Table des matières</h1>
 
     <div class="toc-section">
-        @php
+        <?php
         $tocItems = [
             [‘Informations personnelles’,  true],
             [‘Placements & actifs’,        true],
@@ -690,7 +690,7 @@
             [‘Annexe — Évolution des placements’, $sec(‘annex’, false) && $sec(‘investmentProjection’, false)],
         ];
         $n = 1;
-        @endphp
+        ?>
         @foreach($tocItems as [$name, $show])
         @if($show)
         <div class="toc-item clearfix">
@@ -782,12 +782,12 @@
             <tr>
                 <td>NAS</td>
                 <td>
-                    @php $hs = data_get($client, "has_sin"); $hsText = $hs === null ? $dash : $yesNo($hs); @endphp
+                    <?php $hs = data_get($client, "has_sin"); $hsText = $hs === null ? $dash : $yesNo($hs); ?>
                     {{ $hsText }}
                 </td>
                 @if($hasSpouse)
                 <td>
-                    @php $hs2 = data_get($spouse, "has_sin"); $hs2Text = $hs2 === null ? $dash : $yesNo($hs2); @endphp
+                    <?php $hs2 = data_get($spouse, "has_sin"); $hs2Text = $hs2 === null ? $dash : $yesNo($hs2); ?>
                     {{ $hs2Text }}
                 </td>
                 @endif
@@ -876,15 +876,15 @@
         </thead>
         <tbody>
             @foreach($deps as $d)
-            @php
+            <?php
             $a = $age($d['birth_date'] ?? null);
             $rel = ['child'=>'Enfant','dependent'=>'Personne à charge','other'=>'Autre'][$d['relationship'] ?? ''] ?? '—';
             $dep = ['full'=>'Totale','partial'=>'Partielle','none'=>'Aucune'][$d['financial_dependency'] ?? ''] ?? '—';
-            @endphp
+            ?>
             <tr>
                 <td>{{ $d['name'] ?? $dash }}</td>
                 <td>{{ $d['birth_date'] ?? $dash }}</td>
-                @php $ageText = $a === null ? $dash : ($a . " ans"); @endphp
+                <?php $ageText = $a === null ? $dash : ($a . " ans"); ?>
                 <td>{{ $ageText }}</td>
                 <td>{{ $rel }}</td>
                 <td>{{ $dep }}</td>
@@ -938,7 +938,7 @@
             @foreach($goalsSelected as $k)
             <tr>
                 <td style="width:35%;">{{ $goalsLabels[$k] ?? $k }}</td>
-                <td>@php $goalText = trim((string) ($goalsAnswers[$k] ?? "")) ?: $dash; @endphp
+                <td><?php $goalText = trim((string) ($goalsAnswers[$k] ?? "")) ?: $dash; ?>
                 {{ $goalText }}</td>
             </tr>
             @endforeach
@@ -953,15 +953,15 @@
      ====================== --}}
     <h1>Placements & actifs</h1>
 
-    @php $byOwner = collect($assets)->groupBy(fn($a) => $a['owner'] ?? 'client'); @endphp
+    <?php $byOwner = collect($assets)->groupBy(fn($a) => $a['owner'] ?? 'client'); ?>
 
     @foreach($ownersList as $owner)
-    @php
+    <?php
     if ($owner === 'spouse' && ! $hasSpouse) continue;
     $rows = (array) ($byOwner[$owner] ?? []);
     if (count($rows) === 0) continue;
     $grouped = collect($rows)->groupBy(fn($a) => $a['type'] ?? 'other');
-    @endphp
+    ?>
 
     <h2>{{ $ownerLabel($owner) }}</h2>
     <table class="simple">
@@ -1000,15 +1000,15 @@
      ====================== --}}
     <h1>Dettes & passifs</h1>
 
-    @php $liabsByOwner = collect($liabs)->groupBy(fn($l) => $l['owner'] ?? 'client'); @endphp
+    <?php $liabsByOwner = collect($liabs)->groupBy(fn($l) => $l['owner'] ?? 'client'); ?>
 
     @foreach($ownersList as $owner)
-    @php
+    <?php
     if ($owner === 'spouse' && ! $hasSpouse) continue;
     $rows = (array) ($liabsByOwner[$owner] ?? []);
     if (count($rows) === 0) continue;
     $grouped = collect($rows)->groupBy(fn($l) => $l['type'] ?? 'other');
-    @endphp
+    ?>
 
     <h2>{{ $ownerLabel($owner) }}</h2>
     <table class="simple">
@@ -1109,22 +1109,22 @@
      ====================== --}}
     <h1>Assurances</h1>
 
-    @php
+    <?php
     $ppl = [
     'client' => ['name' => $clientName, 'data' => (array) ($prot['client'] ?? [])],
     'spouse' => ['name' => $spouseName, 'data' => (array) ($prot['spouse'] ?? [])],
     'children' => ['name' => 'Enfants', 'data' => (array) ($prot['children'] ?? [])],
     ];
-    @endphp
+    ?>
 
     @foreach($ppl as $key => $block)
-    @php
+    <?php
     if ($key === 'spouse' && ! $hasSpouse) continue;
     $life = (array) data_get($block['data'],'life', []);
     $dis = (array) data_get($block['data'],'disability', []);
     $ci = (array) data_get($block['data'],'critical_illness', []);
     if (count($life)+count($dis)+count($ci) === 0) continue;
-    @endphp
+    ?>
 
     <h2>{{ $block['name'] }}</h2>
 
@@ -1206,15 +1206,15 @@
      ====================== --}}
     <h1>Budget au décès</h1>
 
-    @php $db = (array) data_get($results, 'death_budget.per_person', []); @endphp
+    <?php $db = (array) data_get($results, 'death_budget.per_person', []); ?>
 
     {{-- Stat cards résumé --}}
     <table class="stat-grid">
         <tr>
-            @php $dbWidth = $hasSpouse ? "50%" : "100%"; @endphp
+            <?php $dbWidth = $hasSpouse ? "50%" : "100%"; ?>
             <td class="stat-card" style="width:{{ $dbWidth }}">
                 <div class="stat-card-label">{{ $clientName }} — Besoin additionnel</div>
-                @php $dbClientDanger = data_get($db,"client.e.additional_need",0) > 0 ? "danger" : ""; @endphp
+                <?php $dbClientDanger = data_get($db,"client.e.additional_need",0) > 0 ? "danger" : ""; ?>
                 <div class="stat-card-value {{ $dbClientDanger }}">
                     {{ $money(data_get($db,"client.e.additional_need", 0)) }}
                 </div>
@@ -1223,7 +1223,7 @@
             @if($hasSpouse)
             <td class="stat-card">
                 <div class="stat-card-label">{{ $spouseName }} — Besoin additionnel</div>
-                @php $dbSpouseDanger = data_get($db,"spouse.e.additional_need",0) > 0 ? "danger" : ""; @endphp
+                <?php $dbSpouseDanger = data_get($db,"spouse.e.additional_need",0) > 0 ? "danger" : ""; ?>
                 <div class="stat-card-value {{ $dbSpouseDanger }}">
                     {{ $money(data_get($db,"spouse.e.additional_need", 0)) }}
                 </div>
@@ -1281,7 +1281,7 @@
 
     @if($ipFilled)
     {{-- Stat card profil --}}
-    @php
+    <?php
     $profileColor = match(true) {
         $ipScore <= 25  => '#3B82F6',
         $ipScore <= 55  => '#22C55E',
@@ -1289,7 +1289,7 @@
         $ipScore <= 120 => '#F97316',
         default         => '#EF4444',
     };
-    @endphp
+    ?>
     <table class="stat-grid">
         <tr>
             <td class="stat-card" style="width:50%;border-top-color:{{ $profileColor }}">
@@ -1306,20 +1306,20 @@
     </table>
 
     {{-- Questions par section --}}
-    @php
+    <?php
     $currentSection = null;
-    @endphp
+    ?>
     @foreach($ipQuestions as $key => $q)
-    @php $sectionChanged = $q['section'] !== $currentSection; @endphp
+    <?php $sectionChanged = $q['section'] !== $currentSection; ?>
     @if($sectionChanged)
-    @php $currentSection = $q['section']; @endphp
+    <?php $currentSection = $q['section']; ?>
     <h2>{{ $currentSection }}</h2>
     @endif
-    @php
+    <?php
     $pts = (int) ($ip[$key] ?? 0);
     $answer = $pts > 0 ? ($q['options'][$pts] ?? '—') : '—';
     $ptLabel = $pts === 1 ? '1 point' : ($pts > 0 ? "{$pts} points" : '—');
-    @endphp
+    ?>
     <table class="simple" style="margin-bottom:2mm;">
         <tbody>
             <tr>
@@ -1363,13 +1363,13 @@
     <h1>Confirmation de remise</h1>
     <p style="margin-bottom:6mm;">Je, soussigné(e), confirme avoir reçu et pris connaissance du document « Votre portrait financier » préparé par <strong>VIP Gestion de patrimoine et investissements inc.</strong> en date du {{ $docDate }}, ainsi que des hypothèses et des informations qui y sont contenues.</p>
 
-    @php
+    <?php
     $signataires = array_values(array_filter([
         ['name' => $clientName,          'show' => true,                          'role' => ''],
         ['name' => $spouseName,          'show' => $hasSpouse,                    'role' => ''],
         ['name' => $advisorName ?? '',   'show' => !empty($advisorName ?? ''),    'role' => 'Conseiller'],
     ], fn($r) => $r['show']));
-    @endphp
+    ?>
     @foreach($signataires as $sig)
     <table class="simple" style="margin-bottom:8mm;">
         <tbody>
@@ -1393,7 +1393,7 @@
     @endforeach
     @endif {{-- /sec deliveryConfirmation --}}
 
-    @php
+    <?php
     $retData         = (array) data_get($payload, 'retraite', []);
     $regPubClient    = (array) data_get($retData, 'regimesPublics.client', []);
     $regPubConjoint  = (array) data_get($retData, 'regimesPublics.conjoint', []);
@@ -1415,7 +1415,7 @@
             default     => (float)$montant,
         };
     };
-    @endphp
+    ?>
 
     @if($showRetIncome)
     <pagebreak />
@@ -1426,12 +1426,12 @@
     <h1>Annexe — Revenus de retraite</h1>
     <p class="muted small">Estimations basées sur les informations fournies. Les montants des régimes publics sont indexés.</p>
 
-    @php
+    <?php
     $retireBlocks = array_filter([
         ['role' => 'client',  'label' => $clientName,  'age' => $retAgeClient,  'pub' => $regPubClient],
         $hasSpouse ? ['role' => 'conjoint', 'label' => $spouseName, 'age' => $retAgeConjoint, 'pub' => $regPubConjoint] : null,
     ]);
-    @endphp
+    ?>
     @foreach($retireBlocks as $_block)
     @if($_block === null) @continue @endif
     <h2>{{ $_block['label'] }} — retraite à {{ $_block['age'] }} ans</h2>
@@ -1456,7 +1456,7 @@
             </tr>
             @endforeach
             @foreach($rpdList as $_r)
-            @php $rpdMatch = ($_r["role"] ?? "") === $_block["role"]; @endphp
+            <?php $rpdMatch = ($_r["role"] ?? "") === $_block["role"]; ?>
             @if($rpdMatch)
             <tr>
                 <td>{{ $_r["nom"] ?? "Régime privé" }}</td>
@@ -1468,7 +1468,7 @@
             @endif
             @endforeach
             @foreach($retraitsList as $_r)
-            @php $retraitMatch = ($_r["role"] ?? "") === $_block["role"]; @endphp
+            <?php $retraitMatch = ($_r["role"] ?? "") === $_block["role"]; ?>
             @if($retraitMatch)
             <tr>
                 <td>{{ $_r["desc"] ?? $_r["type"] ?? "Retrait" }}</td>
@@ -1479,11 +1479,11 @@
             </tr>
             @endif
             @endforeach
-            @php
+            <?php
             $totalAnnuel = collect($_block['pub'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
                 + collect($rpdList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
                 + collect($retraitsList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'));
-            @endphp
+            ?>
             <tr class="grand-total">
                 <td colspan="4">Total annuel estimé</td>
                 <td>{{ $money($totalAnnuel) }}</td>
@@ -1494,7 +1494,7 @@
     @endif {{-- /sec retirementIncome --}}
 
     @if($showInvProjection)
-    @php
+    <?php
     $currentAge   = $age($client['birth_date'] ?? null) ?? 40;
     $targetAge    = $retAgeClient ?: 65;
     $years        = max(1, $targetAge - $currentAge);
@@ -1509,7 +1509,7 @@
             $projRows[] = ['age' => $currentAge + $y, 'an' => $y, 'valeur' => $v];
         }
     }
-    @endphp
+    ?>
     <pagebreak />
 
     {{-- ======================
