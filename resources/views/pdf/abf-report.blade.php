@@ -6,34 +6,20 @@
     <title>Votre portrait financier</title>
 
     <style>
-        /* =============================================
-           PAGE SETUP
-           ============================================= */
-        /* Margins controlled by mPDF constructor + <pagebreak> tags */
-
-        /* =============================================
-           BASE
-           ============================================= */
         body {
             font-family: DejaVu Sans, sans-serif;
             font-size: 10.5px;
             color: #1A1C2E;
             line-height: 1.5;
         }
-
         p {
             margin: 0 0 6px 0;
             line-height: 1.5;
         }
-
-        /* Page breaks handled by mPDF <pagebreak /> tags */
         .muted      { color: #6B7280; }
         .small      { font-size: 9.5px; }
         .strong     { font-weight: 700; }
 
-        /* =============================================
-           SECTION HEADINGS
-           ============================================= */
         h1 {
             font-family: DejaVu Serif, serif;
             font-size: 20px;
@@ -45,7 +31,6 @@
             border-left: 5px solid #C9A050;
             page-break-after: avoid;
         }
-
         h2 {
             font-family: DejaVu Sans, sans-serif;
             font-size: 12px;
@@ -56,7 +41,6 @@
             border-left: 3px solid #C9A050;
             page-break-after: avoid;
         }
-
         h3 {
             font-family: DejaVu Sans, sans-serif;
             font-size: 10.5px;
@@ -68,9 +52,6 @@
             page-break-after: avoid;
         }
 
-        /* =============================================
-           HEADER / FOOTER (page 2+)
-           ============================================= */
         .header {
             width: 100%;
             height: 14mm;
@@ -99,7 +80,6 @@
             margin-top: 3mm;
             margin-left: 6mm;
         }
-
         .footer {
             width: 100%;
             height: 12mm;
@@ -120,11 +100,7 @@
             color: #0E1030;
             font-weight: 700;
         }
-        /* Page numbers use mPDF {PAGENO} placeholder */
 
-        /* =============================================
-           COVER PAGE
-           ============================================= */
         .cover {
             position: relative;
             height: 297mm;
@@ -236,16 +212,11 @@
             letter-spacing: .5px;
         }
 
-        /* =============================================
-           TABLES
-           ============================================= */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 4mm;
         }
-
-        /* --- Tableau comparatif (client / conjoint) --- */
         .compare thead tr {
             background: #0E1030;
         }
@@ -273,8 +244,6 @@
             color: #6B7280;
             font-size: 10px;
         }
-
-        /* --- Tableau simple (listes) --- */
         .simple thead tr {
             background: #F8F5EE;
             border-bottom: 2px solid #C9A050;
@@ -295,8 +264,6 @@
             vertical-align: top;
             font-size: 10.5px;
         }
-
-        /* Ligne de sous-total */
         .subtotal-row td {
             background: #F0EBE0;
             font-weight: 700;
@@ -304,8 +271,6 @@
             color: #0E1030;
             border-top: 1px solid #C9A050;
         }
-
-        /* Ligne de total général */
         .total-row td {
             background: #0E1030;
             color: #C9A050;
@@ -313,8 +278,6 @@
             font-size: 10.5px;
             border-bottom: none;
         }
-
-        /* Ligne grand total (alias) */
         .grand-total td {
             background: #0E1030;
             color: #C9A050;
@@ -322,9 +285,6 @@
             border-bottom: none;
         }
 
-        /* =============================================
-           STAT CARDS (budget décès, etc.)
-           ============================================= */
         .stat-grid {
             width: 100%;
             border-collapse: separate;
@@ -362,9 +322,6 @@
             margin-top: 1mm;
         }
 
-        /* =============================================
-           BADGE / PILL
-           ============================================= */
         .badge {
             display: inline;
             font-size: 9px;
@@ -379,9 +336,6 @@
         .badge-red    { background: #FEE2E2; color: #DC2626; }
         .badge-gray   { background: #F3F4F6; color: #6B7280; }
 
-        /* =============================================
-           INFO BOX
-           ============================================= */
         .info-box {
             background: #F8F5EE;
             border-left: 3px solid #C9A050;
@@ -391,9 +345,6 @@
             color: #6B7280;
         }
 
-        /* =============================================
-           TABLE OF CONTENTS
-           ============================================= */
         .toc-section {
             margin-top: 8mm;
         }
@@ -419,9 +370,6 @@
         }
         .clearfix:after { content: ""; display: block; clear: both; }
 
-        /* =============================================
-           MISC
-           ============================================= */
         .section-gap   { margin-top: 4mm; }
         .divider {
             border: none;
@@ -439,157 +387,8 @@
 </head>
 
 <body>
-    <?php
-    $sections = (array) ($sections ?? []);
-    $sec = fn($k, $def = true) => (bool) ($sections[$k] ?? $def);
 
-    $payload = (array) ($case->payload ?? []);
-    $client = (array) data_get($payload, 'client', []);
-    $spouse = (array) data_get($payload, 'spouse', []);
-    $hasSpouse = (bool) data_get($payload, 'has_spouse', false);
-
-    $clientName = trim((string)(($client['first_name'] ?? '').' '.($client['last_name'] ?? ''))) ?: 'Client';
-    $spouseName = trim((string)(($spouse['first_name'] ?? '').' '.($spouse['last_name'] ?? ''))) ?: 'Conjoint';
-
-    $docDateRaw = data_get($payload, 'document_meta.document_date');
-    $docDate = null;
-    try {
-    $docDate = $docDateRaw ? \Carbon\Carbon::parse($docDateRaw)->locale('fr_CA')->isoFormat('D MMMM YYYY') : null;
-    } catch(\Throwable) {}
-    $docDate ??= now()->locale('fr_CA')->isoFormat('D MMMM YYYY');
-
-    // Logo (transparent OK)
-    $logoPath = public_path('assets/img/VIP_Logo_Gold_Gradient10.png');
-    $logo = file_exists($logoPath) ? ('data:image/png;base64,' . base64_encode(file_get_contents($logoPath))) : null;
-
-    $money = fn($v) => number_format((float)$v, 0, '.', ' ') . ' $';
-
-    $age = function($d){
-    if (blank($d)) return null;
-    try { return \Carbon\Carbon::parse($d)->age; } catch(\Throwable) { return null; }
-    };
-
-    $maritalLabel = fn($k) => [
-    'single' => 'Célibataire',
-    'common_law' => 'Conjoint de fait',
-    'married' => 'Marié(e)',
-    'divorced' => 'Divorcé(e)',
-    'separated' => 'Séparé(e)',
-    'widowed' => 'Veuf(ve)',
-    ][$k ?? ''] ?? '—';
-
-    $citLabel = fn($k) => [
-    'canadian_citizen' => 'Citoyen(ne) canadien(ne)',
-    'permanent_resident' => 'Résident(e) permanent(e)',
-    'temporary_resident' => 'Résident(e) temporaire / permis',
-    'other' => 'Autre',
-    ][$k ?? ''] ?? '—';
-
-    $smokerLabel = fn($k) => [
-    'smoker' => 'Fumeur',
-    'non_smoker' => 'Non-fumeur',
-    'former_smoker' => 'Ancien fumeur',
-    ][$k ?? ''] ?? '—';
-
-    $assets = (array) data_get($payload, 'assets', []);
-    $liabs = (array) data_get($payload, 'liabilities', []);
-    $deps = (array) data_get($payload, 'dependents', []);
-
-    $assetType = [
-    'cash' => 'Liquidités',
-    'tfsa' => 'CELI',
-    'rrsp' => 'REER',
-    'nonreg' => 'Non-enregistré',
-    'home' => 'Résidence principale',
-    'rental' => 'Résidence secondaire / immeuble',
-    'vehicle' => 'Véhicule',
-    'business' => 'Entreprise',
-    'other' => 'Autre',
-    ];
-
-    $liabType = [
-    'mortgage' => 'Hypothèque',
-    'loc' => 'Marge de crédit',
-    'loan' => 'Prêt',
-    'credit' => 'Carte de crédit',
-    'student' => 'Prêt étudiant',
-    'tax' => 'Impôts',
-    'other' => 'Autre',
-    ];
-
-    $ownerLabel = fn($o) => ['client'=>'Client','spouse'=>'Conjoint','joint'=>'Commun'][$o ?? 'client'] ?? 'Client';
-
-    $sumByOwner = function(array $rows, string $key){
-    $out = ['client'=>0,'spouse'=>0,'joint'=>0];
-    foreach($rows as $r){
-    $o = $r['owner'] ?? 'client';
-    $out[$o] = ($out[$o] ?? 0) + (float) ($r[$key] ?? 0);
-    }
-    return $out;
-    };
-
-    $assetSums = $sumByOwner($assets,'value');
-    $liabSums = $sumByOwner($liabs,'balance');
-    $assetTotal = array_sum($assetSums);
-    $liabTotal = array_sum($liabSums);
-    $netTotal = $assetTotal - $liabTotal;
-    $netColor = $netTotal >= 0 ? '#16A34A' : '#DC2626';
-
-    // ── Helpers Blade-safe (pas de single-quotes dans les expressions {{ }}) ──
-    $yesNo = fn($v) => (bool) $v ? 'Oui' : 'Non';
-    $dash  = "\xE2\x80\x94"; // em-dash —
-
-    // ── Profil investisseur ──────────────────────────────────────────────
-    $ip = (array) data_get($payload, 'investor_profile', []);
-    $ipQuestions = [
-        'q1' => ['section' => 'Horizon d\'investissement', 'label' => '1. Quel âge avez-vous?', 'options' => [1=>'Plus de 71 ans',2=>'Entre 65 et 70 ans',5=>'Entre 55 et 64 ans',10=>'Entre 41 et 54 ans',20=>'Entre 18 et 40 ans']],
-        'q2' => ['section' => 'Horizon d\'investissement', 'label' => '2. Sorties de fonds (≥25 % de l\'épargne)?', 'options' => [1=>'Dans moins de 1 an',2=>'Entre 1 et 3 ans',5=>'Entre 4 et 5 ans',10=>'Entre 6 et 9 ans',20=>'Dans plus de 10 ans']],
-        'q3' => ['section' => 'Horizon d\'investissement', 'label' => '3. Retraits prévus (5 prochaines années)?', 'options' => [1=>'Retraits réguliers du capital',2=>'Totalité du rendement + partie du capital',5=>'Tout le rendement sans toucher au capital',10=>'Partie du rendement seulement',20=>'Accumulation (aucun retrait)']],
-        'q4' => ['section' => 'Situation financière', 'label' => '4. Revenu annuel brut (avant impôts)?', 'options' => [1=>'25 000 $ et moins',2=>'25 001 $ à 35 000 $',5=>'35 001 $ à 50 000 $',10=>'50 001 $ à 100 000 $',20=>'100 001 $ et plus']],
-        'q5' => ['section' => 'Situation financière', 'label' => '5. Valeur nette (actif moins passif)?', 'options' => [1=>'25 000 $ et moins',2=>'25 001 $ à 50 000 $',5=>'50 001 $ à 100 000 $',10=>'100 001 $ à 200 000 $',20=>'200 001 $ et plus']],
-        'q6' => ['section' => 'Tolérance au risque', 'label' => '6. Niveau de tolérance au risque?', 'options' => [1=>'Très faible',2=>'Faible',5=>'Modéré',10=>'Élevé',20=>'Très élevé']],
-        'q7' => ['section' => 'Tolérance au risque', 'label' => '7. Fourchette acceptée pour un placement de 10 000 $?', 'options' => [1=>'10 000 $ à 10 300 $',2=>'9 500 $ à 11 000 $',5=>'9 000 $ à 11 500 $',10=>'8 500 $ à 12 000 $',20=>'8 000 $ à 12 500 $']],
-        'q8' => ['section' => 'Connaissance des placements', 'label' => '8. Niveau de connaissance des placements?', 'options' => [1=>'Très faible',2=>'Faible',5=>'Modéré',10=>'Avancé',20=>'Très avancé']],
-    ];
-    $ipScore = 0;
-    foreach (array_keys($ipQuestions) as $k) { $ipScore += (int) ($ip[$k] ?? 0); }
-    $ipProfile = match(true) {
-        $ipScore <= 25  => 'Conservateur',
-        $ipScore <= 55  => 'Modérément conservateur',
-        $ipScore <= 90  => 'Équilibré',
-        $ipScore <= 120 => 'Croissance',
-        default         => 'Croissance agressive',
-    };
-    $ipFilled = $ipScore > 0;
-
-    $goalsSelected = (array) data_get($payload, 'goals.selected', []);
-    $goalsAnswers = (array) data_get($payload, 'goals.answers', []);
-    $goalsLabels = [
-    'retirement' => 'Retraite',
-    'buy_house' => 'Achat / changement de propriété',
-    'kids_education' => 'Études des enfants',
-    'debt_repayment' => 'Remboursement dettes',
-    'insurance' => 'Optimisation assurances',
-    'investments' => 'Stratégie placements',
-    'business' => 'Projet entreprise',
-    'travel' => 'Voyages / style de vie',
-    ];
-
-    $prot = (array) data_get($payload, 'protections_details', []);
-
-    // Pre-computed section flags (Blade cannot parse single quotes inside directives)
-    $ownersList        = ['client', 'spouse', 'joint'];
-    $showAssurances    = $sec('lifeInsurance') || $sec('disability') || $sec('seriousIllness');
-    $showDeathBudget   = $sec('lifeInsurance');
-    $showDashboard     = $sec('dashboard');
-    $showReco          = $sec('recommendations');
-    $hasAdvisorNotes   = !blank(data_get($payload, 'advisor_notes'));
-    $showDelivery      = $sec('deliveryConfirmation', false);
-    $showRetIncome     = $sec('annex', false) && $sec('retirementIncome', false);
-    $showInvProjection = $sec('annex', false) && $sec('investmentProjection', false);
-    ?>
-
-    {{-- ====== mPDF: running header & footer (not rendered inline) ====== --}}
+    {{-- mPDF running header & footer --}}
     <htmlpageheader name="main-header">
         <div class="header">
             @if($logo)
@@ -607,17 +406,13 @@
         </div>
     </htmlpagefooter>
 
-    {{-- ======================
-     COVER (PAGE 1)
-     ====================== --}}
+    {{-- ====== COVER (PAGE 1) ====== --}}
     <div class="cover">
-        @if($coverPhoto ?? null)
+        @if($coverPhoto)
         <img class="cover-photo" src="{{ $coverPhoto }}" alt="">
         @endif
-        <div class="cover-bg" @if($coverPhoto ?? null) style="background:rgba(9,10,31,.78)" @endif></div>
+        <div class="cover-bg" @if($coverPhoto) style="background:rgba(9,10,31,.78)" @endif></div>
         <div class="cover-inner">
-
-            {{-- En-tête : logo + nom firme --}}
             <div class="cover-header clearfix">
                 @if($logo)
                 <img class="cover-logo-img" src="{{ $logo }}" alt="VIP GPI" style="float:left">
@@ -627,15 +422,11 @@
                     <div style="font-size:8px;color:#C9A050;letter-spacing:.3px">ET INVESTISSEMENTS INC.</div>
                 </div>
             </div>
-
-            {{-- Corps principal --}}
             <div class="cover-body">
                 <div class="cover-label">Analyse des besoins financiers</div>
                 <div class="cover-title">Votre portrait<br>financier</div>
                 <div class="cover-gold-bar"></div>
                 <div class="cover-subtitle">Préparé le {{ $docDate }}</div>
-
-                {{-- Bloc client --}}
                 <div class="cover-client-block">
                     <div class="cover-client-label">Préparé pour</div>
                     <div class="cover-client-name">{{ $clientName }}</div>
@@ -643,25 +434,18 @@
                     <div class="cover-client-name" style="font-size:14px;opacity:.85;margin-top:1mm">{{ $spouseName }}</div>
                     @endif
                 </div>
-
-                <?php
-                $advisorName = auth()->user()?->name ?? data_get($case->advisor, ‘name’, ‘’);
-                ?>
                 @if($advisorName)
                 <div class="cover-date-block">
                     Conseiller&nbsp;: <strong style="color:rgba(255,255,255,.85)">{{ $advisorName }}</strong>
                 </div>
                 @endif
             </div>
-
-            {{-- Pied de page couverture --}}
             <div class="cover-footer-band">
                 <div class="cover-footer-conf">
                     <strong>DOCUMENT CONFIDENTIEL</strong>
-                    Ce document est strictement confidentiel. Il est réservé à l’usage exclusif du ou des destinataires désignés. Toute reproduction, distribution ou utilisation non autorisée est interdite.
+                    Ce document est strictement confidentiel. Il est réservé à l'usage exclusif du ou des destinataires désignés. Toute reproduction, distribution ou utilisation non autorisée est interdite.
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -669,33 +453,14 @@
                margin-top="30" margin-bottom="20" margin-left="18" margin-right="18"
                margin-header="3" margin-footer="3" />
 
-    {{-- ======================
-     TOC
-     ====================== --}}
+    {{-- ====== TABLE DES MATIÈRES ====== --}}
     <h1>Table des matières</h1>
-
     <div class="toc-section">
-        <?php
-        $tocItems = [
-            [‘Informations personnelles’,  true],
-            [‘Placements & actifs’,        true],
-            [‘Dettes & passifs’,           true],
-            [‘Bilan financier’,            true],
-            [‘Assurances’,                 $sec(‘lifeInsurance’) || $sec(‘disability’) || $sec(‘seriousIllness’)],
-            [‘Budget au décès’,            $sec(‘lifeInsurance’)],
-            [‘Profil d\’investisseur’,     $sec(‘dashboard’)],
-            [‘Notes / recommandations’,    $sec(‘recommendations’)],
-            [‘Accusé de réception’,        $sec(‘deliveryConfirmation’, false)],
-            [‘Annexe — Revenus de retraite’, $sec(‘annex’, false) && $sec(‘retirementIncome’, false)],
-            [‘Annexe — Évolution des placements’, $sec(‘annex’, false) && $sec(‘investmentProjection’, false)],
-        ];
-        $n = 1;
-        ?>
-        @foreach($tocItems as [$name, $show])
-        @if($show)
+        @foreach($tocItems as $tocIdx => $tocItem)
+        @if($tocItem["show"])
         <div class="toc-item clearfix">
-            <span class="toc-num">{{ $n++ }}</span>
-            <span class="toc-name">{{ $name }}</span>
+            <span class="toc-num">{{ $loop->iteration }}</span>
+            <span class="toc-name">{{ $tocItem["name"] }}</span>
         </div>
         @endif
         @endforeach
@@ -703,9 +468,7 @@
 
     <pagebreak />
 
-    {{-- ======================
-     INFORMATIONS PERSONNELLES
-     ====================== --}}
+    {{-- ====== INFORMATIONS PERSONNELLES ====== --}}
     <h1>Informations personnelles</h1>
 
     <h2>Informations de base</h2>
@@ -721,81 +484,73 @@
             <tr>
                 <td>Date de naissance</td>
                 <td>
-                    {{ $client['birth_date'] ?? $dash }}
-                    @if($age($client['birth_date'] ?? null) !== null)
-                    <span class="muted">({{ $age($client['birth_date'] ?? null) }} ans)</span>
+                    {{ $clientBirthDate }}
+                    @if($clientAgeText)
+                    <span class="muted">({{ $clientAgeText }})</span>
                     @endif
                 </td>
                 @if($hasSpouse)
                 <td>
-                    {{ $spouse['birth_date'] ?? $dash }}
-                    @if($age($spouse['birth_date'] ?? null) !== null)
-                    <span class="muted">({{ $age($spouse['birth_date'] ?? null) }} ans)</span>
+                    {{ $spouseBirthDate }}
+                    @if($spouseAgeText)
+                    <span class="muted">({{ $spouseAgeText }})</span>
                     @endif
                 </td>
                 @endif
             </tr>
             <tr>
                 <td>État civil</td>
-                <td>{{ $maritalLabel($client['marital_status'] ?? null) }}</td>
-                @if($hasSpouse)<td>{{ $maritalLabel($spouse['marital_status'] ?? null) }}</td>@endif
+                <td>{{ $clientMarital }}</td>
+                @if($hasSpouse)<td>{{ $spouseMarital }}</td>@endif
             </tr>
             <tr>
                 <td>Tabagisme</td>
                 <td>
-                    {{ $smokerLabel($client['smoker_status'] ?? null) }}
-                    @if(($client["smoker_status"] ?? null) === "smoker" && !blank($client["smoker_since"] ?? null))
-                    <span class="muted">({{ $client['smoker_since'] }})</span>
+                    {{ $clientSmoker }}
+                    @if($clientIsSmoker)
+                    <span class="muted">({{ $clientSmokerSince }})</span>
                     @endif
                 </td>
                 @if($hasSpouse)
                 <td>
-                    {{ $smokerLabel($spouse['smoker_status'] ?? null) }}
-                    @if(($spouse["smoker_status"] ?? null) === "smoker" && !blank($spouse["smoker_since"] ?? null))
-                    <span class="muted">({{ $spouse['smoker_since'] }})</span>
+                    {{ $spouseSmoker }}
+                    @if($spouseIsSmoker)
+                    <span class="muted">({{ $spouseSmokerSince }})</span>
                     @endif
                 </td>
                 @endif
             </tr>
             <tr>
                 <td>Adresse (principale)</td>
-                <td>{{ $client['address'] ?? $dash }} @if(!blank($client['postal_code'] ?? null))<span class="muted">{{ $client['postal_code'] }}</span>@endif</td>
+                <td>{{ $clientAddress }} @if(!blank($clientPostal))<span class="muted">{{ $clientPostal }}</span>@endif</td>
                 @if($hasSpouse)
-                <td>{{ $spouse['address'] ?? $dash }} @if(!blank($spouse['postal_code'] ?? null))<span class="muted">{{ $spouse['postal_code'] }}</span>@endif</td>
+                <td>{{ $spouseAddress }} @if(!blank($spousePostal))<span class="muted">{{ $spousePostal }}</span>@endif</td>
                 @endif
             </tr>
             <tr>
                 <td>Téléphone (domicile)</td>
-                <td>{{ $client['home_phone'] ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ $spouse['home_phone'] ?? $dash }}</td>@endif
+                <td>{{ $clientPhone }}</td>
+                @if($hasSpouse)<td>{{ $spousePhone }}</td>@endif
             </tr>
             <tr>
                 <td>Courriel (principal)</td>
-                <td>{{ $client['email'] ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ $spouse['email'] ?? $dash }}</td>@endif
+                <td>{{ $clientEmail }}</td>
+                @if($hasSpouse)<td>{{ $spouseEmail }}</td>@endif
             </tr>
             <tr>
                 <td>Statut au Canada</td>
-                <td>{{ $citLabel($client['citizenship_status'] ?? null) }}</td>
-                @if($hasSpouse)<td>{{ $citLabel($spouse['citizenship_status'] ?? null) }}</td>@endif
+                <td>{{ $clientCit }}</td>
+                @if($hasSpouse)<td>{{ $spouseCit }}</td>@endif
             </tr>
             <tr>
                 <td>NAS</td>
-                <td>
-                    <?php $hs = data_get($client, "has_sin"); $hsText = $hs === null ? $dash : $yesNo($hs); ?>
-                    {{ $hsText }}
-                </td>
-                @if($hasSpouse)
-                <td>
-                    <?php $hs2 = data_get($spouse, "has_sin"); $hs2Text = $hs2 === null ? $dash : $yesNo($hs2); ?>
-                    {{ $hs2Text }}
-                </td>
-                @endif
+                <td>{{ $clientSinText }}</td>
+                @if($hasSpouse)<td>{{ $spouseSinText }}</td>@endif
             </tr>
             <tr>
                 <td>Travaille au Canada depuis</td>
-                <td>{{ $client['work_in_canada_since'] ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ $spouse['work_in_canada_since'] ?? $dash }}</td>@endif
+                <td>{{ $clientWorkSince }}</td>
+                @if($hasSpouse)<td>{{ $spouseWorkSince }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -812,18 +567,18 @@
         <tbody>
             <tr>
                 <td>Titre</td>
-                <td>{{ data_get($client,"jobs.0.occupation") ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ data_get($spouse,"jobs.0.occupation") ?? $dash }}</td>@endif
+                <td>{{ $clientJobTitle }}</td>
+                @if($hasSpouse)<td>{{ $spouseJobTitle }}</td>@endif
             </tr>
             <tr>
                 <td>Entreprise</td>
-                <td>{{ data_get($client,"jobs.0.employer") ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ data_get($spouse,"jobs.0.employer") ?? $dash }}</td>@endif
+                <td>{{ $clientEmployer }}</td>
+                @if($hasSpouse)<td>{{ $spouseEmployer }}</td>@endif
             </tr>
             <tr>
                 <td>Depuis</td>
-                <td>{{ $client['employment_since'] ?? $dash }}</td>
-                @if($hasSpouse)<td>{{ $spouse['employment_since'] ?? $dash }}</td>@endif
+                <td>{{ $clientEmpSince }}</td>
+                @if($hasSpouse)<td>{{ $spouseEmpSince }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -840,27 +595,27 @@
         <tbody>
             <tr>
                 <td>Revenu d'emploi (annuel)</td>
-                <td>{{ $money(data_get($client,"jobs.0.annual_income", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,"jobs.0.annual_income", 0)) }}</td>@endif
+                <td>{{ $clientJobIncome }}</td>
+                @if($hasSpouse)<td>{{ $spouseJobIncome }}</td>@endif
             </tr>
             <tr>
                 <td>Autres revenus (annuels)</td>
-                <td>{{ $money(data_get($client,"other_income_annual", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,"other_income_annual", 0)) }}</td>@endif
+                <td>{{ $clientOtherAnnual }}</td>
+                @if($hasSpouse)<td>{{ $spouseOtherAnnual }}</td>@endif
             </tr>
             <tr>
                 <td>Autres revenus (mensuels)</td>
-                <td>{{ $money(data_get($client,"other_income_monthly", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($spouse,"other_income_monthly", 0)) }}</td>@endif
+                <td>{{ $clientOtherMonthly }}</td>
+                @if($hasSpouse)<td>{{ $spouseOtherMonthly }}</td>@endif
             </tr>
             <tr class="small">
-                <td colspan="{{ $hasSpouse ? 3 : 2 }}" class="muted">* Montants bruts selon les informations fournies.</td>
+                <td colspan="{{ $colSpan2or3 }}" class="muted">* Montants bruts selon les informations fournies.</td>
             </tr>
         </tbody>
     </table>
 
     <h2>Personnes à charge</h2>
-    @if(count($deps) === 0)
+    @if(count($depsDisplay) === 0)
     <p class="muted">Aucune personne à charge.</p>
     @else
     <table class="simple">
@@ -875,20 +630,14 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($deps as $d)
-            <?php
-            $a = $age($d['birth_date'] ?? null);
-            $rel = ['child'=>'Enfant','dependent'=>'Personne à charge','other'=>'Autre'][$d['relationship'] ?? ''] ?? '—';
-            $dep = ['full'=>'Totale','partial'=>'Partielle','none'=>'Aucune'][$d['financial_dependency'] ?? ''] ?? '—';
-            ?>
+            @foreach($depsDisplay as $dep)
             <tr>
-                <td>{{ $d['name'] ?? $dash }}</td>
-                <td>{{ $d['birth_date'] ?? $dash }}</td>
-                <?php $ageText = $a === null ? $dash : ($a . " ans"); ?>
-                <td>{{ $ageText }}</td>
-                <td>{{ $rel }}</td>
-                <td>{{ $dep }}</td>
-                <td>{{ $yesNo($d["same_contact_as_client"] ?? false) }}</td>
+                <td>{{ $dep["name"] }}</td>
+                <td>{{ $dep["birth_date"] }}</td>
+                <td>{{ $dep["age_text"] }}</td>
+                <td>{{ $dep["relationship"] }}</td>
+                <td>{{ $dep["dependency"] }}</td>
+                <td>{{ $dep["same_address"] }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -905,26 +654,18 @@
             </tr>
         </thead>
         <tbody>
+            @foreach($legalDocs as $doc)
             <tr>
-                <td>Testament</td>
-                <td>{{ $yesNo(data_get($client,"legal.will_exists", false)) }}</td>
-                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.will_exists", false)) }}</td>@endif
+                <td>{{ $doc["label"] }}</td>
+                <td>{{ $doc["client"] }}</td>
+                @if($hasSpouse)<td>{{ $doc["spouse"] }}</td>@endif
             </tr>
-            <tr>
-                <td>Mandat en cas d'inaptitude (QC)</td>
-                <td>{{ $yesNo(data_get($client,"legal.mandate_incapacity_exists", false)) }}</td>
-                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.mandate_incapacity_exists", false)) }}</td>@endif
-            </tr>
-            <tr>
-                <td>Procuration (hors QC)</td>
-                <td>{{ $yesNo(data_get($client,"legal.power_of_attorney_exists", false)) }}</td>
-                @if($hasSpouse)<td>{{ $yesNo(data_get($spouse,"legal.power_of_attorney_exists", false)) }}</td>@endif
-            </tr>
+            @endforeach
         </tbody>
     </table>
 
     <h2>Objectifs</h2>
-    @if(count($goalsSelected) === 0)
+    @if(count($goalsDisplay) === 0)
     <p class="muted">Aucun objectif sélectionné.</p>
     @else
     <table class="simple">
@@ -935,11 +676,10 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($goalsSelected as $k)
+            @foreach($goalsDisplay as $goal)
             <tr>
-                <td style="width:35%;">{{ $goalsLabels[$k] ?? $k }}</td>
-                <td><?php $goalText = trim((string) ($goalsAnswers[$k] ?? "")) ?: $dash; ?>
-                {{ $goalText }}</td>
+                <td style="width:35%;">{{ $goal["label"] }}</td>
+                <td>{{ $goal["answer"] }}</td>
             </tr>
             @endforeach
         </tbody>
@@ -948,22 +688,11 @@
 
     <pagebreak />
 
-    {{-- ======================
-     PLACEMENTS & ACTIFS
-     ====================== --}}
+    {{-- ====== PLACEMENTS & ACTIFS ====== --}}
     <h1>Placements & actifs</h1>
 
-    <?php $byOwner = collect($assets)->groupBy(fn($a) => $a['owner'] ?? 'client'); ?>
-
-    @foreach($ownersList as $owner)
-    <?php
-    if ($owner === 'spouse' && ! $hasSpouse) continue;
-    $rows = (array) ($byOwner[$owner] ?? []);
-    if (count($rows) === 0) continue;
-    $grouped = collect($rows)->groupBy(fn($a) => $a['type'] ?? 'other');
-    ?>
-
-    <h2>{{ $ownerLabel($owner) }}</h2>
+    @foreach($assetsByOwner as $ownerBlock)
+    <h2>{{ $ownerBlock["label"] }}</h2>
     <table class="simple">
         <thead>
             <tr>
@@ -973,21 +702,21 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($grouped as $type => $rows2)
+            @foreach($ownerBlock["grouped"] as $group)
             <tr style="background:#F0EBE0;">
-                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#0E1030;padding:4px 8px;border-bottom:1px solid #C9A050;">{{ $assetType[$type] ?? $type }}</td>
+                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#0E1030;padding:4px 8px;border-bottom:1px solid #C9A050;">{{ $group["type_label"] }}</td>
             </tr>
-            @foreach($rows2 as $aRow)
+            @foreach($group["items"] as $aRow)
             <tr>
-                <td class="muted">{{ $assetType[$type] ?? $type }}</td>
-                <td>{{ $aRow['description'] ?? $dash }}</td>
-                <td>{{ $money($aRow['value'] ?? 0) }}</td>
+                <td class="muted">{{ $aRow["type_label"] }}</td>
+                <td>{{ $aRow["description"] }}</td>
+                <td>{{ $aRow["value"] }}</td>
             </tr>
             @endforeach
             @endforeach
             <tr class="grand-total">
-                <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
-                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r["value"] ?? 0))) }}</td>
+                <td colspan="2">Total {{ $dash }} {{ $ownerBlock["label"] }}</td>
+                <td>{{ $ownerBlock["total"] }}</td>
             </tr>
         </tbody>
     </table>
@@ -995,22 +724,11 @@
 
     <pagebreak />
 
-    {{-- ======================
-     DETTES & PASSIFS
-     ====================== --}}
+    {{-- ====== DETTES & PASSIFS ====== --}}
     <h1>Dettes & passifs</h1>
 
-    <?php $liabsByOwner = collect($liabs)->groupBy(fn($l) => $l['owner'] ?? 'client'); ?>
-
-    @foreach($ownersList as $owner)
-    <?php
-    if ($owner === 'spouse' && ! $hasSpouse) continue;
-    $rows = (array) ($liabsByOwner[$owner] ?? []);
-    if (count($rows) === 0) continue;
-    $grouped = collect($rows)->groupBy(fn($l) => $l['type'] ?? 'other');
-    ?>
-
-    <h2>{{ $ownerLabel($owner) }}</h2>
+    @foreach($liabsByOwner as $ownerBlock)
+    <h2>{{ $ownerBlock["label"] }}</h2>
     <table class="simple">
         <thead>
             <tr>
@@ -1020,21 +738,21 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($grouped as $type => $rows2)
+            @foreach($ownerBlock["grouped"] as $group)
             <tr style="background:#FEF2F2;">
-                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#DC2626;padding:4px 8px;border-bottom:1px solid #FECACA;">{{ $liabType[$type] ?? $type }}</td>
+                <td colspan="3" style="font-weight:700;font-size:9.5px;color:#DC2626;padding:4px 8px;border-bottom:1px solid #FECACA;">{{ $group["type_label"] }}</td>
             </tr>
-            @foreach($rows2 as $lRow)
+            @foreach($group["items"] as $lRow)
             <tr>
-                <td class="muted">{{ $liabType[$type] ?? $type }}</td>
-                <td>{{ $lRow['creditor'] ?? $dash }}</td>
-                <td>{{ $money($lRow['balance'] ?? 0) }}</td>
+                <td class="muted">{{ $lRow["type_label"] }}</td>
+                <td>{{ $lRow["creditor"] }}</td>
+                <td>{{ $lRow["balance"] }}</td>
             </tr>
             @endforeach
             @endforeach
             <tr class="grand-total">
-                <td colspan="2">Total — {{ $ownerLabel($owner) }}</td>
-                <td>{{ $money(collect($rows)->sum(fn($r)=> (float) ($r["balance"] ?? 0))) }}</td>
+                <td colspan="2">Total {{ $dash }} {{ $ownerBlock["label"] }}</td>
+                <td>{{ $ownerBlock["total"] }}</td>
             </tr>
         </tbody>
     </table>
@@ -1042,25 +760,22 @@
 
     <pagebreak />
 
-    {{-- ======================
-     BILAN FINANCIER
-     ====================== --}}
+    {{-- ====== BILAN FINANCIER ====== --}}
     <h1>Bilan financier</h1>
 
-    {{-- Stat cards résumé --}}
     <table class="stat-grid">
         <tr>
             <td class="stat-card success" style="width:33%">
                 <div class="stat-card-label">Total des actifs</div>
-                <div class="stat-card-value">{{ $money($assetTotal) }}</div>
+                <div class="stat-card-value">{{ $bilan["asset_total"] }}</div>
             </td>
             <td class="stat-card danger" style="width:33%">
                 <div class="stat-card-label">Total des passifs</div>
-                <div class="stat-card-value">{{ $money($liabTotal) }}</div>
+                <div class="stat-card-value">{{ $bilan["liab_total"] }}</div>
             </td>
             <td class="stat-card" style="width:33%;border-top-color:{{ $netColor }}">
                 <div class="stat-card-label">Valeur nette</div>
-                <div class="stat-card-value" style="color:{{ $netColor }}">{{ $money($netTotal) }}</div>
+                <div class="stat-card-value" style="color:{{ $netColor }}">{{ $bilan["net_total"] }}</div>
             </td>
         </tr>
     </table>
@@ -1079,56 +794,38 @@
         <tbody>
             <tr>
                 <td>Actifs</td>
-                <td>{{ $money($assetSums['client'] ?? 0) }}</td>
-                @if($hasSpouse)<td>{{ $money($assetSums['spouse'] ?? 0) }}</td>@endif
-                @if($hasSpouse)<td>{{ $money($assetSums['joint'] ?? 0) }}</td>@endif
-                <td>{{ $money($assetTotal) }}</td>
+                <td>{{ $bilan["client_assets"] }}</td>
+                @if($hasSpouse)<td>{{ $bilan["spouse_assets"] }}</td>@endif
+                @if($hasSpouse)<td>{{ $bilan["joint_assets"] }}</td>@endif
+                <td>{{ $bilan["asset_total"] }}</td>
             </tr>
             <tr>
                 <td>Passifs</td>
-                <td>{{ $money($liabSums['client'] ?? 0) }}</td>
-                @if($hasSpouse)<td>{{ $money($liabSums['spouse'] ?? 0) }}</td>@endif
-                @if($hasSpouse)<td>{{ $money($liabSums['joint'] ?? 0) }}</td>@endif
-                <td>{{ $money($liabTotal) }}</td>
+                <td>{{ $bilan["client_liabs"] }}</td>
+                @if($hasSpouse)<td>{{ $bilan["spouse_liabs"] }}</td>@endif
+                @if($hasSpouse)<td>{{ $bilan["joint_liabs"] }}</td>@endif
+                <td>{{ $bilan["liab_total"] }}</td>
             </tr>
             <tr class="grand-total">
                 <td>Valeur nette</td>
-                <td>{{ $money(($assetSums['client'] ?? 0) - ($liabSums['client'] ?? 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(($assetSums['spouse'] ?? 0) - ($liabSums['spouse'] ?? 0)) }}</td>@endif
-                @if($hasSpouse)<td>{{ $money(($assetSums['joint'] ?? 0) - ($liabSums['joint'] ?? 0)) }}</td>@endif
-                <td>{{ $money($netTotal) }}</td>
+                <td>{{ $bilan["client_net"] }}</td>
+                @if($hasSpouse)<td>{{ $bilan["spouse_net"] }}</td>@endif
+                @if($hasSpouse)<td>{{ $bilan["joint_net"] }}</td>@endif
+                <td>{{ $bilan["net_total"] }}</td>
             </tr>
         </tbody>
     </table>
 
     <pagebreak />
 
+    {{-- ====== ASSURANCES ====== --}}
     @if($showAssurances)
-    {{-- ======================
-     ASSURANCES
-     ====================== --}}
     <h1>Assurances</h1>
 
-    <?php
-    $ppl = [
-    'client' => ['name' => $clientName, 'data' => (array) ($prot['client'] ?? [])],
-    'spouse' => ['name' => $spouseName, 'data' => (array) ($prot['spouse'] ?? [])],
-    'children' => ['name' => 'Enfants', 'data' => (array) ($prot['children'] ?? [])],
-    ];
-    ?>
+    @foreach($insuranceBlocks as $insBlock)
+    <h2>{{ $insBlock["name"] }}</h2>
 
-    @foreach($ppl as $key => $block)
-    <?php
-    if ($key === 'spouse' && ! $hasSpouse) continue;
-    $life = (array) data_get($block['data'],'life', []);
-    $dis = (array) data_get($block['data'],'disability', []);
-    $ci = (array) data_get($block['data'],'critical_illness', []);
-    if (count($life)+count($dis)+count($ci) === 0) continue;
-    ?>
-
-    <h2>{{ $block['name'] }}</h2>
-
-    @if(count($life) > 0)
+    @if(count($insBlock["life"]) > 0)
     <h3>Assurance vie</h3>
     <table class="simple">
         <thead>
@@ -1140,19 +837,19 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($life as $r)
+            @foreach($insBlock["life"] as $r)
             <tr>
-                <td>{{ $r['provider'] ?? $dash }}</td>
-                <td>{{ $r['contract_type'] ?? $dash }}</td>
-                <td>{{ $money($r['death_capital'] ?? 0) }}</td>
-                <td>{{ $money($r['annual_premium'] ?? 0) }}</td>
+                <td>{{ $r["provider"] }}</td>
+                <td>{{ $r["contract_type"] }}</td>
+                <td>{{ $r["death_capital"] }}</td>
+                <td>{{ $r["annual_premium"] }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
     @endif
 
-    @if(count($ci) > 0)
+    @if(count($insBlock["ci"]) > 0)
     <h3>Assurance maladie grave</h3>
     <table class="simple">
         <thead>
@@ -1163,18 +860,18 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($ci as $r)
+            @foreach($insBlock["ci"] as $r)
             <tr>
-                <td>{{ $r['provider'] ?? $dash }}</td>
-                <td>{{ $money($r['insured_capital'] ?? 0) }}</td>
-                <td>{{ $money($r['premium'] ?? 0) }}</td>
+                <td>{{ $r["provider"] }}</td>
+                <td>{{ $r["insured_capital"] }}</td>
+                <td>{{ $r["premium"] }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
     @endif
 
-    @if(count($dis) > 0)
+    @if(count($insBlock["dis"]) > 0)
     <h3>Assurance invalidité</h3>
     <table class="simple">
         <thead>
@@ -1185,49 +882,36 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($dis as $r)
+            @foreach($insBlock["dis"] as $r)
             <tr>
-                <td>{{ $r['provider'] ?? $dash }}</td>
-                <td>{{ $money($r['monthly_income'] ?? 0) }}</td>
-                <td>{{ $money($r['premium'] ?? 0) }}</td>
+                <td>{{ $r["provider"] }}</td>
+                <td>{{ $r["monthly_income"] }}</td>
+                <td>{{ $r["premium"] }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
     @endif
     @endforeach
-    @endif {{-- /sec lifeInsurance|disability|seriousIllness --}}
+    @endif
 
+    {{-- ====== BUDGET AU DÉCÈS ====== --}}
     @if($showDeathBudget)
     <pagebreak />
-
-    {{-- ======================
-     BUDGET AU DÉCÈS
-     ====================== --}}
     <h1>Budget au décès</h1>
 
-    <?php $db = (array) data_get($results, 'death_budget.per_person', []); ?>
-
-    {{-- Stat cards résumé --}}
     <table class="stat-grid">
         <tr>
-            <?php $dbWidth = $hasSpouse ? "50%" : "100%"; ?>
-            <td class="stat-card" style="width:{{ $dbWidth }}">
-                <div class="stat-card-label">{{ $clientName }} — Besoin additionnel</div>
-                <?php $dbClientDanger = data_get($db,"client.e.additional_need",0) > 0 ? "danger" : ""; ?>
-                <div class="stat-card-value {{ $dbClientDanger }}">
-                    {{ $money(data_get($db,"client.e.additional_need", 0)) }}
-                </div>
-                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,"client.d.capital_required", 0)) }}</div>
+            <td class="stat-card {{ $deathBudget["client_danger"] }}" style="width:{{ $deathBudget["width"] }}">
+                <div class="stat-card-label">{{ $clientName }} {{ $dash }} Besoin additionnel</div>
+                <div class="stat-card-value">{{ $deathBudget["client_additional"] }}</div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $deathBudget["client_capital"] }}</div>
             </td>
             @if($hasSpouse)
-            <td class="stat-card">
-                <div class="stat-card-label">{{ $spouseName }} — Besoin additionnel</div>
-                <?php $dbSpouseDanger = data_get($db,"spouse.e.additional_need",0) > 0 ? "danger" : ""; ?>
-                <div class="stat-card-value {{ $dbSpouseDanger }}">
-                    {{ $money(data_get($db,"spouse.e.additional_need", 0)) }}
-                </div>
-                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $money(data_get($db,"spouse.d.capital_required", 0)) }}</div>
+            <td class="stat-card {{ $deathBudget["spouse_danger"] }}">
+                <div class="stat-card-label">{{ $spouseName }} {{ $dash }} Besoin additionnel</div>
+                <div class="stat-card-value">{{ $deathBudget["spouse_additional"] }}</div>
+                <div class="stat-card-sub">Capital-décès requis&nbsp;: {{ $deathBudget["spouse_capital"] }}</div>
             </td>
             @endif
         </tr>
@@ -1245,23 +929,23 @@
         <tbody>
             <tr>
                 <td>Liquidités nettes au décès</td>
-                <td>{{ $money(data_get($db,"client.b.net_liquidities", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.b.net_liquidities", 0)) }}</td>@endif
+                <td>{{ $deathBudget["client_liquidities"] }}</td>
+                @if($hasSpouse)<td>{{ $deathBudget["spouse_liquidities"] }}</td>@endif
             </tr>
             <tr>
                 <td>Revenu mensuel à combler</td>
-                <td>{{ $money(data_get($db,"client.c.monthly_gap", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.c.monthly_gap", 0)) }}</td>@endif
+                <td>{{ $deathBudget["client_gap"] }}</td>
+                @if($hasSpouse)<td>{{ $deathBudget["spouse_gap"] }}</td>@endif
             </tr>
             <tr>
                 <td>Capital requis</td>
-                <td>{{ $money(data_get($db,"client.d.capital_required", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.d.capital_required", 0)) }}</td>@endif
+                <td>{{ $deathBudget["client_capital"] }}</td>
+                @if($hasSpouse)<td>{{ $deathBudget["spouse_capital"] }}</td>@endif
             </tr>
             <tr class="total-row">
                 <td>Besoin d'assurance additionnel</td>
-                <td>{{ $money(data_get($db,"client.e.additional_need", 0)) }}</td>
-                @if($hasSpouse)<td>{{ $money(data_get($db,"spouse.e.additional_need", 0)) }}</td>@endif
+                <td>{{ $deathBudget["client_need"] }}</td>
+                @if($hasSpouse)<td>{{ $deathBudget["spouse_need"] }}</td>@endif
             </tr>
         </tbody>
     </table>
@@ -1269,27 +953,14 @@
     <div class="info-box">
         Les résultats sont calculés à partir des hypothèses et des informations fournies. Ils doivent être validés selon la situation réelle du client.
     </div>
-    @endif {{-- /sec lifeInsurance --}}
+    @endif
 
+    {{-- ====== PROFIL INVESTISSEUR ====== --}}
     @if($showDashboard)
     <pagebreak />
-
-    {{-- ======================
-     PROFIL INVESTISSEUR
-     ====================== --}}
     <h1>Profil d'investisseur</h1>
 
     @if($ipFilled)
-    {{-- Stat card profil --}}
-    <?php
-    $profileColor = match(true) {
-        $ipScore <= 25  => '#3B82F6',
-        $ipScore <= 55  => '#22C55E',
-        $ipScore <= 90  => '#C9A050',
-        $ipScore <= 120 => '#F97316',
-        default         => '#EF4444',
-    };
-    ?>
     <table class="stat-grid">
         <tr>
             <td class="stat-card" style="width:50%;border-top-color:{{ $profileColor }}">
@@ -1305,26 +976,15 @@
         </tr>
     </table>
 
-    {{-- Questions par section --}}
-    <?php
-    $currentSection = null;
-    ?>
-    @foreach($ipQuestions as $key => $q)
-    <?php $sectionChanged = $q['section'] !== $currentSection; ?>
-    @if($sectionChanged)
-    <?php $currentSection = $q['section']; ?>
-    <h2>{{ $currentSection }}</h2>
+    @foreach($ipDisplay as $ipQ)
+    @if($ipQ["section_changed"])
+    <h2>{{ $ipQ["section"] }}</h2>
     @endif
-    <?php
-    $pts = (int) ($ip[$key] ?? 0);
-    $answer = $pts > 0 ? ($q['options'][$pts] ?? '—') : '—';
-    $ptLabel = $pts === 1 ? '1 point' : ($pts > 0 ? "{$pts} points" : '—');
-    ?>
     <table class="simple" style="margin-bottom:2mm;">
         <tbody>
             <tr>
-                <td style="width:70%;">{{ $q['label'] }}<br><em style="color:#555;">{{ $answer }}</em></td>
-                <td style="text-align:right;font-weight:700;">{{ $ptLabel }}</td>
+                <td style="width:70%;">{{ $ipQ["label"] }}<br><em style="color:#555;">{{ $ipQ["answer"] }}</em></td>
+                <td style="text-align:right;font-weight:700;">{{ $ipQ["pt_label"] }}</td>
             </tr>
         </tbody>
     </table>
@@ -1332,19 +992,16 @@
     @else
     <p class="muted">Le questionnaire du profil d'investisseur n'a pas encore été complété.</p>
     @endif
-    @endif {{-- /sec dashboard --}}
+    @endif
 
+    {{-- ====== NOTES / RECOMMANDATIONS ====== --}}
     @if($showReco)
     <pagebreak />
-
-    {{-- ======================
-     NOTES / RECO
-     ====================== --}}
     <h1>Notes / recommandations</h1>
 
     @if($hasAdvisorNotes)
     <h2>Notes du conseiller</h2>
-    <p>{!! nl2br(e((string) data_get($payload,'advisor_notes'))) !!}</p>
+    <p>{!! nl2br(e($advisorNotes)) !!}</p>
     @else
     <p class="muted">Aucune note du conseiller.</p>
     @endif
@@ -1352,24 +1009,14 @@
     <div class="info-box">
         <strong>Avis de non-responsabilité :</strong> Cette analyse est basée sur les informations fournies par le client et sur les hypothèses retenues à la date du rapport. Les recommandations ne constituent pas une garantie de rendement ni de résultat futur.
     </div>
-    @endif {{-- /sec recommendations --}}
+    @endif
 
+    {{-- ====== ACCUSÉ DE RÉCEPTION ====== --}}
     @if($showDelivery)
     <pagebreak />
-
-    {{-- ======================
-     ACCUSÉ
-     ====================== --}}
     <h1>Confirmation de remise</h1>
     <p style="margin-bottom:6mm;">Je, soussigné(e), confirme avoir reçu et pris connaissance du document « Votre portrait financier » préparé par <strong>VIP Gestion de patrimoine et investissements inc.</strong> en date du {{ $docDate }}, ainsi que des hypothèses et des informations qui y sont contenues.</p>
 
-    <?php
-    $signataires = array_values(array_filter([
-        ['name' => $clientName,          'show' => true,                          'role' => ''],
-        ['name' => $spouseName,          'show' => $hasSpouse,                    'role' => ''],
-        ['name' => $advisorName ?? '',   'show' => !empty($advisorName ?? ''),    'role' => 'Conseiller'],
-    ], fn($r) => $r['show']));
-    ?>
     @foreach($signataires as $sig)
     <table class="simple" style="margin-bottom:8mm;">
         <tbody>
@@ -1380,7 +1027,7 @@
                 <td style="width:5%;"></td>
                 <td style="width:30%;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm">
                     <div style="font-size:9px;color:#6B7280">Nom</div>
-                    <div style="font-size:11px;font-weight:700;color:#0E1030">{{ $sig['name'] }}</div>
+                    <div style="font-size:11px;font-weight:700;color:#0E1030">{{ $sig["name"] }}</div>
                 </td>
                 <td style="width:5%;"></td>
                 <td style="width:15%;border-bottom:1px solid #0E1030;vertical-align:bottom;padding-bottom:2mm">
@@ -1391,50 +1038,16 @@
         </tbody>
     </table>
     @endforeach
-    @endif {{-- /sec deliveryConfirmation --}}
+    @endif
 
-    <?php
-    $retData         = (array) data_get($payload, 'retraite', []);
-    $regPubClient    = (array) data_get($retData, 'regimesPublics.client', []);
-    $regPubConjoint  = (array) data_get($retData, 'regimesPublics.conjoint', []);
-    $rpdList         = (array) data_get($retData, 'rpd', []);
-    $retraitsList    = (array) data_get($retData, 'retraits', []);
-    $retAgeClient    = (int) ($retData['ageClient'] ?? 65);
-    $retAgeConjoint  = (int) ($retData['ageConjoint'] ?? 65);
-
-    $fmtFreq = fn($f) => match($f) {
-        'mensuel'   => '/mois',
-        'annuel'    => '/an',
-        'bimensuel' => '/2 sem.',
-        default     => '',
-    };
-    $toAnnual = function($montant, $freq) {
-        return match($freq ?? 'mensuel') {
-            'mensuel'   => (float)$montant * 12,
-            'bimensuel' => (float)$montant * 26,
-            default     => (float)$montant,
-        };
-    };
-    ?>
-
+    {{-- ====== ANNEXE : REVENUS DE RETRAITE ====== --}}
     @if($showRetIncome)
     <pagebreak />
-
-    {{-- ======================
-     ANNEXE : REVENUS DE RETRAITE
-     ====================== --}}
-    <h1>Annexe — Revenus de retraite</h1>
+    <h1>Annexe {{ $dash }} Revenus de retraite</h1>
     <p class="muted small">Estimations basées sur les informations fournies. Les montants des régimes publics sont indexés.</p>
 
-    <?php
-    $retireBlocks = array_filter([
-        ['role' => 'client',  'label' => $clientName,  'age' => $retAgeClient,  'pub' => $regPubClient],
-        $hasSpouse ? ['role' => 'conjoint', 'label' => $spouseName, 'age' => $retAgeConjoint, 'pub' => $regPubConjoint] : null,
-    ]);
-    ?>
-    @foreach($retireBlocks as $_block)
-    @if($_block === null) @continue @endif
-    <h2>{{ $_block['label'] }} — retraite à {{ $_block['age'] }} ans</h2>
+    @foreach($retireBlocks as $retBlock)
+    <h2>{{ $retBlock["label"] }} {{ $dash }} retraite à {{ $retBlock["age"] }} ans</h2>
     <table class="simple">
         <thead>
             <tr>
@@ -1446,80 +1059,50 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($_block["pub"] as $_r)
+            @foreach($retBlock["pub_rows"] as $rr)
             <tr>
-                <td>{{ $_r['label'] ?? $_r['id'] ?? $dash }}</td>
-                <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
-                <td>{{ $_r['debut'] ?? 65 }} ans</td>
-                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
+                <td>{{ $rr["label"] }}</td>
+                <td>{{ $rr["montant"] }}</td>
+                <td>{{ $rr["freq"] }}</td>
+                <td>{{ $rr["debut"] }}</td>
+                <td>{{ $rr["annuel"] }}</td>
             </tr>
             @endforeach
-            @foreach($rpdList as $_r)
-            <?php $rpdMatch = ($_r["role"] ?? "") === $_block["role"]; ?>
-            @if($rpdMatch)
+            @foreach($retBlock["rpd_rows"] as $rr)
             <tr>
-                <td>{{ $_r["nom"] ?? "Régime privé" }}</td>
-                <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
-                <td>{{ $_r['debut'] ?? $dash }} ans</td>
-                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
+                <td>{{ $rr["label"] }}</td>
+                <td>{{ $rr["montant"] }}</td>
+                <td>{{ $rr["freq"] }}</td>
+                <td>{{ $rr["debut"] }}</td>
+                <td>{{ $rr["annuel"] }}</td>
             </tr>
-            @endif
             @endforeach
-            @foreach($retraitsList as $_r)
-            <?php $retraitMatch = ($_r["role"] ?? "") === $_block["role"]; ?>
-            @if($retraitMatch)
+            @foreach($retBlock["retrait_rows"] as $rr)
             <tr>
-                <td>{{ $_r["desc"] ?? $_r["type"] ?? "Retrait" }}</td>
-                <td>{{ $money($_r['montant'] ?? 0) }}</td>
-                <td>{{ $fmtFreq($_r["frequence"] ?? "mensuel") }}</td>
-                <td>{{ $_r['debut'] ?? $dash }}</td>
-                <td>{{ $money($toAnnual($_r["montant"] ?? 0, $_r["frequence"] ?? "mensuel")) }}</td>
+                <td>{{ $rr["label"] }}</td>
+                <td>{{ $rr["montant"] }}</td>
+                <td>{{ $rr["freq"] }}</td>
+                <td>{{ $rr["debut"] }}</td>
+                <td>{{ $rr["annuel"] }}</td>
             </tr>
-            @endif
             @endforeach
-            <?php
-            $totalAnnuel = collect($_block['pub'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
-                + collect($rpdList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'))
-                + collect($retraitsList)->where('role', $_block['role'])->sum(fn($r) => $toAnnual($r['montant'] ?? 0, $r['frequence'] ?? 'mensuel'));
-            ?>
             <tr class="grand-total">
                 <td colspan="4">Total annuel estimé</td>
-                <td>{{ $money($totalAnnuel) }}</td>
+                <td>{{ $retBlock["total_annuel"] }}</td>
             </tr>
         </tbody>
     </table>
     @endforeach
-    @endif {{-- /sec retirementIncome --}}
+    @endif
 
+    {{-- ====== ANNEXE : ÉVOLUTION DES PLACEMENTS ====== --}}
     @if($showInvProjection)
-    <?php
-    $currentAge   = $age($client['birth_date'] ?? null) ?? 40;
-    $targetAge    = $retAgeClient ?: 65;
-    $years        = max(1, $targetAge - $currentAge);
-    $currentValue = $assetTotal;
-    $annualSavings= (float) data_get($client, 'jobs.0.annual_income", 0) * 0.10; // 10% savings assumption
-    $rate         = (float) (data_get($payload, 'hypotheses.return_rate', 5) ?: 5) / 100;
-    $projRows     = [];
-    $v = $currentValue;
-    for ($y = 1; $y <= min($years, 40); $y++) {
-        $v = ($v + $annualSavings) * (1 + $rate);
-        if ($y % 5 === 0 || $y === 1 || $y === $years) {
-            $projRows[] = ['age' => $currentAge + $y, 'an' => $y, 'valeur' => $v];
-        }
-    }
-    ?>
     <pagebreak />
-
-    {{-- ======================
-     ANNEXE : ÉVOLUTION DES PLACEMENTS
-     ====================== --}}
-    <h1>Annexe — Évolution des placements</h1>
+    <h1>Annexe {{ $dash }} Évolution des placements</h1>
     <p class="muted small">
-        Projection basée sur une valeur initiale de {{ $money($currentValue) }},
-        des cotisations annuelles estimées de {{ $money($annualSavings) }}
-        et un taux de rendement hypothétique de {{ number_format($rate * 100, 1) }}% par année.
+        Projection basée sur une valeur initiale de {{ $projInitialValue }},
+        des cotisations annuelles estimées de {{ $projAnnualSavings }}
+        et un taux de rendement hypothétique de {{ $projRate }}% par année.
         Ces projections sont indicatives et ne constituent pas une garantie.
     </p>
     <table class="simple">
@@ -1531,16 +1114,16 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($projRows as $_row)
-            <tr @if($_row["age"] >= $targetAge) class="total-row" @endif>
-                <td>{{ $_row["age"] }} ans</td>
-                <td>{{ $_row["an"] }} an{{ $_row["an"] > 1 ? "s" : "" }}</td>
-                <td>{{ $money($_row["valeur"]) }}</td>
+            @foreach($projRows as $pRow)
+            <tr @if($pRow["is_target"]) class="total-row" @endif>
+                <td>{{ $pRow["age"] }} ans</td>
+                <td>{{ $pRow["an_label"] }}</td>
+                <td>{{ $pRow["valeur"] }}</td>
             </tr>
             @endforeach
         </tbody>
     </table>
-    @endif {{-- /sec investmentProjection --}}
+    @endif
 
 </body>
 
